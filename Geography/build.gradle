@@ -91,6 +91,16 @@ def repastJvmArgs = [
     '-Xmx4g',
 ]
 
+// Audit utility (see IDE_VALIDATION.md): prints every jar/class-dir on the
+// resolved compile classpath so the IDE's dependency view can be checked
+// against the CLI build.  Usage: .\gradlew.bat -q printResolvedClasspath
+tasks.register('printResolvedClasspath') {
+    def cp = configurations.compileClasspath
+    doLast {
+        cp.files.sort().each { println it }
+    }
+}
+
 tasks.register('runModel', JavaExec) {
     group = 'repast'
     description = 'Launch the Repast Simphony GUI with the Geography scenario'
