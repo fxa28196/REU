@@ -108,6 +108,30 @@ Format per variable: purpose · implementation location · scientific mechanism
 - **Source:** derived quantity; graph algorithm standard (Dijkstra 1959,
   Numer. Math. 1:269–271, DOI: 10.1007/BF01386390).
 
+## Outcome states — `GisAgent.State` (commit 5)
+
+- **Purpose:** Explicit per-agent outcome vocabulary
+  (`EN_ROUTE` / `SHELTERED` / `UNREACHABLE`; `REFUSED_ALL_FULL` reserved for
+  capacity enforcement, roadmap commit 6) matching the Phase 5 logging
+  schema's `finalState` field.
+- **Implementation:** `GisAgent.getState()`, `getArrivalTick()`,
+  `getTargetShelter()`; agents are **never removed from the context** — a
+  sheltered agent persists at its shelter, an unreachable agent persists at
+  its start location.
+- **Scientific mechanism:** Outcome measurement requires the full
+  population denominator. The stock demo deleted agents on both arrival and
+  failure, making the two outcomes indistinguishable and biasing any future
+  exposure statistic toward survivors (survivorship bias —
+  PROJECT_ASSESSMENT.md risk 2). Persistent states make every agent
+  countable in exposure-hours, VWE, and Gini computations.
+- **Assumptions:** A SHELTERED agent stays sheltered (no departures within
+  the event window); an UNREACHABLE agent shelters in place at its start
+  location for the whole event.
+- **Limitations:** States are currently terminal; re-evaluation (e.g.,
+  leaving a full shelter) arrives with capacity enforcement in commit 6.
+- **Source:** design requirement from the project brief (Agent ID /
+  Final outcome record) — no external value.
+
 ## Movement-geometry implementation note (commit 3)
 
 All movement arithmetic in `GisAgent.step()` — shelter-distance ranking, path

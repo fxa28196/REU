@@ -32,16 +32,35 @@ import repast.simphony.util.ContextUtils;
  * of arc length along that path (geodesic metres on the WGS84 ellipsoid,
  * GeographicLib).
  *
- * Remaining limitation tracked in PROJECT_ASSESSMENT.md (roadmap commit 5):
- * the agent still removes itself from the context both on arrival and when
- * no shelter is reachable, which destroys outcome measurement; commit 5
- * replaces removal with explicit persistent states.
+ * Agents are never removed from the context: every resident persists to the
+ * end of the run carrying an explicit outcome {@link State}
+ * (EN_ROUTE / SHELTERED / UNREACHABLE), so exposure accumulation and
+ * end-of-run outcome logging can account for the whole population — silent
+ * removal on arrival/failure was the model's largest transparency defect
+ * (PROJECT_ASSESSMENT.md, risk 2).
  */
 public class GisAgent {
+
+	/**
+	 * Outcome state vocabulary (PROJECT_ASSESSMENT.md Phase 5 schema).
+	 * REFUSED_ALL_FULL joins when shelter capacity is enforced (commit 6).
+	 */
+	public enum State {
+		/** Walking its routed path toward the chosen shelter. */
+		EN_ROUTE,
+		/** Arrived at its shelter; remains there for the rest of the run. */
+		SHELTERED,
+		/** No shelter reachable from its start node on the street graph. */
+		UNREACHABLE
+	}
 
 	private final String name;
 	private final StreetNetwork network;
 	private final long startNodeId;
+
+	private State state = State.EN_ROUTE;
+	/** Tick at which the agent became SHELTERED (NaN until then). */
+	private double arrivalTick = Double.NaN;
 
 	private Shelter targetShelter = null;
 	/** Walking path (start node -> shelter node), set once on first step. */
@@ -63,6 +82,10 @@ public class GisAgent {
 
 	@ScheduledMethod(start = 1, interval = 1)
 	public void step() {
+		if (state != State.EN_ROUTE) {
+			return; // terminal-for-now states persist in place
+		}
+
 		Context context = ContextUtils.getContext(this);
 		Geography geography = (Geography) context.getProjection("Geography");
 
@@ -79,9 +102,10 @@ public class GisAgent {
 
 		if (routePath == null) {
 			// No shelter reachable from this start node on the street graph.
-			// Roadmap commit 5 turns this into a logged UNREACHABLE state.
-			System.out.println(name + " cannot reach any shelter via the street network; removed.");
-			context.remove(this);
+			// The agent persists in place so its (maximal) exposure still
+			// counts in every outcome metric.
+			state = State.UNREACHABLE;
+			System.out.println(name + " cannot reach any shelter via the street network; state=UNREACHABLE.");
 			return;
 		}
 
@@ -113,16 +137,18 @@ public class GisAgent {
 			// Path exhausted: we are standing on the shelter's street node.
 			Point shelterPoint = (Point) geography.getGeometry(targetShelter);
 			double dShelterM = StreetNetwork.geodesicDistanceM(current, shelterPoint.getCoordinate());
+			state = State.SHELTERED;
+			arrivalTick = RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
 			if (dShelterM < shelterArrivalDistanceM) {
-				System.out.println(name + " reached destination shelter via street lines and exited.");
+				System.out.println(name + " reached destination shelter via street lines; state=SHELTERED at tick "
+						+ (long) arrivalTick + ".");
 			} else {
 				// Shelter farther from its snapped node than the arrival
 				// radius - flag loudly; should not occur with node-snapped
 				// shelters.
 				System.out.println(name + " ended route " + String.format("%.0f", dShelterM)
-						+ " m from shelter " + targetShelter.getId() + "; removed.");
+						+ " m from shelter " + targetShelter.getId() + "; state=SHELTERED (flagged).");
 			}
-			context.remove(this);
 		}
 	}
 
@@ -155,6 +181,21 @@ public class GisAgent {
 
 	public String getName() {
 		return name;
+	}
+
+	/** Current outcome state (never null; EN_ROUTE until arrival/failure). */
+	public State getState() {
+		return state;
+	}
+
+	/** Tick at which the agent became SHELTERED (NaN if it never arrived). */
+	public double getArrivalTick() {
+		return arrivalTick;
+	}
+
+	/** Shelter this agent selected (null until routed, or if unreachable). */
+	public Shelter getTargetShelter() {
+		return targetShelter;
 	}
 
 	/** V9: cumulative geodesic metres walked since the run began. */
