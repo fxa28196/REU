@@ -1,15 +1,15 @@
 package geography.agents;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.geographiclib.Geodesic;
 import net.sf.geographiclib.GeodesicData;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+
+import geography.routing.StreetNetwork;
 
 import repast.simphony.context.Context;
 import repast.simphony.engine.environment.RunEnvironment;
@@ -23,42 +23,42 @@ import repast.simphony.util.ContextUtils;
  * agent in WGS84 lon/lat (JTS convention: {@code Coordinate.x} = longitude,
  * {@code Coordinate.y} = latitude).
  *
- * Movement model (documented in docs/science/VARIABLES.md):
- * each tick represents {@code minutesPerTick} minutes of simulated time; the
- * agent walks {@code walkingSpeedMps * 60 * minutesPerTick} metres along its
- * current street polyline toward the straight-line-nearest {@link Shelter}.
- * All distances, speeds and arrival thresholds are geodesic metres on the
- * WGS84 ellipsoid (GeographicLib, bundled with Repast's GIS plugin) —
- * replacing the stock demo's anisotropic raw-degree arithmetic.
+ * Movement model (documented in docs/science/VARIABLES.md): on its first
+ * active tick the resident selects the shelter with the smallest
+ * street-network distance from its starting node — "the nearest shelter you
+ * can actually reach" — by looking up its node in each shelter's Dijkstra
+ * shortest-path tree, and reconstructs the corresponding walking path. Each
+ * tick it then advances {@code walkingSpeedMps * 60 * minutesPerTick} metres
+ * of arc length along that path (geodesic metres on the WGS84 ellipsoid,
+ * GeographicLib).
  *
- * Known limitations tracked in PROJECT_ASSESSMENT.md (Phase 4 roadmap):
- * street choice is a greedy nearest-segment heuristic, not shortest-path
- * routing on a street graph (commit 4); the agent removes itself from the
- * context both on arrival and on path failure, which destroys outcome
- * measurement (commit 5).
+ * Remaining limitation tracked in PROJECT_ASSESSMENT.md (roadmap commit 5):
+ * the agent still removes itself from the context both on arrival and when
+ * no shelter is reachable, which destroys outcome measurement; commit 5
+ * replaces removal with explicit persistent states.
  */
 public class GisAgent {
 
+	private final String name;
+	private final StreetNetwork network;
+	private final long startNodeId;
+
 	private Shelter targetShelter = null;
-	private String name;
+	/** Walking path (start node -> shelter node), set once on first step. */
+	private List<Coordinate> routePath = null;
+	/** Next path vertex to reach. */
+	private int pathIndex = 0;
+	private boolean routed = false;
 
-	private List<Coordinate> currentPathCoords = null;
-	private int currentPathIndex = 0;
-	private PortlandStreet lastVisitedStreet = null;
-
-	/** Cumulative geodesic metres walked (variable V9, docs/science/VARIABLES.md). */
+	/** V11: street-network metres to the chosen shelter at selection time. */
+	private double networkDistToShelterM = Double.NaN;
+	/** V9: cumulative geodesic metres walked. */
 	private double distanceTraveledM = 0;
 
-	public GisAgent(String name) {
+	public GisAgent(String name, StreetNetwork network, long startNodeId) {
 		this.name = name;
-	}
-
-	/**
-	 * Geodesic distance in metres between two WGS84 lon/lat coordinates
-	 * (GeographicLib inverse problem on the WGS84 ellipsoid).
-	 */
-	private static double geodesicDistanceM(Coordinate a, Coordinate b) {
-		return Geodesic.WGS84.Inverse(a.y, a.x, b.y, b.x).s12;
+		this.network = network;
+		this.startNodeId = startNodeId;
 	}
 
 	@ScheduledMethod(start = 1, interval = 1)
@@ -70,114 +70,86 @@ public class GisAgent {
 		double minutesPerTick = (Double) params.getValue("minutesPerTick");
 		double walkingSpeedMps = (Double) params.getValue("walkingSpeedMps");
 		double shelterArrivalDistanceM = (Double) params.getValue("shelterArrivalDistanceM");
-		// Metres walkable in one tick; also the vertex-advance tolerance so a
-		// vertex reachable within the current tick counts as reached (the
-		// stock demo used degree constants chosen with the same invariant).
 		double stepLengthM = walkingSpeedMps * 60.0 * minutesPerTick;
+
+		if (!routed) {
+			chooseNetworkNearestShelter(context);
+			routed = true;
+		}
+
+		if (routePath == null) {
+			// No shelter reachable from this start node on the street graph.
+			// Roadmap commit 5 turns this into a logged UNREACHABLE state.
+			System.out.println(name + " cannot reach any shelter via the street network; removed.");
+			context.remove(this);
+			return;
+		}
 
 		GeometryFactory fac = new GeometryFactory();
 		Point myPoint = (Point) geography.getGeometry(this);
-		Coordinate myCoord = myPoint.getCoordinate();
+		Coordinate current = myPoint.getCoordinate();
 
-		// Find the closest shelter if we don't have one
-		if (targetShelter == null) {
-			double minDistance = Double.MAX_VALUE;
-			for (Object obj : context.getObjects(Shelter.class)) {
-				Shelter shelter = (Shelter) obj;
-				Point shelterPoint = (Point) geography.getGeometry(shelter);
-				double dist = geodesicDistanceM(myCoord, shelterPoint.getCoordinate());
-				if (dist < minDistance) {
-					minDistance = dist;
-					targetShelter = shelter;
-				}
-			}
-
-			// Greedy nearest-street selection. NOTE: point-to-polyline ranking
-			// still uses JTS planar degree distance — acceptable as a relative
-			// ordering heuristic at city scale, and scheduled for replacement
-			// by true street-graph routing (roadmap commit 4). All *movement*
-			// arithmetic below is geodesic metres.
-			if (targetShelter != null) {
-				double minStreetDist = Double.MAX_VALUE;
-				Geometry closestStreetGeom = null;
-				PortlandStreet currentSelectedStreet = null;
-
-				for (Object obj : context.getObjects(PortlandStreet.class)) {
-					PortlandStreet street = (PortlandStreet) obj;
-
-					if (street == lastVisitedStreet) {
-						continue;
-					}
-
-					Geometry streetGeom = geography.getGeometry(street);
-					double distToStreet = myPoint.distance(streetGeom);
-
-					if (distToStreet < minStreetDist) {
-						minStreetDist = distToStreet;
-						closestStreetGeom = streetGeom;
-						currentSelectedStreet = street;
-					}
-				}
-
-				if (closestStreetGeom != null) {
-					lastVisitedStreet = currentSelectedStreet;
-					currentPathCoords = new ArrayList<Coordinate>();
-
-					Coordinate[] coords = closestStreetGeom.getCoordinates();
-					Point shelterPoint = (Point) geography.getGeometry(targetShelter);
-
-					double startDistToShelter = geodesicDistanceM(coords[0], shelterPoint.getCoordinate());
-					double endDistToShelter = geodesicDistanceM(coords[coords.length - 1], shelterPoint.getCoordinate());
-
-					if (startDistToShelter > endDistToShelter) {
-						for (int i = 0; i < coords.length; i++) {
-							currentPathCoords.add(coords[i]);
-						}
-					} else {
-						for (int i = coords.length - 1; i >= 0; i--) {
-							currentPathCoords.add(coords[i]);
-						}
-					}
-					currentPathIndex = 0;
-				}
+		// Advance up to stepLengthM metres of arc length along the path,
+		// consuming vertices exactly (no overshoot).
+		double remainingM = stepLengthM;
+		while (remainingM > 0 && pathIndex < routePath.size()) {
+			Coordinate next = routePath.get(pathIndex);
+			double dM = StreetNetwork.geodesicDistanceM(current, next);
+			if (dM <= remainingM) {
+				current = next;
+				pathIndex++;
+				remainingM -= dM;
+			} else {
+				GeodesicData toNext = Geodesic.WGS84.Inverse(current.y, current.x, next.y, next.x);
+				GeodesicData moved = Geodesic.WGS84.Direct(current.y, current.x, toNext.azi1, remainingM);
+				current = new Coordinate(moved.lon2, moved.lat2);
+				remainingM = 0;
 			}
 		}
+		distanceTraveledM += stepLengthM - remainingM;
+		geography.move(this, fac.createPoint(current));
 
-		// Travel along the street's coordinate path array
-		if (currentPathCoords != null && !currentPathCoords.isEmpty()) {
-			Coordinate nextTargetCoord = currentPathCoords.get(currentPathIndex);
-
-			double distanceToNextNodeM = geodesicDistanceM(myCoord, nextTargetCoord);
-
-			if (distanceToNextNodeM < stepLengthM) {
-				currentPathIndex++;
-
-				if (currentPathIndex >= currentPathCoords.size()) {
-					Point shelterPoint = (Point) geography.getGeometry(targetShelter);
-
-					if (geodesicDistanceM(myCoord, shelterPoint.getCoordinate()) < shelterArrivalDistanceM) {
-						System.out.println(this.toString() + " reached destination shelter via street lines and exited.");
-						context.remove(this);
-					} else {
-						targetShelter = null;
-						currentPathCoords = null;
-					}
-					return;
-				}
-				nextTargetCoord = currentPathCoords.get(currentPathIndex);
+		if (pathIndex >= routePath.size()) {
+			// Path exhausted: we are standing on the shelter's street node.
+			Point shelterPoint = (Point) geography.getGeometry(targetShelter);
+			double dShelterM = StreetNetwork.geodesicDistanceM(current, shelterPoint.getCoordinate());
+			if (dShelterM < shelterArrivalDistanceM) {
+				System.out.println(name + " reached destination shelter via street lines and exited.");
+			} else {
+				// Shelter farther from its snapped node than the arrival
+				// radius - flag loudly; should not occur with node-snapped
+				// shelters.
+				System.out.println(name + " ended route " + String.format("%.0f", dShelterM)
+						+ " m from shelter " + targetShelter.getId() + "; removed.");
 			}
-
-			// Walk stepLengthM metres along the geodesic toward the next
-			// street vertex (GeographicLib direct problem).
-			GeodesicData toTarget = Geodesic.WGS84.Inverse(myCoord.y, myCoord.x,
-					nextTargetCoord.y, nextTargetCoord.x);
-			GeodesicData moved = Geodesic.WGS84.Direct(myCoord.y, myCoord.x,
-					toTarget.azi1, stepLengthM);
-
-			geography.move(this, fac.createPoint(new Coordinate(moved.lon2, moved.lat2)));
-			distanceTraveledM += stepLengthM;
-		} else if (targetShelter != null) {
 			context.remove(this);
+		}
+	}
+
+	/**
+	 * Picks the shelter with minimum street-network distance from this
+	 * agent's start node (slide 7: nearest shelter you can actually reach)
+	 * and materializes the walking path from that shelter's Dijkstra tree.
+	 */
+	private void chooseNetworkNearestShelter(Context context) {
+		double bestDistM = Double.POSITIVE_INFINITY;
+		Shelter best = null;
+		for (Object obj : context.getObjects(Shelter.class)) {
+			Shelter shelter = (Shelter) obj;
+			if (shelter.getRouteTree() == null) {
+				continue;
+			}
+			double dM = shelter.getRouteTree().distanceTo(startNodeId);
+			if (dM < bestDistM) {
+				bestDistM = dM;
+				best = shelter;
+			}
+		}
+		if (best != null && !Double.isInfinite(bestDistM)) {
+			targetShelter = best;
+			networkDistToShelterM = bestDistM;
+			routePath = network.pathToSource(best.getRouteTree(), startNodeId);
+			pathIndex = 0;
 		}
 	}
 
@@ -185,9 +157,14 @@ public class GisAgent {
 		return name;
 	}
 
-	/** Cumulative geodesic metres walked since the run began (V9). */
+	/** V9: cumulative geodesic metres walked since the run began. */
 	public double getDistanceTraveledM() {
 		return distanceTraveledM;
+	}
+
+	/** V11: network metres to the chosen shelter at selection time (NaN if none). */
+	public double getNetworkDistToShelterM() {
+		return networkDistToShelterM;
 	}
 
 	@Override
