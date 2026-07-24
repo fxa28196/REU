@@ -41,10 +41,16 @@ and a concentration–response function evaluated over the same averaging period
 as the source epidemiology, which this model does not currently do (see V7
 option B and F1).
 
-**Decision 2 — indoor protection is a first-order effect and must not be
-implicit.** A shelter that does not reduce concentration cannot change VWE, so
-the entire study reduces to travel time. See **V17**, which is therefore a
-required component, not an optional refinement.
+**Decision 2 — the study endpoint is ARRIVAL AT SHELTER; indoor air quality is
+out of scope.** Exposure accumulates only while a resident is outside and stops
+the moment they are admitted to a shelter. Residents who never reach shelter keep
+accruing for the whole event. Shelter benefit is therefore the reduction of
+outdoor exposure *time* through better placement and accessibility — not indoor
+filtration. The indoor/outdoor ratio γ a filtration model would require is
+unsupported by any acquired data and unrequested by the slides or mentor, so it
+is deliberately excluded (rationale in AUDIT.md §0). If the advisor later wants
+indoor performance modelled, it re-enters as documented future extension
+F-INDOOR, never as a silent default.
 
 **Decision 3 — exposure accrues for *every* agent in *every* state.** Sheltered,
 en-route and unreachable agents all accumulate exposure (at different
@@ -80,7 +86,8 @@ concentrations). This is already enabled by the persistent-state design
   exposed to agents through the `Geography` coverage machinery **or** a direct
   lookup (coverage layers were removed in commit `eaa9605`; re-declare a
   properly named `PM25` coverage in `context.xml` when this lands).
-- **Interactions.** Feeds V6, V7, V8; modulated by V17 indoors.
+- **Interactions.** Feeds V6, V7, V8 (exposure accrues only while a resident is
+  outside; accumulation stops at shelter arrival — Decision 2).
 - **Computational cost.** Option A: O(1) per agent-tick after an O(monitors)
   hourly update — negligible. Option B: O(7) per agent-tick, still trivial.
 - **Assumptions.** Monitor readings represent outdoor ambient concentration at
@@ -175,23 +182,13 @@ the run must be anchored to a wall-clock start (`simulationStartDateTime =
   pre- and post-2024 breakpoint tables; higher categories differ and must cite
   a table version.
 
-### V17 — Indoor protection factor (shelter effectiveness) · class **L**, **REQUIRED, not yet specified numerically**
+### ~~V17 — Indoor protection factor (γ)~~ · **REMOVED — out of scope**
 
-- **Purpose.** Determines the entire benefit of sheltering (Decision 2).
-- **Mechanism.** Building envelope + filtration reduce indoor PM2.5 relative to
-  outdoors; the ratio depends on air exchange rate, filter rating (MERV/HEPA)
-  and operation.
-- **Formulation.** C_indoor(t) = γ · C_outdoor(t), γ ∈ (0,1]; VWE accrues at
-  C_indoor while `state == SHELTERED`.
-- **⚠️ Value.** **NOT YET SOURCED — must not be guessed.** Candidate literature
-  to review: EPA indoor-air/cleaner-air-space guidance; wildfire smoke
-  infiltration studies (I/O ratio literature); portable air cleaner efficacy
-  trials. Until sourced, γ **must be exposed as a swept parameter with no
-  default that implies knowledge** (i.e. run the full range and report
-  sensitivity, or state γ = 1 meaning "no protection modelled").
-- **Sensitivity.** γ is likely to be *the* dominant parameter for absolute
-  benefit magnitude — sweep it explicitly and report the benefit as a function
-  of γ rather than a single number.
+Indoor air quality is not modelled (Decision 2; AUDIT.md §0). The study endpoint
+is arrival at shelter: exposure stops when a resident is admitted, so shelter
+benefit is reduced outdoor exposure time, not indoor filtration. γ is not a
+model parameter. Reserved as future extension **F-INDOOR** only if the advisor
+requests it.
 
 ### V12 — Shelter capacity and occupancy · class **M** (pending D1) + **A** (queue policy)
 
@@ -244,8 +241,7 @@ Each remains one commit, with compile + headless + GUI validation as before.
 |---|---|---|
 | 6 | Real shelter locations + capacity enforcement | **D1 confirmation** (coordinates + capacity from a primary source) |
 | 7 | Population initialisation from PIT | **D2 extraction**; D2b or a stated spatial assumption |
-| 8 | **PM2.5 smoke field (Option A, uniform)** | ✅ **unblocked — D3 acquired** |
-| 8b | Indoor protection factor V17 | Literature review for γ |
+| 8 | **PM2.5 smoke field (Option A, uniform)** | ✅ done |
 | 9 | Age/comorbidity attributes | **D5/D6 citation resolution** |
 | 10 | Exposure + VWE accumulation | after 8, 9 |
 | 11–12 | Outcome + decision logging | after 10 |

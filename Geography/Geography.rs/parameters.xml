@@ -34,15 +34,6 @@
 		isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
 	/>
-	<!-- V17 (docs/science/DESIGN_SPEC.md): indoor PM2.5 as a fraction of outdoor
-	     while sheltered. UNSOURCED - default 1.0 means "no protection modelled"
-	     (shelters give zero exposure benefit); the model warns. Set from
-	     literature and sweep before interpreting shelter benefit. -->
-	<parameter name="indoorProtectionFactor" displayName="Indoor protection factor (gamma)" type="double"
-		defaultValue="1.0"
-		isReadOnly="false"
-		converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
-	/>
 	<!-- Length of the simulated event window in hours (Sept 7-19 2020 = ~312 h).
 	     Run ends at simulationHours*60/minutesPerTick, capped at the smoke-field
 	     length. Anchors the end-of-run export. -->

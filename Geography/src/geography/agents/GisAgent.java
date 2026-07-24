@@ -30,12 +30,16 @@ import repast.simphony.util.ContextUtils;
  * network-nearest shelter that still has capacity; on arrival it is admitted
  * (V12). Refused or unreachable residents persist in place.
  *
- * <p><b>Exposure</b> (V6/V7/V8): every tick, in <em>every</em> state, the
- * resident accrues PM2.5 exposure from the {@link SmokeField}. While sheltered
- * it breathes the indoor concentration γ·C_outdoor (V17). Vulnerability-weighted
- * exposure multiplies by RR_age and RR_comorbidity — both default to 1.0
- * because the slide-cited values are unverified (DATA_SOURCES D5/D6); the model
- * warns if a non-unit RR is ever applied without a source.
+ * <p><b>Exposure</b> (V6/V7/V8): each tick while the resident is OUTSIDE (any
+ * non-sheltered state) it accrues PM2.5 exposure from the {@link SmokeField}.
+ * <b>Arrival at a shelter is the study endpoint</b> and terminates exposure
+ * accumulation for that resident (DESIGN_SPEC "Study endpoint"); residents who
+ * never reach shelter (UNREACHABLE / REFUSED_ALL_FULL) remain outside and keep
+ * accruing for the whole event. Shelter benefit is therefore the reduction of
+ * outdoor exposure TIME through better placement and accessibility — not indoor
+ * filtration, which this study deliberately does not model. Vulnerability-
+ * weighted exposure multiplies by RR_age and RR_comorbidity — both default to
+ * 1.0 because the slide-cited values are unverified (DATA_SOURCES D5/D6).
  *
  * <p>All scientific quantities on this agent are exposed via getters and
  * exported per-agent by {@code geography.output.OutcomeLogger}. Nothing
@@ -102,32 +106,30 @@ public class GisAgent {
 		Parameters params = RunEnvironment.getInstance().getParameters();
 		double minutesPerTick = (Double) params.getValue("minutesPerTick");
 		double walkingSpeedMps = (Double) params.getValue("walkingSpeedMps");
-		double shelterArrivalDistanceM = (Double) params.getValue("shelterArrivalDistanceM");
-		double indoorProtectionFactor = (Double) params.getValue("indoorProtectionFactor");
 		double tick = RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
 		double dtHours = minutesPerTick / 60.0;
 
-		// --- Exposure accrues in EVERY state (DESIGN_SPEC Decision 3) --------
-		if (smokeField != null) {
-			double cOutdoor = smokeField.concentrationForTick(tick, minutesPerTick);
-			double cBreathed = (state == State.SHELTERED)
-					? cOutdoor * indoorProtectionFactor
-					: cOutdoor;
-			exposureUgM3h += cBreathed * dtHours;
-			vweUgM3h += cBreathed * ageRR * comorbidityRR * dtHours;
+		// --- Exposure accrues while OUTSIDE; arrival at shelter is the study
+		// endpoint and stops it (DESIGN_SPEC "Study endpoint"). SHELTERED
+		// residents accrue nothing further; EN_ROUTE, UNREACHABLE and
+		// REFUSED_ALL_FULL residents are all still outside and keep accruing.
+		if (smokeField != null && state != State.SHELTERED) {
+			double c = smokeField.concentrationForTick(tick, minutesPerTick);
+			exposureUgM3h += c * dtHours;
+			vweUgM3h += c * ageRR * comorbidityRR * dtHours;
 			if (state == State.EN_ROUTE) {
-				exposureWhileTravelingUgM3h += cBreathed * dtHours;
+				exposureWhileTravelingUgM3h += c * dtHours;
 			}
-			if (cBreathed > UNHEALTHY_UGM3) {
+			if (c > UNHEALTHY_UGM3) {
 				hoursAboveUnhealthy += dtHours;
 			}
-			if (cBreathed > peakConcUgM3) {
-				peakConcUgM3 = cBreathed;
+			if (c > peakConcUgM3) {
+				peakConcUgM3 = c;
 			}
 		}
 
 		if (state != State.EN_ROUTE) {
-			return; // terminal-for-now states persist in place, still exposed
+			return; // terminal states persist in place (still accruing if outside)
 		}
 
 		// --- Routing (capacity-aware) ---------------------------------------
