@@ -143,6 +143,33 @@ System (AQS) pre-generated hourly data files, parameter 88502, 2020.* Retrieved
 
 ---
 
+## 2b. `shelters/shelters_2020-09.csv` — real Sept-2020 shelters (**model input, in use**)
+
+| Field | Value |
+|---|---|
+| File | `shelters/shelters_2020-09.csv` (SHA-256 `892b72500eeaa34005c8ae00f9abb5bdba639e463f505b2794e3231e1801b302`) |
+| Source | Multnomah County Joint Office of Homeless Services Sept-2020 press releases (operating dates, 24-h operation, 9-day span) + Street Roots 2020-09-16 (site names, capacity 99 each); DATA_SOURCES D1 |
+| Coordinates | Geocoded from official addresses: OCC + MSCC via **US Census geocoder** (Public_AR_Current); Charles Jordan via **Esri World geocoder** (score 99.52) cross-checked against Wikipedia (agree to ~15 m). Per-row `coord_source` column records which. |
+| Retrieved | 2026-07-24 |
+| Licence | Government press-info (public); coordinates derived from public addresses |
+| Completeness | 3 sites: OCC + Charles Jordan operating (Sep 10/Sep 11 → morning Sep 19), Mount Scott standby |
+| Uncertainty / limitations | **Capacity 99 is newsroom-sourced, NOT confirmed by a primary JOHS record** (`capacity_basis` column flags this). Charles Jordan ZIP is 97203 (Esri) not 97217 (portland.gov listing). Capacity is a nightly cap, not throughput. |
+| Transformations before use | `ContextCreator` loads rows, treats `status="operating"` as the active status-quo scenario (2 sites; standby excluded), snaps each to the nearest street-graph node, roots a Dijkstra tree. No coordinate modification. |
+
+## 2c. `encampments/irp_campsite_reports_sample.csv` — real encampment locations (**model input, in use; TEMPORAL PROXY**)
+
+| Field | Value |
+|---|---|
+| File | `encampments/irp_campsite_reports_sample.csv` (SHA-256 `3e557de5db4668c5d30fd7a6fc13bcc38b5e37bab4b9becaf9b3dc35366285ca`; 3,400 points) |
+| Source | **City of Portland IRP Campsite Reports** (Impact Reduction Program / One Point of Contact, via 311 and pdxreporter.org), ArcGIS Feature Service `COP_OpenData_Miscellaneous/MapServer/1396`; DATA_SOURCES D2b |
+| Retrieved | 2026-07-24 via `scripts/fetch-encampments.ps1` (non-duplicate reports, systematic sample across the OBJECTID range) |
+| Licence | City of Portland open data (public) |
+| Geographic coverage | Portland (lon −122.79..−122.48, lat 45.44..45.65) |
+| Temporal coverage | **2025-01-08 .. 2026-07-23** |
+| ⚠️ CRITICAL limitation | The open-data feed retains only a rolling recent window — **there are ZERO records for 2020.** These are REAL reported Portland encampment locations but from 2025–26, used as a **spatial-distribution proxy** for the Sept-2020 population. This is a flagged assumption; `ContextCreator` prints a runtime warning. |
+| Other limitations | Complaint-driven (311/web reports) → biased toward visible, complained-about camps; not a census of unsheltered people. Paging a live feed is not byte-reproducible — the *spatial distribution* is the reproducible quantity, not the exact rows (see the fetch script). |
+| Transformations before use | `ContextCreator` samples `numAgents` points uniformly at random (seeded by `randomSeed`), snaps each to the nearest street-graph node, and records the report `inc_id` as the resident's `encampment_id`. No coordinate modification. |
+
 ## 3. Stock Repast Simphony demo data (**not used by the model; retained**)
 
 `Agents2.*`, `CookCounty.*`, `WaterLines.*`, `Zones2.*`, `RGBTestPattern.*`,

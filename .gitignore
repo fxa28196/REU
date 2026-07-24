@@ -1,8 +1,10 @@
 # ---- Build output ----
 Geography/bin/
 Geography/build/
-Geography/output/
-output/
+# Simulation results directory (anchored to repo root and Geography/, so it
+# does NOT match the source package src/geography/output/).
+/output/
+/Geography/output/
 
 # ---- Gradle machine-local state ----
 .gradle/

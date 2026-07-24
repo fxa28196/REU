@@ -9,6 +9,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 
+import geography.env.SmokeField;
 import geography.routing.StreetNetwork;
 
 import repast.simphony.context.Context;
@@ -23,69 +24,78 @@ import repast.simphony.util.ContextUtils;
  * agent in WGS84 lon/lat (JTS convention: {@code Coordinate.x} = longitude,
  * {@code Coordinate.y} = latitude).
  *
- * Movement model (documented in docs/science/VARIABLES.md): on its first
- * active tick the resident selects the shelter with the smallest
- * street-network distance from its starting node — "the nearest shelter you
- * can actually reach" — by looking up its node in each shelter's Dijkstra
- * shortest-path tree, and reconstructs the corresponding walking path. Each
- * tick it then advances {@code walkingSpeedMps * 60 * minutesPerTick} metres
- * of arc length along that path (geodesic metres on the WGS84 ellipsoid,
- * GeographicLib).
+ * <p><b>Movement</b> (docs/science/DESIGN_SPEC.md, VARIABLES.md): each active
+ * tick the resident walks {@code walkingSpeedMps · 60 · minutesPerTick} metres
+ * of geodesic arc length along a shortest street-network path toward the
+ * network-nearest shelter that still has capacity; on arrival it is admitted
+ * (V12). Refused or unreachable residents persist in place.
  *
- * Agents are never removed from the context: every resident persists to the
- * end of the run carrying an explicit outcome {@link State}
- * (EN_ROUTE / SHELTERED / UNREACHABLE), so exposure accumulation and
- * end-of-run outcome logging can account for the whole population — silent
- * removal on arrival/failure was the model's largest transparency defect
- * (PROJECT_ASSESSMENT.md, risk 2).
+ * <p><b>Exposure</b> (V6/V7/V8): every tick, in <em>every</em> state, the
+ * resident accrues PM2.5 exposure from the {@link SmokeField}. While sheltered
+ * it breathes the indoor concentration γ·C_outdoor (V17). Vulnerability-weighted
+ * exposure multiplies by RR_age and RR_comorbidity — both default to 1.0
+ * because the slide-cited values are unverified (DATA_SOURCES D5/D6); the model
+ * warns if a non-unit RR is ever applied without a source.
+ *
+ * <p>All scientific quantities on this agent are exposed via getters and
+ * exported per-agent by {@code geography.output.OutcomeLogger}. Nothing
+ * important lives only in memory.
  */
 public class GisAgent {
 
-	/**
-	 * Outcome state vocabulary (PROJECT_ASSESSMENT.md Phase 5 schema).
-	 * REFUSED_ALL_FULL joins when shelter capacity is enforced (commit 6).
-	 */
+	/** Person-hours are counted above this PM2.5 concentration (µg/m³): the EPA
+	 *  "Unhealthy" AQI breakpoint lower bound, stable across the pre/post-2024
+	 *  tables (DATA_SOURCES D9). This is a concentration threshold, not the
+	 *  24-hour-average AQI category. */
+	public static final double UNHEALTHY_UGM3 = 55.5;
+
+	/** Outcome state (docs/science/DESIGN_SPEC.md Decision 3). */
 	public enum State {
-		/** Walking its routed path toward the chosen shelter. */
-		EN_ROUTE,
-		/** Arrived at its shelter; remains there for the rest of the run. */
-		SHELTERED,
-		/** No shelter reachable from its start node on the street graph. */
-		UNREACHABLE
+		EN_ROUTE,          // walking toward a shelter
+		SHELTERED,         // admitted; remains for the rest of the run
+		UNREACHABLE,       // no shelter reachable on the street graph
+		REFUSED_ALL_FULL   // every reachable operating shelter was at capacity
 	}
 
 	private final String name;
 	private final StreetNetwork network;
 	private final long startNodeId;
+	private final String encampmentId;
+	private final SmokeField smokeField;
 
 	private State state = State.EN_ROUTE;
-	/** Tick at which the agent became SHELTERED (NaN until then). */
 	private double arrivalTick = Double.NaN;
 
 	private Shelter targetShelter = null;
-	/** Walking path (start node -> shelter node), set once on first step. */
 	private List<Coordinate> routePath = null;
-	/** Next path vertex to reach. */
 	private int pathIndex = 0;
-	private boolean routed = false;
+	private int retargetCount = 0;
+	private static final int MAX_RETARGETS = 8;
 
-	/** V11: street-network metres to the chosen shelter at selection time. */
-	private double networkDistToShelterM = Double.NaN;
-	/** V9: cumulative geodesic metres walked. */
-	private double distanceTraveledM = 0;
+	// Vulnerability modifiers (V2/V4). Default 1.0 = no weighting; see class doc.
+	private double ageRR = 1.0;
+	private double comorbidityRR = 1.0;
 
-	public GisAgent(String name, StreetNetwork network, long startNodeId) {
+	// Exported scientific quantities -----------------------------------------
+	private double networkDistToShelterM = Double.NaN;  // V11
+	private double distanceTraveledM = 0;               // V9
+	private double exposureUgM3h = 0;                   // V6 cumulative raw exposure
+	private double vweUgM3h = 0;                        // V7 vulnerability-weighted
+	private double exposureWhileTravelingUgM3h = 0;     // exposure accrued EN_ROUTE
+	private double hoursAboveUnhealthy = 0;             // V8
+	private double peakConcUgM3 = 0;
+
+	public GisAgent(String name, StreetNetwork network, long startNodeId,
+			String encampmentId, SmokeField smokeField) {
 		this.name = name;
 		this.network = network;
 		this.startNodeId = startNodeId;
+		this.encampmentId = encampmentId;
+		this.smokeField = smokeField;
 	}
 
 	@ScheduledMethod(start = 1, interval = 1)
 	public void step() {
-		if (state != State.EN_ROUTE) {
-			return; // terminal-for-now states persist in place
-		}
-
 		Context context = ContextUtils.getContext(this);
 		Geography geography = (Geography) context.getProjection("Geography");
 
@@ -93,28 +103,48 @@ public class GisAgent {
 		double minutesPerTick = (Double) params.getValue("minutesPerTick");
 		double walkingSpeedMps = (Double) params.getValue("walkingSpeedMps");
 		double shelterArrivalDistanceM = (Double) params.getValue("shelterArrivalDistanceM");
-		double stepLengthM = walkingSpeedMps * 60.0 * minutesPerTick;
+		double indoorProtectionFactor = (Double) params.getValue("indoorProtectionFactor");
+		double tick = RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
+		double dtHours = minutesPerTick / 60.0;
 
-		if (!routed) {
-			chooseNetworkNearestShelter(context);
-			routed = true;
+		// --- Exposure accrues in EVERY state (DESIGN_SPEC Decision 3) --------
+		if (smokeField != null) {
+			double cOutdoor = smokeField.concentrationForTick(tick, minutesPerTick);
+			double cBreathed = (state == State.SHELTERED)
+					? cOutdoor * indoorProtectionFactor
+					: cOutdoor;
+			exposureUgM3h += cBreathed * dtHours;
+			vweUgM3h += cBreathed * ageRR * comorbidityRR * dtHours;
+			if (state == State.EN_ROUTE) {
+				exposureWhileTravelingUgM3h += cBreathed * dtHours;
+			}
+			if (cBreathed > UNHEALTHY_UGM3) {
+				hoursAboveUnhealthy += dtHours;
+			}
+			if (cBreathed > peakConcUgM3) {
+				peakConcUgM3 = cBreathed;
+			}
 		}
 
+		if (state != State.EN_ROUTE) {
+			return; // terminal-for-now states persist in place, still exposed
+		}
+
+		// --- Routing (capacity-aware) ---------------------------------------
 		if (routePath == null) {
-			// No shelter reachable from this start node on the street graph.
-			// The agent persists in place so its (maximal) exposure still
-			// counts in every outcome metric.
-			state = State.UNREACHABLE;
-			System.out.println(name + " cannot reach any shelter via the street network; state=UNREACHABLE.");
-			return;
+			chooseNetworkNearestShelter(context);
+			if (routePath == null) {
+				// state was set by chooseNetworkNearestShelter (UNREACHABLE or
+				// REFUSED_ALL_FULL); the agent persists and keeps accruing.
+				return;
+			}
 		}
 
 		GeometryFactory fac = new GeometryFactory();
 		Point myPoint = (Point) geography.getGeometry(this);
 		Coordinate current = myPoint.getCoordinate();
 
-		// Advance up to stepLengthM metres of arc length along the path,
-		// consuming vertices exactly (no overshoot).
+		double stepLengthM = walkingSpeedMps * 60.0 * minutesPerTick;
 		double remainingM = stepLengthM;
 		while (remainingM > 0 && pathIndex < routePath.size()) {
 			Coordinate next = routePath.get(pathIndex);
@@ -134,82 +164,85 @@ public class GisAgent {
 		geography.move(this, fac.createPoint(current));
 
 		if (pathIndex >= routePath.size()) {
-			// Path exhausted: we are standing on the shelter's street node.
-			Point shelterPoint = (Point) geography.getGeometry(targetShelter);
-			double dShelterM = StreetNetwork.geodesicDistanceM(current, shelterPoint.getCoordinate());
-			state = State.SHELTERED;
-			arrivalTick = RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
-			if (dShelterM < shelterArrivalDistanceM) {
-				System.out.println(name + " reached destination shelter via street lines; state=SHELTERED at tick "
-						+ (long) arrivalTick + ".");
+			// Reached the shelter's street node: request admission (V12).
+			if (targetShelter.admit()) {
+				state = State.SHELTERED;
+				arrivalTick = tick;
 			} else {
-				// Shelter farther from its snapped node than the arrival
-				// radius - flag loudly; should not occur with node-snapped
-				// shelters.
-				System.out.println(name + " ended route " + String.format("%.0f", dShelterM)
-						+ " m from shelter " + targetShelter.getId() + "; state=SHELTERED (flagged).");
+				// Filled since selection: drop this target and re-select next
+				// tick, excluding full shelters. Bounded to avoid livelock.
+				targetShelter = null;
+				routePath = null;
+				pathIndex = 0;
+				retargetCount++;
+				if (retargetCount > MAX_RETARGETS) {
+					state = State.REFUSED_ALL_FULL;
+				}
 			}
 		}
 	}
 
 	/**
-	 * Picks the shelter with minimum street-network distance from this
-	 * agent's start node (slide 7: nearest shelter you can actually reach)
-	 * and materializes the walking path from that shelter's Dijkstra tree.
+	 * Picks the operating shelter with minimum street-network distance from
+	 * this agent's start node that still has capacity, and materialises the
+	 * walking path from that shelter's Dijkstra tree. Sets a terminal state if
+	 * none qualifies: REFUSED_ALL_FULL if reachable shelters exist but are all
+	 * full, otherwise UNREACHABLE.
 	 */
 	private void chooseNetworkNearestShelter(Context context) {
 		double bestDistM = Double.POSITIVE_INFINITY;
 		Shelter best = null;
+		boolean anyReachable = false;
+
 		for (Object obj : context.getObjects(Shelter.class)) {
 			Shelter shelter = (Shelter) obj;
-			if (shelter.getRouteTree() == null) {
+			if (!shelter.isOperating() || shelter.getRouteTree() == null) {
 				continue;
 			}
 			double dM = shelter.getRouteTree().distanceTo(startNodeId);
-			if (dM < bestDistM) {
+			if (Double.isInfinite(dM)) {
+				continue;
+			}
+			anyReachable = true;
+			if (shelter.hasSpace() && dM < bestDistM) {
 				bestDistM = dM;
 				best = shelter;
 			}
 		}
-		if (best != null && !Double.isInfinite(bestDistM)) {
+
+		if (best != null) {
 			targetShelter = best;
 			networkDistToShelterM = bestDistM;
 			routePath = network.pathToSource(best.getRouteTree(), startNodeId);
 			pathIndex = 0;
+		} else if (anyReachable) {
+			state = State.REFUSED_ALL_FULL;
+		} else {
+			state = State.UNREACHABLE;
 		}
 	}
 
-	public String getName() {
-		return name;
-	}
+	// --- Vulnerability setters (used by ContextCreator once sourced) ---------
+	public void setAgeRR(double ageRR) { this.ageRR = ageRR; }
+	public void setComorbidityRR(double comorbidityRR) { this.comorbidityRR = comorbidityRR; }
 
-	/** Current outcome state (never null; EN_ROUTE until arrival/failure). */
-	public State getState() {
-		return state;
-	}
-
-	/** Tick at which the agent became SHELTERED (NaN if it never arrived). */
-	public double getArrivalTick() {
-		return arrivalTick;
-	}
-
-	/** Shelter this agent selected (null until routed, or if unreachable). */
-	public Shelter getTargetShelter() {
-		return targetShelter;
-	}
-
-	/** V9: cumulative geodesic metres walked since the run began. */
-	public double getDistanceTraveledM() {
-		return distanceTraveledM;
-	}
-
-	/** V11: network metres to the chosen shelter at selection time (NaN if none). */
-	public double getNetworkDistToShelterM() {
-		return networkDistToShelterM;
-	}
+	// --- Accessors for export (geography.output.OutcomeLogger) ---------------
+	public String getName() { return name; }
+	public String getEncampmentId() { return encampmentId; }
+	public long getStartNodeId() { return startNodeId; }
+	public State getState() { return state; }
+	public double getArrivalTick() { return arrivalTick; }
+	public Shelter getTargetShelter() { return targetShelter; }
+	public double getNetworkDistToShelterM() { return networkDistToShelterM; }
+	public double getDistanceTraveledM() { return distanceTraveledM; }
+	public double getExposureUgM3h() { return exposureUgM3h; }
+	public double getVweUgM3h() { return vweUgM3h; }
+	public double getExposureWhileTravelingUgM3h() { return exposureWhileTravelingUgM3h; }
+	public double getHoursAboveUnhealthy() { return hoursAboveUnhealthy; }
+	public double getPeakConcUgM3() { return peakConcUgM3; }
+	public double getAgeRR() { return ageRR; }
+	public double getComorbidityRR() { return comorbidityRR; }
 
 	@Override
-	public String toString(){
-		return name;
-	}
+	public String toString() { return name; }
 }
