@@ -1,0 +1,17 @@
+{
+    // Machine-local toolchain paths — a fresh clone on another machine updates
+    // these two paths (or installs to the same locations). See ENVIRONMENT_SETUP.md.
+    "java.jdt.ls.java.home": "C:\\Users\\Chick\\tools\\jdk-17.0.19+10",
+    "java.import.gradle.java.home": "C:\\Users\\Chick\\tools\\jdk-17.0.19+10",
+
+    // Use the checked-in Gradle wrapper (self-bootstrapping on fresh clones).
+    "java.import.gradle.enabled": true,
+    "java.import.gradle.wrapper.enabled": true,
+
+    "java.configuration.updateBuildConfiguration": "automatic",
+
+    // Keep search/editor noise down: compiled classes are build output
+    "files.exclude": {
+        "**/Geography/bin": true
+    }
+}

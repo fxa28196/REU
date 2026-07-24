@@ -1,0 +1,110 @@
+// Gradle build for the Repast Simphony 2.11.0 "Geography" wildfire-shelter model.
+//
+// LIMITATION (documented): Repast Simphony is NOT published to Maven Central.
+// Its jars exist only inside a local Repast Simphony installation, so this build
+// resolves dependencies from that installation instead of a remote repository.
+// Resolution order for the install location:
+//   1. -PrepastHome=<path>                      (command line)
+//   2. gradle.properties: repastHome=<path>     (machine-local, gitignored)
+//   3. REPAST_HOME environment variable
+//   4. default: <user home>/RepastSimphony-2.11.0
+
+plugins {
+    id 'java'
+}
+
+def repastHome = providers.gradleProperty('repastHome')
+        .orElse(providers.environmentVariable('REPAST_HOME'))
+        .getOrElse("${System.properties['user.home']}/RepastSimphony-2.11.0")
+def pluginsDir = file("${repastHome}/eclipse/plugins")
+
+if (!pluginsDir.exists()) {
+    logger.warn("WARNING: Repast plugins directory not found at ${pluginsDir}. " +
+                "Set REPAST_HOME or repastHome in gradle.properties. See ENVIRONMENT_SETUP.md.")
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+sourceSets {
+    main {
+        java { srcDirs = ['src'] }
+    }
+}
+
+// The Repast scenario (Geography.rs/user_path.xml) loads model classes from ../bin,
+// so compile into bin/ exactly like the original Eclipse setup did.
+tasks.named('compileJava') {
+    destinationDirectory = layout.projectDirectory.dir('bin')
+    options.encoding = 'UTF-8'
+}
+
+tasks.named('clean') {
+    delete layout.projectDirectory.dir('bin')
+}
+
+dependencies {
+    // All Repast Simphony plugin jars (incl. GeoTools/JTS inside repast.simphony.gis*/lib)
+    implementation fileTree(dir: pluginsDir, include: [
+        'repast.simphony.*/**/*.jar',
+        'repast.simphony.*.jar',
+        'libs.*/**/*.jar',
+        'libs.*.jar',
+        'saf.*/**/*.jar',
+        'saf.*.jar',
+        'org.codehaus.groovy*/**/*.jar',
+        'org.codehaus.groovy*.jar',
+    ])
+    // Plugins that ship unpacked class folders (<plugin>/bin)
+    implementation files(
+        (pluginsDir.listFiles() ?: new File[0])
+            .findAll { it.isDirectory() && new File(it, 'bin').exists() }
+            .collect { new File(it, 'bin') }
+    )
+}
+
+// Resolve the runtime plugin directory (its name carries the version suffix).
+def runtimePluginDir = {
+    def d = (pluginsDir.listFiles() ?: new File[0])
+            .find { it.isDirectory() && it.name.startsWith('repast.simphony.runtime_') }
+    if (d == null) logger.warn("repast.simphony.runtime_* plugin not found under ${pluginsDir}")
+    d
+}
+
+// JVM flags copied verbatim from the project's Eclipse launcher
+// (launchers/Geography Model.launch) and the recorded run in hs_err_pid5412.log.
+def repastJvmArgs = [
+    '-XX:+IgnoreUnrecognizedVMOptions',
+    '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED',
+    '--add-modules=ALL-SYSTEM',
+    '--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED',
+    '--add-exports=java.desktop/sun.awt=ALL-UNNAMED',
+    '--add-exports=java.base/java.lang=ALL-UNNAMED',
+    '--add-opens=java.base/java.util=ALL-UNNAMED',
+    '--add-exports=java.xml/com.sun.org.apache.xpath.internal.objects=ALL-UNNAMED',
+    '--add-exports=java.xml/com.sun.org.apache.xpath.internal=ALL-UNNAMED',
+    '--add-opens=java.base/java.lang=ALL-UNNAMED',
+    // The 112,070-feature street layer caused an OOM on the default heap
+    // (hs_err_pid5412.log); give the GUI generous headroom.
+    '-Xmx4g',
+]
+
+tasks.register('runModel', JavaExec) {
+    group = 'repast'
+    description = 'Launch the Repast Simphony GUI with the Geography scenario'
+    dependsOn 'compileJava'
+    def rt = runtimePluginDir()
+    mainClass = 'repast.simphony.runtime.RepastMain'
+    args layout.projectDirectory.dir('Geography.rs').asFile.absolutePath
+    if (rt != null) {
+        classpath = files(new File(rt, 'bin'), fileTree(new File(rt, 'lib')) { include '*.jar' })
+    }
+    jvmArgs repastJvmArgs
+    workingDir = projectDir   // scenario uses relative ./data paths
+    // Listen for a debugger on :5005 when invoked with -PdebugJvm
+    if (providers.gradleProperty('debugJvm').isPresent()) {
+        jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005'
+    }
+}

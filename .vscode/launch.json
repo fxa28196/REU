@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // Debug workflow: run the task "Repast: Run GUI (wait for debugger
+            // on :5005)" first, then launch this attach config.
+            // Set breakpoints in Geography/src/**.java as usual.
+            "type": "java",
+            "name": "Attach to Repast (localhost:5005)",
+            "request": "attach",
+            "hostName": "localhost",
+            "port": 5005,
+            "projectName": "Geography"
+        }
+    ]
+}
