@@ -79,15 +79,16 @@ public class OutcomeLogger {
 		File f = new File(outDir, "agents.csv");
 		try (PrintWriter w = new PrintWriter(f, "UTF-8")) {
 			w.println("agent_id,encampment_id,start_node,assigned_shelter,final_state,"
-					+ "arrival_tick,distance_traveled_m,network_dist_to_shelter_m,"
+					+ "arrival_tick,evacuation_tick,distance_traveled_m,network_dist_to_shelter_m,"
 					+ "exposure_ugm3h,exposure_while_traveling_ugm3h,vwe_ugm3h,"
 					+ "hours_above_unhealthy,peak_conc_ugm3,age_rr,comorbidity_rr");
 			for (GisAgent a : agents) {
 				String shelter = a.getTargetShelter() == null ? "" : a.getTargetShelter().getId();
-				w.printf(Locale.US, "%s,%s,%d,%s,%s,%s,%.2f,%.2f,%.4f,%.4f,%.4f,%.4f,%.2f,%.3f,%.3f%n",
+				w.printf(Locale.US, "%s,%s,%d,%s,%s,%s,%s,%.2f,%.2f,%.4f,%.4f,%.4f,%.4f,%.2f,%.3f,%.3f%n",
 						a.getName(), a.getEncampmentId(), a.getStartNodeId(), shelter,
 						a.getState(),
 						Double.isNaN(a.getArrivalTick()) ? "" : String.valueOf((long) a.getArrivalTick()),
+						Double.isNaN(a.getEvacuationTick()) ? "" : String.valueOf((long) a.getEvacuationTick()),
 						a.getDistanceTraveledM(),
 						Double.isNaN(a.getNetworkDistToShelterM()) ? -1.0 : a.getNetworkDistToShelterM(),
 						a.getExposureUgM3h(), a.getExposureWhileTravelingUgM3h(), a.getVweUgM3h(),
@@ -132,7 +133,7 @@ public class OutcomeLogger {
 		double[] exposure = new double[n];
 		double[] vwe = new double[n];
 		double[] travel = new double[n];
-		int sheltered = 0, enRoute = 0, unreachable = 0, refused = 0;
+		int sheltered = 0, enRoute = 0, unreachable = 0, refused = 0, preEvac = 0;
 		double sumHoursUnhealthy = 0;
 		for (int i = 0; i < n; i++) {
 			GisAgent a = agents.get(i);
@@ -145,6 +146,7 @@ public class OutcomeLogger {
 				case EN_ROUTE: enRoute++; break;
 				case UNREACHABLE: unreachable++; break;
 				case REFUSED_ALL_FULL: refused++; break;
+				case PRE_EVAC: preEvac++; break;
 			}
 		}
 
@@ -179,8 +181,9 @@ public class OutcomeLogger {
 			w.println("  },");
 			w.println("  \"population\": {");
 			w.println("    \"n_agents\": " + n + ",");
-			w.println("    \"sheltered\": " + sheltered + ", \"en_route\": " + enRoute
-					+ ", \"unreachable\": " + unreachable + ", \"refused_all_full\": " + refused + ",");
+			w.println("    \"pre_evac\": " + preEvac + ", \"sheltered\": " + sheltered
+					+ ", \"en_route\": " + enRoute + ", \"unreachable\": " + unreachable
+					+ ", \"refused_all_full\": " + refused + ",");
 			w.printf(Locale.US, "    \"exposure_ugm3h\": {\"mean\": %.4f, \"median\": %.4f, \"min\": %.4f, "
 					+ "\"p25\": %.4f, \"p75\": %.4f, \"p90\": %.4f, \"max\": %.4f, \"total\": %.4f, \"gini\": %.4f},%n",
 					mean(exposure), pct(exposure, 50), min(exposure), pct(exposure, 25), pct(exposure, 75),

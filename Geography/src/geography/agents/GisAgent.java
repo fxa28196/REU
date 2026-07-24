@@ -55,6 +55,7 @@ public class GisAgent {
 
 	/** Outcome state (docs/science/DESIGN_SPEC.md Decision 3). */
 	public enum State {
+		PRE_EVAC,          // sheltering in place at the encampment, awaiting the smoke trigger
 		EN_ROUTE,          // walking toward a shelter
 		SHELTERED,         // admitted; remains for the rest of the run
 		UNREACHABLE,       // no shelter reachable on the street graph
@@ -67,8 +68,9 @@ public class GisAgent {
 	private final String encampmentId;
 	private final SmokeField smokeField;
 
-	private State state = State.EN_ROUTE;
+	private State state = State.PRE_EVAC;
 	private double arrivalTick = Double.NaN;
+	private double evacuationTick = Double.NaN;  // tick the smoke evacuation trigger fired
 
 	private Shelter targetShelter = null;
 	private List<Coordinate> routePath = null;
@@ -125,6 +127,23 @@ public class GisAgent {
 			}
 			if (c > peakConcUgM3) {
 				peakConcUgM3 = c;
+			}
+		}
+
+		// PRE_EVAC: shelter in place at the encampment, accruing outdoor
+		// exposure, until local PM2.5 crosses the evacuation threshold (default
+		// the EPA "Unhealthy" AQI breakpoint 55.5 µg/m³ — a sourced value,
+		// DATA_SOURCES D9), then begin evacuating. This ties evacuation to the
+		// smoke event rather than assuming everyone leaves at t0 (AUDIT.md #1).
+		if (state == State.PRE_EVAC) {
+			double evacThreshold = (Double) params.getValue("evacuationThresholdUgM3");
+			double cNow = (smokeField == null) ? 0.0
+					: smokeField.concentrationForTick(tick, minutesPerTick);
+			if (cNow >= evacThreshold) {
+				state = State.EN_ROUTE;
+				evacuationTick = tick;
+			} else {
+				return; // still waiting outdoors; exposure already accrued above
 			}
 		}
 
@@ -234,6 +253,7 @@ public class GisAgent {
 	public long getStartNodeId() { return startNodeId; }
 	public State getState() { return state; }
 	public double getArrivalTick() { return arrivalTick; }
+	public double getEvacuationTick() { return evacuationTick; }
 	public Shelter getTargetShelter() { return targetShelter; }
 	public double getNetworkDistToShelterM() { return networkDistToShelterM; }
 	public double getDistanceTraveledM() { return distanceTraveledM; }
