@@ -11,6 +11,7 @@ Geography/gradle.properties
 
 # ---- Logs & crash dumps (kept on disk as forensic artifacts, never tracked) ----
 *.log
+*.log.*
 hs_err_pid*.log
 
 # ---- OS / editor noise ----

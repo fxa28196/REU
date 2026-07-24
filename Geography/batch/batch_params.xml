@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
 <sweep runs="1">
 	<parameter name="numAgents" type="constant" constant_type="int" value="100"/>
-	<parameter name="zoneDistance" type="constant" constant_type="number" value="1000.0"/>
 </sweep>
