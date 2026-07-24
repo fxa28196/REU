@@ -17,6 +17,8 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiLineString;
 import org.locationtech.jts.geom.Point;
 
+import geography.routing.StreetNetwork;
+
 import repast.simphony.context.Context;
 import repast.simphony.context.space.gis.GeographyFactoryFinder;
 import repast.simphony.context.space.graph.NetworkBuilder;
@@ -36,16 +38,18 @@ import repast.simphony.space.gis.GeographyParameters;
  *       "Network" projection, both declared in Geography.rs/context.xml.</li>
  *   <li>Load the Portland street centerlines from data/Streets.shp
  *       (Portland Metro RLIS schema, reprojected Web Mercator to WGS84 at
- *       load) and place {@code numAgents} {@link GisAgent} residents at
- *       street start-vertices.</li>
- *   <li>Create placeholder {@link Shelter}s (see inline note).</li>
- *   <li>Create one {@link PortlandStreet} agent per street feature so the
- *       street layer is visible and queryable by resident movement.</li>
+ *       load) in a single pass that creates one {@link PortlandStreet} agent
+ *       per feature (real FULL_NAME/STREETNAME attribute, geodesic length in
+ *       metres) and simultaneously builds the routable
+ *       {@link StreetNetwork} from the RLIS PDX_F_NODE/PDX_T_NODE topology.</li>
+ *   <li>Create placeholder {@link Shelter}s, snap each to its nearest graph
+ *       node, and root a Dijkstra shortest-path tree there.</li>
+ *   <li>Place {@code numAgents} {@link GisAgent} residents at street
+ *       start-vertices with their start nodes resolved on the graph.</li>
  * </ol>
  *
  * Derived from the Repast Simphony stock "Geography" GIS demo
- * (@author Eric Tatara); demo water/zone/tower logic removed 2026-07-24 —
- * see git history for the original.
+ * (@author Eric Tatara); demo logic removed 2026-07-24 — see git history.
  */
 public class ContextCreator implements ContextBuilder {
 
@@ -64,58 +68,99 @@ public class ContextCreator implements ContextBuilder {
 
 		// The "Network" projection is declared in Geography.rs/context.xml and
 		// bound by the GIS displays, so it must exist even though no edges are
-		// created. (The stock demo added a random edge between residents here;
-		// removed — it had no modeling meaning.)
+		// created.
 		NetworkBuilder<?> netBuilder = new NetworkBuilder<Object>("Network", context, true);
 		netBuilder.buildNetwork();
 
-		String portlandStreetsFilename = "./data/Streets.shp";
-		List<SimpleFeature> features = loadFeaturesFromShapefile(portlandStreetsFilename);
+		List<SimpleFeature> features = loadFeaturesFromShapefile("./data/Streets.shp");
 
-		// Residents start at the first vertex of the i-th street polyline.
-		// PLACEHOLDER (PROJECT_ASSESSMENT.md R2/V15): real encampment-derived
-		// starting locations are a scheduled scientific deliverable.
-		List<Coordinate> agentCoords = new ArrayList<Coordinate>();
-		if (features != null && !features.isEmpty()) {
-			for (int i = 0; i < numAgents; i++) {
-				Geometry streetGeom = (Geometry) features.get(i % features.size()).getDefaultGeometry();
-				agentCoords.add(streetGeom.getCoordinate());
+		// ---- Single pass: street agents + routable graph -------------------
+		StreetNetwork network = new StreetNetwork();
+		int skippedNoNodes = 0;
+		List<Coordinate> firstVertices = new ArrayList<Coordinate>();
+
+		for (SimpleFeature feature : features) {
+			Geometry geom = (Geometry) feature.getDefaultGeometry();
+			if (!(geom instanceof MultiLineString)) {
+				continue;
 			}
-		}
+			if (!geom.isValid()) {
+				System.out.println("Invalid geometry: " + feature.getID());
+			}
+			LineString line = (LineString) ((MultiLineString) geom).getGeometryN(0);
+			Coordinate[] coords = line.getCoordinates();
+			firstVertices.add(coords[0]);
 
-		// PLACEHOLDER (PROJECT_ASSESSMENT.md R3/V12): 5 shelters of capacity
-		// 100 at formula-picked street vertices stand in for the real
-		// Multnomah County cleaner-air shelter map; capacity is not yet
-		// enforced anywhere.
+			// Real RLIS attributes (R1): FULL_NAME preferred, STREETNAME
+			// fallback; length computed geodesically in metres rather than
+			// trusting the LENGTH column's undocumented unit.
+			String name = attributeString(feature, "FULL_NAME");
+			if (name == null) {
+				name = attributeString(feature, "STREETNAME");
+			}
+			if (name == null) {
+				name = "unnamed street";
+			}
+
+			Object fNode = feature.getAttribute("PDX_F_NODE");
+			Object tNode = feature.getAttribute("PDX_T_NODE");
+			double lengthM;
+			if (fNode instanceof Number && tNode instanceof Number) {
+				lengthM = network.addStreet(((Number) fNode).longValue(),
+						((Number) tNode).longValue(), coords);
+			} else {
+				lengthM = StreetNetwork.polylineLengthM(coords);
+				skippedNoNodes++;
+			}
+
+			PortlandStreet street = new PortlandStreet(name, lengthM);
+			context.add(street);
+			geography.move(street, line);
+		}
+		network.buildIndex();
+		System.out.println("[StreetNetwork] " + network.nodeCount() + " nodes, "
+				+ network.streetEdgeCount() + " street edges"
+				+ (skippedNoNodes > 0 ? ", " + skippedNoNodes + " features without node ids" : ""));
+
+		// ---- Shelters (placeholders, R3/V12): snap to graph, root a tree ---
 		int numShelters = 5;
-		if (features != null && !features.isEmpty()) {
+		if (!firstVertices.isEmpty()) {
 			for (int i = 0; i < numShelters; i++) {
 				Shelter shelter = new Shelter("Shelter_" + i, 100);
 				context.add(shelter);
 
-				SimpleFeature streetFeature = features.get((i * 7) % features.size());
-				Geometry streetGeom = (Geometry) streetFeature.getDefaultGeometry();
-
-				Coordinate shelterCoord = streetGeom.getCoordinate();
-
+				Coordinate shelterCoord = firstVertices.get((i * 7) % firstVertices.size());
 				geography.move(shelter, fac.createPoint(shelterCoord));
+
+				long nodeId = network.nearestNode(shelterCoord);
+				shelter.setGraphNodeId(nodeId);
+				shelter.setRouteTree(network.computeTree(nodeId));
 			}
 		}
 
-		int cnt = 0;
-		for (Coordinate coord : agentCoords) {
-			GisAgent agent = new GisAgent("Site " + cnt);
-			context.add(agent);
+		// ---- Residents (placeholder starts, R2/V15) ------------------------
+		if (!firstVertices.isEmpty()) {
+			for (int i = 0; i < numAgents; i++) {
+				Coordinate coord = firstVertices.get(i % firstVertices.size());
+				long startNode = network.nearestNode(coord);
+				GisAgent agent = new GisAgent("Site " + i, network, startNode);
+				context.add(agent);
 
-			Point geom = fac.createPoint(coord);
-			geography.move(agent, geom);
-			cnt++;
+				Point geom = fac.createPoint(coord);
+				geography.move(agent, geom);
+			}
 		}
 
-		// Create one PortlandStreet agent per street feature.
-		loadFeatures("data/Streets.shp", context, geography);
-
 		return context;
+	}
+
+	private static String attributeString(SimpleFeature feature, String name) {
+		Object v = feature.getAttribute(name);
+		if (v == null) {
+			return null;
+		}
+		String s = v.toString().trim();
+		return s.isEmpty() ? null : s;
 	}
 
 	private List<SimpleFeature> loadFeaturesFromShapefile(String filename){
@@ -160,51 +205,5 @@ public class ContextCreator implements ContextBuilder {
 		}
 
 		return features;
-	}
-
-
-	/**
-	 * Creates one PortlandStreet agent per line feature in the shapefile and
-	 * places it in the geography.
-	 *
-	 * @param filename the shapefile to load street features from
-	 * @param context the context
-	 * @param geography the geography
-	 */
-	private void loadFeatures (String filename, Context context, Geography geography){
-
-		List<SimpleFeature> features = loadFeaturesFromShapefile(filename);
-
-		for (SimpleFeature feature : features){
-			Geometry geom = (Geometry)feature.getDefaultGeometry();
-			Object agent = null;
-
-			if (!geom.isValid()){
-				System.out.println("Invalid geometry: " + feature.getID());
-			}
-
-			if (geom instanceof MultiLineString){
-			    MultiLineString line = (MultiLineString)feature.getDefaultGeometry();
-			    geom = (LineString)line.getGeometryN(0);
-
-			    // PLACEHOLDER (PROJECT_ASSESSMENT.md R1): the RLIS shapefile
-			    // carries real STREETNAME/LENGTH attributes; reading them (and
-			    // building a routable graph from PDX_F_NODE/PDX_T_NODE) is
-			    // roadmap commit 4 work. Safe defaults avoid schema coupling
-			    // until then.
-			    String name = "Portland Street";
-			    double length = 1.0;
-
-			    agent = new PortlandStreet(name, length);
-			}
-
-			if (agent != null){
-				context.add(agent);
-				geography.move(agent, geom);
-			}
-			else{
-				System.out.println("Error creating agent for  " + geom);
-			}
-		}
 	}
 }

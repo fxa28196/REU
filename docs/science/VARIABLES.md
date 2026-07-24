@@ -86,6 +86,28 @@ Format per variable: purpose · implementation location · scientific mechanism
   when an agent arrives and self-removes; it becomes reportable with the
   outcome-logging system (roadmap commit 11).
 
+## V11 — `networkDistToShelterM` (shelter accessibility)
+
+- **Purpose:** Street-network distance (metres) from a resident's starting
+  node to the shelter it selects — "the nearest shelter you can *actually
+  reach*" (slide 7) and the future Gap-index strategy input.
+- **Implementation:** `GisAgent.getNetworkDistToShelterM()`; computed at
+  route selection from the chosen shelter's Dijkstra tree
+  (`geography.routing.StreetNetwork`).
+- **Scientific mechanism:** Shortest-path distance over the RLIS street
+  graph (nodes = `PDX_F_NODE`/`PDX_T_NODE` intersection ids; edge weights =
+  geodesic polyline lengths in metres). Undirected graph — pedestrians are
+  not bound by one-way vehicle restrictions (assumption, documented).
+- **Assumptions:** All mapped street centerlines are walkable (no
+  freeway-pedestrian exclusion yet); grade separation is honored via the
+  RLIS node ids themselves.
+- **Limitations:** Freeway/highway segments (CFCC codes) are not yet
+  filtered from the pedestrian graph — flagged for the data-curation pass
+  (roadmap commits 6–7). NaN when no shelter is reachable (disconnected
+  component); that outcome becomes a logged state in roadmap commit 5.
+- **Source:** derived quantity; graph algorithm standard (Dijkstra 1959,
+  Numer. Math. 1:269–271, DOI: 10.1007/BF01386390).
+
 ## Movement-geometry implementation note (commit 3)
 
 All movement arithmetic in `GisAgent.step()` — shelter-distance ranking, path
