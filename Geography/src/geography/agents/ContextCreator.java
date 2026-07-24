@@ -102,7 +102,7 @@ public class ContextCreator implements ContextBuilder {
 			double lengthM;
 			if (fNode instanceof Number && tNode instanceof Number) {
 				lengthM = network.addStreet(((Number) fNode).longValue(),
-						((Number) tNode).longValue(), coords);
+						((Number) tNode).longValue(), coords, name);
 			} else {
 				lengthM = StreetNetwork.polylineLengthM(coords);
 			}
@@ -111,8 +111,22 @@ public class ContextCreator implements ContextBuilder {
 			geography.move(street, line);
 		}
 		network.buildIndex();
+		StreetNetwork.ValidationReport netReport = network.getValidationReport();
 		System.out.println("[StreetNetwork] " + network.nodeCount() + " nodes, "
 				+ network.streetEdgeCount() + " street edges");
+		System.out.printf(
+				"[StreetNetwork VALIDATION] %d corrupt attribute node ids corrected "
+				+ "(%d sites reattached by geometry, %d split to synthetic nodes); "
+				+ "impossible edges after fix: %d; max endpoint gap %.1f m; "
+				+ "%d components (largest %d nodes)%n",
+				netReport.affectedAttrIds, netReport.reattachedSites, netReport.splitSites,
+				netReport.impossibleEdgesAfterFix, netReport.maxEndpointGapM,
+				netReport.componentCount, netReport.largestComponentSize);
+		if (netReport.impossibleEdgesAfterFix > 0) {
+			System.out.println("[StreetNetwork VALIDATION][WARN] impossible-span edges "
+					+ "remain after correction — routing distances are NOT trustworthy; "
+					+ "see simulation.json street_network_validation");
+		}
 
 		// ---- Smoke field (real EPA AQS hourly PM2.5) -----------------------
 		SmokeField smokeField = new SmokeField(SMOKE_CSV, "Multnomah", SIM_START);
@@ -179,7 +193,8 @@ public class ContextCreator implements ContextBuilder {
 		String[] dataFiles = { STREETS_SHP, SMOKE_CSV, SHELTERS_CSV, ENCAMPMENTS_CSV };
 
 		@SuppressWarnings("unchecked")
-		OutcomeLogger logger = new OutcomeLogger(context, smokeField, seed, pNames, pVals, dataFiles);
+		OutcomeLogger logger = new OutcomeLogger(context, smokeField, seed, pNames, pVals,
+				dataFiles, netReport);
 		ISchedule schedule = RunEnvironment.getInstance().getCurrentSchedule();
 		schedule.schedule(ScheduleParameters.createAtEnd(ScheduleParameters.LAST_PRIORITY), logger, "export");
 
