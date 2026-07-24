@@ -209,9 +209,16 @@ Ranked by expected improvement to validity, not implementation ease.
 | **7** | **Five placement strategies + sweeps** (slide 6). Deliberately AFTER 1–4: comparing strategies on a metric that isn't yet valid would produce misleading rankings. | **High once 1–4 done** | 1,2,3 |
 | **8** | **Encampment temporal proxy** — seek any archival 2020 spatial source; else keep flagged (D2b). | **Medium** | data availability |
 
-**Immediate next action (this roadmap's #1):** implement the evacuation-timing
-model, because it is the highest-validity gain and unblocks meaningful absolute
-exposure before any strategy comparison.
+**Status update:** roadmap #1 (evacuation-timing model) is now **IMPLEMENTED and
+validated** (`PRE_EVAC` state + sourced 55.5 µg/m³ trigger): residents shelter in
+place accruing exposure until the smoke reaches the EPA "Unhealthy" breakpoint,
+then evacuate. Absolute exposure rose from mean 28.5 → **379 µg·m³·h** and
+person-hours-above-unhealthy from 2.8 → **281**, so absolute exposure is now
+materially meaningful (exposure Gini 0.30). **Tracked refinement:** also gate
+evacuation on shelter operating dates (Sep 10–11) so the transient Sep 7 PM2.5
+spike does not trigger evacuation before shelters existed. **Next by validity
+gain:** #2 (resolve RR_age/RR_comorbidity — needs mentor) then #4
+(routing/movement + determinism tests).
 
 ---
 

@@ -34,6 +34,14 @@
 		isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
 	/>
+	<!-- AUDIT.md issue #1: residents shelter in place at their encampment until
+	     local PM2.5 first reaches this threshold, then evacuate. Default 55.5 =
+	     the EPA "Unhealthy" AQI PM2.5 breakpoint (sourced; DATA_SOURCES D9). -->
+	<parameter name="evacuationThresholdUgM3" displayName="Evacuation PM2.5 threshold (ug/m3)" type="double"
+		defaultValue="55.5"
+		isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+	/>
 	<!-- Length of the simulated event window in hours (Sept 7-19 2020 = ~312 h).
 	     Run ends at simulationHours*60/minutesPerTick, capped at the smoke-field
 	     length. Anchors the end-of-run export. -->

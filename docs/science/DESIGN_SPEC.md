@@ -105,7 +105,21 @@ concentrations). This is already enabled by the persistent-state design
 implemented (`minutesPerTick`); rationale in VARIABLES.md. **Change required:**
 the run must be anchored to a wall-clock start (`simulationStartDateTime =
 2020-09-07T00:00`) so tick↔timestamp is unambiguous. The full event is
-17,280 ticks.
+18,720 ticks (312 h at 1 min/tick).
+
+### Evacuation timing · model **A**, threshold **L** — implemented (AUDIT.md #1)
+
+Residents start in state `PRE_EVAC` at their encampment and **shelter in place,
+accruing outdoor exposure, until local PM2.5 first reaches
+`evacuationThresholdUgM3`** (default 55.5 µg/m³, the EPA "Unhealthy" AQI
+breakpoint — DATA_SOURCES D9, a sourced value), then transition to `EN_ROUTE`.
+This ties evacuation to the smoke event rather than assuming everyone leaves at
+t0, and is the fix for the audit's highest-priority validity issue (absolute
+exposure was dominated by a Sept-7 evacuation start). **Assumptions:** all
+residents share one threshold and respond immediately; heterogeneous
+awareness/willingness is future work (F3). **Refinement tracked:** also gate on
+shelter operating dates (shelters opened Sep 10–11; a brief Sep 7 PM2.5 spike
+can trigger evacuation slightly before shelters existed).
 
 ### V1 / V2 — Age and RR_age · class **L**, currently **BLOCKED**
 
