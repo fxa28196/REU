@@ -90,6 +90,7 @@ public class GisAgent {
 	private double exposureWhileTravelingUgM3h = 0;     // exposure accrued EN_ROUTE
 	private double hoursAboveUnhealthy = 0;             // V8
 	private double peakConcUgM3 = 0;
+	private double outdoorHours = 0;                    // total hours outdoors (for average PM2.5 reporting)
 
 	public GisAgent(String name, StreetNetwork network, long startNodeId,
 			String encampmentId, SmokeField smokeField) {
@@ -128,6 +129,7 @@ public class GisAgent {
 			if (c > peakConcUgM3) {
 				peakConcUgM3 = c;
 			}
+			outdoorHours += dtHours;
 		}
 
 		// PRE_EVAC: shelter in place at the encampment, accruing outdoor
@@ -262,6 +264,7 @@ public class GisAgent {
 	public double getExposureWhileTravelingUgM3h() { return exposureWhileTravelingUgM3h; }
 	public double getHoursAboveUnhealthy() { return hoursAboveUnhealthy; }
 	public double getPeakConcUgM3() { return peakConcUgM3; }
+	public double getOutdoorHours() { return outdoorHours; }
 	public double getAgeRR() { return ageRR; }
 	public double getComorbidityRR() { return comorbidityRR; }
 

@@ -45,6 +45,8 @@ public class OutcomeLogger {
 	private final String[] paramNames;
 	private final Object[] paramValues;
 	private final String[] inputDataFiles;
+	private final String simId;
+	private final String dataVersionTag;
 
 	public OutcomeLogger(Context<Object> context, SmokeField smokeField, long seed,
 			String[] paramNames, Object[] paramValues, String[] inputDataFiles) {
@@ -54,6 +56,13 @@ public class OutcomeLogger {
 		this.paramNames = paramNames;
 		this.paramValues = paramValues;
 		this.inputDataFiles = inputDataFiles;
+		this.simId = "sim-" + java.time.LocalDateTime.now()
+				.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")) + "-seed" + seed;
+		StringBuilder cat = new StringBuilder();
+		for (String fpath : inputDataFiles) {
+			cat.append(sha256(fpath));
+		}
+		this.dataVersionTag = sha256OfString(cat.toString()).substring(0, 12);
 		this.outDir = new File("output/run_seed" + seed);
 		this.outDir.mkdirs();
 	}
@@ -77,22 +86,45 @@ public class OutcomeLogger {
 
 	private void writeAgents(List<GisAgent> agents) {
 		File f = new File(outDir, "agents.csv");
+		double mpt = param("minutesPerTick");
+		String commit = gitCommit();
 		try (PrintWriter w = new PrintWriter(f, "UTF-8")) {
-			w.println("agent_id,encampment_id,start_node,assigned_shelter,final_state,"
-					+ "arrival_tick,evacuation_tick,distance_traveled_m,network_dist_to_shelter_m,"
-					+ "exposure_ugm3h,exposure_while_traveling_ugm3h,vwe_ugm3h,"
-					+ "hours_above_unhealthy,peak_conc_ugm3,age_rr,comorbidity_rr");
+			// Complete per-agent journey record. Run-identity columns (sim_id,
+			// commit, seed, data_version) repeat on every row so the CSV is
+			// self-describing and analysable standalone. age/asthma/copd are
+			// intentionally EMPTY: not implemented (see CURRENT_MODEL_RUN.md);
+			// no value is invented.
+			w.println("agent_id,sim_id,commit,random_seed,data_version,"
+					+ "starting_encampment,shelter_reached,reached_shelter,"
+					+ "time_started_tick,time_started_local,time_arrived_tick,time_arrived_local,"
+					+ "travel_time_min,total_travel_distance_m,network_dist_to_shelter_m,"
+					+ "avg_pm25_ugm3,peak_pm25_ugm3,cumulative_dose_ugm3h,exposure_while_traveling_ugm3h,"
+					+ "vwe_ugm3h,hours_above_unhealthy,age,asthma,copd,age_rr,comorbidity_rr,final_state");
 			for (GisAgent a : agents) {
-				String shelter = a.getTargetShelter() == null ? "" : a.getTargetShelter().getId();
-				w.printf(Locale.US, "%s,%s,%d,%s,%s,%s,%s,%.2f,%.2f,%.4f,%.4f,%.4f,%.4f,%.2f,%.3f,%.3f%n",
-						a.getName(), a.getEncampmentId(), a.getStartNodeId(), shelter,
-						a.getState(),
-						Double.isNaN(a.getArrivalTick()) ? "" : String.valueOf((long) a.getArrivalTick()),
-						Double.isNaN(a.getEvacuationTick()) ? "" : String.valueOf((long) a.getEvacuationTick()),
-						a.getDistanceTraveledM(),
-						Double.isNaN(a.getNetworkDistToShelterM()) ? -1.0 : a.getNetworkDistToShelterM(),
-						a.getExposureUgM3h(), a.getExposureWhileTravelingUgM3h(), a.getVweUgM3h(),
-						a.getHoursAboveUnhealthy(), a.getPeakConcUgM3(), a.getAgeRR(), a.getComorbidityRR());
+				boolean reached = a.getState() == GisAgent.State.SHELTERED;
+				String shelter = reached && a.getTargetShelter() != null ? a.getTargetShelter().getId() : "";
+				double evac = a.getEvacuationTick();
+				double arr = a.getArrivalTick();
+				String startTick = Double.isNaN(evac) ? "" : String.valueOf((long) evac);
+				String startLocal = Double.isNaN(evac) ? "" : smokeField.timeForTick(evac, mpt).toString();
+				String arrTick = Double.isNaN(arr) ? "" : String.valueOf((long) arr);
+				String arrLocal = Double.isNaN(arr) ? "" : smokeField.timeForTick(arr, mpt).toString();
+				String travelMin = (Double.isNaN(evac) || Double.isNaN(arr)) ? ""
+						: String.format(Locale.US, "%.1f", (arr - evac) * mpt);
+				double outH = a.getOutdoorHours();
+				String avgPm = outH > 0 ? String.format(Locale.US, "%.2f", a.getExposureUgM3h() / outH) : "";
+				String netDist = Double.isNaN(a.getNetworkDistToShelterM()) ? ""
+						: String.format(Locale.US, "%.2f", a.getNetworkDistToShelterM());
+				w.printf(Locale.US,
+						"%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s,%.2f,%.4f,%.4f,%.4f,%.4f,%s,%s,%s,%.3f,%.3f,%s%n",
+						a.getName(), simId, commit, seed, dataVersionTag,
+						a.getEncampmentId(), shelter, reached ? "yes" : "no",
+						startTick, startLocal, arrTick, arrLocal,
+						travelMin, a.getDistanceTraveledM(), netDist,
+						avgPm, a.getPeakConcUgM3(), a.getExposureUgM3h(), a.getExposureWhileTravelingUgM3h(),
+						a.getVweUgM3h(), a.getHoursAboveUnhealthy(),
+						"", "", "",
+						a.getAgeRR(), a.getComorbidityRR(), a.getState());
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("writeAgents failed", e);
@@ -157,6 +189,8 @@ public class OutcomeLogger {
 			w.println("  \"generated_utc\": \"" + LocalDateTime.now() + "\",");
 			w.println("  \"reproducibility\": {");
 			w.println("    \"random_seed\": " + seed + ",");
+			w.println("    \"sim_id\": \"" + jsonEsc(simId) + "\",");
+			w.println("    \"data_version_tag\": \"" + jsonEsc(dataVersionTag) + "\",");
 			w.println("    \"git_commit\": \"" + jsonEsc(gitCommit()) + "\",");
 			w.println("    \"java_version\": \"" + jsonEsc(System.getProperty("java.version")) + "\",");
 			w.println("    \"repast_version\": \"2.11.0\",");
@@ -240,6 +274,27 @@ public class OutcomeLogger {
 	}
 
 	// --- reproducibility helpers --------------------------------------------
+	private double param(String name) {
+		for (int i = 0; i < paramNames.length; i++) {
+			if (paramNames[i].equals(name) && paramValues[i] instanceof Number) {
+				return ((Number) paramValues[i]).doubleValue();
+			}
+		}
+		return Double.NaN;
+	}
+
+	private static String sha256OfString(String s) {
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
+			byte[] d = md.digest(s.getBytes(StandardCharsets.UTF_8));
+			StringBuilder sb = new StringBuilder();
+			for (byte b : d) sb.append(String.format("%02x", b));
+			return sb.toString();
+		} catch (Exception e) {
+			return "unavailable";
+		}
+	}
+
 	private static String sha256(String path) {
 		try {
 			byte[] bytes = Files.readAllBytes(new File(path).toPath());
