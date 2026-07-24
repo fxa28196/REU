@@ -1,0 +1,4 @@
+shelter_id,name,address,city,state,zip,lon,lat,capacity,capacity_basis,opened,closed,status,coord_source,coord_confidence
+CJ,Charles Jordan Community Center,9009 N Foss Ave,Portland,OR,97203,-122.711387,45.587754,99,nightly_cap_newsroom_unconfirmed,2020-09-11,2020-09-19,operating,esri_world_geocoder_xcheck_wikipedia,high
+OCC,Oregon Convention Center,777 NE Martin Luther King Jr Blvd,Portland,OR,97232,-122.661771,45.528461,99,nightly_cap_newsroom_unconfirmed,2020-09-10,2020-09-19,operating,us_census_geocoder_public_ar_current,high
+MSCC,Mount Scott Community Center,5530 SE 72nd Ave,Portland,OR,97206,-122.589160,45.482738,,unstated_standby_site,2020-09-11,,standby,us_census_geocoder_public_ar_current,high

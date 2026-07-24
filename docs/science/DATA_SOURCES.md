@@ -265,9 +265,9 @@ convention this project adopts and why.
 | ID | Dataset | Status | Blocking which roadmap commit |
 |---|---|---|---|
 | D0 | Street centerlines | ACQUIRED (provenance gap) | — (publication blocker only) |
-| D1 | Shelter locations/capacities | IDENTIFIED, partly reconstructed | **6** |
+| D1 | Shelter locations/capacities | **ACQUIRED** (coords geocoded; capacity 99 still newsroom-unconfirmed) | 6 (done) |
 | D2 | PIT population + demographics | IDENTIFIED | **7**, 9 |
-| D2b | Encampment locations | GAP | **7** |
+| D2b | Encampment locations | **ACQUIRED as 2025–26 proxy** (no 2020 records exist; flagged) | 7 (done) |
 | D3 | Hourly PM2.5 | **ACQUIRED** | 8 (unblocked) |
 | D4 | Meteorology | IDENTIFIED, deliberately deferred | — |
 | D5 | RR_age | ⚠️ Citation problem | **9** |
