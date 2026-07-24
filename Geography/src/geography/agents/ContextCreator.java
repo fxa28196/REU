@@ -1,19 +1,13 @@
 package geography.agents;
 
-import java.awt.Color;
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.coverage.Category;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureIterator;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.util.NumberRange;
 import org.opengis.feature.simple.SimpleFeature;
 
 import org.locationtech.jts.geom.Coordinate;
@@ -21,54 +15,46 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiLineString;
-import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.Polygon;
 
 import repast.simphony.context.Context;
 import repast.simphony.context.space.gis.GeographyFactoryFinder;
 import repast.simphony.context.space.graph.NetworkBuilder;
 import repast.simphony.dataLoader.ContextBuilder;
 import repast.simphony.engine.environment.RunEnvironment;
-import repast.simphony.engine.schedule.ISchedule;
-import repast.simphony.engine.schedule.ScheduleParameters;
-import repast.simphony.gis.util.GeometryUtil;
 import repast.simphony.parameter.Parameters;
 import repast.simphony.space.gis.Geography;
 import repast.simphony.space.gis.GeographyParameters;
-import repast.simphony.space.gis.RepastCoverageFactory;
-import repast.simphony.space.gis.WritableGridCoverage2D;
-import repast.simphony.space.graph.Network;
 
 /**
- * ContextBuilder for the GIS demo.  In this model, mobile GisAgents move around
- * the Geography with a random motion and are represented by point locations.  
- * ZoneAgents are polygons that represent certain geographic areas.  WaterLine
- * agents represent water supply lines from Lake Michigan that supply the 
- * Chicago area.  When a ZoneAgent intersects a WaterLine, the ZoneAgent will 
- * have access to fresh drinking water.  GisAgents that are within a certain 
- * distance from the ZoneAgent boundary will also have access to water.  Agents
- * that are not in proximity to a Zone with a water supply will not have access
- * to water (they will be thirsty).  BufferZoneAgents are for visualization 
- * to illustrate the extend of the boundary around a ZoneAgent.  
- * 
- * GisAgents may be generated programmatically depending on the value for 
- * number of agents.  GisAgents, ZoneAgents, and WaterLine agents are also
- * loaded from ESRI shapefiles.
- * 
- * @author Eric Tatara
+ * Builds the simulation context for the wildfire-smoke shelter-placement
+ * model (NSF REU, Portland State University; see PROJECT_ASSESSMENT.md).
  *
+ * Construction sequence:
+ * <ol>
+ *   <li>Create the WGS84 GIS projection "Geography" and the (currently empty)
+ *       "Network" projection, both declared in Geography.rs/context.xml.</li>
+ *   <li>Load the Portland street centerlines from data/Streets.shp
+ *       (Portland Metro RLIS schema, reprojected Web Mercator to WGS84 at
+ *       load) and place {@code numAgents} {@link GisAgent} residents at
+ *       street start-vertices.</li>
+ *   <li>Create placeholder {@link Shelter}s (see inline note).</li>
+ *   <li>Create one {@link PortlandStreet} agent per street feature so the
+ *       street layer is visible and queryable by resident movement.</li>
+ * </ol>
+ *
+ * Derived from the Repast Simphony stock "Geography" GIS demo
+ * (@author Eric Tatara); demo water/zone/tower logic removed 2026-07-24 —
+ * see git history for the original.
  */
 public class ContextCreator implements ContextBuilder {
 
 	int numAgents;
-	double zoneDistance;
-		
+
 	public Context build(Context context) {
-		
+
 		Parameters parm = RunEnvironment.getInstance().getParameters();
 		numAgents = (Integer)parm.getValue("numAgents");
-		zoneDistance = (Double)parm.getValue("zoneDistance");
 
 		GeographyParameters geoParams = new GeographyParameters();
 		Geography geography = GeographyFactoryFinder.createGeographyFactory(null)
@@ -76,21 +62,19 @@ public class ContextCreator implements ContextBuilder {
 
 		GeometryFactory fac = new GeometryFactory();
 
+		// The "Network" projection is declared in Geography.rs/context.xml and
+		// bound by the GIS displays, so it must exist even though no edges are
+		// created. (The stock demo added a random edge between residents here;
+		// removed — it had no modeling meaning.)
 		NetworkBuilder<?> netBuilder = new NetworkBuilder<Object>("Network", context, true);
-		Network net = netBuilder.buildNetwork();
-				
+		netBuilder.buildNetwork();
 
-		// Create an area in which to create agents.  This border is loaded from a shapefile.
-//		String boundaryFilename = "./data/CookCounty.shp";
-//		List<SimpleFeature> features = loadFeaturesFromShapefile(boundaryFilename);
-//		Geometry boundary = (MultiPolygon)features.iterator().next().getDefaultGeometry();
-		
-		// Generate random points in the area to create agents.
-//		List<Coordinate> agentCoords = GeometryUtil.generateRandomPointsInPolygon(boundary, numAgents);
-		
 		String portlandStreetsFilename = "./data/Streets.shp";
 		List<SimpleFeature> features = loadFeaturesFromShapefile(portlandStreetsFilename);
-				
+
+		// Residents start at the first vertex of the i-th street polyline.
+		// PLACEHOLDER (PROJECT_ASSESSMENT.md R2/V15): real encampment-derived
+		// starting locations are a scheduled scientific deliverable.
 		List<Coordinate> agentCoords = new ArrayList<Coordinate>();
 		if (features != null && !features.isEmpty()) {
 			for (int i = 0; i < numAgents; i++) {
@@ -98,113 +82,39 @@ public class ContextCreator implements ContextBuilder {
 				agentCoords.add(streetGeom.getCoordinate());
 			}
 		}
-		
-		int numShelters = 5; 
+
+		// PLACEHOLDER (PROJECT_ASSESSMENT.md R3/V12): 5 shelters of capacity
+		// 100 at formula-picked street vertices stand in for the real
+		// Multnomah County cleaner-air shelter map; capacity is not yet
+		// enforced anywhere.
+		int numShelters = 5;
 		if (features != null && !features.isEmpty()) {
 			for (int i = 0; i < numShelters; i++) {
 				Shelter shelter = new Shelter("Shelter_" + i, 100);
 				context.add(shelter);
-				
+
 				SimpleFeature streetFeature = features.get((i * 7) % features.size());
 				Geometry streetGeom = (Geometry) streetFeature.getDefaultGeometry();
-				
+
 				Coordinate shelterCoord = streetGeom.getCoordinate();
-				
+
 				geography.move(shelter, fac.createPoint(shelterCoord));
 			}
 		}
-		
-		int cnt=0;
+
+		int cnt = 0;
 		for (Coordinate coord : agentCoords) {
 			GisAgent agent = new GisAgent("Site " + cnt);
 			context.add(agent);
 
 			Point geom = fac.createPoint(coord);
 			geography.move(agent, geom);
-			
-			Object o = context.getRandomObject();
-		
-			if (o != null && o instanceof GisAgent) {
-				net.addEdge(agent, o, 1.0);
-			}
 			cnt++;
 		}
 
-		// TODO GIS: use an example of ShapefileLoader
-		
-		// envelope around Midway airport
-//		ReferencedEnvelope env = new ReferencedEnvelope(-87.761278, -87.742395, 
-//				41.778022, 41.791462, DefaultGeographicCRS.WGS84);
-//		
-//		WritableGridCoverage2D coverage = RepastCoverageFactory.createWritableCoverageFloat(
-//				"My data", 10, 10, env, null, -1, 0, 10, -1);
-//		
-//		geography.addCoverage("My coverage", coverage);
-//		
-//		// envelope south west Chicago
-//		env = new ReferencedEnvelope(-87.9220, -87.7236, 41.50, 41.7313, DefaultGeographicCRS.WGS84);
-//		
-//		// Simple 3-category coverage with no-data
-//		 Category[] categories	= new Category[] {	
-//	        new Category("No data", Color.BLACK, 0),
-//	        new Category("Level 1", Color.GREEN, 1),
-//	        new Category("Level 2", Color.BLUE, 2),
-//	        new Category("Level 3", Color.RED, 3)
-//	    };
-//		WritableGridCoverage2D coverage2 = RepastCoverageFactory.createWritableByteIndexedCoverage(
-//				"My data indexed", 100, 200, env, categories, null, 0);
-//		
-//		geography.addCoverage("My indexed coverage", coverage2);
-//		
-//		// envelope south east Chicago
-//		env = new ReferencedEnvelope(-87.7236, -87.5252, 41.50, 41.7313, DefaultGeographicCRS.WGS84);
-//
-//		int maxColorIndex = 10; //RepastCoverageFactory.MAX_BYTE_COLOR_INDEX;
-//		Color[] whiteRedColorScale = new Color[maxColorIndex];
-//		
-//		// white to red color scale
-//		for (int i=0; i<whiteRedColorScale.length; i++) {
-//			int blueGreen = (255/maxColorIndex*(maxColorIndex-i));			
-//			whiteRedColorScale[i] = new Color(255, blueGreen, blueGreen); 
-//		}
-//			
-//		// Color scale coverage with no-data
-//		 categories	= new Category[] {	
-//	        new Category("No data", Color.WHITE, 0),
-//	        new Category("Level", whiteRedColorScale, NumberRange.create(1, 10))
-//	    };
-//		WritableGridCoverage2D coverage3 = RepastCoverageFactory.createWritableByteIndexedCoverage(
-//				"My data indexed", 100, 200, env, categories, null, 0);
-//		
-//		geography.addCoverage("My indexed coverage 2", coverage3);
-//	
-		
-		// Load Features from shapefiles
-//		loadFeatures( "data/TestShapefile2latlon.shp", context, geography);
-//		loadFeatures( "data/Zones2.shp", context, geography);
-//		loadFeatures( "data/Agents2.shp", context, geography);
-//		loadFeatures( "data/WaterLines.shp", context, geography);
-		loadFeatures( "data/Streets.shp", context, geography);
-		System.out.println("[TEST] Reached the shapefile loading block successfully!");
-		
-		ISchedule schedule = RunEnvironment.getInstance().getCurrentSchedule();
-		ScheduleParameters params = ScheduleParameters.createAtEnd(ScheduleParameters.LAST_PRIORITY);
+		// Create one PortlandStreet agent per street feature.
+		loadFeatures("data/Streets.shp", context, geography);
 
-//		schedule.schedule(params, new IAction(){
-//			File shpFile = new File("output/testShapeFile.shp");
-//			
-//			@Override
-//			public void execute() {
-//				ShapefileWriter shpWriter = new ShapefileWriter(geography);
-//				
-//				try {
-//					shpWriter.write("geography.GisAgent.FeatureType", shpFile.toURI().toURL());
-//				} catch (MalformedURLException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-		
 		return context;
 	}
 
@@ -217,19 +127,18 @@ public class ContextCreator implements ContextBuilder {
 		}
 
 		List<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		
+
 		SimpleFeatureIterator fiter = null;
 		ShapefileDataStore store = null;
 		store = new ShapefileDataStore(url);
-		
+
 		try {
 			org.geotools.data.simple.SimpleFeatureCollection collection = store.getFeatureSource().getFeatures();
-			
+
 			org.opengis.referencing.crs.CoordinateReferenceSystem sourceCRS = store.getFeatureSource().getSchema().getCoordinateReferenceSystem();
 			org.opengis.referencing.crs.CoordinateReferenceSystem targetCRS = org.geotools.referencing.crs.DefaultGeographicCRS.WGS84;
-			
+
 			if (sourceCRS != null && !org.geotools.referencing.CRS.equalsIgnoreMetadata(sourceCRS, targetCRS)) {
-				org.opengis.referencing.operation.MathTransform transform = org.geotools.referencing.CRS.findMathTransform(sourceCRS, targetCRS, true);
 				collection = new org.geotools.data.store.ReprojectingFeatureCollection(collection, targetCRS);
 			}
 
@@ -250,39 +159,22 @@ public class ContextCreator implements ContextBuilder {
 			}
 		}
 
-
-//		try {
-//			fiter = store.getFeatureSource().getFeatures().features();
-//
-//			while(fiter.hasNext()){
-//				features.add(fiter.next());
-//			}
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		finally{
-//			fiter.close();
-//			store.dispose();
-//		}
-//		
 		return features;
 	}
-		
-	
+
+
 	/**
-	 * Loads features from the specified shapefile.  The appropriate type of agents
-	 * will be created depending on the geometry type in the shapefile (point, 
-	 * line, polygon).
-	 * 
-	 * @param filename the name of the shapefile from which to load agents
+	 * Creates one PortlandStreet agent per line feature in the shapefile and
+	 * places it in the geography.
+	 *
+	 * @param filename the shapefile to load street features from
 	 * @param context the context
 	 * @param geography the geography
 	 */
 	private void loadFeatures (String filename, Context context, Geography geography){
 
 		List<SimpleFeature> features = loadFeaturesFromShapefile(filename);
-		
-		// For each feature in the file
+
 		for (SimpleFeature feature : features){
 			Geometry geom = (Geometry)feature.getDefaultGeometry();
 			Object agent = null;
@@ -290,56 +182,19 @@ public class ContextCreator implements ContextBuilder {
 			if (!geom.isValid()){
 				System.out.println("Invalid geometry: " + feature.getID());
 			}
-			
-			// For Polygons, create ZoneAgents
-			if (geom instanceof MultiPolygon){
-				MultiPolygon mp = (MultiPolygon)feature.getDefaultGeometry();
-				geom = (Polygon)mp.getGeometryN(0);
 
-				// Read the feature attributes and assign to the ZoneAgent
-				String name = (String)feature.getAttribute("name");
-				double taxRate = (double)feature.getAttribute("Tax_Rate");
-//				String name = String.valueOf((Long)feature.getAttribute("OBJECTID"));
-//				double taxRate = (double)feature.getAttribute("ProbEggs");
-
-				agent = new ZoneAgent(name,taxRate);
-
-				// Create a BufferZoneAgent around the zone, just for visualization
-				Geometry buffer = GeometryUtil.generateBuffer(geography, geom, zoneDistance);
-				BufferZoneAgent bufferZone = new BufferZoneAgent("Buffer: " + name, 
-						zoneDistance, (ZoneAgent)agent);
-				context.add(bufferZone);
-				geography.move(bufferZone, buffer);
-			}
-
-			// For Points, create RadioTower agents
-//			else if (geom instanceof Point){
-//				geom = (Point)feature.getDefaultGeometry();				
-//
-//				// Read the feature attributes and assign to the ZoneAgent
-//				String name = (String)feature.getAttribute("Name");
-//				agent = new RadioTower(name);
-//			}
-
-			// For Lines, create WaterLines
-//			else if (geom instanceof MultiLineString){
-//				MultiLineString line = (MultiLineString)feature.getDefaultGeometry();
-//				geom = (LineString)line.getGeometryN(0);
-//
-//				// Read the feature attributes and assign to the ZoneAgent
-//				String name = (String)feature.getAttribute("Name");
-//				double flowRate = (Long)feature.getAttribute("Flow_Rate");
-//				agent = new WaterLine(name, flowRate);
-//			}
-			else if (geom instanceof MultiLineString){
+			if (geom instanceof MultiLineString){
 			    MultiLineString line = (MultiLineString)feature.getDefaultGeometry();
 			    geom = (LineString)line.getGeometryN(0);
 
-			    // Using safe defaults so missing shapefile columns won't crash the engine
+			    // PLACEHOLDER (PROJECT_ASSESSMENT.md R1): the RLIS shapefile
+			    // carries real STREETNAME/LENGTH attributes; reading them (and
+			    // building a routable graph from PDX_F_NODE/PDX_T_NODE) is
+			    // roadmap commit 4 work. Safe defaults avoid schema coupling
+			    // until then.
 			    String name = "Portland Street";
 			    double length = 1.0;
 
-//			    agent = new WaterLine(name, flowRate);
 			    agent = new PortlandStreet(name, length);
 			}
 
@@ -350,6 +205,6 @@ public class ContextCreator implements ContextBuilder {
 			else{
 				System.out.println("Error creating agent for  " + geom);
 			}
-		}				
+		}
 	}
 }
