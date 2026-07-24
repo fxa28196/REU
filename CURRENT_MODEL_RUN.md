@@ -77,8 +77,11 @@ recorded in `simulation.json` and on every row of `agents.csv`.
 ## 2. What is implemented
 
 - **Real geography:** City-of-Portland RLIS street centerlines (112,070
-  segments) → an undirected pedestrian graph (89,322 nodes) with geodesic edge
-  lengths; Dijkstra shortest paths.
+  segments) → an undirected pedestrian graph (89,345 nodes) with geodesic edge
+  lengths; Dijkstra shortest paths. A **street-network validation layer**
+  corrects 27 corrupt `PDX_F_NODE`/`PDX_T_NODE` attribute IDs at load time
+  (provenance in every `simulation.json` under `street_network_validation`;
+  method and proof in `docs/validation/STREET_NETWORK_VALIDATION.md`).
 - **Real inputs:** EPA AQS hourly PM2.5 (Sept 2020); real Sept-2020 shelters
   (Oregon Convention Center + Charles Jordan operating, Mount Scott standby);
   resident start points sampled from real City of Portland IRP campsite reports.
@@ -175,7 +178,29 @@ Full data dictionary with literature and caveats: `docs/science/METRICS.md`.
 
 ## 6. How to analyze the outputs
 
-The files are plain CSV/JSON. Examples:
+**Canonical workflow** (verification + statistics + figures, all outputs stamped
+with sim id / seed / commit / data version / timestamp):
+
+```powershell
+python scripts\analyze_run.py                       # every run under Geography\output
+python scripts\analyze_run.py Geography\output\run_seed42   # one run
+```
+
+Writes `analysis\summary.json`, `analysis\analysis-report.md` and
+`analysis\figures\*.png` inside each run directory, and runs 37 cross-checks
+between agents.csv, shelters.csv and simulation.json (non-zero exit code if any
+fail). Requires `pip install pandas matplotlib`. Current cross-run findings:
+`docs/runs/current-results-report.md`.
+
+**Routing validation tests** (independent shortest-path recomputation from
+Streets.shp, walking-speed bounds per Bohannon 1997, impossible-jump audit;
+exit code gates):
+
+```powershell
+python scripts\test_routing.py        # requires pip install pyshp
+```
+
+The files are also plain CSV/JSON for ad-hoc analysis:
 
 ```python
 import pandas as pd, json

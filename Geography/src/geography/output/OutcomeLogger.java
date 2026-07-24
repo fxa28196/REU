@@ -14,6 +14,7 @@ import java.util.Locale;
 import geography.agents.GisAgent;
 import geography.agents.Shelter;
 import geography.env.SmokeField;
+import geography.routing.StreetNetwork;
 
 import repast.simphony.context.Context;
 
@@ -47,15 +48,18 @@ public class OutcomeLogger {
 	private final String[] inputDataFiles;
 	private final String simId;
 	private final String dataVersionTag;
+	private final StreetNetwork.ValidationReport netReport;
 
 	public OutcomeLogger(Context<Object> context, SmokeField smokeField, long seed,
-			String[] paramNames, Object[] paramValues, String[] inputDataFiles) {
+			String[] paramNames, Object[] paramValues, String[] inputDataFiles,
+			StreetNetwork.ValidationReport netReport) {
 		this.context = context;
 		this.smokeField = smokeField;
 		this.seed = seed;
 		this.paramNames = paramNames;
 		this.paramValues = paramValues;
 		this.inputDataFiles = inputDataFiles;
+		this.netReport = netReport;
 		this.simId = "sim-" + java.time.LocalDateTime.now()
 				.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")) + "-seed" + seed;
 		StringBuilder cat = new StringBuilder();
@@ -213,6 +217,7 @@ public class OutcomeLogger {
 			w.printf(Locale.US, "    \"peak_hourly_ugm3\": %.1f,%n", smokeField.peakHourly());
 			w.println("    \"out_of_range_lookups\": " + smokeField.getOutOfRangeLookups());
 			w.println("  },");
+			writeNetworkValidation(w);
 			w.println("  \"population\": {");
 			w.println("    \"n_agents\": " + n + ",");
 			w.println("    \"pre_evac\": " + preEvac + ", \"sheltered\": " + sheltered
@@ -244,6 +249,40 @@ public class OutcomeLogger {
 		} catch (Exception e) {
 			throw new RuntimeException("writeSimulation failed", e);
 		}
+	}
+
+	/** Street-graph validation provenance (docs/validation/STREET_NETWORK_VALIDATION.md):
+	 *  which corrupt attribute node ids were corrected, how, and the post-fix
+	 *  audit results. Nothing was deleted; every correction is listed. */
+	private void writeNetworkValidation(PrintWriter w) {
+		if (netReport == null) {
+			return;
+		}
+		w.println("  \"street_network_validation\": {");
+		w.printf(Locale.US, "    \"node_site_tolerance_m\": %.1f, \"reattach_tolerance_m\": %.1f,%n",
+				StreetNetwork.NODE_SITE_TOLERANCE_M, StreetNetwork.REATTACH_TOLERANCE_M);
+		w.println("    \"features\": " + netReport.featureCount
+				+ ", \"attr_node_ids\": " + netReport.attrNodeIds
+				+ ", \"final_graph_nodes\": " + netReport.finalGraphNodes + ",");
+		w.println("    \"affected_attr_node_ids\": " + netReport.affectedAttrIds
+				+ ", \"sites_reattached\": " + netReport.reattachedSites
+				+ ", \"sites_split_synthetic\": " + netReport.splitSites + ",");
+		w.printf(Locale.US, "    \"impossible_edges_after_fix\": %d, \"max_endpoint_gap_m\": %.1f,%n",
+				netReport.impossibleEdgesAfterFix, netReport.maxEndpointGapM);
+		w.println("    \"components\": " + netReport.componentCount
+				+ ", \"largest_component_nodes\": " + netReport.largestComponentSize + ",");
+		w.println("    \"corrections\": [");
+		for (int i = 0; i < netReport.corrections.size(); i++) {
+			StreetNetwork.Correction c = netReport.corrections.get(i);
+			w.printf(Locale.US, "      {\"kind\": \"%s\", \"attr_node_id\": %d, \"graph_node_id\": %d, "
+					+ "\"dist_from_primary_m\": %.1f, \"lon\": %.6f, \"lat\": %.6f, "
+					+ "\"first_feature\": \"%s\", \"claims\": %d}%s%n",
+					c.kind, c.attrId, c.graphId, c.distFromPrimaryM, c.lon, c.lat,
+					jsonEsc(c.firstFeature), c.claims,
+					i < netReport.corrections.size() - 1 ? "," : "");
+		}
+		w.println("    ]");
+		w.println("  },");
 	}
 
 	// --- statistics ----------------------------------------------------------
