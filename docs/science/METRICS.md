@@ -12,7 +12,7 @@ its `simulation.json` manifest (seed + parameters + dataset checksums + git
 commit).
 
 Cross-references: [`DESIGN_SPEC.md`](DESIGN_SPEC.md) (variable specifications
-V1–V17), [`VARIABLES.md`](VARIABLES.md), [`DATA_SOURCES.md`](DATA_SOURCES.md),
+V1–V16), [`VARIABLES.md`](VARIABLES.md), [`DATA_SOURCES.md`](DATA_SOURCES.md),
 [`BIBLIOGRAPHY.md`](BIBLIOGRAPHY.md).
 
 ---
@@ -55,7 +55,7 @@ V1–V17), [`VARIABLES.md`](VARIABLES.md), [`DATA_SOURCES.md`](DATA_SOURCES.md),
 **counterfactual** (exposure avoided versus not sheltering) and requires a
 paired no-shelter baseline run; it is deliberately not fabricated from a single
 run. Computing it is future work (a `--no-shelter` scenario differenced against
-the status quo). With γ = 1.0 it would be identically zero regardless (V17).
+the status quo), now well-defined since exposure ends at arrival.
 
 ## 3. `simulation.json` — run summary + reproducibility manifest
 
@@ -74,7 +74,7 @@ which return 0 rather than a fabricated value — must be 0 for a clean run).
 |---|---|---|
 | `n_agents`, `sheltered`/`en_route`/`unreachable`/`refused_all_full` | count | Outcome census; the four states sum to `n_agents`. |
 | `exposure_ugm3h.{mean,median,min,p25,p75,p90,max,total}` | µg·m⁻³·h | Distribution of raw exposure across residents. |
-| `exposure_ugm3h.gini` | dimensionless [0,1) | **Gini of exposure (V14):** `ΣᵢΣⱼ|xᵢ−xⱼ| / (2n²x̄)`. 0 = everyone equally exposed; →(n−1)/n = maximally unequal. Under a uniform field with γ=1 this is 0 by construction — an honest reflection that location doesn't change exposure in that configuration, not a bug. |
+| `exposure_ugm3h.gini` | dimensionless [0,1) | **Gini of exposure (V14):** `ΣᵢΣⱼ|xᵢ−xⱼ| / (2n²x̄)`. 0 = everyone equally exposed; →(n−1)/n = maximally unequal. Now driven by travel-time inequality (exposure ends at arrival), so it is > 0 and discriminating (≈0.63 in the reference run). Its meaning will shift again once vulnerability weighting and realistic evacuation timing land. |
 | `vwe_ugm3h.{mean,median,total,gini}` | µg·m⁻³·h | Same for vulnerability-weighted exposure. Report both so equity claims are separable from the RR weighting assumption. |
 | `total_person_hours_above_unhealthy` | person·hours | Σ over residents of `hours_above_unhealthy`. Headline burden metric (slide 6). |
 | `travel_m.{mean,median,max}` | metres | Travel-distance distribution. |
@@ -92,10 +92,14 @@ refusals (mirrors `shelters.csv`).
 2. **RR weighting is currently off** (RR_age = RR_com = 1.0), so `vwe` = raw
    `exposure` until the disputed slide citations are resolved (D5/D6). Any
    run with non-unit RRs prints a provenance warning.
-3. **Shelter benefit is currently zero by construction** because the indoor
-   protection factor γ (V17) is unsourced and defaults to 1.0. Absolute
-   benefit magnitudes are meaningless until γ is sourced and swept; the model
-   warns at startup.
+3. **Shelter benefit = reduced outdoor exposure time.** Exposure stops at
+   shelter arrival (the study endpoint); a better-placed / more-accessible
+   shelter lowers exposure by ending outdoor time sooner. Indoor air quality is
+   out of scope (γ removed; AUDIT.md §0).
+3b. **Absolute exposure currently reflects a Sept-7 evacuation start**, before
+   the smoke peak, so absolute `exposure_ugm3h` and `hours_above_unhealthy` are
+   not yet research-grade (AUDIT.md issue #1); their *relative* ordering by
+   travel time is meaningful (exposure Gini ≈ 0.63).
 4. **The smoke field is spatially uniform** (2 in-county monitors). Strategy
    differences therefore come only from travel/access, not from spatial
    exposure gradients, until IDW is justified by cross-validation (V5).

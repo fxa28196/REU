@@ -72,7 +72,6 @@ public class ContextCreator implements ContextBuilder {
 		Parameters parm = RunEnvironment.getInstance().getParameters();
 		int numAgents = (Integer) parm.getValue("numAgents");
 		double minutesPerTick = (Double) parm.getValue("minutesPerTick");
-		double indoorProtectionFactor = (Double) parm.getValue("indoorProtectionFactor");
 		int simulationHours = (Integer) parm.getValue("simulationHours");
 		long seed = RandomHelper.getSeed();
 
@@ -119,13 +118,6 @@ public class ContextCreator implements ContextBuilder {
 		SmokeField smokeField = new SmokeField(SMOKE_CSV, "Multnomah", SIM_START);
 		System.out.printf("[SmokeField] %d hourly slices from %s; peak %.1f ug/m3%n",
 				smokeField.hours(), SIM_START, smokeField.peakHourly());
-
-		if (indoorProtectionFactor >= 1.0) {
-			System.out.println("[WARN] indoorProtectionFactor = " + indoorProtectionFactor
-					+ ": shelters provide NO modelled exposure benefit. The indoor "
-					+ "protection factor (V17) is unsourced (DESIGN_SPEC); set it from "
-					+ "literature and sweep it before interpreting shelter benefit.");
-		}
 
 		// ---- Real shelters (Sept 2020) -------------------------------------
 		List<Map<String, String>> shelterRows = CsvLoader.read(SHELTERS_CSV);
@@ -181,9 +173,9 @@ public class ContextCreator implements ContextBuilder {
 		RunEnvironment.getInstance().endAt(endTick);
 
 		String[] pNames = { "numAgents", "minutesPerTick", "walkingSpeedMps",
-				"shelterArrivalDistanceM", "indoorProtectionFactor", "simulationHours", "randomSeed" };
+				"shelterArrivalDistanceM", "simulationHours", "randomSeed" };
 		Object[] pVals = { numAgents, minutesPerTick, parm.getValue("walkingSpeedMps"),
-				parm.getValue("shelterArrivalDistanceM"), indoorProtectionFactor, simulationHours, seed };
+				parm.getValue("shelterArrivalDistanceM"), simulationHours, seed };
 		String[] dataFiles = { STREETS_SHP, SMOKE_CSV, SHELTERS_CSV, ENCAMPMENTS_CSV };
 
 		@SuppressWarnings("unchecked")
