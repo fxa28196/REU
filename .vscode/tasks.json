@@ -1,0 +1,34 @@
+{
+    "version": "2.0.0",
+    "options": {
+        "cwd": "${workspaceFolder}/Geography"
+    },
+    "tasks": [
+        {
+            "label": "Repast: Compile",
+            "type": "shell",
+            "command": ".\\gradlew.bat compileJava",
+            "group": { "kind": "build", "isDefault": true },
+            "problemMatcher": ["$gradle"]
+        },
+        {
+            "label": "Repast: Run GUI",
+            "type": "shell",
+            "command": ".\\gradlew.bat runModel",
+            "problemMatcher": []
+        },
+        {
+            "label": "Repast: Run GUI (wait for debugger on :5005)",
+            "type": "shell",
+            "command": ".\\gradlew.bat runModel -PdebugJvm",
+            "problemMatcher": [],
+            "isBackground": true
+        },
+        {
+            "label": "Repast: Clean",
+            "type": "shell",
+            "command": ".\\gradlew.bat clean",
+            "problemMatcher": []
+        }
+    ]
+}

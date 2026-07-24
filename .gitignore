@@ -1,0 +1,25 @@
+# ---- Build output ----
+Geography/bin/
+Geography/build/
+Geography/output/
+output/
+
+# ---- Gradle machine-local state ----
+.gradle/
+Geography/.gradle/
+Geography/gradle.properties
+
+# ---- Logs & crash dumps (kept on disk as forensic artifacts, never tracked) ----
+*.log
+hs_err_pid*.log
+
+# ---- OS / editor noise ----
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# ---- Machine-generated classpath artifacts ----
+scripts/cp.args
+
+# ---- Redundant archive: the extracted, tracked copy lives at Geography/data/Streets.* ----
+/Streets.zip
