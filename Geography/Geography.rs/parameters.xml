@@ -10,4 +10,28 @@
 		isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 	/>
+	<!-- V13 (docs/science/VARIABLES.md): simulated minutes per schedule tick.
+	     Modeling decision, pre-registration candidate - not a literature value. -->
+	<parameter name="minutesPerTick" displayName="Simulated minutes per tick" type="double"
+		defaultValue="1.0"
+		isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+	/>
+	<!-- V10 (docs/science/VARIABLES.md): comfortable walking speed, m/s.
+	     Default 1.30 m/s within measured ranges of Bohannon 1997
+	     (Age and Ageing 26(1):15-19, doi:10.1093/ageing/26.1.15).
+	     PROVISIONAL for the unhoused population; declared sweep axis. -->
+	<parameter name="walkingSpeedMps" displayName="Walking speed (m/s)" type="double"
+		defaultValue="1.30"
+		isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+	/>
+	<!-- Metric replacement for the stock demo's 0.002-degree arrival radius
+	     (anisotropic: ~222 m N-S vs ~156 m E-W at Portland's latitude).
+	     Modeling threshold, documented in docs/science/VARIABLES.md. -->
+	<parameter name="shelterArrivalDistanceM" displayName="Shelter arrival radius (m)" type="double"
+		defaultValue="200.0"
+		isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+	/>
 </parameters>
