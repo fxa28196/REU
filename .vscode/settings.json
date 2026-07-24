@@ -1,7 +1,10 @@
 {
-    // Machine-local toolchain paths — a fresh clone on another machine updates
-    // these two paths (or installs to the same locations). See ENVIRONMENT_SETUP.md.
-    "java.jdt.ls.java.home": "C:\\Users\\Chick\\tools\\jdk-17.0.19+10",
+    // Machine-local toolchain path — a fresh clone on another machine updates
+    // this (or installs to the same location). See ENVIRONMENT_SETUP.md.
+    // Runs the Gradle daemon (and therefore javac) on JDK 17.
+    // NOTE: do NOT set java.jdt.ls.java.home here — the language server itself
+    // needs Java 21+ and redhat.java 1.55 silently ignores an older JDK,
+    // falling back to its embedded JRE 21 (verified in IDE_VALIDATION.md).
     "java.import.gradle.java.home": "C:\\Users\\Chick\\tools\\jdk-17.0.19+10",
 
     // Use the checked-in Gradle wrapper (self-bootstrapping on fresh clones).
