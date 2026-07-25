@@ -1,7 +1,6 @@
 # Phase 2 — Scientific Implementation Plan: Heterogeneous Human Agents
 
-**Status: DESIGN COMPLETE except §9 (movement spec pending). NOTHING IS
-IMPLEMENTED.** No model code, scenario file, or parameter file has been created
+**Status: DESIGN COMPLETE. NOTHING IS IMPLEMENTED.** No model code, scenario file, or parameter file has been created
 or modified in this phase. The validated baseline (`c48cd70`,
 `sim-20260724-223555-seed42`) is untouched; all work is on branch
 `phase2/human-agent-modeling`.
@@ -43,7 +42,7 @@ columns. One deliberate exception is proposed and flagged for approval (§7).
 |---|---|---|
 | [`01-POPULATION.md`](01-POPULATION.md) | age, sex, health conditions, mobility limitation, disability | Strong **local** evidence exists (2019 Multnomah PIT, n = 2,037). Condition-specific prevalence does **not** exist locally and must be imported as PROXY. |
 | [`02-VULNERABILITY.md`](02-VULNERABILITY.md) | asthma, COPD, age, disability effects | **Both disputed slide citations confirmed dead**, and the VWE formula itself is a **category error**. Recommends stratified reporting instead of multiplication. |
-| [`03-MOVEMENT.md`](03-MOVEMENT.md) | walking speed, fatigue, route choice | *Pending — the mobility literature review is still running (§9).* |
+| [`03-MOVEMENT.md`](03-MOVEMENT.md) | walking speed, fatigue, route choice, inhaled dose | **Inhaled dose is nearly flat in walking speed** (∝ speed^0.17) — distance dominates. Speed is an *access* variable, not an exposure one. Load carriage does **not** slow walking. |
 | [`04-DECISION.md`](04-DECISION.md) | shelter decision framework | PADM three-stage structure; **awareness ≈ 0.35** is the one directly sourced behavioural parameter; two local occupancy calibration targets. |
 | [`05-HAZARDS.md`](05-HAZARDS.md) | dynamic disruptions | **Recommends OMITTING stochastic road closures** — no documented occurrence in the study area, no transferable duration parameters. |
 | [`06-SCENARIOS.md`](06-SCENARIOS.md) | scenario framework | One `scenario` parameter → external `.properties` files; three-layer resolution; full manifest capture. |
@@ -189,9 +188,30 @@ change did nothing — not with a feature.
 
 ## 9. Outstanding
 
-`03-MOVEMENT.md` (walking-speed distributions by age and sex, mobility-impaired
-speeds, fatigue and encumbrance, ventilation rate by activity level, route
-choice) is pending completion of its literature review. Until it lands, walking
-speed remains the single-value V10 of the baseline, and `01-POPULATION.md`'s
-mobility-limitation variable has no speed mapping — so the reduced-mobility
-scenario cannot yet be authored.
+**All nine specs are written.** Two items remain open and are recorded here so
+they are not forgotten:
+
+1. **Two library pulls before publication** (`03-MOVEMENT.md` §9): Broach & Dill
+   2015 (TRB 15-3669, Portland pedestrian GPS route choice) and Boyce, Shields &
+   Silcock 1999 (*Fire Technology*, disability movement speeds). Both are
+   currently VERIFIED-IN-SECONDARY — the numbers are quoted from documents that
+   were retrieved in full, but the primaries were not.
+2. **One paywalled estimate** (`02-VULNERABILITY.md` §7): Borchers Arriagada
+   2019's pooled asthma values are confirmed only via secondary sources.
+
+Neither blocks implementation; both must be resolved before any manuscript
+quotes the affected numbers.
+
+### A fourth finding that changes the brief
+
+`03-MOVEMENT.md` establishes that **inhaled dose scales as roughly speed^0.17** —
+it is nearly flat. Ventilation rises as MET^1.17 while METs rise about linearly
+with speed, so walking faster shortens exposure time and raises breathing rate
+almost in cancellation. **Distance to shelter dominates inhaled dose; walking
+speed barely affects it.**
+
+This reframes the movement work: heterogeneous speed matters for *who reaches
+shelter and who does not*, not for how much smoke they inhale. It also supplies
+the fix for a standing `METRICS.md` limitation — the model can now compute an
+actual inhaled mass (µg) via a verified EPA/Layton ventilation chain, rather than
+the current exposure *index* (µg·m⁻³·h) that has no breathing rate in it.
