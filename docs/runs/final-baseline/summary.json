@@ -1,0 +1,493 @@
+{
+  "schema": "reu-wildfire-shelter-abm/analysis/v1",
+  "analysis": {
+    "generated_utc": "2026-07-25T02:36:12Z",
+    "script": "scripts/analyze_run.py",
+    "script_version": "1.0.2",
+    "analysis_git_commit": "ae66e63c11b3462e01e05e0509a6f7443aa54b8c",
+    "python": "3.14.6",
+    "pandas": "3.0.5",
+    "matplotlib": "3.11.0"
+  },
+  "reproducibility": {
+    "sim_id": "sim-20260724-223555-seed42",
+    "random_seed": 42,
+    "model_git_commit": "ae66e63c11b3462e01e05e0509a6f7443aa54b8c",
+    "data_version_tag": "0bc943324ae6",
+    "input_datasets": [
+      {
+        "file": "data/Streets.shp",
+        "sha256": "f5e5e311b625f129f94fcf6d3150f8feb521ea5a79039ade43514ebfb35810a8"
+      },
+      {
+        "file": "data/airnow/aqs_hourly_pm25_portland_2020-09.csv",
+        "sha256": "d908556c347ecdf68342ce859b1c56813cc606f695804c0ba71992604486ca08"
+      },
+      {
+        "file": "data/shelters/shelters_2020-09.csv",
+        "sha256": "892b72500eeaa34005c8ae00f9abb5bdba639e463f505b2794e3231e1801b302"
+      },
+      {
+        "file": "data/encampments/irp_campsite_reports_sample.csv",
+        "sha256": "3e557de5db4668c5d30fd7a6fc13bcc38b5e37bab4b9becaf9b3dc35366285ca"
+      }
+    ],
+    "parameters": {
+      "numAgents": 50,
+      "minutesPerTick": 1.0,
+      "walkingSpeedMps": 1.3,
+      "shelterArrivalDistanceM": 200.0,
+      "simulationHours": 312,
+      "randomSeed": 42
+    },
+    "run_generated_utc": "2026-07-24T22:35:55.594761600"
+  },
+  "verification": {
+    "n_checks": 37,
+    "n_failed": 0,
+    "checks": [
+      {
+        "name": "agents.csv row count == manifest n_agents",
+        "status": "PASS",
+        "detail": "50 vs 50"
+      },
+      {
+        "name": "census PRE_EVAC == manifest pre_evac",
+        "status": "PASS",
+        "detail": "0 vs 0"
+      },
+      {
+        "name": "census SHELTERED == manifest sheltered",
+        "status": "PASS",
+        "detail": "49 vs 49"
+      },
+      {
+        "name": "census EN_ROUTE == manifest en_route",
+        "status": "PASS",
+        "detail": "0 vs 0"
+      },
+      {
+        "name": "census UNREACHABLE == manifest unreachable",
+        "status": "PASS",
+        "detail": "1 vs 1"
+      },
+      {
+        "name": "census REFUSED_ALL_FULL == manifest refused_all_full",
+        "status": "PASS",
+        "detail": "0 vs 0"
+      },
+      {
+        "name": "reached_shelter == (final_state SHELTERED)",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "sim_id constant and == manifest",
+        "status": "PASS",
+        "detail": "['sim-20260724-223555-seed42'] vs sim-20260724-223555-seed42"
+      },
+      {
+        "name": "commit constant and == manifest",
+        "status": "PASS",
+        "detail": "['ae66e63c11b3462e01e05e0509a6f7443aa54b8c'] vs ae66e63c11b3462e01e05e0509a6f7443aa54b8c"
+      },
+      {
+        "name": "random_seed constant and == manifest",
+        "status": "PASS",
+        "detail": "[np.int64(42)] vs 42"
+      },
+      {
+        "name": "data_version constant and == manifest",
+        "status": "PASS",
+        "detail": "['0bc943324ae6'] vs 0bc943324ae6"
+      },
+      {
+        "name": "shelter CJ: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "6 vs 6"
+      },
+      {
+        "name": "shelter CJ: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter OCC: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "43 vs 43"
+      },
+      {
+        "name": "shelter OCC: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter MSCC: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "0 vs 0"
+      },
+      {
+        "name": "shelter MSCC: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "sum(final_occupancy) == n sheltered",
+        "status": "PASS",
+        "detail": "49 vs 49"
+      },
+      {
+        "name": "exposure mean recomputed == manifest",
+        "status": "PASS",
+        "detail": "1330.7599 vs 1330.7599"
+      },
+      {
+        "name": "exposure median recomputed == manifest",
+        "status": "PASS",
+        "detail": "215.5333 vs 215.5333"
+      },
+      {
+        "name": "exposure min recomputed == manifest",
+        "status": "PASS",
+        "detail": "161.9083 vs 161.9083"
+      },
+      {
+        "name": "exposure p25 recomputed == manifest",
+        "status": "PASS",
+        "detail": "194.2208 vs 194.2208"
+      },
+      {
+        "name": "exposure p75 recomputed == manifest",
+        "status": "PASS",
+        "detail": "307.0059 vs 307.0058"
+      },
+      {
+        "name": "exposure p90 recomputed == manifest",
+        "status": "PASS",
+        "detail": "396.0592 vs 396.0592"
+      },
+      {
+        "name": "exposure max recomputed == manifest",
+        "status": "PASS",
+        "detail": "54002.8192 vs 54002.8192"
+      },
+      {
+        "name": "exposure total recomputed == manifest",
+        "status": "PASS",
+        "detail": "66537.9946 vs 66537.9958"
+      },
+      {
+        "name": "exposure gini recomputed == manifest",
+        "status": "PASS",
+        "detail": "0.8234 vs 0.8234"
+      },
+      {
+        "name": "all RR placeholders == 1.0",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "VWE == exposure row-by-row (placeholder RRs)",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "travel_m mean recomputed == manifest",
+        "status": "PASS",
+        "detail": "6041.09 vs 6041.09"
+      },
+      {
+        "name": "travel_m median recomputed == manifest",
+        "status": "PASS",
+        "detail": "3754.69 vs 3754.69"
+      },
+      {
+        "name": "travel_m max recomputed == manifest",
+        "status": "PASS",
+        "detail": "16540.55 vs 16540.55"
+      },
+      {
+        "name": "travel_time_min == (arrived - started) * minutesPerTick",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "per-agent peak PM2.5 <= smoke-field peak",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "per-agent avg PM2.5 <= peak PM2.5",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "sum(hours_above_unhealthy) == manifest person-hours",
+        "status": "PASS",
+        "detail": "258.97 vs 258.97"
+      },
+      {
+        "name": "smoke field out_of_range_lookups == 0",
+        "status": "PASS",
+        "detail": ""
+      }
+    ]
+  },
+  "summary_statistics": {
+    "total_agents": 50,
+    "successful_arrivals": 49,
+    "failed_arrivals": 1,
+    "failed_by_state": {
+      "UNREACHABLE": 1
+    },
+    "arrival_rate": 0.98,
+    "evacuation_start": {
+      "tick": 960,
+      "local": "2020-09-07T16:00",
+      "all_simultaneous": true
+    },
+    "travel_time_min_arrived": {
+      "mean": 78.55,
+      "median": 49.0,
+      "min": 11.0,
+      "p25": 34.0,
+      "p75": 118.0,
+      "p90": 167.4,
+      "max": 212.0
+    },
+    "travel_distance_m_arrived": {
+      "mean": 6164.37,
+      "median": 3876.1,
+      "min": 901.14,
+      "p25": 2654.96,
+      "p75": 9247.14,
+      "p90": 13084.34,
+      "max": 16540.55
+    },
+    "travel_distance_m_all_agents": {
+      "mean": 6041.09,
+      "median": 3754.69,
+      "min": 0.0,
+      "p25": 2613.27,
+      "p75": 9227.76,
+      "p90": 13069.06,
+      "max": 16540.55
+    },
+    "exposure_ugm3h": {
+      "mean": 1330.76,
+      "median": 215.53,
+      "min": 161.91,
+      "p25": 194.22,
+      "p75": 307.01,
+      "p90": 396.06,
+      "max": 54002.82,
+      "total": 66537.99,
+      "gini": 0.8234
+    },
+    "vwe_ugm3h": {
+      "mean": 1330.76,
+      "median": 215.53,
+      "min": 161.91,
+      "p25": 194.22,
+      "p75": 307.01,
+      "p90": 396.06,
+      "max": 54002.82,
+      "total": 66537.99,
+      "gini": 0.8234,
+      "note": "identical to exposure while RR placeholders = 1.0"
+    },
+    "avg_pm25_ugm3": {
+      "mean": 17.75,
+      "median": 12.8,
+      "min": 10.0,
+      "p25": 11.71,
+      "p75": 17.03,
+      "p90": 21.04,
+      "max": 173.09
+    },
+    "peak_pm25_ugm3": {
+      "mean": 99.21,
+      "median": 82.5,
+      "min": 82.5,
+      "p25": 82.5,
+      "p75": 104.7,
+      "p90": 112.1,
+      "max": 562.7
+    },
+    "hours_above_unhealthy": {
+      "mean": 5.18,
+      "median": 0.85,
+      "min": 0.2,
+      "p25": 0.59,
+      "p75": 2.05,
+      "p90": 2.84,
+      "max": 194.0,
+      "total_person_hours": 258.97
+    },
+    "exposure_split_mean_ugm3h": {
+      "while_waiting_pre_evac": 1223.9,
+      "while_traveling_or_stranded": 106.86
+    }
+  },
+  "shelter_statistics": [
+    {
+      "shelter_id": "CJ",
+      "name": "Charles Jordan Community Center",
+      "operating": true,
+      "capacity": 99,
+      "final_occupancy": 6,
+      "peak_occupancy": 6,
+      "unused_capacity": 93,
+      "utilization": 0.0606,
+      "refused_agents": 0,
+      "mean_travel_dist_m_admitted": 3359.47,
+      "arrival_timing": {
+        "first_tick": 981,
+        "first_local": "2020-09-07T16:21",
+        "median_tick": 1002,
+        "last_tick": 1030,
+        "last_local": "2020-09-07T17:10"
+      }
+    },
+    {
+      "shelter_id": "OCC",
+      "name": "Oregon Convention Center",
+      "operating": true,
+      "capacity": 99,
+      "final_occupancy": 43,
+      "peak_occupancy": 43,
+      "unused_capacity": 56,
+      "utilization": 0.4343,
+      "refused_agents": 0,
+      "mean_travel_dist_m_admitted": 6555.76,
+      "arrival_timing": {
+        "first_tick": 971,
+        "first_local": "2020-09-07T16:11",
+        "median_tick": 1011,
+        "last_tick": 1172,
+        "last_local": "2020-09-07T19:32"
+      }
+    },
+    {
+      "shelter_id": "MSCC",
+      "name": "Mount Scott Community Center",
+      "operating": false,
+      "capacity": null,
+      "final_occupancy": 0,
+      "peak_occupancy": 0,
+      "unused_capacity": null,
+      "utilization": null,
+      "refused_agents": 0,
+      "mean_travel_dist_m_admitted": null,
+      "arrival_timing": null
+    }
+  ],
+  "exposure_analysis": {
+    "highest_exposure_agents": [
+      {
+        "agent_id": "Site 24",
+        "final_state": "UNREACHABLE",
+        "shelter_reached": null,
+        "cumulative_dose_ugm3h": 54002.82,
+        "travel_time_min": null,
+        "hours_above_unhealthy": 194.0
+      },
+      {
+        "agent_id": "Site 13",
+        "final_state": "SHELTERED",
+        "shelter_reached": "OCC",
+        "cumulative_dose_ugm3h": 448.76,
+        "travel_time_min": 212.0,
+        "hours_above_unhealthy": 3.55
+      },
+      {
+        "agent_id": "Site 10",
+        "final_state": "SHELTERED",
+        "shelter_reached": "OCC",
+        "cumulative_dose_ugm3h": 426.52,
+        "travel_time_min": 191.0,
+        "hours_above_unhealthy": 3.2
+      },
+      {
+        "agent_id": "Site 12",
+        "final_state": "SHELTERED",
+        "shelter_reached": "OCC",
+        "cumulative_dose_ugm3h": 416.99,
+        "travel_time_min": 182.0,
+        "hours_above_unhealthy": 3.05
+      },
+      {
+        "agent_id": "Site 9",
+        "final_state": "SHELTERED",
+        "shelter_reached": "OCC",
+        "cumulative_dose_ugm3h": 404.47,
+        "travel_time_min": 174.0,
+        "hours_above_unhealthy": 2.92
+      }
+    ],
+    "lowest_exposure_agents": [
+      {
+        "agent_id": "Site 28",
+        "final_state": "SHELTERED",
+        "shelter_reached": "OCC",
+        "cumulative_dose_ugm3h": 161.91,
+        "travel_time_min": 11.0,
+        "hours_above_unhealthy": 0.2
+      },
+      {
+        "agent_id": "Site 31",
+        "final_state": "SHELTERED",
+        "shelter_reached": "OCC",
+        "cumulative_dose_ugm3h": 166.03,
+        "travel_time_min": 14.0,
+        "hours_above_unhealthy": 0.25
+      },
+      {
+        "agent_id": "Site 2",
+        "final_state": "SHELTERED",
+        "shelter_reached": "OCC",
+        "cumulative_dose_ugm3h": 170.16,
+        "travel_time_min": 17.0,
+        "hours_above_unhealthy": 0.3
+      },
+      {
+        "agent_id": "Site 48",
+        "final_state": "SHELTERED",
+        "shelter_reached": "CJ",
+        "cumulative_dose_ugm3h": 175.66,
+        "travel_time_min": 21.0,
+        "hours_above_unhealthy": 0.37
+      },
+      {
+        "agent_id": "Site 47",
+        "final_state": "SHELTERED",
+        "shelter_reached": "OCC",
+        "cumulative_dose_ugm3h": 177.03,
+        "travel_time_min": 22.0,
+        "hours_above_unhealthy": 0.38
+      }
+    ],
+    "travel_time_vs_exposure_arrived": {
+      "pearson_r": 0.9974,
+      "spearman_rho": 1.0,
+      "n": 49,
+      "note": "Structurally near-deterministic: with a county-uniform smoke field and simultaneous evacuation, dose differences among sheltered agents are driven almost entirely by time outdoors (= travel time)."
+    }
+  },
+  "routing_anomaly": {
+    "n_with_route": 49,
+    "n_flagged": 0,
+    "flag_threshold_m": 200.0,
+    "detour_max_m": 135.4,
+    "detour_median_flagged_m": null,
+    "distinct_detour_values_m": [],
+    "flagged_agents": []
+  },
+  "figures": [
+    "fig1_travel_time_hist.png",
+    "fig2_travel_distance_hist.png",
+    "fig3_exposure_distribution.png",
+    "fig4_exposure_by_agent.png",
+    "fig5_shelter_utilization.png"
+  ]
+}
