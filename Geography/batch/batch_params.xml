@@ -1,4 +1,8 @@
 <?xml version="1.0"?>
+<!-- OFFICIAL BASELINE CONFIGURATION (docs/runs/BASELINE_RESULTS.md).
+     Fixed seed 42, 50 agents, corrected street network; future experiments
+     compare against the run this produces. Change values only for new
+     experiments, never for the baseline. -->
 <sweep runs="1">
 	<parameter name="numAgents" type="constant" constant_type="int" value="50"/>
 	<parameter name="randomSeed" type="constant" constant_type="int" value="42"/>
