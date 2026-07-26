@@ -90,13 +90,17 @@ public class ContextCreator implements ContextBuilder {
 	private static final String SCENARIO_B_NAME = "B_capacity_meets_demand_real_locations";
 	private static final String SHELTERS_B_CSV = "data/shelters/shelters_2026_expanded_capacity.csv";
 
-	/** Arm C — B's capacity, optimally placed. Holds B's facility count and
-	 *  per-facility capacity EXACTLY and changes only the coordinates, so any
-	 *  B->C difference is attributable to placement alone. Sites are street-network
-	 *  nodes chosen by capacity-aware greedy p-median (scripts/optimize_2026_placement.py):
-	 *  THEORETICAL locations, not verified venues with filtered indoor air. */
-	private static final String SCENARIO_C_NAME = "C_capacity_meets_demand_optimized_locations";
-	private static final String SHELTERS_C_CSV = "data/shelters/shelters_2026_expanded_optimized.csv";
+	/** Arm C — a BUILDABLE version of B. Every real facility stays exactly where
+	 *  it is and grows only 1.5x instead of B's 3.06x; the capacity B would have
+	 *  poured into those same sites instead funds NEW facilities at street-network
+	 *  optimal locations. TOTAL capacity is held equal to B (6,842), so a B->C
+	 *  difference isolates WHERE the marginal capacity sits — nothing else.
+	 *  Built by scripts/build_scenario_c_2026.py. The new sites are street-network
+	 *  nodes: THEORETICAL locations, not verified venues with filtered indoor air.
+	 *  Existing facilities are never moved, because a real shelter system cannot
+	 *  be picked up and set down somewhere else. */
+	private static final String SCENARIO_C_NAME = "C_existing_expanded_plus_new_optimized_sites";
+	private static final String SHELTERS_C_CSV = "data/shelters/shelters_2026_expanded_plus_new_sites.csv";
 	/** NOT a scenario — the historical-capacity reference run (2 x 99 real beds)
 	 *  retained solely so the model can be compared against the one observed
 	 *  occupancy record (~130 of 198 on 2020-09-16, Street Roots). Used for the
