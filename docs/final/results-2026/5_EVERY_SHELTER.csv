@@ -71,39 +71,49 @@ Scenario,Shelter,Name,Longitude,Latitude,Beds,People inside at the end,People tu
 "B - More beds, in the places we already have",Doreens_Place,Doreen's Place (Transition Projects),-122.677480,45.527488,276,276,383,100.0,1711.79
 "B - More beds, in the places we already have",Menlo_Park_SRV,Menlo Park Safe Rest Village,-122.537593,45.522410,168,168,652,100.0,1275.69
 "B - More beds, in the places we already have",Reedway_SRV,Reedway Safe Rest Village,-122.606664,45.481822,202,202,112,100.0,1715.29
-"C - The same extra beds, in better places",Bybee_Lakes_Hope_Center,Bybee Lakes Hope Center,-122.677609,45.527327,536,536,51,100.0,1839.12
-"C - The same extra beds, in better places",Roseway_Inn_Motel_Shelte,Roseway Inn Motel Shelter,-122.674314,45.514205,459,459,52,100.0,2136.12
-"C - The same extra beds, in better places",Willamette_Center,Willamette Center,-122.689707,45.535665,398,398,28,100.0,1118.32
-"C - The same extra beds, in better places",Lilac_Meadows,Lilac Meadows,-122.670296,45.523109,389,389,183,100.0,1151.05
-"C - The same extra beds, in better places",Laurelwood_Center,Laurelwood Center,-122.571918,45.465833,368,368,199,100.0,1730.56
-"C - The same extra beds, in better places",River_District_Navigatio,River District Navigation Center,-122.747506,45.590142,306,306,28,100.0,1452.69
-"C - The same extra beds, in better places",Clark_Center,Clark Center,-122.682750,45.584518,276,276,169,100.0,5339.19
-"C - The same extra beds, in better places",Gresham_Womens_Shelter,Gresham Women's Shelter,-122.544555,45.489718,276,276,543,100.0,1715.41
-"C - The same extra beds, in better places",Doreens_Place,Doreen's Place (Transition Projects),-122.543241,45.555387,276,276,103,100.0,2629.57
-"C - The same extra beds, in better places",Arbor_Lodge_Shelter,Arbor Lodge Shelter,-122.675258,45.500394,270,270,330,100.0,1931.10
-"C - The same extra beds, in better places",Delta_Park_Motel_Shelter,Delta Park Motel Shelter,-122.574416,45.540881,233,233,33,100.0,2718.45
-"C - The same extra beds, in better places",Walnut_Park_Shelter,Walnut Park Shelter,-122.664644,45.557667,220,220,237,100.0,4595.65
-"C - The same extra beds, in better places",Banfield_Motel_Shelter,Banfield Motel Shelter,-122.576346,45.541808,220,220,40,100.0,2234.15
-"C - The same extra beds, in better places",Dignity_Village,Dignity Village,-122.521026,45.484303,202,202,683,100.0,3208.05
-"C - The same extra beds, in better places",Peninsula_Crossing_SRV,Peninsula Crossing Trail Safe Rest Village,-122.673484,45.519995,202,202,71,100.0,944.59
-"C - The same extra beds, in better places",Reedway_SRV,Reedway Safe Rest Village,-122.608809,45.553917,202,202,231,100.0,11170.29
-"C - The same extra beds, in better places",Sunderland_RV_Safe_Park,Sunderland RV Safe Park,-122.679366,45.498008,187,187,54,100.0,4312.38
-"C - The same extra beds, in better places",Jeans_Place,Jean's Place,-122.678460,45.471261,184,146,0,79.3,7094.82
-"C - The same extra beds, in better places",Menlo_Park_SRV,Menlo Park Safe Rest Village,-122.563081,45.561364,168,168,834,100.0,3867.35
-"C - The same extra beds, in better places",Stark_Street_Motel_Shelt,Stark Street Motel Shelter,-122.679775,45.502990,165,165,15,100.0,15935.60
-"C - The same extra beds, in better places",Rockwood_Bridge_Shelter,Rockwood Bridge Shelter,-122.560499,45.563175,159,159,51,100.0,14665.05
-"C - The same extra beds, in better places",Harrison_Community_Villa,Harrison Community Village,-122.681903,45.502294,129,129,111,100.0,24282.19
-"C - The same extra beds, in better places",BIPOC_SRV,BIPOC Safe Rest Village,-122.578550,45.559880,129,129,271,100.0,11330.09
-"C - The same extra beds, in better places",Queer_Affinity_Village,Queer Affinity Safe Rest Village,-122.683123,45.604416,116,116,129,100.0,13723.62
-"C - The same extra beds, in better places",Behavioral_Health_Resour,Behavioral Health Resource Center,-122.550574,45.572563,101,101,136,100.0,14453.93
-"C - The same extra beds, in better places",Oak_Street_Village,Oak Street Village,-122.681624,45.509202,98,98,14,100.0,3435.92
-"C - The same extra beds, in better places",Porch_Light_Youth_Shelte,Porch Light Youth Shelter,-122.581127,45.559140,92,92,50,100.0,17293.46
-"C - The same extra beds, in better places",Street_Light_Youth_Shelt,Street Light Youth Shelter,-122.679356,45.492386,92,92,12,100.0,35777.24
-"C - The same extra beds, in better places",Thayer_Family_Foundation,Thayer Family Foundation Veterans Motel Shelter,-122.573348,45.561882,64,64,115,100.0,13537.44
-"C - The same extra beds, in better places",Kenton_Womens_Village,Kenton Women's Village,-122.554744,45.573950,64,64,75,100.0,18328.34
-"C - The same extra beds, in better places",St_Johns_Village,St Johns Village,-122.678756,45.514533,64,64,77,100.0,524.18
-"C - The same extra beds, in better places",Arbor_Lodge_Village_Pods,Arbor Lodge Village Pods,-122.587379,45.562669,61,61,106,100.0,10857.99
-"C - The same extra beds, in better places",Avalon_Village,Avalon Village,-122.555803,45.574513,34,34,30,100.0,13870.53
-"C - The same extra beds, in better places",Beacon_Village,Beacon Village,-122.587383,45.563251,34,34,7,100.0,20053.31
-"C - The same extra beds, in better places",Parkrose_Community_Villa,Parkrose Community Village,-122.578039,45.569031,34,34,176,100.0,9715.71
-"C - The same extra beds, in better places",St_Andrews_Village,St Andrews Village,-122.591176,45.561328,34,34,35,100.0,14616.01
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Arbor_Lodge_Shelter,Arbor Lodge Shelter,-122.686753,45.576626,132,132,192,100.0,3416.87
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Bybee_Lakes_Hope_Center,Bybee Lakes Hope Center,-122.757778,45.626297,262,262,223,100.0,37640.04
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Clark_Center,Clark Center,-122.661942,45.512502,135,135,193,100.0,435.91
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Gresham_Womens_Shelter,Gresham Women's Shelter,-122.497037,45.522018,135,0,0,0.0,
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Jeans_Place,Jean's Place,-122.654323,45.523278,90,90,262,100.0,391.09
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Laurelwood_Center,Laurelwood Center,-122.600281,45.491148,180,180,110,100.0,818.83
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",River_District_Navigatio,River District Navigation Center,-122.676937,45.530708,150,150,153,100.0,1309.12
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Walnut_Park_Shelter,Walnut Park Shelter,-122.661833,45.562279,108,108,59,100.0,1310.23
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Willamette_Center,Willamette Center,-122.649327,45.485729,195,195,58,100.0,1341.75
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Banfield_Motel_Shelter,Banfield Motel Shelter,-122.625558,45.534537,108,108,151,100.0,647.67
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Delta_Park_Motel_Shelter,Delta Park Motel Shelter,-122.679565,45.590053,114,114,308,100.0,7536.84
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Roseway_Inn_Motel_Shelte,Roseway Inn Motel Shelter,-122.562494,45.558812,225,225,158,100.0,2832.43
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Rockwood_Bridge_Shelter,Rockwood Bridge Shelter,-122.477620,45.522979,78,3,0,3.8,3873.69
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Stark_Street_Motel_Shelt,Stark Street Motel Shelter,-122.474369,45.519541,81,19,0,23.5,24776.45
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Thayer_Family_Foundation,Thayer Family Foundation Veterans Motel Shelter,-122.685370,45.583337,32,32,49,100.0,1617.65
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Arbor_Lodge_Village_Pods,Arbor Lodge Village Pods,-122.686753,45.576626,30,30,0,100.0,6794.18
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Avalon_Village,Avalon Village,-122.647011,45.504545,16,16,236,100.0,791.39
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Beacon_Village,Beacon Village,-122.585163,45.527605,16,16,145,100.0,426.98
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Dignity_Village,Dignity Village,-122.635880,45.590779,99,99,572,100.0,17508.68
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Harrison_Community_Villa,Harrison Community Village,-122.578184,45.509737,63,63,102,100.0,1109.53
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Kenton_Womens_Village,Kenton Women's Village,-122.691841,45.586652,32,32,6,100.0,706.16
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Oak_Street_Village,Oak Street Village,-122.579609,45.520115,48,48,120,100.0,365.72
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Parkrose_Community_Villa,Parkrose Community Village,-122.533971,45.534177,16,16,173,100.0,391.81
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",St_Andrews_Village,St Andrews Village,-122.721754,45.582464,16,16,25,100.0,653.67
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",St_Johns_Village,St Johns Village,-122.750203,45.590193,32,32,176,100.0,416.00
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Lilac_Meadows,Lilac Meadows,-122.583071,45.496970,190,190,199,100.0,1042.28
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Porch_Light_Youth_Shelte,Porch Light Youth Shelter,-122.688141,45.522468,45,45,151,100.0,522.62
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Street_Light_Youth_Shelt,Street Light Youth Shelter,-122.688141,45.522468,45,45,0,100.0,962.28
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Behavioral_Health_Resour,Behavioral Health Resource Center,-122.679643,45.521959,50,50,31,100.0,359.51
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Sunderland_RV_Safe_Park,Sunderland RV Safe Park,-122.635896,45.595053,92,92,62,100.0,17602.01
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Peninsula_Crossing_SRV,Peninsula Crossing Trail Safe Rest Village,-122.735946,45.583354,99,99,167,100.0,1413.13
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",BIPOC_SRV,BIPOC Safe Rest Village,-122.665928,45.534443,63,63,195,100.0,351.40
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Queer_Affinity_Village,Queer Affinity Safe Rest Village,-122.677686,45.506081,57,57,19,100.0,463.62
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Doreens_Place,Doreen's Place (Transition Projects),-122.677480,45.527488,135,135,27,100.0,700.37
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Menlo_Park_SRV,Menlo Park Safe Rest Village,-122.537593,45.522410,82,82,398,100.0,647.28
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Reedway_SRV,Reedway Safe Rest Village,-122.606664,45.481822,99,99,76,100.0,995.78
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",NEW_optimized_site_01,Proposed clean-air shelter 1 (optimized location),-122.684239,45.525066,350,350,95,100.0,3420.00
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",NEW_optimized_site_02,Proposed clean-air shelter 2 (optimized location),-122.674314,45.514205,350,350,83,100.0,2594.73
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",NEW_optimized_site_03,Proposed clean-air shelter 3 (optimized location),-122.685357,45.536118,349,349,46,100.0,1474.65
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",NEW_optimized_site_04,Proposed clean-air shelter 4 (optimized location),-122.544555,45.489718,349,349,190,100.0,1912.69
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",NEW_optimized_site_05,Proposed clean-air shelter 5 (optimized location),-122.574416,45.540881,349,349,647,100.0,4691.41
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",NEW_optimized_site_06,Proposed clean-air shelter 6 (optimized location),-122.686929,45.585790,349,349,160,100.0,13194.56
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",NEW_optimized_site_07,Proposed clean-air shelter 7 (optimized location),-122.675258,45.500394,349,349,101,100.0,3532.69
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",NEW_optimized_site_08,Proposed clean-air shelter 8 (optimized location),-122.571918,45.465833,349,349,166,100.0,1613.12
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",NEW_optimized_site_09,Proposed clean-air shelter 9 (optimized location),-122.543241,45.555387,349,349,352,100.0,3763.79
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",NEW_optimized_site_10,Proposed clean-air shelter 10 (optimized location),-122.673484,45.519995,349,349,139,100.0,1727.85

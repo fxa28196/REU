@@ -21,51 +21,62 @@ capacity.
 The scenarios are **not** three guesses. Each one answers what the previous one
 measured.
 
-| | What it is | What changed from the previous arm |
-|---|---|---|
-| **A** | **Reality.** Real shelters, real locations, real bed counts. | — |
-| **B** | **More beds, same places.** | capacity only |
-| **C** | **The same extra beds, better placed.** | coordinates only |
+| | What it is | Facilities | Capacity | What changed |
+|---|---|---|---|---|
+| **A** | **Reality.** Real shelters, real locations, real bed counts. | 36 real | 2,234 | — |
+| **B** | **More beds in the buildings we already have.** Every real site grows 3.06×. | 36 real | 6,842 | capacity only |
+| **C** | **Existing sites grow modestly (1.5×), and the rest is built as 10 new shelters at optimal locations.** | 36 real + 10 new | 6,842 | *where* the new capacity sits |
 
 **A is a measurement, not a treatment.** Its job is to reveal which constraint
 actually binds. It reported: capacity. So B relieves capacity and nothing else.
-B then revealed a *second* constraint, so C relieves that one and nothing else.
-Because each step changes exactly one thing, each difference is attributable.
+B then revealed a *second* constraint, so C spends **the identical total
+capacity** differently.
+
+**C never moves an existing shelter.** Every one of the 36 real facilities stays
+at its real coordinates — a real shelter system cannot be picked up and set down
+somewhere else. C only decides where the *new* capacity goes.
+
+Because B and C hold total capacity equal at 6,842, a B→C difference isolates
+**where the marginal capacity sits** and nothing else.
 
 ---
 
 ## Results
 
 Seed 42; the range across seeds 42/43/44 is in brackets. **No range overlaps
-between arms**, so every difference below is far larger than seed noise.
+between arms.**
 
-| | **A — today** | **B — more beds** | **C — better placed** |
+| | **A — today** | **B — bigger existing sites** | **C — modest growth + 10 new sites** |
 |---|---|---|---|
-| Got inside | **2,060 (30.1%)** [2,055–2,060] | **6,264 (91.6%)** [6,259–6,264] | **6,804 (99.4%)** [6,800–6,804] |
-| Turned away | **4,766** | **562** | **0** |
+| Facilities | 36 | 36 | **46** (36 real + 10 new) |
+| Total beds | 2,234 | 6,842 | 6,842 |
+| Got inside | **2,060 (30.1%)** [2,055–2,060] | **6,264 (91.6%)** [6,259–6,264] | **6,570 (96.0%)** [6,565–6,570] |
+| Turned away | **4,766** | **562** | **256** |
 | Couldn't reach any shelter | 16 | 16 | 16 |
-| Beds left empty | 174 | 578 | 38 |
-| Average walk | 18,260 m [18,260–18,356] | 7,938 m [7,938–8,085] | 5,466 m [5,184–5,466] |
-| Person-hours in unhealthy air | 928,934 [928,934–929,924] | 119,921 [119,921–120,881] | 14,944 [14,944–15,650] |
-| Mean exposure (µg·m⁻³·h) | 37,802 [37,802–37,842] | 4,789 [4,789–4,828] | 537 [537–567] |
+| Beds left empty | 174 | 578 | 272 |
+| Average walk | 18,260 m [18,260–18,356] | 7,938 m [7,938–8,085] | 5,689 m [5,198–5,689] |
+| Average hours in unhealthy air | 135.8 | 17.5 | **8.6** |
+| Person-hours in unhealthy air | 928,934 [928,934–929,924] | 119,921 [119,921–120,881] | **59,060** [59,060–59,724] |
+| Average smoke inhaled | 23,374 µg | 3,056 µg | **1,534 µg** |
+| Mean exposure (µg·m⁻³·h) | 37,802 | 4,789 | 2,361 |
 
-**A → B:** sheltered ×3.0, exposure **−87.3%**, person-hours **−87.1%**, walking **−56.5%**
-**B → C:** sheltered +8.6%, exposure **−88.8%**, person-hours **−87.5%**, walking **−31.1%**
-**A → C:** sheltered ×3.3, exposure **−98.6%**, person-hours **−98.4%**, walking **−70.1%**
+**A → B:** sheltered ×3.04, exposure **−87.3%**, person-hours **−87.1%**, walking **−56.5%**
+**B → C:** sheltered +4.9%, exposure **−50.7%**, person-hours **−50.8%**, walking **−28.3%**, **refusals cut in half (562 → 256)**
+**A → C:** sheltered ×3.19, exposure **−93.8%**, person-hours **−93.6%**, inhaled dose **−93.4%**, walking **−68.8%**
 
 ### The finding that matters most
 
-**Scenario B leaves 578 beds empty and 562 people standing outside at the same
-time.** Those two numbers are almost equal. There is no shortage in B — the
-beds exist and go unused, while the people who need them cannot reach them.
+**Scenario B leaves 578 beds empty while turning 562 people away.** Those two
+numbers are nearly equal. B has no shortage — the beds exist and go unused,
+because the people who need them cannot reach them.
 
-That is a pure geography failure, and it is why C exists. C uses **exactly the
-same number of beds as B**, distributed across **exactly the same 36 facilities**,
-and changes nothing but where they sit. It shelters 540 more people and drops
-turned-away to **zero**.
+That is a geography failure, and it is what C fixes. C spends **exactly the
+same 6,842 beds**, but instead of tripling the size of buildings that are
+already in the wrong places, it grows them modestly and puts the difference
+into 10 new shelters where people actually are.
 
-**Capacity gets you most of the way. Placement finishes the job — and nothing
-else can.**
+**Same beds, better places: refusals halve, empty beds halve, walking drops
+28%, and smoke inhaled drops half again.**
 
 ---
 
@@ -73,45 +84,55 @@ else can.**
 
 Percentage of each group that got inside:
 
-| Group | Share of population | A | B | C |
+| Group | Share | A | B | C |
 |---|---|---|---|---|
-| Everyone | 100% | 30.1 | 91.6 | **99.4** |
-| Walks without difficulty | 80.1% | 32.7 | 96.4 | 99.4 |
-| **Has trouble walking** | **19.9%** | **19.7** | **71.9** | **99.5** |
-| Age 18–44 | 52.8% | 30.6 | 93.1 | 99.5 |
-| Age 45–64 | 42.0% | 30.4 | 90.8 | 99.4 |
-| **Age 65+** | **5.2%** | **22.4** | **82.4** | **99.4** |
-| Has asthma | 14.8% | 29.2 | 90.6 | 99.4 |
-| **Has COPD** | **10.8%** | **22.2** | **86.2** | **99.3** |
-| Long-term physical condition | 39.6% | 30.2 | 91.1 | 99.7 |
-| Counted as more vulnerable | 71.1% | 28.2 | 88.8 | 99.5 |
+| Everyone | 100% | 30.1 | 91.6 | **96.0** |
+| Walks without difficulty | 80.1% | 32.7 | 96.4 | 98.6 |
+| **Has trouble walking** | **19.9%** | **19.7** | **71.9** | **85.7** |
+| Age 18–44 | 52.8% | 30.6 | 93.1 | 96.8 |
+| Age 45–64 | 42.0% | 30.4 | 90.8 | 95.8 |
+| **Age 65+** | **5.2%** | **22.4** | **82.4** | **89.8** |
+| Has asthma | 14.8% | 29.2 | 90.6 | 95.7 |
+| **Has COPD** | **10.8%** | **22.2** | **86.2** | **93.8** |
+| Long-term physical condition | 39.6% | 30.2 | 91.1 | 95.8 |
+| Counted as more vulnerable | 71.1% | 28.2 | 88.8 | 94.7 |
 
-**Adding beds alone widens the gap. Placing them well closes it.**
+**Adding beds to existing buildings widens the equity gap. Placing new beds
+well narrows it again.**
 
-Look at the mobility rows. In A the gap between people who walk easily and
-people who don't is 13 points (32.7 vs 19.7). In B — after adding 4,608 beds —
-the gap *grows to 24.5 points* (96.4 vs 71.9), because extra beds at existing
-locations are captured first by whoever can walk fastest. In C the gap is
-**0.1 points**. Placement is not merely more efficient than capacity; it is the
-only one of the two that is equitable.
+The mobility gap — the difference between people who walk easily and people who
+don't:
 
-The same pattern holds for age 65+ (22.4 → 82.4 → 99.4) and COPD
-(22.2 → 86.2 → 99.3). COPD tracks mobility because COPD is the one condition
-with a measured walking-speed decrement (−0.19 m/s, Buekers 2024). Asthma
-shows almost no access penalty, and that is correct, not an omission: no
+| | A | B | C |
+|---|---|---|---|
+| Gap (percentage points) | 13.0 | **24.5** | **12.9** |
+
+In A the gap is 13 points. Pouring 4,608 beds into the *same* buildings widens
+it to 24.5, because extra capacity at an existing site is captured first by
+whoever can walk there fastest. Spending that same capacity on well-placed new
+sites brings the gap back to 12.9 **while lifting the slowest group from 71.9%
+to 85.7%**.
+
+The same pattern holds for age 65+ (22.4 → 82.4 → 89.8) and COPD
+(22.2 → 86.2 → 93.8). COPD tracks mobility because it is the one condition with
+a measured walking-speed decrement (−0.19 m/s, Buekers 2024). Asthma shows
+almost no access penalty, and that is correct rather than an omission: no
 gait-speed evidence exists for asthma, so inventing one would have manufactured
 the finding.
+
+**The gap is narrowed, not closed.** 14.3% of people with mobility limitations
+are still outside in C. Ten new shelters are not enough to reach everyone.
 
 ---
 
 ## The population is real, and so is every starting point
 
 Residents are placed at **2,981 distinct real City-of-Portland campsite report
-locations**, and every result row now carries the actual start coordinate
+locations**, and every result row carries the actual start coordinate
 (`start_lon`, `start_lat`) so the demand geography can be audited without
 re-joining any file.
 
-Sampled attributes reproduce their published marginals:
+Sampled attributes reproduce their published marginals (seed 42):
 
 | Attribute | Target | Realised | Source |
 |---|---|---|---|
@@ -122,9 +143,10 @@ Sampled attributes reproduce their published marginals:
 | COPD | 10.5% | **10.8%** | Zellmer 2025 |
 | Long-term physical condition | 39.1% | **39.6%** | Pathways 2026 (local) |
 
-Attributes are drawn from a separate RNG stream, so the three arms contain the
-**same people with the same bodies standing in the same places** — only the
-shelters differ.
+**Verified:** within each seed, the three arms contain a byte-identical
+population — same agent ids, start coordinates, ages, sexes, mobility, asthma,
+COPD and walking speeds (SHA-256 of the joined attribute vector matches across
+A, B and C for all three seeds). Only the shelters differ.
 
 ---
 
@@ -135,7 +157,7 @@ shelters differ.
 | File | What it is |
 |---|---|
 | `1_EVERY_PERSON.csv` | one row per person: who they are, where they started, what happened |
-| `2_BY_GROUP.csv` | the same outcomes broken down by age, sex, mobility, asthma, COPD |
+| `2_BY_GROUP.csv` | outcomes by age, sex, mobility, asthma, COPD |
 | `3_WHOLE_POPULATION.csv` | the headline table, all three seeds |
 | `4_WHERE_PEOPLE_STARTED.csv` | the 2,981 real encampment locations and how many started at each |
 | `5_EVERY_SHELTER.csv` | every facility: where it is, how full it got, how many it turned away |
@@ -151,8 +173,9 @@ shelters differ.
 ## What this does and does not claim
 
 **The claim:** *optimized shelter placement improves outcomes under the modelled
-assumptions* — and, added by this run, *capacity expansion alone does not
-distribute those improvements equitably.*
+assumptions* — specifically, that for a fixed total capacity, placing new
+capacity at optimized locations outperforms enlarging existing facilities, both
+in aggregate and in equity.
 
 **Not claimed:** that this recreates what happened in 2020. It does not, and
 calibration does not support it. This is a present-day question asked with a
@@ -160,29 +183,31 @@ historical smoke field.
 
 ### Limitations that bear on these numbers
 
-1. **Scenario C's sites are street-network nodes, not real venues.** They are
-   theoretical optima, not buildings with filtered indoor air. C is an upper
-   bound on what placement can buy, not a construction plan.
-2. **Scenario B's uniform 3.06× scale-up is a modelling construct**, not an
-   operational proposal. Real buildings have physical limits.
-3. **Two City facilities are still missing** — Clinton Triangle (160 units, the
-   single largest site) and Multnomah Safe Rest Village (28), neither of which
+1. **C's 10 new sites are street-network nodes, not real venues.** They are
+   theoretical optima, not buildings with filtered indoor air, and no siting,
+   zoning, construction cost or staffing is modelled.
+2. **The 1.5× existing-expansion factor and the choice of 10 new sites are
+   policy parameters**, not measured quantities. Different values would give
+   different magnitudes; the direction is what the comparison establishes.
+3. **B's uniform 3.06× scale-up is likewise a construct** — real buildings have
+   physical limits.
+4. **Two City facilities are still missing** — Clinton Triangle (160 units, the
+   largest single site) and Multnomah Safe Rest Village (28), neither of which
    publishes a street address. Real capacity is ~207 people higher than modelled.
-4. **Ten day centres are excluded** because none publishes a capacity. In a
+5. **Ten day centres are excluded** because none publishes a capacity. In a
    *daytime* smoke episode these are plausibly the most relevant clean-air
-   spaces that exist, so A understates daytime shelter availability.
-5. **Three shelter coordinates are block- or intersection-level**, accurate to a
+   spaces that exist, so A understates daytime availability.
+6. **Three shelter coordinates are block- or intersection-level**, accurate to a
    few hundred metres.
-6. **Sex and mobility distributions are 2019** inside an otherwise 2026 study;
+7. **Sex and mobility distributions are 2019** inside an otherwise 2026 study;
    no local replacement was found.
-7. **Asthma and COPD prevalences are imported from Minnesota** (Zellmer 2025);
-   no local figure exists.
-8. **A-12 — everyone is assumed to know the shelters exist.** Local survey
-   evidence says 65% never heard of them. Every "got inside" number here is
-   therefore an **upper bound**.
-9. **A-16 — admission is order-dependent**; residents are served in shuffle
-   order rather than by need. This matters most in A, where capacity binds hard.
-10. **Encampment locations are 2025–26 reports** used as a spatial proxy for
+8. **Asthma and COPD prevalences are imported from Minnesota** (Zellmer 2025).
+9. **A-12 — everyone is assumed to know the shelters exist.** Local survey
+   evidence says 65% never heard of them, so every "got inside" figure is an
+   **upper bound**.
+10. **A-16 — admission is order-dependent**; residents are served in shuffle
+    order rather than by need. This matters most in A, where capacity binds hard.
+11. **Encampment locations are 2025–26 reports** used as a spatial proxy for
     2020, and they are complaint-driven, so they carry visibility bias.
-11. **All 36 facilities are modelled as open from hour 0**, appropriate for a
+12. **All facilities are modelled as open from hour 0**, appropriate for a
     year-round present-day system but not a claim about activation timing.

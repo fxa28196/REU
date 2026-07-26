@@ -5,6 +5,6 @@ Scenario,Seed,People in the simulation,Shelters,Total beds,Got inside,Got inside
 "B - More beds, in the places we already have",42,6842,36,6842,6264,91.6,562,16,578,7938,17.5,3056,32765083,119921
 "B - More beds, in the places we already have",43,6842,36,6842,6259,91.5,558,25,583,7939,17.7,3080,33034278,120881
 "B - More beds, in the places we already have",44,6842,36,6842,6260,91.5,558,24,582,8085,17.7,3077,32989513,120805
-"C - The same extra beds, in better places",42,6842,36,6842,6804,99.4,0,38,38,5466,2.2,419,3671260,14944
-"C - The same extra beds, in better places",43,6842,36,6842,6800,99.4,0,42,42,5279,2.3,436,3879046,15650
-"C - The same extra beds, in better places",44,6842,36,6842,6800,99.4,0,42,42,5184,2.3,434,3870239,15551
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",42,6842,46,6842,6570,96.0,256,16,272,5689,8.6,1534,16156745,59060
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",43,6842,46,6842,6565,96.0,252,25,277,5198,8.7,1551,16399286,59659
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",44,6842,46,6842,6566,96.0,252,24,276,5443,8.7,1551,16364848,59724

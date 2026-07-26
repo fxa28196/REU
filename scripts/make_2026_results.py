@@ -26,7 +26,7 @@ SEEDS = [42, 43, 44]
 ARMS = {
     "A": "A - Today (real shelters, real number of beds)",
     "B": "B - More beds, in the places we already have",
-    "C": "C - The same extra beds, in better places",
+    "C": "C - Existing shelters a bit bigger, plus 10 new ones in better places",
 }
 COLOR = {"A": "#c0392b", "B": "#e67e22", "C": "#27ae60"}
 
