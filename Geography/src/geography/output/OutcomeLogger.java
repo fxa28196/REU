@@ -341,8 +341,14 @@ public class OutcomeLogger {
 			"data/Streets.prj", "data/Streets.cpg",
 			"data/airnow/aqs_hourly_pm25_portland_2020-09.csv",
 			"data/shelters/shelters_2020-09.csv",
-			"data/shelters/shelters_A_placement_current.csv",
-			"data/shelters/shelters_B_placement_optimized.csv",
+			// The three present-day study arms. These replaced
+			// shelters_{A,B}_placement_*.csv, which belonged to the retired
+			// capacity-equalized 2020 design: those files still existed on disk,
+			// so this block kept checksumming them and silently omitted every
+			// shelter file that actually drove a run.
+			"data/shelters/shelters_2026_current_placement.csv",
+			"data/shelters/shelters_2026_expanded_capacity.csv",
+			"data/shelters/shelters_2026_expanded_plus_new_sites.csv",
 			"data/encampments/irp_campsite_reports_sample.csv",
 			"data/registry/variables.csv", "data/registry/assumptions.csv",
 		};
