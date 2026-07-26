@@ -1,11 +1,11 @@
 {
   "schema": "reu-wildfire-shelter-abm/simulation/v1",
-  "generated_utc": "2026-07-25T22:52:17.981295100",
+  "generated_utc": "2026-07-25T23:31:00.439003700",
   "reproducibility": {
     "random_seed": 42,
-    "sim_id": "sim-20260725-225210-seed42",
+    "sim_id": "sim-20260725-233053-seed42",
     "data_version_tag": "0c1d98308440",
-    "git_commit": "ccad7b70fd659026bf1e9f796cd7ec0c8a1582e0",
+    "git_commit": "6616232434c84b43ee9551f9ba3f5419cf021cb3",
     "java_version": "17.0.19",
     "repast_version": "2.11.0",
     "parameters": {"numAgents": 2037, "minutesPerTick": 1.0, "walkingSpeedMps": 1.3, "shelterArrivalDistanceM": 200.0, "simulationHours": 312, "randomSeed": 42, "evacuationThresholdUgM3": 55.5, "scenarioCode": 1, "enableHeterogeneity": 1, "respectShelterOpeningDates": 1},
@@ -70,28 +70,28 @@
   "stratified_exposure": {
     "definition": "vulnerable_any = age 55+ OR mobility-limited OR asthma OR COPD; a REPORTING STRATUM, not a risk score (decision D-3)",
     "strata": [
-      {"stratum": "vulnerable_any", "member": true, "n": 966, "sheltered_share": 0.0807, "mean_exposure_ugm3h": 49899.65, "mean_travel_m": 9545.21, "mean_travel_time_min": 535.81, "mean_walking_speed_mps": 1.2305},
-      {"stratum": "vulnerable_any", "member": false, "n": 1071, "sheltered_share": 0.1120, "mean_exposure_ugm3h": 48300.76, "mean_travel_m": 9153.15, "mean_travel_time_min": 514.30, "mean_walking_speed_mps": 1.3940},
-      {"stratum": "age55plus", "member": true, "n": 396, "sheltered_share": 0.0808, "mean_exposure_ugm3h": 49865.79, "mean_travel_m": 9261.37, "mean_travel_time_min": 425.47, "mean_walking_speed_mps": 1.2252},
-      {"stratum": "age55plus", "member": false, "n": 1641, "sheltered_share": 0.1012, "mean_exposure_ugm3h": 48864.30, "mean_travel_m": 9357.83, "mean_travel_time_min": 541.53, "mean_walking_speed_mps": 1.3384},
+      {"stratum": "vulnerable_any", "member": true, "n": 966, "sheltered_share": 0.0694, "mean_exposure_ugm3h": 50462.23, "mean_travel_m": 9547.38, "mean_travel_time_min": 468.61, "mean_walking_speed_mps": 1.1920},
+      {"stratum": "vulnerable_any", "member": false, "n": 1071, "sheltered_share": 0.1223, "mean_exposure_ugm3h": 47793.37, "mean_travel_m": 9151.19, "mean_travel_time_min": 550.60, "mean_walking_speed_mps": 1.3940},
+      {"stratum": "age55plus", "member": true, "n": 396, "sheltered_share": 0.0783, "mean_exposure_ugm3h": 49989.72, "mean_travel_m": 9261.37, "mean_travel_time_min": 405.71, "mean_walking_speed_mps": 1.2073},
+      {"stratum": "age55plus", "member": false, "n": 1641, "sheltered_share": 0.1018, "mean_exposure_ugm3h": 48834.42, "mean_travel_m": 9357.83, "mean_travel_time_min": 544.60, "mean_walking_speed_mps": 1.3201},
       {"stratum": "mobility_limited", "member": true, "n": 369, "sheltered_share": 0.0379, "mean_exposure_ugm3h": 52034.48, "mean_travel_m": 9516.90, "mean_travel_time_min": 227.43, "mean_walking_speed_mps": 1.0136},
-      {"stratum": "mobility_limited", "member": false, "n": 1668, "sheltered_share": 0.1103, "mean_exposure_ugm3h": 48400.75, "mean_travel_m": 9299.74, "mean_travel_time_min": 545.24, "mean_walking_speed_mps": 1.3834},
-      {"stratum": "asthma", "member": true, "n": 290, "sheltered_share": 0.1000, "mean_exposure_ugm3h": 48984.18, "mean_travel_m": 9936.34, "mean_travel_time_min": 718.66, "mean_walking_speed_mps": 1.3285},
-      {"stratum": "asthma", "member": false, "n": 1747, "sheltered_share": 0.0967, "mean_exposure_ugm3h": 49071.42, "mean_travel_m": 9239.93, "mean_travel_time_min": 489.16, "mean_walking_speed_mps": 1.3144},
-      {"stratum": "copd", "member": true, "n": 250, "sheltered_share": 0.0880, "mean_exposure_ugm3h": 49527.01, "mean_travel_m": 9647.61, "mean_travel_time_min": 522.86, "mean_walking_speed_mps": 1.3080},
-      {"stratum": "copd", "member": false, "n": 1787, "sheltered_share": 0.0985, "mean_exposure_ugm3h": 48993.52, "mean_travel_m": 9295.91, "mean_travel_time_min": 522.76, "mean_walking_speed_mps": 1.3176},
-      {"stratum": "any_respiratory", "member": true, "n": 501, "sheltered_share": 0.0998, "mean_exposure_ugm3h": 48969.45, "mean_travel_m": 9762.71, "mean_travel_time_min": 646.72, "mean_walking_speed_mps": 1.3132},
-      {"stratum": "any_respiratory", "member": false, "n": 1536, "sheltered_share": 0.0964, "mean_exposure_ugm3h": 49088.20, "mean_travel_m": 9200.90, "mean_travel_time_min": 480.90, "mean_walking_speed_mps": 1.3175}
+      {"stratum": "mobility_limited", "member": false, "n": 1668, "sheltered_share": 0.1103, "mean_exposure_ugm3h": 48400.78, "mean_travel_m": 9299.74, "mean_travel_time_min": 545.33, "mean_walking_speed_mps": 1.3611},
+      {"stratum": "asthma", "member": true, "n": 290, "sheltered_share": 0.1034, "mean_exposure_ugm3h": 48814.95, "mean_travel_m": 9936.34, "mean_travel_time_min": 729.43, "mean_walking_speed_mps": 1.3065},
+      {"stratum": "asthma", "member": false, "n": 1747, "sheltered_share": 0.0962, "mean_exposure_ugm3h": 49099.53, "mean_travel_m": 9239.93, "mean_travel_time_min": 485.96, "mean_walking_speed_mps": 1.2968},
+      {"stratum": "copd", "member": true, "n": 250, "sheltered_share": 0.0400, "mean_exposure_ugm3h": 51897.14, "mean_travel_m": 9655.99, "mean_travel_time_min": 6.70, "mean_walking_speed_mps": 1.1593},
+      {"stratum": "copd", "member": false, "n": 1787, "sheltered_share": 0.1052, "mean_exposure_ugm3h": 48661.97, "mean_travel_m": 9294.74, "mean_travel_time_min": 550.31, "mean_walking_speed_mps": 1.3176},
+      {"stratum": "any_respiratory", "member": true, "n": 501, "sheltered_share": 0.0778, "mean_exposure_ugm3h": 50054.19, "mean_travel_m": 9766.89, "mean_travel_time_min": 562.56, "mean_walking_speed_mps": 1.2390},
+      {"stratum": "any_respiratory", "member": false, "n": 1536, "sheltered_share": 0.1035, "mean_exposure_ugm3h": 48734.42, "mean_travel_m": 9199.53, "mean_travel_time_min": 513.11, "mean_walking_speed_mps": 1.3175}
     ]
   },
   "scenario": "B_optimized_placement",
-  "population_sampling": {"heterogeneity": true, "n_sampled": 2037, "realised_mobility_limited": 0.1811, "realised_asthma": 0.1424, "realised_copd": 0.1227, "realised_any_respiratory": 0.2459, "realised_age_55plus": 0.1944, "mean_walking_speed_mps": 1.3164, "published_targets": "targets: mobility 0.192 (PIT 2019, lower bound) | asthma 0.150 (Zellmer 2025) | COPD 0.105 (Zellmer 2025) | any respiratory 0.239 (independent draws; CASPEH measured 0.25) | age 55+ 0.204 (PIT 2019)"},
+  "population_sampling": {"heterogeneity": true, "n_sampled": 2037, "realised_mobility_limited": 0.1811, "realised_asthma": 0.1424, "realised_copd": 0.1227, "realised_any_respiratory": 0.2459, "realised_age_55plus": 0.1944, "mean_walking_speed_mps": 1.2982, "published_targets": "targets: mobility 0.192 (PIT 2019, lower bound) | asthma 0.150 (Zellmer 2025) | COPD 0.105 (Zellmer 2025) | any respiratory 0.239 (independent draws; CASPEH measured 0.25) | age 55+ 0.204 (PIT 2019)"},
   "population": {
     "n_agents": 2037,
     "pre_evac": 0, "sheltered": 198, "en_route": 0, "unreachable": 15, "refused_all_full": 1824,
-    "exposure_ugm3h": {"mean": 49058.9961, "median": 54002.8192, "min": 1354.1042, "p25": 54002.8192, "p75": 54002.8192, "p90": 54002.8192, "max": 54002.8192, "total": 99933175.1233, "gini": 0.0911},
-    "vwe_ugm3h": {"mean": 49058.9961, "median": 54002.8192, "total": 99933175.1233, "gini": 0.0911},
-    "total_person_hours_above_unhealthy": 359682.45,
+    "exposure_ugm3h": {"mean": 49059.0169, "median": 54002.8192, "min": 1354.1042, "p25": 54002.8192, "p75": 54002.8192, "p90": 54002.8192, "max": 54002.8192, "total": 99933217.5050, "gini": 0.0911},
+    "vwe_ugm3h": {"mean": 49059.0169, "median": 54002.8192, "total": 99933217.5050, "gini": 0.0911},
+    "total_person_hours_above_unhealthy": 359682.72,
     "travel_m": {"mean": 9339.07, "median": 9941.86, "max": 20951.78}
   },
   "shelters": [

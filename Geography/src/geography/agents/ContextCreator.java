@@ -74,6 +74,16 @@ public class ContextCreator implements ContextBuilder {
 	 *  not a policy recommendation: see docs/runs/scenario-b-optimization/. */
 	private static final String SCENARIO_B_NAME = "B_optimized_placement";
 	private static final String SHELTERS_OPTIMIZED_CSV = "data/shelters/shelters_optimized_2020-09.csv";
+	/** Scenario C — DEMONSTRATION ONLY. Real shelter locations and opening dates,
+	 *  but total capacity raised to equal the simulated population so that
+	 *  capacity is no longer the binding constraint and the exposure effect of
+	 *  travel alone becomes visible. Relative site capacities stay 1:1, matching
+	 *  the equal capacities the source reports, so shelters still fill in
+	 *  sequence and residents still redirect. <b>This is not real-world shelter
+	 *  availability and must never be presented as such.</b> */
+	private static final String SCENARIO_C_NAME = "C_capacity_neutral_demonstration";
+	private static final String SHELTERS_CAPACITY_NEUTRAL_CSV =
+			"data/shelters/shelters_capacity_neutral_2020-09.csv";
 
 	// V13 anchor: simulation hour 0 = local midnight at the start of the study
 	// window (Portland's Sept 7-19 2020 smoke episode).
@@ -99,8 +109,18 @@ public class ContextCreator implements ContextBuilder {
 		int scenarioCode = intParam(parm, "scenarioCode", 0);
 		int enableHeterogeneity = intParam(parm, "enableHeterogeneity", 0);
 		int respectShelterOpeningDates = intParam(parm, "respectShelterOpeningDates", 0);
-		String scenarioName = (scenarioCode == 1) ? SCENARIO_B_NAME : SCENARIO_A_NAME;
-		String sheltersCsv = (scenarioCode == 1) ? SHELTERS_OPTIMIZED_CSV : SHELTERS_CSV;
+		String scenarioName;
+		String sheltersCsv;
+		if (scenarioCode == 1) {
+			scenarioName = SCENARIO_B_NAME;
+			sheltersCsv = SHELTERS_OPTIMIZED_CSV;
+		} else if (scenarioCode == 2) {
+			scenarioName = SCENARIO_C_NAME;
+			sheltersCsv = SHELTERS_CAPACITY_NEUTRAL_CSV;
+		} else {
+			scenarioName = SCENARIO_A_NAME;
+			sheltersCsv = SHELTERS_CSV;
+		}
 
 		// Scientific governance: validate the variable and assumption registries
 		// before anything else runs, so a registry defect stops the run rather
