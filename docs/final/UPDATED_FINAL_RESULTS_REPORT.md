@@ -8,7 +8,7 @@ during the September 2020 wildfire-smoke episode.**
 | Design | Two-arm placement experiment: **A** = historical shelter locations · **B** = street-network optimum |
 | Population | n = 2,037 residents per run; seeds 42, 43, 44 per arm (6 runs) |
 | Model commit | **`02c3181`**, working tree clean (`git_working_tree_dirty: false` in every manifest) |
-| Governance | 27 variables / 24 assumptions, registry hashes recorded and matching disk |
+| Governance | 28 variables / 26 assumptions, registry hashes recorded and matching disk |
 | Integrity | 12 files checksummed per run, including all shapefile sidecars and both registries |
 | Archived | `docs/runs/final-placement-experiment/{A,B}-seed{42,43,44}/` · reference run: `docs/runs/historical-capacity-reference/` |
 
