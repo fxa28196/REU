@@ -11,12 +11,15 @@ randomSeed, so a difference between two files is the only thing that can explain
 a difference between two runs.
 """
 import pathlib
+import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 BATCH = ROOT / "Geography/batch"
 
 N_AGENTS = 6842      # 2025 Tri-County PIT: 10,526 homeless, >65% unsheltered
-SEEDS = [42, 43, 44]
+# Seeds may be passed on the command line (e.g. `make_batch_params_2026.py 48 49 50`
+# generated the third replication batch); the original experiment used 42/43/44.
+SEEDS = [int(s) for s in sys.argv[1:]] or [42, 43, 44]
 ARMS = {
     "A": (0, "REALITY - every clean-air-capable facility the county actually "
              "operates today (36 sites, 2,234 people-capacity) at its real "
