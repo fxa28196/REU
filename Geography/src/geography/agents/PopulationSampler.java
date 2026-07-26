@@ -36,10 +36,9 @@ public class PopulationSampler {
 	// Minors excluded per decision D-4 (6 people; separate service systems and no
 	// child-specific mobility evidence), adult bands renormalised to 1.
 	public enum AgeBand {
-		A18_24("18-24", 18, 25),
-		A25_54("25-54", 25, 55),
-		A55_69("55-69", 55, 70),
-		A70_PLUS("70+", 70, 90);   // upper bound 90 = numerical guard, not a measurement
+		A18_44("18-44", 18, 45),
+		A45_64("45-64", 45, 65),
+		A65_PLUS("65+", 65, 90);   // upper bound 90 = numerical guard, not a measurement
 
 		public final String label;
 		final int lowInclusive;
@@ -53,8 +52,12 @@ public class PopulationSampler {
 	}
 
 	private static final AgeBand[] AGE_BANDS = AgeBand.values();
-	/** Renormalised adult shares (0.067/0.727/0.191/0.012 ÷ 0.997). */
-	private static final double[] AGE_WEIGHTS = { 0.06720, 0.72918, 0.19158, 0.01204 };
+	/** Pathways Study 2026 (N = 541, Multnomah County, PSU HRAC / OHSU), Table 2.1:
+	 *  18-24 6.3% + 25-34 20.3% + 35-44 26.1% = 52.7%; 45-54 25.3% + 55-64 17.0%
+	 *  = 42.3%; 65+ 5.0%. Adults only — the survey does not cover minors.
+	 *  <b>Supersedes the 2019 PIT bands</b> for the present-day study: Pathways is
+	 *  local, current, and contemporaneous with the 2026 shelter network. */
+	private static final double[] AGE_WEIGHTS = { 0.527, 0.423, 0.050 };
 
 	// ---- V19 Sex · class M (local measurement) ------------------------------
 	// Same source (D10): male 0.685, female 0.293, transgender 0.011,
@@ -117,6 +120,21 @@ public class PopulationSampler {
 	// units, landline/cell households) structurally exclude unsheltered people.
 	private static final double P_ASTHMA = 0.15;
 	private static final double P_COPD   = 0.105;
+
+	/** Any chronic physical health condition — the LOCAL, survey-measured figure.
+	 *  Pathways Study 2026 (N = 541, Multnomah County, PSU HRAC / OHSU), Table 2.1:
+	 *  "physical illness / chronic condition / physical disability" 194 (39.1%).
+	 *  Independently triangulated by the City of Portland Shelter Services annual
+	 *  report FY2023-24, which puts any-disability at 69% of 1,800 sheltered
+	 *  people against Pathways' 73% — two agencies, different populations,
+	 *  different methods.
+	 *
+	 *  <p>This is a REPORTING stratum and does not drive movement. The asthma /
+	 *  COPD split is retained separately because only COPD has a verified
+	 *  gait-speed effect (Buekers 2024) and Pathways reports a single combined
+	 *  category that cannot support that mechanism. Sensitivity 0.313-0.469
+	 *  (published 0.391; responder-only 0.446). */
+	private static final double P_CHRONIC_PHYSICAL = 0.391;
 
 	// Asthma and COPD are sampled INDEPENDENTLY OF AGE, and that is an
 	// evidence-based choice rather than a convenience: Brown et al. 2017
@@ -197,11 +215,13 @@ public class PopulationSampler {
 		public final MobilityCategory mobilityCategory;
 		public final boolean asthma;
 		public final boolean copd;
+		/** Any chronic physical health condition (Pathways 2026, local). */
+		public final boolean chronicPhysical;
 		public final double walkingSpeedMps;
 
 		Attributes(int ageYears, AgeBand ageBand, Sex sex, boolean mobilityLimited,
 				MobilityCategory mobilityCategory, boolean asthma, boolean copd,
-				double walkingSpeedMps) {
+				boolean chronicPhysical, double walkingSpeedMps) {
 			this.ageYears = ageYears;
 			this.ageBand = ageBand;
 			this.sex = sex;
@@ -209,6 +229,7 @@ public class PopulationSampler {
 			this.mobilityCategory = mobilityCategory;
 			this.asthma = asthma;
 			this.copd = copd;
+			this.chronicPhysical = chronicPhysical;
 			this.walkingSpeedMps = walkingSpeedMps;
 		}
 	}
@@ -223,6 +244,7 @@ public class PopulationSampler {
 	private int nAsthma = 0;
 	private int nCopd = 0;
 	private int nAnyRespiratory = 0;
+	private int nChronicPhysical = 0;
 	private int n55Plus = 0;
 	private double speedSum = 0;
 
@@ -253,6 +275,7 @@ public class PopulationSampler {
 
 		boolean asthma = rng.nextDouble() < P_ASTHMA;
 		boolean copd = rng.nextDouble() < P_COPD;
+		boolean chronicPhysical = rng.nextDouble() < P_CHRONIC_PHYSICAL;
 
 		double speed;
 		if (mobilityLimited) {
@@ -274,11 +297,12 @@ public class PopulationSampler {
 		if (asthma) nAsthma++;
 		if (copd) nCopd++;
 		if (asthma || copd) nAnyRespiratory++;
+		if (chronicPhysical) nChronicPhysical++;
 		if (ageYears >= 55) n55Plus++;
 		speedSum += speed;
 
 		return new Attributes(ageYears, band, sex, mobilityLimited, mobilityCategory,
-				asthma, copd, speed);
+				asthma, copd, chronicPhysical, speed);
 	}
 
 	/**
@@ -329,6 +353,7 @@ public class PopulationSampler {
 	public double getAsthmaShare() { return share(nAsthma); }
 	public double getCopdShare() { return share(nCopd); }
 	public double getAnyRespiratoryShare() { return share(nAnyRespiratory); }
+	public double getChronicPhysicalShare() { return share(nChronicPhysical); }
 	public double getAge55PlusShare() { return share(n55Plus); }
 	public double getMeanWalkingSpeedMps() { return nSampled == 0 ? Double.NaN : speedSum / nSampled; }
 
@@ -340,6 +365,7 @@ public class PopulationSampler {
 	public static String publishedTargets() {
 		return "targets: mobility 0.192 (PIT 2019, lower bound) | asthma 0.150 "
 				+ "(Zellmer 2025) | COPD 0.105 (Zellmer 2025) | any respiratory 0.239 "
-				+ "(independent draws; CASPEH measured 0.25) | age 55+ 0.204 (PIT 2019)";
+				+ "(independent draws) | chronic physical 0.391 (Pathways 2026, local) | "
+				+ "age bands 0.527/0.423/0.050 (Pathways 2026)";
 	}
 }

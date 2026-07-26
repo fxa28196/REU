@@ -123,7 +123,7 @@ public class OutcomeLogger {
 					// heterogeneity is disabled - never a fabricated default.
 					+ "scenario,walking_speed_mps,age_years,age_band,sex,"
 					+ "mobility_limited,mobility_category,asthma_flag,copd_flag,"
-					+ "any_respiratory,vulnerable_flag,"
+					+ "any_respiratory,chronic_physical,vulnerable_flag,"
 					// Exposure / dose / risk kept as three separate columns so
 					// physics and biology are never conflated (HEALTH_MODEL_AUDIT).
 					+ "air_volume_breathed_m3,mean_ventilation_m3h,"
@@ -151,12 +151,13 @@ public class OutcomeLogger {
 				String legacyAsthma = at == null ? "" : (at.asthma ? "1" : "0");
 				String legacyCopd = at == null ? "" : (at.copd ? "1" : "0");
 				String het = (at == null)
-						? ",,,,,,,,,"
-						: String.format(Locale.US, "%.4f,%d,%s,%s,%d,%s,%d,%d,%d,%d",
+						? ",,,,,,,,,,"
+						: String.format(Locale.US, "%.4f,%d,%s,%s,%d,%s,%d,%d,%d,%d,%d",
 								at.walkingSpeedMps, at.ageYears, at.ageBand.label, at.sex,
 								at.mobilityLimited ? 1 : 0, at.mobilityCategory.label,
 								at.asthma ? 1 : 0, at.copd ? 1 : 0,
 								(at.asthma || at.copd) ? 1 : 0,
+								at.chronicPhysical ? 1 : 0,
 								isVulnerable(at) ? 1 : 0);
 				w.printf(Locale.US,
 						"%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s,%.2f,%.4f,%.4f,%.4f,%.4f,%s,%s,%s,%.3f,%.3f,%s,%.2f,%.2f,%d,%s,%s,%.4f,%.4f,%.4f,%.3f,%.4f%n",
@@ -475,7 +476,8 @@ public class OutcomeLogger {
 	 * cannot ("this group suffered more harm").
 	 */
 	private static boolean isVulnerable(geography.agents.PopulationSampler.Attributes at) {
-		return at.ageYears >= 55 || at.mobilityLimited || at.asthma || at.copd;
+		return at.ageYears >= 55 || at.mobilityLimited || at.asthma || at.copd
+				|| at.chronicPhysical;
 	}
 
 	/** Mean of a per-agent quantity over a stratum, or NaN if the stratum is empty. */
