@@ -9,6 +9,15 @@ guard. Two findings reframe the sequencing and are stated first.
 
 ## Finding A (CRITICAL) — the retarget path walks agents back to their encampment
 
+> **RESOLVED.** Fixed per decision **D-6** (`09-DECISIONS.md`): refused
+> residents now remain at the refusing shelter's street node and re-plan from
+> that node (`GisAgent.currentNodeId`); V11 keeps its first-selection meaning;
+> `agents.csv` gains `planned_route_m` + `door_refusals`; the
+> walked-vs-planned check in `analyze_run.py` is now a **failing** check, and a
+> capacity-binding reference run is archived. Registry assumption **A-17**
+> moved `blocking` → `active` (the remaining assumption is behavioural:
+> instant re-decision at the door, no queueing/abandonment).
+
 **Mechanism.** When a resident is refused at a full shelter, `GisAgent` clears
 `routePath` and `pathIndex`. Next tick, `chooseNetworkNearestShelter` rebuilds
 the path with `pathToSource(tree, startNodeId)` — from the **immutable start

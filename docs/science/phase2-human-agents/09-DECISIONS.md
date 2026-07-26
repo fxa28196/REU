@@ -168,6 +168,53 @@ overwriting it.
 
 ---
 
+## D-6 — Refusal re-routing: remain in place, re-plan from the refusing shelter's node
+
+**Question.** When a shelter fills between route selection and arrival, the
+resident is refused at the door. Where does it go next? As implemented before
+this decision (Finding A, `10-FAILURE-MODES.md`; registry assumption A-17), the
+re-route was rebuilt from the *immutable start node*, so the resident walked a
+straight off-network line back to its encampment before setting out again —
+inflating travel distance, travel time and accrued dose for every refused
+resident. That behaviour was an accident of implementation, not a model.
+
+| Option | Consequence |
+|---|---|
+| **A. Re-plan from the resident's current node** (the refusing shelter's street node) | The resident stays where it stands and walks on to the next-nearest shelter with space, using the same network-nearest selection rule. No new behavioural parameter; every leg is a shortest path from where the person actually is. |
+| **B. Model return-to-encampment as behaviour** | Would assert that refused people walk home before trying again — an empirical claim about evacuation behaviour with no supporting source. Also maximises exposure by construction. |
+| **C. Queue at the full shelter** | Plausible real behaviour, but requires queue-discipline and abandonment parameters that have no source, and shelters here have no modelled departures for a queue to absorb. |
+
+**Decision: A.** The refused resident remains at the refusing shelter's
+location and selects the next shelter by the *existing* routing logic
+(minimum street-network distance among operating shelters with space),
+measured from its current graph node. Selection happens on the next tick,
+preserving the established one-decision-per-tick cadence. Re-targeting remains
+bounded (`MAX_RETARGETS = 8`) as a livelock guard; exhaustion → `REFUSED_ALL_FULL`.
+
+**Reasoning.** A is the only option that adds no unsourced behavioural
+parameter: it is the minimal correct completion of the already-documented
+capacity rule (V12). B and C would each introduce assumptions the registry
+cannot support. This matches A-17's registered sensitivity plan verbatim.
+
+**Metric semantics preserved.** V11 `network_dist_to_shelter_m` keeps its
+documented meaning — network distance from the *starting* node to the *first*
+selected shelter (initial accessibility). Three QC columns are appended to
+`agents.csv` (append-only contract, D-2): `planned_route_m` — the sum of all
+planned leg lengths — `snap_gap_m` — off-network metres from the resident's
+position to each leg's first waypoint (dominated by the encampment→street
+snap; observed up to ~500 m for campsites far from a mapped street) — and
+`door_refusals`. The analysis pipeline now enforces
+walked ≤ planned + snap gap + 200 m as a **failing** check (A-17's guard,
+formulated exactly as registered: "snap plus the sum of planned leg
+distances"); the print-only version was itself a flagged defect (Finding A
+note).
+
+**Behavioural assumption remaining (A-17, now `active`).** Instant
+re-decision at the door with full knowledge of remaining shelter capacity;
+no queueing, no abandonment, no return-home choice. Future work.
+
+---
+
 ## Decisions deferred — explicitly not yet due
 
 - **Whether to enable susceptibility weighting at all** (weights ≠ 1.0) awaits

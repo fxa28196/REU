@@ -36,6 +36,9 @@ V1–V16), [`VARIABLES.md`](VARIABLES.md), [`DATA_SOURCES.md`](DATA_SOURCES.md),
 | `peak_conc_ugm3` | µg/m³ | Maximum C_breathed experienced. | — |
 | `age_rr` | dimensionless | RR_age applied (V2). | **1.0 = no age weighting** (unsourced; DATA_SOURCES D5). |
 | `comorbidity_rr` | dimensionless | RR_com applied (V4). | **1.0 = no comorbidity weighting** (unsourced; DATA_SOURCES D6). |
+| `planned_route_m` | metres | Sum of the network lengths of every planned route leg: the initial selection plus one leg per post-refusal re-route from the refusing shelter's node (D-6/A-17). | QC quantity, not a scientific variable. Invariant enforced by `analyze_run.py` as a **failing** check: `total_travel_distance_m` ≤ `planned_route_m` + `snap_gap_m` + 200 m tolerance. 0 for residents that never planned a route. |
+| `snap_gap_m` | metres | Off-network metres from where the resident stood to the first waypoint of each planned leg: encampment→street snap gap on leg 1 (hundreds of metres for campsites far from a mapped street), polyline endpoint gaps (≤ ~12 m) on re-routes. | Real walked distance not covered by network legs; makes the A-17 check exact. Also an honest record of how far each start point sits from the walkable graph. |
+| `door_refusals` | count | Capacity refusals this resident experienced at a shelter door (retarget count). | 0 unless capacity binds. A resident refused everywhere ends `REFUSED_ALL_FULL`; one later admitted ends `SHELTERED` with `door_refusals` > 0. |
 
 ## 2. `shelters.csv` — one row per shelter
 
