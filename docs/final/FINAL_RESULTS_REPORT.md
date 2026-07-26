@@ -6,11 +6,11 @@ residents and a shelter-siting counterfactual.**
 
 | Run identity | Value |
 |---|---|
-| Scenarios | **A** = real September-2020 shelter placement · **B** = same capacity relocated to the street-network optimum |
-| Population | n = 2,037 residents per run; seeds 42, 43, 44 per scenario (6 runs) |
+| Scenarios | **A** = real September-2020 shelter placement · **B** = same capacity relocated to the street-network optimum · **C** = capacity-neutral demonstration (NOT real availability) |
+| Population | n = 2,037 residents per run; seeds 42, 43, 44 per scenario (9 runs) |
 | Model git commit | `ccad7b7` |
 | Data version tag | `0bc943324ae6` (SHA-256 over all input datasets; per-file hashes in every `simulation.json`) |
-| Archived artifacts | `docs/runs/final-scenarios/{A,B}-seed{42,43,44}/` — `agents.csv`, `shelters.csv`, `simulation.json` |
+| Archived artifacts | `docs/runs/final-scenarios/{A,B,C}-seed{42,43,44}/` — `agents.csv`, `shelters.csv`, `simulation.json` |
 | Analysis outputs | `docs/final/analysis/*.csv`, `comparison_summary.json`, `docs/final/figures/*.png` |
 
 Every number below is reproducible from the archived manifests: seed + parameters +
@@ -66,16 +66,21 @@ whether a bed is still free on arrival:
 | COPD | 0.105 | Literature (PROXY) | Same |
 | Walking speed | TruncNormal(µ[age,sex], CV 0.13), [0.40, 2.20] m/s | Literature | Means: Bohannon & Williams Andrews 2011, [10.1016/j.physio.2010.12.004](https://doi.org/10.1016/j.physio.2010.12.004) (n=23,111); CV: Bohannon 1997, [10.1093/ageing/26.1.15](https://doi.org/10.1093/ageing/26.1.15) |
 | Speed if mobility-limited | N(0.95, 0.32) m/s **by replacement** | Literature (verified-in-secondary) | Boyce, Shields & Silcock 1999, [10.1023/A:1015339216366](https://doi.org/10.1023/A:1015339216366), via Tinaburri 2018 |
+| Speed effect of COPD | **−0.19 m/s** additive (95% CI −0.28 to −0.11) | Literature (low quality per authors) | Buekers et al. 2024, *Eur Respir Rev* 33(172):230253, [10.1183/16000617.0253-2023](https://doi.org/10.1183/16000617.0253-2023) — 25 studies, 1,015 COPD vs 2,229 controls |
+| Speed effect of asthma | **none** | No evidence found | Literature supports lower physical *activity*, not a gait-speed decrement; borrowing the COPD figure would be invention |
 
 Three deliberate restraints, each of which could have been papered over with an invented
 number and was not:
 
-1. **Asthma and COPD carry no dose multiplier.** They are *reporting strata*, not risk
-   scores. A multiplied "vulnerability-weighted exposure" was rejected (decision D-3):
-   the coefficients it needs do not exist for this population, the multiplicative form is
-   a category error, and no health outcome is simulated against which it could ever be
-   validated. Consequently the model shows almost no access difference by diagnosis —
-   which is the honest result, not a disappointing one (§7.3).
+1. **Neither asthma nor COPD carries a dose multiplier, and inhalation rate is constant
+   for every resident.** A multiplied "vulnerability-weighted exposure" was rejected
+   (decision D-3): the coefficients it needs do not exist for this population, the
+   multiplicative form is a category error, and no health outcome is simulated against
+   which it could ever be validated. No population-specific ventilation multiplier exists
+   either, so inhaled volume is held constant (`VULNERABILITY_MECHANISM_AUDIT.md` §1).
+   COPD *does* reduce walking speed, because that effect is measured; asthma does not,
+   because no gait-speed estimate for asthma was found. That asymmetry follows from
+   evidence availability, not preference (§7.3).
 2. **Age is sampled uniformly within published bands.** Nothing constrains the
    within-band shape; a fitted curve would manufacture precision.
 3. **Mobility-limited residents all use the *fastest* impaired category** (unaided
@@ -122,6 +127,24 @@ southeast Portland near the encampment centroid.
 > recommendation.** It ignores building availability, ownership, zoning, staffing and ADA
 > access, and does not assert that a structure capable of housing 99 people exists at
 > those coordinates. It is an *upper bound on what siting alone can achieve*.
+
+### 3.6 Scenario C — the capacity-neutral demonstration
+
+> ⚠️ **DEMONSTRATION ONLY — NOT REAL SEPTEMBER-2020 AVAILABILITY.**
+
+Real locations, real opening dates, real street network, real air — but total capacity
+raised to 2,037 so that beds stop being the binding constraint and the exposure effect of
+*travel alone* becomes visible. Relative site capacities stay 1:1 (1,019 / 1,018),
+matching the equal per-site capacities the 2020 source reports, so shelters still fill in
+sequence and residents are still redirected.
+
+The total is bounded rather than arbitrary: it falls inside the **1,900–2,200 person**
+range that Multnomah County's *entire current* year-round shelter system provides once the
+published bed / room / unit / family counts are converted
+(`SHELTER_CAPACITY_AUDIT.md` §3). The scenario therefore asks a specific question — *what
+if smoke-respite capacity had been on the scale of the county's whole present-day shelter
+system?* — rather than an unbounded one. Registered as assumption **A-24**; labelled
+`C_capacity_neutral_demonstration` in every export.
 
 ## 4. Datasets
 
@@ -181,16 +204,24 @@ shelters open at 00:00 on their recorded date (understates pre-opening exposure)
 
 ### 7.1 Population outcomes — capacity is the binding constraint
 
-| Outcome | Scenario A (current) | Scenario B (optimized) |
-|---|---|---|
-| **Reached shelter** | **198 / 2,037 = 9.72%** | **198 / 2,037 = 9.72%** |
-| Refused everywhere | ~1,824 | ~1,824 |
-| No reachable shelter | ~15 | ~15 |
-| Beds occupied | 198 / 198 (100%) | 198 / 198 (100%) |
-| Total population exposure | 99,962,705 µg·m⁻³·h | 99,933,244 (**−0.03%**) |
-| Mean walk, admitted residents | 8,715 m | **5,439 m (−37.6%)** |
+| Outcome | A (current) | B (optimized) | C (capacity-neutral, demo) |
+|---|---|---|---|
+| **Reached shelter** | **198 / 2,037 = 9.72%** | **198 / 2,037 = 9.72%** | **2,022 / 2,037 = 99.25%** |
+| Refused everywhere | ~1,824 | ~1,824 | 0 |
+| No reachable shelter | ~15 | ~15 | ~15 |
+| Beds occupied | 198 / 198 (100%) | 198 / 198 (100%) | 2,022 / 2,037 |
+| Total population exposure (µg·m⁻³·h) | 99,962,958 | 99,933,295 (**−0.03%**) | 7,669,225 (**−92.3%**) |
+| Person-hours above Unhealthy | 359,794 | 359,684 (−0.03%) | 34,948 (**−90.3%**) |
+| Mean walk, admitted residents | 8,692 m | **5,335 m (−38.6%)** | 11,279 m (+29.8%) |
 
-Identical in all three seeds. Both shelters fill completely in both scenarios.
+A and B are identical in all three seeds; both shelters fill completely in both.
+
+**The comparison that answers the research question:** relocating the same beds changes
+population exposure by **0.03%**; adding beds changes it by **92.3%**. Better siting
+shortens the walk for people who were already going to be admitted (−38.6%); it does not
+admit one additional person. In C the mean walk *rises*, because residents who would
+previously have been turned away now walk further to a shelter that still has room — and
+still end up with 92% less exposure.
 
 ### 7.2 The exposure cliff
 
@@ -211,40 +242,59 @@ Scenario A, mean of three seeds:
 
 | Stratum | n | Reached shelter | Mean walking speed | Mean exposure (µg·m⁻³·h) | Mean h > Unhealthy |
 |---|---|---|---|---|---|
-| Mobility-limited | 393 | **3.54%** | 0.99 m/s | 52,163 | 187.5 |
-| Not mobility-limited | 1,644 | **11.20%** | 1.39 m/s | 48,336 | 174.0 |
-| Vulnerable (any) | 986 | 7.24% | 1.22 m/s | 50,329 | 181.1 |
-| Not vulnerable | 1,051 | 12.06% | 1.40 m/s | 47,891 | 172.5 |
-| Asthma | 311 | 8.84% | 1.31 m/s | 49,548 | 178.3 |
-| COPD | 218 | 9.36% | 1.30 m/s | 49,288 | 177.4 |
+| **COPD** | 218 | **3.07%** | 1.15 m/s | 52,406 | 188.3 |
+| No COPD | 1,819 | **10.52%** | 1.31 m/s | 48,673 | 175.2 |
+| **Mobility-limited** | 393 | **3.63%** | 0.99 m/s | 52,119 | 187.3 |
+| Not mobility-limited | 1,644 | **11.18%** | 1.37 m/s | 48,346 | 174.1 |
+| Vulnerable (any) | 986 | 6.19% | 1.18 m/s | 50,850 | 182.9 |
+| Not vulnerable | 1,051 | 13.04% | 1.40 m/s | 47,405 | 170.8 |
+| Asthma | 311 | 8.95% | 1.29 m/s | 49,501 | 178.2 |
+| No asthma | 1,726 | 9.87% | 1.29 m/s | 48,992 | 176.3 |
 
-**Mobility-limited residents were ~3.2× less likely to reach shelter** (3.54% vs 11.20%)
-and accrued ~8% more exposure with 13 more hours above the Unhealthy breakpoint. This is
-the mechanism the study set out to demonstrate: slower walking → longer outdoors → the
-last bed is gone on arrival. It is a *simulated consequence of measured local mobility
-prevalence and published gait speeds*, not an assumed penalty.
+**Residents with COPD or a mobility limitation were roughly 3× less likely to reach
+shelter** (3.1% and 3.6% versus 10.5% and 11.2%), accrued ~8% more exposure, and spent
+13–14 more hours in air above the Unhealthy breakpoint. This is the mechanism the study
+set out to demonstrate, and it is a *simulated consequence* of measured local mobility
+prevalence and published gait speeds — not an assumed penalty.
 
-**Asthma and COPD show almost no access difference** (8.84% and 9.36% vs ~9.8%), and this
-is the correct behaviour: in this model a respiratory diagnosis does not slow anyone
-down, and it is not permitted to multiply anyone's dose. The model reports what it
-simulates. Any larger asthma/COPD gap would have to come from a susceptibility
-coefficient that does not exist for this population — which is exactly the number this
-project twice refused to invent.
+**Asthma shows almost no difference** (8.95% vs 9.87%), and that is the honest result
+rather than a null finding to explain away. Asthma carries no walking-speed effect in this
+model because no quantitative comfortable-gait-speed decrement for adults with asthma was
+found; COPD carries one because Buekers et al. 2024 measured it. The gap between the two
+conditions in this table is a gap in the evidence base, made visible
+(`VULNERABILITY_MECHANISM_AUDIT.md` §3).
 
-### 7.4 Does better siting help? — the counterfactual answer
+Neither condition alters inhaled volume — inhalation rate is constant for every resident
+(§3.2 restraint 1).
+
+### 7.4 Does better siting help? — and what removing the bottleneck reveals
 
 Relocating the same 198 beds to the network optimum:
 
-- **Number sheltered: unchanged** (198 in every seed, both scenarios).
-- **Total population exposure: −0.03%.** Statistically real, practically nil.
-- **Mean walk for admitted residents: −37.6%** (8,715 → 5,439 m).
-- **Vulnerable residents sheltered: 7.24% → 7.55%** (+4.25% relative) — better siting
-  helps slower residents slightly more, because proximity partially offsets speed.
+- **Number sheltered: unchanged** (198 in every seed).
+- **Total population exposure: −0.03%.** Real, but practically nil.
+- **Mean walk for admitted residents: −38.6%** (8,692 → 5,335 m).
+- **Vulnerable residents sheltered: 6.19% → 6.53%** — proximity partially offsets slower
+  walking, but only slightly.
 - **Residents with no reachable shelter: unchanged** (~15).
 
-**Siting is not the binding constraint; capacity is.** Optimal placement makes the
-journey shorter for the people who were already going to get a bed. It does not change
-how many beds exist.
+**Siting is not the binding constraint; capacity is.**
+
+Scenario C isolates that. With capacity removed as a constraint, 99.25% reach shelter and
+population exposure falls 92.3%. But the equity story does not vanish — it changes shape:
+
+| Group | Exposure, Scenario C | Comparison group | Gap |
+|---|---|---|---|
+| Mobility-limited | 4,388 | 3,619 | **+21%** |
+| COPD | 3,956 | 3,741 | +6% |
+| Vulnerable (any) | 4,006 | 3,542 | **+13%** |
+| Asthma | 3,731 | 3,774 | −1% (no effect, as designed) |
+
+In A the disparity appears as an **access** gap (who gets a bed); in C, where nearly
+everyone gets one, it reappears as a residual **exposure** gap, because slower residents
+spend longer walking. Capacity solves most of the inequity; it does not solve all of it.
+Sheltering everyone would still leave mobility-limited residents breathing ~21% more
+smoke than everyone else.
 
 ### 7.5 Figures and data
 

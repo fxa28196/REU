@@ -161,6 +161,33 @@ public class PopulationSampler {
 	private static final double SPEED_MIN_MPS = 0.40;
 	private static final double SPEED_MAX_MPS = 2.20;
 
+	// ---- COPD -> walking speed · class L ------------------------------------
+	// The ONE respiratory effect this model implements, because it is the one
+	// with a verified quantitative estimate in a mechanism the model simulates.
+	// Buekers J et al. (2024), European Respiratory Review 33(172):230253,
+	// DOI 10.1183/16000617.0253-2023 (PMID 38657998) - systematic review and
+	// meta-analysis, 25 studies, 1,015 people with COPD vs 2,229 healthy
+	// controls; gait speed assessed in 17 of them. People with COPD walk more
+	// slowly at USUAL speed by a pooled mean difference of
+	//   -19 cm/s (95% CI -28 to -11)  ->  -0.19 m/s, swept -0.11 to -0.28
+	// (fast-pace difference -30 cm/s is not used: residents here walk at a
+	// comfortable pace, not a maximal one). The authors rate the evidence LOW
+	// quality, which is why the value is class L with a swept range and not
+	// treated as settled.
+	//
+	// Applied ADDITIVELY to the age-by-sex comfortable speed, and NEVER as a
+	// dose multiplier: COPD changes how fast someone walks, not how much air
+	// they move per minute (see the inhalation-rate decision in
+	// docs/final/VULNERABILITY_MECHANISM_AUDIT.md).
+	private static final double COPD_SPEED_DELTA_MPS = -0.19;
+
+	// Asthma gets NO speed effect. The searched literature supports lower total,
+	// moderate and vigorous PHYSICAL ACTIVITY among adults with asthma, but no
+	// verified quantitative comfortable-gait-speed decrement was found. Applying
+	// the COPD figure to asthma would be an invention, so asthma remains a
+	// prevalence and reporting variable only. This asymmetry is deliberate and
+	// documented rather than smoothed over.
+
 	/** One resident's sampled attributes. Immutable; exported verbatim. */
 	public static final class Attributes {
 		public final int ageYears;
@@ -229,9 +256,16 @@ public class PopulationSampler {
 
 		double speed;
 		if (mobilityLimited) {
+			// Boyce's impaired categories already embed a slower, less able
+			// walker, so the COPD decrement is NOT stacked on top of them —
+			// same no-double-counting rule that makes mobility a replacement
+			// rather than a multiplier (03-MOVEMENT.md §3).
 			speed = truncatedNormal(IMPAIRED_SPEED_MEAN, IMPAIRED_SPEED_SD);
 		} else {
 			double mu = freeSpeedMean(ageYears, sex);
+			if (copd) {
+				mu = Math.max(SPEED_MIN_MPS, mu + COPD_SPEED_DELTA_MPS);
+			}
 			speed = truncatedNormal(mu, SPEED_CV * mu);
 		}
 

@@ -51,7 +51,12 @@ INK, INK2, MUTED = "#0b0b0b", "#52514e", "#898781"
 GRID, BASELINE, SURFACE = "#e1e0d9", "#c3c2b7", "#fcfcfb"
 BLUE, ORANGE = "#2a78d6", "#ec835a"
 CRITICAL, SERIOUS = "#d03b3b", "#ec835a"
-SCEN_COLOR = {"A": BLUE, "B": ORANGE}
+SCEN_COLOR = {"A": BLUE, "B": ORANGE, "C": "#5f8f5a"}
+SCEN_LABEL = {
+    "A": "A — current placement",
+    "B": "B — optimized placement",
+    "C": "C — capacity-neutral (demo only)",
+}
 
 STRATA = [
     ("vulnerable_flag", "Vulnerable (any)"),
@@ -80,7 +85,7 @@ def load_runs(runs_dir, pattern):
         agents = pd.read_csv(agents_f)
         man = json.loads(man_f.read_text(encoding="utf-8"))
         scen_name = man.get("scenario", "")
-        scen = "B" if "B_" in scen_name or "optimi" in scen_name.lower() else "A"
+        scen = "B" if scen_name.startswith("B_") else ("C" if scen_name.startswith("C_") else "A")
         seed = man["reproducibility"]["random_seed"]
         runs[(scen, seed)] = {
             "dir": d, "agents": agents, "manifest": man,
@@ -135,6 +140,57 @@ def population_row(scen, seed, run):
             "mean_walking_speed_mps": round(float(a["walking_speed_mps"].mean()), 4),
         })
     return row
+
+
+def quick_summary(runs, seed):
+    """The demonstration file: one row per resident, plain-English headers, only
+    the columns a non-technical reviewer needs. Every value is copied verbatim
+    from agents.csv — nothing is recomputed, rescaled or rounded away."""
+    frames = []
+    for scen in sorted({k[0] for k in runs}):
+        if (scen, seed) not in runs:
+            continue
+        a = runs[(scen, seed)]["agents"].copy()
+        a["_scen"] = scen
+        frames.append(a)
+    if not frames:
+        return None
+    a = pd.concat(frames, ignore_index=True)
+
+    yes_no = {1: "yes", 0: "no"}
+    state_plain = {
+        "SHELTERED": "Reached shelter",
+        "REFUSED_ALL_FULL": "Turned away - every shelter full",
+        "UNREACHABLE": "No shelter reachable on foot",
+        "EN_ROUTE": "Still walking when the event ended",
+        "PRE_EVAC": "Never departed",
+    }
+    out = pd.DataFrame({
+        "Agent ID": a["agent_id"],
+        "Scenario": a["scenario"],
+        "Starting location (encampment ID)": a["starting_encampment"],
+        "Shelter reached": a["shelter_reached"].fillna(""),
+        "Reached shelter?": a["reached_shelter"],
+        "Travel time (minutes)": a["travel_time_min"],
+        "Travel distance (metres)": a["total_travel_distance_m"].round(0),
+        "Average PM2.5 (ug/m3)": a["avg_pm25_ugm3"],
+        "Peak PM2.5 (ug/m3)": a["peak_pm25_ugm3"],
+        "Cumulative PM2.5 dose (ug/m3 x hours)": a["cumulative_dose_ugm3h"].round(0),
+        "Exposure burden index (ug/m3 x hours)": a["vwe_ugm3h"].round(0),
+        "Walking speed (m/s)": a["walking_speed_mps"].round(3),
+        "Age group": a["age_band"],
+        "Mobility limitation": a["mobility_limited"].map(yes_no),
+        "Asthma": a["asthma_flag"].map(yes_no),
+        "COPD": a["copd_flag"].map(yes_no),
+        "Final state": a["final_state"].map(state_plain).fillna(a["final_state"]),
+        "_scen": a["_scen"],
+    })
+    # Sorted so the story is visible on opening: within each scenario, the
+    # residents who got in fastest are first and those who never got in are last.
+    out = out.sort_values(["_scen", "Cumulative PM2.5 dose (ug/m3 x hours)"]).drop(columns="_scen")
+    path = REPO_ROOT / "docs" / "final" / "QUICK_RESULTS_SUMMARY.csv"
+    out.to_csv(path, index=False)
+    return path, len(out)
 
 
 def gini(values):
@@ -309,7 +365,7 @@ def figures(pop, strat, runs, footer):
         "Shelter utilization",
         "Beds occupied and residents turned away at the door", footer)
     rows, labels, colors = [], [], []
-    for scen in (["A", "B"] if have_b else ["A"]):
+    for scen in sorted(set(pop["scenario"])):
         seeds = sorted(k[1] for k in runs if k[0] == scen)
         sdf = runs[(scen, seeds[0])]["shelters"]
         for _, r in sdf[sdf.operating == True].iterrows():  # noqa: E712
@@ -328,8 +384,9 @@ def figures(pop, strat, runs, footer):
     ax.grid(axis="y", visible=False)
     save(fig, "figF_shelter_utilization.png", made)
 
-    # 7 — A vs B population comparison (only when B exists)
-    if have_b:
+    # 7 — scenario comparison across every scenario present
+    scens = sorted(set(pop["scenario"]))
+    if len(scens) > 1:
         agg = pop.groupby("scenario").agg(
             pct=("pct_sheltered", "mean"),
             mean_exp=("mean_exposure_ugm3h", "mean"),
@@ -337,18 +394,20 @@ def figures(pop, strat, runs, footer):
             vuln_pct=("vulnerable_pct_sheltered", "mean")).reset_index()
         metrics = [("pct", "Reached shelter (%)"), ("vuln_pct", "Vulnerable reached (%)"),
                    ("mean_exp", "Mean exposure (µg·m⁻³·h)"), ("travel", "Mean walk, admitted (m)")]
-        fig, axes = plt.subplots(1, 4, figsize=(11.5, 3.6), dpi=200, layout="constrained")
+        fig, axes = plt.subplots(1, 4, figsize=(11.5, 3.8), dpi=200, layout="constrained")
         fig.patch.set_facecolor(SURFACE)
-        fig.suptitle("Scenario A (current) vs B (optimized placement)", x=0.02, ha="left",
+        fig.suptitle("Scenario comparison", x=0.02, ha="left",
                      fontsize=12, fontweight="bold", color=INK)
+        fig.text(0.02, 0.052, "  ·  ".join(SCEN_LABEL[s] for s in scens),
+                 fontsize=8, color=INK2)
         fig.text(0.02, 0.005, footer, fontsize=5.5, color=MUTED, va="bottom")
         for ax, (key, label) in zip(axes, metrics):
-            vals = [float(agg[agg.scenario == s][key].iloc[0]) for s in ("A", "B")]
-            ax.bar(["A", "B"], vals, color=[SCEN_COLOR["A"], SCEN_COLOR["B"]], width=0.55)
+            vals = [float(agg[agg.scenario == s][key].iloc[0]) for s in scens]
+            ax.bar(scens, vals, color=[SCEN_COLOR[s] for s in scens], width=0.55)
             for i, v in enumerate(vals):
                 ax.text(i, v, f"{v:,.1f}", ha="center", va="bottom", fontsize=8, color=INK2)
             ax.set_title(label, loc="left", fontsize=8.5, color=INK2)
-            ax.set_ylim(0, max(vals) * 1.25)
+            ax.set_ylim(0, max(vals) * 1.28)
             style_axes(ax)
         save(fig, "figG_scenario_comparison.png", made)
 
@@ -460,6 +519,10 @@ def main():
                         a0[a0.final_state != "SHELTERED"].head(200)])
     sample.to_csv(OUT_DIR / "journeys_sample.csv", index=False)
 
+    q = quick_summary(runs, seeds_a[0])
+    if q:
+        print(f"wrote {q[0]}  ({q[1]:,} rows)")
+
     man0 = runs[("A", seeds_a[0])]["manifest"]["reproducibility"]
     meta = {
         "generated_utc": _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -475,17 +538,20 @@ def main():
 
     # Scenario deltas, only when B exists
     deltas = {}
-    if "B" in set(pop["scenario"]):
-        ga = pop[pop.scenario == "A"].mean(numeric_only=True)
-        gb = pop[pop.scenario == "B"].mean(numeric_only=True)
+    ga = pop[pop.scenario == "A"].mean(numeric_only=True)
+    for other in [s for s in sorted(set(pop["scenario"])) if s != "A"]:
+        go = pop[pop.scenario == other].mean(numeric_only=True)
+        d = {}
         for k in ("pct_sheltered", "total_exposure_ugm3h", "mean_exposure_ugm3h",
                   "mean_travel_m_sheltered", "vulnerable_pct_sheltered",
-                  "vulnerable_mean_exposure_ugm3h", "n_unreachable"):
-            if k in ga and pd.notna(ga.get(k)) and pd.notna(gb.get(k)):
-                av, bv = float(ga[k]), float(gb[k])
-                deltas[k] = {"A": round(av, 3), "B": round(bv, 3),
-                             "abs_change": round(bv - av, 3),
-                             "pct_change": round(100 * (bv - av) / av, 3) if av else None}
+                  "vulnerable_mean_exposure_ugm3h", "n_unreachable",
+                  "total_person_hours_above_unhealthy"):
+            if k in ga and pd.notna(ga.get(k)) and pd.notna(go.get(k)):
+                av, bv = float(ga[k]), float(go[k])
+                d[k] = {"A": round(av, 3), other: round(bv, 3),
+                        "abs_change": round(bv - av, 3),
+                        "pct_change": round(100 * (bv - av) / av, 3) if av else None}
+        deltas[f"{other}_vs_A"] = d
 
     out = {
         "schema": "reu-wildfire-shelter-abm/scenario-comparison/v1",
@@ -521,10 +587,11 @@ def main():
             "vulnerable_pct_sheltered", "mobility_limited_pct_sheltered",
             "unimpaired_pct_sheltered"]
     print("\n" + pop[[c for c in cols if c in pop.columns]].to_string(index=False))
-    if deltas:
-        print("\nScenario B vs A:")
-        for k, v in deltas.items():
-            print(f"  {k}: {v['A']} -> {v['B']}  ({v['pct_change']:+.2f}%)")
+    for pair, d in deltas.items():
+        print(f"\nScenario {pair.replace('_vs_', ' vs ')}:")
+        other = pair.split("_")[0]
+        for k, v in d.items():
+            print(f"  {k}: {v['A']:,} -> {v[other]:,}  ({v['pct_change']:+.2f}%)")
 
 
 if __name__ == "__main__":
