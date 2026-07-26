@@ -1,319 +1,329 @@
 # Final Results Report — Wildfire-Smoke Shelter Access in Portland, OR (September 2020)
 
-**Agent-based simulation of clean-air shelter access for unsheltered residents
-of Multnomah County during the September 2020 wildfire-smoke event.**
+**An agent-based simulation of clean-air shelter access for unsheltered residents of
+Multnomah County during the September 2020 wildfire-smoke event, with heterogeneous
+residents and a shelter-siting counterfactual.**
 
 | Run identity | Value |
 |---|---|
-| Production runs | `sim-20260725-220449-seed42` (primary), `sim-20260725-220529-seed43`, `sim-20260725-220551-seed44` |
-| Population | n = 2,037 per run (measured; see §4) |
-| Model git commit | `83d721b` (post routing-fix `3e4fad1`) |
-| Data version tag | `0bc943324ae6` (SHA-256 over all four input datasets; per-file hashes in each `simulation.json`) |
-| Verification | 38/38 automated cross-checks passed in every run, including the walked-vs-planned routing-integrity gate (A-17) |
-| Archived artifacts | `docs/runs/production-n2037/seed{42,43,44}/` — `agents.csv`, `shelters.csv`, `simulation.json`, full analysis output |
+| Scenarios | **A** = real September-2020 shelter placement · **B** = same capacity relocated to the street-network optimum |
+| Population | n = 2,037 residents per run; seeds 42, 43, 44 per scenario (6 runs) |
+| Model git commit | `ccad7b7` |
+| Data version tag | `0bc943324ae6` (SHA-256 over all input datasets; per-file hashes in every `simulation.json`) |
+| Archived artifacts | `docs/runs/final-scenarios/{A,B}-seed{42,43,44}/` — `agents.csv`, `shelters.csv`, `simulation.json` |
+| Analysis outputs | `docs/final/analysis/*.csv`, `comparison_summary.json`, `docs/final/figures/*.png` |
 
-Every number in this report is reproducible from the archived manifests:
-seed + parameters + dataset SHA-256s + git commit.
+Every number below is reproducible from the archived manifests: seed + parameters +
+dataset SHA-256s + git commit.
 
 ---
 
 ## 1. Research question
 
-**During the September 2020 wildfire-smoke event, could Portland's unsheltered
-residents actually reach clean-air shelter — and how was the resulting PM2.5
-exposure burden distributed between those who found a bed and those who did
-not?**
+**During the September 2020 wildfire-smoke event, could Portland's unsheltered residents
+actually reach clean-air shelter — did that depend on who they were — and would siting
+the same shelter capacity differently have reduced the population's smoke exposure?**
 
-The model measures *access* (can a person walking from a real encampment
-location reach an operating shelter with an open bed over the real street
-network?) and *exposure burden* (a time-integrated PM2.5 concentration index
-accrued while outdoors). It does **not** simulate health outcomes.
+The model measures **access** (can this person, walking at their own speed from a real
+encampment location over the real street network, reach an operating shelter with an
+open bed?) and **exposure burden** (a time-integrated PM2.5 concentration index accrued
+while outdoors). It does **not** simulate health outcomes.
 
 ## 2. What the model measures — and what it does not
 
-**Measures:**
-- Per-resident journey outcomes over the real Portland street network:
-  shelter reached (or not), travel time, walked distance, capacity refusals.
-- Per-resident exposure index: Σ C(t)·Δt (µg·m⁻³·h) accrued while outdoors,
-  using measured hourly PM2.5; accrual stops at shelter arrival (the study
-  endpoint).
-- Population-level distribution of that burden (mean/median/percentiles,
-  person-hours above the EPA "Unhealthy" concentration breakpoint, Gini).
+**Measures:** per-resident journey outcomes (shelter reached or not, departure and
+arrival times, walked distance, walking speed, capacity refusals); per-resident exposure
+index Σ C(t)·Δt accrued outdoors until admission; and the distribution of that burden
+across the population and across susceptibility strata.
 
-**Does not measure:**
-- Health outcomes (no concentration–response function, no breathing rate, no
-  deposition). "Exposure" here is an *index*, not an inhaled dose.
-- Indoor air quality or filtration benefit — shelter benefit in this model is
-  *ending outdoor exposure time*, deliberately.
-- Behavioural heterogeneity in evacuation decisions (all residents depart at
-  the same trigger; see limitation L1).
+**Does not measure:** health outcomes (no concentration–response function, no breathing
+rate, no deposition — "exposure" here is an index, not an inhaled dose); indoor air
+quality; or heterogeneity in the *decision* to evacuate (all residents depart on the
+same trigger — limitation L1).
 
 ## 3. Methodology
 
 ### 3.1 Model structure
 
-Repast Simphony 2.11.0 agent-based model (Java 17), 1-minute ticks, 312
-simulated hours anchored at 2020-09-07 00:00 local. Agents are unsheltered
-residents placed at real encampment-report coordinates; shelters are the real
-September-2020 clean-air shelter sites (2 operating, 1 standby) with capacity
-enforced; movement is along the real RLIS street centerline network
-(89,345 graph nodes / 112,070 edges after validation).
+Repast Simphony 2.11.0 agent-based model (Java 17), 1-minute ticks, 312 simulated hours
+anchored at 2020-09-07 00:00 local. Residents start at real encampment-report
+coordinates; shelters are the real September-2020 clean-air sites with real capacities
+and **real opening dates**; movement is along the real RLIS street centerline network
+(89,345 validated graph nodes / 112,070 edges).
 
-### 3.2 Behaviour rules (in execution order per tick)
+### 3.2 Heterogeneous residents (this study's addition)
 
-1. **Exposure accrual** — every resident not yet sheltered accrues
-   `C(t)·Δt` where `C(t)` is the measured county PM2.5 for the current hour
-   and Δt = 1/60 h.
-2. **Evacuation trigger** — residents shelter in place at their encampment
-   until local PM2.5 first reaches 55.5 µg/m³ (the EPA "Unhealthy" AQI
-   breakpoint lower bound — a sourced threshold, not a fitted one), then
-   depart. In these runs the first crossing is 2020-09-07 16:00, so all
-   residents depart simultaneously (registered artifact, limitation L1).
-3. **Routing** — the resident targets the operating shelter with space at
-   minimum street-network distance from its current graph node (Dijkstra
-   shortest paths; edge weights = geodesic metre lengths, WGS84/Karney 2013)
-   and walks the materialised path at 1.30 m/s (78 m per tick).
-4. **Admission (V12)** — on arrival, the shelter admits if occupancy <
-   capacity; otherwise the resident is refused.
-5. **Refusal re-routing (D-6 / A-17, fixed this commit)** — a refused
-   resident **remains at the refusing shelter's street node** and re-plans
-   from that node to the next-nearest shelter with space. No
-   return-to-encampment movement exists in the model. If no reachable
-   operating shelter has space, the resident becomes `REFUSED_ALL_FULL` and
-   remains outdoors for the rest of the event, still accruing exposure.
+Each resident carries sampled attributes, and those attributes act on the outcome
+through a mechanism the model actually simulates — walking speed → time outdoors →
+whether a bed is still free on arrival:
 
-### 3.3 Equations
-
-For resident *i* with outdoor indicator O_i(t):
-
-- **Cumulative exposure index (V6):** E_i = Σ_t C(t)·Δt·O_i(t)  [µg·m⁻³·h]
-- **Exposure Burden Index (V7, historically "VWE"):**
-  EBI_i = Σ_t C(t)·RR_age,i·RR_com,i·Δt·O_i(t). Both RR factors are **1.0
-  placeholders** (unsourced weights are refused), so EBI ≡ E in these runs.
-- **Person-hours above Unhealthy (V8):** H_i = Σ_t Δt·1[C(t) > 55.5]·O_i(t)
-- **Travel (V9):** geodesic metres walked along the street path;
-  **initial accessibility (V11):** network distance from start node to the
-  first selected shelter.
-- **Inequality (V14):** Gini = Σ_i Σ_j |E_i − E_j| / (2 n² Ē)
-
-### 3.4 Scenario
-
-Status quo: the two shelters that actually operated (Charles Jordan "CJ",
-Oregon Convention Center "OCC"), 99 beds each (provenance caveat, §5);
-the standby site (MSCC) not operating. Population 2,037 (§4). Seeds 42
-(primary), 43, 44.
-
-## 4. Datasets (all real; provenance, checksums and limitations in `docs/science/DATA_SOURCES.md`)
-
-| Dataset | Source | Role | Status |
+| Attribute | Value | Class | Source |
 |---|---|---|---|
-| Street network | City of Portland / Metro RLIS `Streets.shp` (112,070 features) | Routable pedestrian graph | **Measured.** Validated: 27 corrupt attribute node IDs corrected with full provenance (exported per run); 0 impossible edges after fix. |
-| PM2.5 | EPA AQS hourly, Multnomah County, Sept 2020 (576 hourly slices; peak 562.7 µg/m³) | Smoke field C(t) | **Measured.** Spatially uniform by assumption A-01 (2 in-county monitors). |
-| Shelters | September 2020 clean-air shelter sites (geocoded) | Destinations + capacity | **Measured locations**; capacity 99/site is newsroom-sourced, **unconfirmed** (A-04, blocking). |
-| Encampments | City of Portland IRP campsite reports | Start locations | **Measured points, temporally displaced**: 2025–26 reports used as a spatial proxy for 2020 (A-03); complaint-driven visibility bias. |
-| Population size | 2,037 — January 2019 Point-in-Time count of unsheltered people, Multnomah County | Number of agents (D-5) | **Measured count**, used for a September 2020 event (temporal mismatch stated, limitation L3). |
+| Age band | 18–24 .067 / 25–54 .727 / 55–69 .191 / 70+ .012 (adults, renormalised) | **Measured (local)** | 2019 Multnomah PIT, unsheltered N=2,037 (D10) |
+| Sex | M .685 / F .293 / other .023 | **Measured (local)** | Same; corroborated by HUD 2023 AHAR (68.2/30.1/0.9) |
+| Mobility limitation | 0.192 marginal; 0.152 under 55, 0.348 at 55+ | **Measured (local, lower bound)** + donor gradient | PIT 391/2,037; age ratio from CASPEH 2023 (22% vs 32% at 50+) |
+| Asthma | 0.15 | Literature (PROXY) | Zellmer et al. 2025, [10.1007/s11606-025-09814-x](https://doi.org/10.1007/s11606-025-09814-x) — EHR-diagnosed, n=20,139 with recent homelessness |
+| COPD | 0.105 | Literature (PROXY) | Same |
+| Walking speed | TruncNormal(µ[age,sex], CV 0.13), [0.40, 2.20] m/s | Literature | Means: Bohannon & Williams Andrews 2011, [10.1016/j.physio.2010.12.004](https://doi.org/10.1016/j.physio.2010.12.004) (n=23,111); CV: Bohannon 1997, [10.1093/ageing/26.1.15](https://doi.org/10.1093/ageing/26.1.15) |
+| Speed if mobility-limited | N(0.95, 0.32) m/s **by replacement** | Literature (verified-in-secondary) | Boyce, Shields & Silcock 1999, [10.1023/A:1015339216366](https://doi.org/10.1023/A:1015339216366), via Tinaburri 2018 |
 
-## 5. Assumptions (register: `Geography/data/registry/assumptions.csv`, validated at startup)
+Three deliberate restraints, each of which could have been papered over with an invented
+number and was not:
 
-Key active assumptions: **A-01** spatially uniform smoke field; **A-03**
-2025–26 encampment proxy; **A-17** refused residents re-plan instantly from
-the refusal location (no queueing/abandonment — the *implementation* now
-matches the registered statement; the remaining content is behavioural).
+1. **Asthma and COPD carry no dose multiplier.** They are *reporting strata*, not risk
+   scores. A multiplied "vulnerability-weighted exposure" was rejected (decision D-3):
+   the coefficients it needs do not exist for this population, the multiplicative form is
+   a category error, and no health outcome is simulated against which it could ever be
+   validated. Consequently the model shows almost no access difference by diagnosis —
+   which is the honest result, not a disappointing one (§7.3).
+2. **Age is sampled uniformly within published bands.** Nothing constrains the
+   within-band shape; a fitted curve would manufacture precision.
+3. **Mobility-limited residents all use the *fastest* impaired category** (unaided
+   ambulant). The aid mix is unsourced for this population, so the modelled penalty is
+   deliberately conservative — real speeds are likely lower and the disparity larger.
 
-**Assumptions still registered as blocking publication** (reported, not
-hidden): **A-02** simultaneous evacuation at first threshold crossing (drives
-limitation L1), **A-04** unconfirmed 99-bed capacities, plus A-09, A-12, A-16
-(engineering-governance items listed in the registry). Placeholder variables
-V2/V4/V7 (vulnerability weights) are inert at 1.0 and are not quoted as
-results anywhere in this report.
+Attributes are drawn from a **separate RNG stream** from agent placement, so enabling
+heterogeneity leaves the archived baseline population bit-identical.
+
+### 3.3 Behaviour per tick
+
+1. **Exposure accrues** for every resident not yet sheltered: `C(t)·Δt`, measured county
+   PM2.5, Δt = 1/60 h.
+2. **Departure** requires *both* the smoke trigger (PM2.5 ≥ 55.5 µg/m³, the EPA
+   "Unhealthy" breakpoint) *and* an open shelter to walk to. In these runs that is
+   **2020-09-10 07:00** — the first threshold crossing after the Oregon Convention
+   Center opened.
+3. **Routing**: the nearest operating, open shelter with space by street-network distance
+   (Dijkstra, geodesic edge weights), walked at the resident's own speed.
+4. **Admission**: granted if occupancy < capacity, else refused at the door.
+5. **After refusal**: the resident stays where it is and re-plans from there (decision
+   D-6) — never back to its encampment. If nothing is available it waits, and re-attempts
+   when the second shelter opens the next day (A-21).
+
+### 3.4 Equations
+
+- Cumulative exposure index: E_i = Σ_t C(t)·Δt·O_i(t) [µg·m⁻³·h], O = outdoors indicator
+- Person-hours above Unhealthy: H_i = Σ_t Δt·1[C(t) > 55.5]·O_i(t)
+- Exposure Burden Index: EBI_i = Σ_t C(t)·RR_age,i·RR_com,i·Δt·O_i(t) — **both RR = 1.0
+  placeholders**, so EBI ≡ E; reported only to keep the column contract stable
+- Inequality: Gini = Σ_iΣ_j|E_i − E_j| / (2n²Ē)
+
+### 3.5 Scenario B — the siting counterfactual
+
+`scripts/optimize_shelters.py` places the **same total capacity** (2 sites × 99 beds) at
+the street-network p-median optimum over 558 candidate nodes, using a capacity-aware
+greedy assignment that mirrors the simulation's own mechanism, then the ABM is re-run at
+those coordinates with **identical opening dates** so A and B differ in location only.
+
+Chosen sites: OPT1 (−122.6735, 45.5260) and OPT2 (−122.6557, 45.5194), both in inner
+southeast Portland near the encampment centroid.
+
+> **Scenario B is an unconstrained-siting theoretical optimum, not a policy
+> recommendation.** It ignores building availability, ownership, zoning, staffing and ADA
+> access, and does not assert that a structure capable of housing 99 people exists at
+> those coordinates. It is an *upper bound on what siting alone can achieve*.
+
+## 4. Datasets
+
+| Dataset | Source | Status |
+|---|---|---|
+| Street network | Portland/Metro RLIS `Streets.shp`, 112,070 features | **Measured.** 27 corrupt attribute node IDs corrected with per-correction provenance; 0 impossible edges after fix |
+| PM2.5 | EPA AQS hourly, Multnomah County, Sept 2020 (576 hourly slices, peak 562.7 µg/m³) | **Measured.** Spatially uniform by assumption A-01 (only 2 in-county monitors) |
+| Shelters | Real Sept-2020 clean-air sites, geocoded, with opening dates | **Measured locations and dates**; capacity 99/site is newsroom-sourced and **unconfirmed** (A-04, blocking) |
+| Encampments | City of Portland IRP campsite reports | **Real points, temporally displaced**: 2025–26 used as a 2020 spatial proxy (A-03) |
+| Population attributes | 2019 PIT (local) + CASPEH/Zellmer (imported) | See §3.2 |
+| Population size | 2,037 = January-2019 PIT unsheltered count | **Measured count**, applied to a Sept-2020 event (L3) |
+
+## 5. Assumptions
+
+Full register: `Geography/data/registry/assumptions.csv` (21 assumptions, validated at
+startup — a registry defect aborts the run).
+
+**Resolved this cycle:** A-02 (evacuation timing) moved blocking → active — residents can
+no longer depart before a shelter exists to receive them; A-13 (uniform walking speed)
+retired, superseded by the sampled distribution.
+
+**Still blocking publication, and reported rather than hidden:** **A-04** unconfirmed
+99-bed capacities · **A-09** susceptibility weights inert at 1.0 · **A-12** universal
+shelter awareness (contradicted by the local record: 65% of surveyed unhoused residents
+had never heard of the shelters) · **A-16**.
+
+**New this cycle:** **A-18** mobility age-gradient donor-imputed from CASPEH · **A-19**
+all mobility-limited residents use the fastest impaired speed category · **A-20**
+shelters open at 00:00 on their recorded date (understates pre-opening exposure) ·
+**A-21** refused residents wait and re-attempt when a second shelter opens.
 
 ## 6. Validation
 
-1. **Compilation + startup governance** — the variable/assumption registries
-   are schema-validated before any run; a registry defect aborts the run.
-2. **Street-network validation layer** — corrupt RLIS node IDs corrected
-   with per-correction provenance exported in every manifest; post-fix audit:
-   0 impossible edges, max endpoint gap 11.9 m.
-3. **Baseline regression gate** — after the routing fix, the n=50 seed-42
-   baseline reproduces the archived reference exactly: all 25 shared
-   `agents.csv` columns identical on all 50 rows; `shelters.csv`
-   byte-identical (the fix is provably inert where capacity never binds).
-4. **Capacity-binding golden** (`docs/runs/capacity-binding-n400-seed42/`) —
-   n=400 forces refusals: 250/400 residents refused at least once, 53
-   refused-then-sheltered, 198 admitted = exactly 2×99 beds.
-5. **Routing-integrity failing check (A-17)** — for every routed agent,
-   walked distance ≤ planned network legs + off-network snap gap + 200 m.
-   Across all five post-fix runs the maximum unexplained walked distance is
-   **8.9 m**. Before the fix, refused agents walked kilometres of phantom
-   backtracking; that class of error can no longer pass silently — the check
-   fails the run.
-6. **Cross-file consistency** — 38 automated checks per run reconcile
-   `agents.csv`, `shelters.csv` and `simulation.json` (census, occupancy,
-   exposure/travel statistics recomputed from raw rows). 38/38 pass in all
-   three production seeds.
-7. **Multi-seed stability (D-5)** — headline outcomes vary by < 0.4% across
-   seeds 42/43/44 (table below).
+1. **Baseline regression** — with both new switches off, the model reproduces the
+   archived reference exactly: all 25 shared `agents.csv` columns identical on all 50
+   rows, `shelters.csv` byte-identical. The vulnerability layer is provably inert when
+   disabled.
+2. **Sampling verified at load time, not trusted** — realised marginals against published
+   targets across the three seeds: mobility 0.181/0.187/0.211 (target 0.192), asthma
+   0.142/0.159/0.156 (0.150), COPD 0.123/0.096/0.102 (0.105), any-respiratory
+   0.238–0.246 (0.239), age 55+ 0.194–0.204 (0.204).
+3. **Routing integrity (A-17)** — walked distance ≤ planned legs + snap gap + 200 m, a
+   *failing* check; maximum unexplained walked distance 8.9 m across all runs.
+4. **Cross-file consistency** — 38 automated checks per run reconcile `agents.csv`,
+   `shelters.csv` and `simulation.json`.
+5. **Optimizer mirror check** — the optimizer's independent Python graph reproduces the
+   simulation for the real OCC/CJ pair on the hard criterion (198 sheltered, PASS) and
+   closely on door refusals (1,724/637 vs simulated 1,722/622). It reports **13**
+   residents with no reachable facility against the simulation's **15** — a 2-resident
+   (0.1%) discrepancy from snapping differences, recorded as FAIL on that soft check in
+   `optimization_report.json` rather than smoothed over. It does not affect the siting
+   choice.
+6. **Multi-seed stability** — headline outcomes identical across seeds 42/43/44; stratum
+   rates vary by <1 percentage point.
 
 ## 7. Results
 
-### 7.1 Population outcomes (n = 2,037; three seeds)
+### 7.1 Population outcomes — capacity is the binding constraint
 
-| Outcome | seed 42 | seed 43 | seed 44 |
-|---|---|---|---|
-| **Sheltered** | **198 (9.72%)** | 198 (9.72%) | 198 (9.72%) |
-| Refused everywhere (`REFUSED_ALL_FULL`) | 1,824 | 1,820 | 1,827 |
-| Unreachable on street graph | 15 | 19 | 12 |
-| Residents refused at ≥1 shelter door | 1,824 | 1,820 | 1,827 |
-| Total door refusals (CJ + OCC) | 2,344 | 2,378 | 2,336 |
-| Refused at both shelters | 520 (seed 42) | — | — |
-| Shelter utilization | 198/198 beds (100%) | 100% | 100% |
+| Outcome | Scenario A (current) | Scenario B (optimized) |
+|---|---|---|
+| **Reached shelter** | **198 / 2,037 = 9.72%** | **198 / 2,037 = 9.72%** |
+| Refused everywhere | ~1,824 | ~1,824 |
+| No reachable shelter | ~15 | ~15 |
+| Beds occupied | 198 / 198 (100%) | 198 / 198 (100%) |
+| Total population exposure | 99,962,705 µg·m⁻³·h | 99,933,244 (**−0.03%**) |
+| Mean walk, admitted residents | 8,715 m | **5,439 m (−37.6%)** |
 
-**All 198 beds were claimed within ~48 minutes of evacuation start**
-(departure 16:00; last admission 16:46–16:48 across seeds). After that
-moment, no walking strategy could produce a bed: the system is
-**capacity-bound, not access-bound**.
+Identical in all three seeds. Both shelters fill completely in both scenarios.
 
-### 7.2 Exposure burden (µg·m⁻³·h; measured PM2.5, uniform field)
+### 7.2 The exposure cliff
 
-| Group (seed 42) | n | Mean | Median | Max |
-|---|---|---|---|---|
-| Sheltered | 198 | 177 | 167 | 210 |
-| Refused everywhere | 1,824 | 54,003 | 54,003 | 54,003 |
-| Unreachable | 15 | 54,003 | 54,003 | 54,003 |
-| All residents | 2,037 | 48,771 | 54,003 | 54,003 |
+Scenario A, seed 42: a resident who reached shelter accrued a mean of **3,291 µg·m⁻³·h**
+and 15.3 hours above the Unhealthy breakpoint. A resident who did not accrued
+**54,003 µg·m⁻³·h** — the full-event outdoor dose — and **194 hours** above Unhealthy.
+That is a ~16× difference, and it is binary rather than graded: 90.3% of the population
+converges on the identical maximal value. Population total: **359,793 person-hours above
+the Unhealthy breakpoint**. Exposure Gini is low (**0.091**) precisely *because* near-
+total deprivation is shared almost equally.
 
-- A resident who never reached shelter accrued the full-event outdoor dose of
-  **54,003 µg·m⁻³·h** (312 h at a mean measured concentration of
-  ≈173 µg/m³), including **194 hours above the 55.5 µg/m³ "Unhealthy"
-  breakpoint**. A sheltered resident accrued ~177 µg·m⁻³·h — roughly
-  **300× less** — almost all of it during the 16-hour pre-evacuation wait,
-  with only ~30 µg·m⁻³·h accrued while walking.
-- Population total: **99.35 million µg·m⁻³·h**; **356,841 person-hours above
-  Unhealthy** (seed 42; other seeds within ±5 person-hours).
-- Exposure Gini = **0.097**: *low*, because the burden is nearly binary —
-  90.3% of the population shares the identical maximal outdoor dose. The
-  inequality that matters here is the shelter/no-shelter cliff, not a
-  gradient (interpretation §8).
-- Among sheltered residents, travel time and exposure correlate at
-  Pearson r = 1.00 — with a uniform field and simultaneous departure,
-  time outdoors *is* the exposure mechanism.
+Residents who were refused walked a mean of **15.9 km** through hazardous smoke and
+finished with the same dose as if they had never left.
 
-### 7.3 Journeys (individual records: `agents.csv`, one row per resident)
+### 7.3 Who reached shelter — the equity result
 
-Each of the 2,037 rows carries: agent ID, sim ID, commit, seed, data version,
-starting encampment (real report ID), shelter reached, success flag,
-departure/arrival times (tick + local), travel time, walked distance,
-initial network distance (V11), planned route + snap gap + door refusals
-(QC), average/peak PM2.5, cumulative exposure, exposure-while-traveling,
-EBI, hours above Unhealthy, RR placeholders, final state.
+Scenario A, mean of three seeds:
 
-- **Initial accessibility (V11):** the nearest reachable shelter was a median
-  **5.5 km** walk (mean 6.5 km, p90 12.4 km, max 18.1 km) — ~70 minutes at
-  1.30 m/s even before capacity is considered.
-- **Sheltered residents** (n=198): walked mean 1.73 km (max 3.6 km), travel
-  time mean 21.7 min (max 46 min). Fastest: `Site 2018` / `Site 1963`, 3 min,
-  ~290 m. Slowest: `Site 1112` / `Site 1995`, 46 min, ~3.6 km.
-- **Refused residents** (n=1,824, seed 42): walked mean **9.5 km** (median
-  10.2 km, max 18.2 km) through hazardous smoke without obtaining a bed; 520
-  of them were refused at *both* operating shelters (mean walk 10.9 km).
-  Longest journey: `Site 1996`, 18.15 km walked against an 18.12 km planned
-  route (surplus 38 m — the routing now accounts for every metre), refused
-  at the door, everything else full, 194 h above Unhealthy.
-- **Unreachable residents** (n=15): encampment points snapping to street-graph
-  components disconnected from both shelters; they shelter in place and
-  accrue the full outdoor dose. A data-quality outcome, reported as such.
-
-### 7.4 Shelter-level results (seed 42)
-
-| Shelter | Beds | Admitted | Door refusals | Mean walk of admitted | First / last admission |
+| Stratum | n | Reached shelter | Mean walking speed | Mean exposure (µg·m⁻³·h) | Mean h > Unhealthy |
 |---|---|---|---|---|---|
-| Oregon Convention Center (OCC) | 99 | 99 | 1,722 | 0.95 km | 16:03 / 16:16 |
-| Charles Jordan Center (CJ) | 99 | 99 | 622 | 2.51 km | 16:03 / 16:46 |
-| MSCC (standby, not operating) | — | 0 | 0 | — | — |
+| Mobility-limited | 393 | **3.54%** | 0.99 m/s | 52,163 | 187.5 |
+| Not mobility-limited | 1,644 | **11.20%** | 1.39 m/s | 48,336 | 174.0 |
+| Vulnerable (any) | 986 | 7.24% | 1.22 m/s | 50,329 | 181.1 |
+| Not vulnerable | 1,051 | 12.06% | 1.40 m/s | 47,891 | 172.5 |
+| Asthma | 311 | 8.84% | 1.31 m/s | 49,548 | 178.3 |
+| COPD | 218 | 9.36% | 1.30 m/s | 49,288 | 177.4 |
 
-OCC — central to the encampment distribution — filled in 13 minutes and
-turned away 17 people for every bed it had.
+**Mobility-limited residents were ~3.2× less likely to reach shelter** (3.54% vs 11.20%)
+and accrued ~8% more exposure with 13 more hours above the Unhealthy breakpoint. This is
+the mechanism the study set out to demonstrate: slower walking → longer outdoors → the
+last bed is gone on arrival. It is a *simulated consequence of measured local mobility
+prevalence and published gait speeds*, not an assumed penalty.
 
-### 7.5 Figures (seed 42; per-seed copies in each archive)
+**Asthma and COPD show almost no access difference** (8.84% and 9.36% vs ~9.8%), and this
+is the correct behaviour: in this model a respiratory diagnosis does not slow anyone
+down, and it is not permitted to multiply anyone's dose. The model reports what it
+simulates. Any larger asthma/COPD gap would have to come from a susceptibility
+coefficient that does not exist for this population — which is exactly the number this
+project twice refused to invent.
 
-![Travel time](../runs/production-n2037/seed42/analysis/figures/fig1_travel_time_hist.png)
-![Travel distance](../runs/production-n2037/seed42/analysis/figures/fig2_travel_distance_hist.png)
-![Exposure distribution](../runs/production-n2037/seed42/analysis/figures/fig3_exposure_distribution.png)
-![Exposure by agent, colored by outcome](../runs/production-n2037/seed42/analysis/figures/fig4_exposure_by_agent.png)
-![Shelter utilization](../runs/production-n2037/seed42/analysis/figures/fig5_shelter_utilization.png)
+### 7.4 Does better siting help? — the counterfactual answer
 
-## 8. Interpretation (what these results mean — and what they do not)
+Relocating the same 198 beds to the network optimum:
 
-1. **Capacity, not distance, was the binding constraint.** With ~2,037
-   unsheltered people and 198 beds, 90.3% of the population could not be
-   sheltered under *any* routing, placement or information regime — beds ran
-   out ~48 minutes after departure. Access improvements (better placement,
-   wayfinding, transport) cannot change the headline number; only capacity
-   can.
-2. **The exposure burden is a cliff, not a slope.** Residents who found a bed
-   cut their exposure index by roughly 300×; everyone else converged on the
-   identical maximal outdoor dose. This is why the Gini is low (0.097) —
-   near-total deprivation shared almost equally is still near-total
-   deprivation.
-3. **Seeking shelter had a real cost for the refused.** The refused cohort
-   walked a mean of 9.5 km through smoke — with 520 people walking to two
-   full shelters — and finished with the same dose as if they had never left.
-   Under this model's assumptions, walking-based shelter-seeking without bed
-   availability information is all cost and no benefit once capacity binds.
-   (A reservation/notification mechanism is an obvious policy experiment this
-   model could run; it is future work, not a finding.)
-4. **These are exposure-index statements, not health claims.** Converting
-   µg·m⁻³·h to health outcomes requires concentration–response functions and
-   breathing/deposition modelling that this study deliberately does not
-   include.
+- **Number sheltered: unchanged** (198 in every seed, both scenarios).
+- **Total population exposure: −0.03%.** Statistically real, practically nil.
+- **Mean walk for admitted residents: −37.6%** (8,715 → 5,439 m).
+- **Vulnerable residents sheltered: 7.24% → 7.55%** (+4.25% relative) — better siting
+  helps slower residents slightly more, because proximity partially offsets speed.
+- **Residents with no reachable shelter: unchanged** (~15).
+
+**Siting is not the binding constraint; capacity is.** Optimal placement makes the
+journey shorter for the people who were already going to get a bed. It does not change
+how many beds exist.
+
+### 7.5 Figures and data
+
+`docs/final/figures/`: access by stratum (`figA`), walking-speed distributions (`figB`),
+exposure distribution by outcome (`figC`), travel distance (`figD`), travel time
+(`figE`), shelter utilization (`figF`), A-vs-B comparison (`figG`), and an outcome map
+of encampment origins with both scenarios' sites (`figH`).
+
+`docs/final/analysis/`: `scenario_comparison.csv` (population level, per seed),
+`stratified_exposure.csv`, `shelter_utilization.csv`, `journeys_sample.csv` (individual
+records), `comparison_summary.json`.
+
+Per-resident records — the primary evidence — carry: agent ID, scenario, seed, sim ID,
+commit, data version, starting encampment, shelter reached, success flag, departure and
+arrival times, travel duration, travel distance, walking speed, age, age band, sex,
+mobility category, asthma, COPD, vulnerable flag, average and peak PM2.5, cumulative
+dose, exposure burden index, and hours above Unhealthy.
+
+## 8. Interpretation
+
+1. **Capacity, not geography, decided who breathed smoke.** 2,037 people, 198 beds:
+   90.3% could not be sheltered under any placement, and moving the shelters to the
+   mathematical optimum changed population exposure by 0.03%. Access interventions —
+   siting, wayfinding, outreach — cannot close a 10:1 shortfall.
+2. **The burden is a cliff, not a slope.** Reaching a bed cut exposure ~16×; everyone
+   else converged on the identical maximal outdoor dose.
+3. **Scarcity was allocated by walking speed.** With first-come-first-served admission,
+   the beds went disproportionately to residents who could walk fast: 11.2% of unimpaired
+   residents versus 3.5% of mobility-limited ones. Nothing in the model *targets* slower
+   residents — the disparity is an emergent consequence of rationing by arrival order.
+   That is a policy-relevant finding about admission mechanism, not about biology.
+4. **Timing mattered as much as siting.** The shelters opened on 10–11 September, days
+   into the smoke event; every resident accrued the full outdoor dose until then. In this
+   model, opening a day earlier would remove far more exposure than relocating the sites.
+5. **These are exposure statements, not health claims.** Converting µg·m⁻³·h to health
+   outcomes requires concentration–response functions and breathing/deposition modelling
+   this study deliberately excludes.
 
 ## 9. Limitations
 
-- **L1 (A-02, blocking).** All residents evacuate at the *first* threshold
-  crossing (Sept 7 16:00) — before the real shelters opened (Sept 10–11) —
-  and simultaneously. Absolute dose magnitudes and arrival timing carry this
-  artifact; the structural findings (capacity binding, exposure cliff,
-  refused-cohort walking cost) are driven by the bed-to-population ratio, not
-  the trigger time. Realistic staggered departure is registered future work.
-- **L2 (A-04, blocking).** The 99-bed capacities are newsroom-sourced and
-  unconfirmed. The 9.72% arrival rate scales directly with total beds; treat
-  it as "≈198 beds' worth", not a precise percentage.
-- **L3.** Population 2,037 is the measured January-2019 PIT count applied to
-  a September-2020 event; the true event population is unknown.
-- **L4 (A-03).** Encampment start locations are real city reports but from
-  2025–26 (no 2020 records exist in the feed), with complaint-driven
-  visibility bias.
-- **L5 (A-01).** The smoke field is spatially uniform (2 in-county
-  monitors); all between-resident exposure differences arise from time
-  outdoors, none from spatial gradients.
-- **L6.** Bed admission is arrival-order within a tick (seeded shuffle):
-  *which specific residents* get the marginal beds varies by seed, though
-  population-level results are stable (refused count varies by ±4 of ~1,824
-  across seeds). Order-independent two-phase admission remains registered
-  future work (`08-ENGINEERING.md` §3.5).
-- **L7.** All mapped street centerlines are treated as walkable (no
-  freeway-pedestrian exclusion yet); 12–19 residents per seed are
-  "unreachable" due to disconnected graph components — a network-data
-  artifact reported in the outcome census, not removed from it.
-- **L8.** Vulnerability weighting is inert (RR = 1.0 placeholders); EBI
-  equals raw exposure. No claim about differential susceptibility is made.
-- **L9.** No shelter departures, no queueing, no abandonment (A-17
-  behavioural residue); no indoor exposure model.
+- **L1 (A-02, resolved-in-part).** Departure is now gated on real opening dates, but all
+  residents still depart *simultaneously* on the same trigger: no awareness or
+  decision-delay model exists. Real departures would be staggered.
+- **L2 (A-12, blocking).** Every resident is assumed to know the shelters exist — flatly
+  contradicted by the local record (65% of surveyed unhoused residents had not heard of
+  them). Real uptake would be far lower, so the 9.72% arrival rate is an **upper bound**.
+- **L3 (A-04, blocking).** The 99-bed capacities are unconfirmed; the arrival rate scales
+  directly with total beds.
+- **L4.** Population 2,037 is the January-2019 PIT count applied to a September-2020
+  event.
+- **L5 (A-03).** Encampment locations are real city reports from 2025–26 used as a 2020
+  spatial proxy, with complaint-driven visibility bias.
+- **L6 (A-01).** The smoke field is spatially uniform, so all exposure differences arise
+  from time outdoors, none from spatial gradients.
+- **L7 (A-19).** Mobility-limited residents use the fastest impaired speed category; the
+  real disparity is likely **larger** than reported.
+- **L8 (A-22 / A-08).** Admission is first-come-first-served within a tick; which
+  specific residents get marginal beds varies by seed, though stratum-level rates are
+  stable. A vulnerability-prioritised admission policy is an obvious untested scenario.
+- **L9.** `travel_time_min` is elapsed time from departure to admission and **includes
+  waiting** for a second shelter to open the next day; it is not pure walking time.
+- **L10.** No shelter departures, no queueing, no abandonment; no indoor exposure model;
+  freeway segments are not yet excluded from the pedestrian graph (12–19 residents per
+  seed are unreachable due to disconnected graph components).
+- **L11.** Scenario B is a theoretical siting bound (§3.5), not a buildable proposal.
 
 ## 10. Provenance of each headline claim
 
-| Claim | Measured | Literature-supported | Assumption-dependent |
+| Claim | Measured | Literature | Assumption-dependent |
 |---|---|---|---|
-| "198 of 2,037 (9.7%) reached shelter" | Street network, encampment points, shelter locations, PIT count | Walking speed 1.30 m/s (gait literature); Dijkstra routing | Capacity 99×2 (A-04); simultaneous evacuation (A-02); 2025–26 encampment proxy (A-03) |
-| "Refused residents walked ~9.5 km through smoke" | Network distances; PM2.5 concentrations | Walking speed | Refusal behaviour: instant re-decision, no queueing (A-17); A-02 timing |
-| "~300× exposure difference sheltered vs not" | Hourly PM2.5 (EPA AQS) | "Unhealthy" breakpoint 55.5 µg/m³ (EPA) | Uniform field (A-01); exposure ends at arrival (study-endpoint definition); A-02 inflates both sides' absolute values |
-| "356,841 person-hours above Unhealthy" | Hourly PM2.5 | EPA breakpoint | A-01, A-02, population size L3 |
-| "Beds exhausted in ~48 minutes" | Network, locations | Walking speed | A-02 (simultaneous departure compresses this interval); A-04 |
+| "198 of 2,037 (9.7%) reached shelter, in both scenarios" | Street network, encampments, shelter sites + dates, PIT count | Gait speeds; Dijkstra routing | Capacity 99×2 (A-04); universal awareness (A-12); simultaneous departure (A-02); encampment proxy (A-03) |
+| "Mobility-limited residents reached shelter at 3.5% vs 11.2%" | PIT mobility prevalence (local); network distances | Bohannon 2011 speeds; Boyce 1999 impaired speeds | Age gradient donor (A-18); aid mix (A-19); first-come-first-served admission (A-08) |
+| "Optimized siting changes population exposure by −0.03%" | Network, encampment geography | p-median formulation | Unconstrained siting (L11); capacity fixed; A-03 demand geography |
+| "Refused residents walked ~15.9 km through smoke" | Network distances; PM2.5 | Gait speeds | A-21 wait-and-retry behaviour; A-02 timing |
+| "359,793 person-hours above the Unhealthy breakpoint" | Hourly EPA AQS PM2.5 | EPA 55.5 µg/m³ breakpoint | A-01 uniform field; A-02; population size (L4) |
 
 ---
 
-*Generated from archived runs at model commit `83d721b`; analysis pipeline
-`scripts/analyze_run.py` v1.1.0. The routing defect that previously walked
-refused residents back to their encampments (Finding A) was fixed and
-validated before these runs; see `docs/science/phase2-human-agents/09-DECISIONS.md`
-D-6 and the capacity-binding golden in `docs/runs/capacity-binding-n400-seed42/`.*
+*Model commit `ccad7b7`; analysis `scripts/compare_scenarios.py` v1.0.0 and
+`scripts/analyze_run.py` v1.1.0; siting optimum from `scripts/optimize_shelters.py`
+v1.0.0 (`docs/runs/scenario-b-optimization/optimization_report.json`). Runs archived
+under `docs/runs/final-scenarios/`.*

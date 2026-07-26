@@ -1,0 +1,16 @@
+scenario,seed,shelter_id,name,lon,lat,capacity,operating,peak_occupancy,final_occupancy,refused_count,utilization,mean_travel_dist_m_admitted
+A,42,CJ,Charles Jordan Community Center,-122.711387,45.587754,99.0,True,99,99,1824,1.0,16358.14
+A,42,OCC,Oregon Convention Center,-122.661771,45.528461,99.0,True,99,99,1923,1.0,1006.41
+A,42,MSCC,Mount Scott Community Center,-122.58916,45.482738,,False,0,0,0,,
+A,43,CJ,Charles Jordan Community Center,-122.711387,45.587754,99.0,True,99,99,1820,1.0,17017.02
+A,43,OCC,Oregon Convention Center,-122.661771,45.528461,99.0,True,99,99,1919,1.0,983.19
+A,43,MSCC,Mount Scott Community Center,-122.58916,45.482738,,False,0,0,0,,
+A,44,CJ,Charles Jordan Community Center,-122.711387,45.587754,99.0,True,99,99,1827,1.0,15957.11
+A,44,OCC,Oregon Convention Center,-122.661771,45.528461,99.0,True,99,99,1926,1.0,968.14
+A,44,MSCC,Mount Scott Community Center,-122.58916,45.482738,,False,0,0,0,,
+B,42,OPT1,Optimized site 1 (theoretical  street node 49392),-122.6735,45.525975,99.0,True,99,99,1923,1.0,530.76
+B,42,OPT2,Optimized site 2 (theoretical  street node 52835),-122.655673,45.519355,99.0,True,99,99,1824,1.0,10048.4
+B,43,OPT1,Optimized site 1 (theoretical  street node 49392),-122.6735,45.525975,99.0,True,99,99,1919,1.0,693.49
+B,43,OPT2,Optimized site 2 (theoretical  street node 52835),-122.655673,45.519355,99.0,True,99,99,1820,1.0,11049.0
+B,44,OPT1,Optimized site 1 (theoretical  street node 49392),-122.6735,45.525975,99.0,True,99,99,1926,1.0,688.8
+B,44,OPT2,Optimized site 2 (theoretical  street node 52835),-122.655673,45.519355,99.0,True,99,99,1827,1.0,9624.55
