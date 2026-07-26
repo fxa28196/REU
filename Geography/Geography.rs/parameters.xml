@@ -66,8 +66,8 @@
 	     2 = C, CAPACITY-NEUTRAL DEMONSTRATION ONLY - real locations and opening
 	         dates but total capacity raised to match the population, so that beds
 	         stop being the binding constraint. NOT real 2020 availability. -->
-	<parameter name="scenarioCode" displayName="Scenario (0=current, 1=optimized, 2=capacity-neutral demo)" type="int"
-		defaultValue="0"
+	<parameter name="scenarioCode" displayName="Scenario (0=arm A current, 1=arm B optimized, 2=historical 2x99 beds)" type="int"
+		defaultValue="2"
 		isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 	/>
