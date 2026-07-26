@@ -51,11 +51,11 @@ INK, INK2, MUTED = "#0b0b0b", "#52514e", "#898781"
 GRID, BASELINE, SURFACE = "#e1e0d9", "#c3c2b7", "#fcfcfb"
 BLUE, ORANGE = "#2a78d6", "#ec835a"
 CRITICAL, SERIOUS = "#d03b3b", "#ec835a"
-SCEN_COLOR = {"A": BLUE, "B": ORANGE, "C": "#5f8f5a"}
+SCEN_COLOR = {"A": BLUE, "B": ORANGE, "H": "#8a8a8a"}
 SCEN_LABEL = {
     "A": "A — current placement",
     "B": "B — optimized placement",
-    "C": "C — capacity-neutral (demo only)",
+    "H": "historical capacity reference (not an arm)",
 }
 
 STRATA = [
@@ -85,7 +85,7 @@ def load_runs(runs_dir, pattern):
         agents = pd.read_csv(agents_f)
         man = json.loads(man_f.read_text(encoding="utf-8"))
         scen_name = man.get("scenario", "")
-        scen = "B" if scen_name.startswith("B_") else ("C" if scen_name.startswith("C_") else "A")
+        scen = "B" if scen_name.startswith("B_") else ("H" if scen_name.startswith("HISTORICAL") else "A")
         seed = man["reproducibility"]["random_seed"]
         runs[(scen, seed)] = {
             "dir": d, "agents": agents, "manifest": man,
@@ -117,6 +117,12 @@ def population_row(scen, seed, run):
         "mean_travel_min_sheltered": round(float(sheltered["travel_time_min"].mean()), 1)
         if len(sheltered) else None,
         "mean_travel_m_all": round(float(a["total_travel_distance_m"].mean()), 1),
+        "mean_inhaled_dose_ug": (round(float(a["inhaled_dose_ug"].mean()), 2)
+                                 if "inhaled_dose_ug" in a.columns else None),
+        "total_inhaled_dose_ug": (round(float(a["inhaled_dose_ug"].sum()), 1)
+                                  if "inhaled_dose_ug" in a.columns else None),
+        "mean_air_volume_m3": (round(float(a["air_volume_breathed_m3"].mean()), 2)
+                               if "air_volume_breathed_m3" in a.columns else None),
         "total_beds": int(run["shelters"]["capacity"].fillna(0).sum()),
         "beds_used": int(run["shelters"]["final_occupancy"].sum()),
         "model_commit": man["reproducibility"]["git_commit"][:10],
@@ -177,6 +183,10 @@ def quick_summary(runs, seed):
         "Peak PM2.5 (ug/m3)": a["peak_pm25_ugm3"],
         "Cumulative PM2.5 dose (ug/m3 x hours)": a["cumulative_dose_ugm3h"].round(0),
         "Exposure burden index (ug/m3 x hours)": a["vwe_ugm3h"].round(0),
+        "Inhaled PM2.5 dose (micrograms)": (a["inhaled_dose_ug"].round(0)
+                                            if "inhaled_dose_ug" in a.columns else ""),
+        "Health risk score": (a["health_risk_score"].round(0)
+                              if "health_risk_score" in a.columns else ""),
         "Walking speed (m/s)": a["walking_speed_mps"].round(3),
         "Age group": a["age_band"],
         "Mobility limitation": a["mobility_limited"].map(yes_no),
@@ -187,6 +197,7 @@ def quick_summary(runs, seed):
     })
     # Sorted so the story is visible on opening: within each scenario, the
     # residents who got in fastest are first and those who never got in are last.
+    out.insert(2, "Seed", seed)   # audit fix: the file is one seed; say so in the data
     out = out.sort_values(["_scen", "Cumulative PM2.5 dose (ug/m3 x hours)"]).drop(columns="_scen")
     path = REPO_ROOT / "docs" / "final" / "QUICK_RESULTS_SUMMARY.csv"
     out.to_csv(path, index=False)
@@ -226,6 +237,8 @@ def stratified_rows(scen, seed, run):
                 "mean_travel_min_sheltered": round(float(sh["travel_time_min"].mean()), 1)
                 if len(sh) else None,
                 "mean_hours_above_unhealthy": round(float(g["hours_above_unhealthy"].mean()), 2),
+                "mean_inhaled_dose_ug": (round(float(g["inhaled_dose_ug"].mean()), 2)
+                                         if "inhaled_dose_ug" in g.columns else None),
             })
     return out
 
@@ -545,7 +558,8 @@ def main():
         for k in ("pct_sheltered", "total_exposure_ugm3h", "mean_exposure_ugm3h",
                   "mean_travel_m_sheltered", "vulnerable_pct_sheltered",
                   "vulnerable_mean_exposure_ugm3h", "n_unreachable",
-                  "total_person_hours_above_unhealthy"):
+                  "total_person_hours_above_unhealthy", "mean_inhaled_dose_ug",
+                  "total_inhaled_dose_ug", "mean_travel_min_sheltered"):
             if k in ga and pd.notna(ga.get(k)) and pd.notna(go.get(k)):
                 av, bv = float(ga[k]), float(go[k])
                 d[k] = {"A": round(av, 3), other: round(bv, 3),

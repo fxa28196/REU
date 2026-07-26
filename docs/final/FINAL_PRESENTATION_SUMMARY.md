@@ -1,3 +1,8 @@
+﻿> **SUPERSEDED — HISTORICAL RECORD ONLY.** This document describes an earlier
+> state of the model and does not reflect the final submission. For the current
+> model and results see `docs/final/UPDATED_FINAL_RESULTS_REPORT.md` and the
+> audits alongside it. Retained for provenance.
+
 # What did the simulation find?
 
 **Portland, September 2020 wildfire smoke. 2,037 unsheltered residents. 198 clean-air shelter beds.**
@@ -6,29 +11,29 @@
 
 ## The one-sentence answer
 
-> **Shelter capacity — not shelter location — decided who breathed wildfire smoke, and the
+> **Shelter capacity â€” not shelter location â€” decided who breathed wildfire smoke, and the
 > few beds available went disproportionately to people who could walk fastest.**
 
 ---
 
-## 1. Current shelter placement (Scenario A) — what actually happened
+## 1. Current shelter placement (Scenario A) â€” what actually happened
 
 | | Result |
 |---|---|
-| Reached shelter | **198 of 2,037 — 9.7%** |
+| Reached shelter | **198 of 2,037 â€” 9.7%** |
 | Turned away, every shelter full | **~1,824 people** |
 | No walking route to any shelter | ~15 people |
-| Beds used | 198 of 198 — **100% full** |
-| Smoke exposure, sheltered residents | 3,292 µg/m³·h |
-| Smoke exposure, everyone else | **54,003 µg/m³·h — 16× higher** |
+| Beds used | 198 of 198 â€” **100% full** |
+| Smoke exposure, sheltered residents | 3,292 Âµg/mÂ³Â·h |
+| Smoke exposure, everyone else | **54,003 Âµg/mÂ³Â·h â€” 16Ã— higher** |
 | Hours in "Unhealthy" air, unsheltered | **194 hours each** |
-| Distance walked by people who were turned away | **15.9 km on average — for nothing** |
+| Distance walked by people who were turned away | **15.9 km on average â€” for nothing** |
 
 Both shelters filled completely. Identical in all three random seeds.
 
 ---
 
-## 2. Optimized shelter placement (Scenario B) — could better siting have helped?
+## 2. Optimized shelter placement (Scenario B) â€” could better siting have helped?
 
 We moved the same 198 beds to the mathematically optimal locations on Portland's street
 network and re-ran everything.
@@ -36,8 +41,8 @@ network and re-ran everything.
 | Measure | Current (A) | Optimized (B) | Change |
 |---|---|---|---|
 | **People reaching shelter** | 198 | **198** | **no change** |
-| Total population smoke exposure | 99,962,958 | 99,933,295 | **−0.03%** |
-| Distance walked by those admitted | 8,692 m | 5,335 m | −38.6% |
+| Total population smoke exposure | 99,962,958 | 99,933,295 | **âˆ’0.03%** |
+| Distance walked by those admitted | 8,692 m | 5,335 m | âˆ’38.6% |
 | Vulnerable residents sheltered | 6.19% | 6.53% | +0.34 pts |
 
 **Optimizing shelter locations changed nothing that matters.** It shortened the walk for
@@ -49,21 +54,21 @@ the people who were already going to get a bed. It did not shelter one additiona
 
 ### Capacity. Unambiguously.
 
-The evidence is that Scenario B — the *best possible* siting of 198 beds — still sheltered
+The evidence is that Scenario B â€” the *best possible* siting of 198 beds â€” still sheltered
 exactly 198 people and cut population exposure by three hundredths of one percent.
 
 To confirm this, we ran a third scenario in which capacity was removed as a constraint
-(**Scenario C**, a demonstration only — **not** real 2020 availability):
+(**Scenario C**, a demonstration only â€” **not** real 2020 availability):
 
 | Measure | Current capacity (A) | Capacity-neutral (C) | Change |
 |---|---|---|---|
 | **People reaching shelter** | 198 (9.7%) | **2,022 (99.2%)** | **+921%** |
-| Total population smoke exposure | 99,962,958 | 7,669,225 | **−92.3%** |
-| Person-hours in "Unhealthy" air | 359,794 | 34,948 | **−90.3%** |
+| Total population smoke exposure | 99,962,958 | 7,669,225 | **âˆ’92.3%** |
+| Person-hours in "Unhealthy" air | 359,794 | 34,948 | **âˆ’90.3%** |
 
 **Adding beds reduces population smoke exposure by 92%. Moving beds reduces it by 0.03%.**
 
-That is a factor of roughly **3,000× difference** in effectiveness between the two
+That is a factor of roughly **3,000Ã— difference** in effectiveness between the two
 interventions.
 
 ---
@@ -84,9 +89,9 @@ smoke. They went to the people who could walk to them fastest.
 | People with asthma | 9.0% | 1.29 m/s | 49,501 | 178.2 |
 | Without asthma | 9.9% | 1.29 m/s | 48,992 | 176.3 |
 
-**Residents with COPD or mobility limitations were roughly 3× less likely to get a bed.**
+**Residents with COPD or mobility limitations were roughly 3Ã— less likely to get a bed.**
 
-### Why asthma shows almost no difference — and why that is the honest answer
+### Why asthma shows almost no difference â€” and why that is the honest answer
 
 Asthma barely moves the numbers (9.0% vs 9.9%) because **in this model asthma does not
 slow anyone down**. We searched the literature for a quantitative walking-speed effect of
@@ -102,20 +107,20 @@ and neither is used to inflate anyone's inhaled dose.
 
 ### The mechanism, in one line
 
-> **Mobility limitation or COPD → slower walking → longer outdoors → more smoke inhaled,
+> **Mobility limitation or COPD â†’ slower walking â†’ longer outdoors â†’ more smoke inhaled,
 > and a higher chance the last bed is gone on arrival.**
 
 ### What removing the bottleneck reveals
 
-In Scenario C, where nearly everyone gets indoors, the *access* gap disappears — but an
+In Scenario C, where nearly everyone gets indoors, the *access* gap disappears â€” but an
 *exposure* gap survives:
 
 | Group | Exposure, capacity-neutral | vs comparison group |
 |---|---|---|
 | Mobility-limited | 4,388 | **+21%** |
-| Not mobility-limited | 3,619 | — |
+| Not mobility-limited | 3,619 | â€” |
 | Any vulnerability | 4,006 | **+13%** |
-| No vulnerability | 3,542 | — |
+| No vulnerability | 3,542 | â€” |
 
 Even with a bed guaranteed for everyone, slower residents still breathe more smoke,
 because they spend longer walking. **Capacity solves most of the problem; it does not
@@ -129,11 +134,11 @@ Ranked by the effect measured in this simulation:
 
 | Rank | Intervention | Modelled effect | Confidence |
 |---|---|---|---|
-| **1** | **More shelter capacity** | **−92% population exposure** | Directly measured (Scenario C) |
-| **2** | **Open shelters earlier** | Shelters opened 10–11 September, days into the smoke event. Every resident accrued the full outdoor dose until then. In this model, opening earlier removes far more exposure than any relocation | Inferred from the timeline; not separately simulated |
+| **1** | **More shelter capacity** | **âˆ’92% population exposure** | Directly measured (Scenario C) |
+| **2** | **Open shelters earlier** | Shelters opened 10â€“11 September, days into the smoke event. Every resident accrued the full outdoor dose until then. In this model, opening earlier removes far more exposure than any relocation | Inferred from the timeline; not separately simulated |
 | **3** | **Transport, or bringing shelter to people** | Slower residents lose the race for beds. Removing walking from the equation would break the speed-based rationing | Mechanism demonstrated; specific intervention not simulated |
-| **4** | **Prioritized admission for vulnerable residents** | Admission is currently first-come-first-served, which is what produces the 3× disparity. A triage policy would redistribute the same beds | Mechanism demonstrated; policy not simulated |
-| **5** | **Better shelter siting** | **−0.03% population exposure** (but −39% walking distance for those admitted) | Directly measured (Scenario B) |
+| **4** | **Prioritized admission for vulnerable residents** | Admission is currently first-come-first-served, which is what produces the 3Ã— disparity. A triage policy would redistribute the same beds | Mechanism demonstrated; policy not simulated |
+| **5** | **Better shelter siting** | **âˆ’0.03% population exposure** (but âˆ’39% walking distance for those admitted) | Directly measured (Scenario B) |
 
 **The headline policy implication:** siting optimization is the *least* effective of these
 options by three orders of magnitude. Capacity and timing dominate.
@@ -161,3 +166,4 @@ options by three orders of magnitude. Capacity and timing dominate.
 Underlying data: [`QUICK_RESULTS_SUMMARY.csv`](QUICK_RESULTS_SUMMARY.csv) and
 `analysis/`. Full methodology and limitations:
 [`FINAL_RESULTS_REPORT.md`](FINAL_RESULTS_REPORT.md).*
+

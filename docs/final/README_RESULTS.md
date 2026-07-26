@@ -31,17 +31,29 @@ every shelter filled up — it keeps accumulating for the entire two weeks.
 
 **Nothing about the geography, the air, the shelter locations, or the population size is
 invented.** Those all come from real data sources, listed in
-[`FINAL_RESULTS_REPORT.md`](FINAL_RESULTS_REPORT.md) §4.
+[`UPDATED_FINAL_RESULTS_REPORT.md`](UPDATED_FINAL_RESULTS_REPORT.md) §5.
 
-### The three scenarios
+### The two arms of the experiment
 
-| Scenario | What it tests | Is it real? |
+The study asks one question: **does *where* shelters are placed change how much
+smoke people breathe?** To answer only that, both arms are identical in every
+respect — population, health, air quality, opening dates, street network, and
+**total capacity** — except for two coordinate pairs.
+
+| Arm | What it tests | Is it real? |
 |---|---|---|
-| **A — Current placement** | The two shelters that actually operated, at their real locations, with their real opening dates | **Yes** — this is the historical situation |
-| **B — Optimized placement** | The *same number of beds*, moved to the mathematically best locations | Hypothetical but constrained: same capacity, same dates, only location changes |
-| **C — Capacity-neutral demonstration** | Real locations, but enough beds for everyone | **NO — demonstration only.** See the warning in §5 |
+| **A — current placement** | The two shelters at their real September-2020 locations | Real locations, **modelled assumptions** — not a replay of history (§4) |
+| **B — optimized placement** | The same system moved to the best locations on the street network | Hypothetical, tightly constrained: same capacity, same dates, only location differs |
 
----
+**Why both arms have room for everyone.** Total capacity equals the population
+(2,037 spaces) in *both* arms. If beds were scarce, the bed count — not
+geography — would decide the outcome, and the experiment could not detect a
+placement effect at all. Individual shelters still fill up, so residents are
+still turned away at a full door and still have to walk somewhere else.
+
+A separate **historical reference run** uses the real 2 × 99 beds. It is **not a
+study arm**; it exists only to compare the model against the one observed
+occupancy record (§4).
 
 ## 2. What one row in `agents.csv` represents
 
@@ -51,7 +63,7 @@ Reading across a single row tells you that person's whole story: where they star
 they left, how fast they walk, how far they walked, which shelter they tried, whether they
 got in, and how much smoke they breathed along the way.
 
-Here is a real row from Scenario A, translated:
+Here is a real row from arm A, translated:
 
 > *Site 1963 started at encampment `25-156603`. They walk at 1.30 m/s. When the smoke
 > crossed the danger threshold on 10 September at 07:00, they set out, walked 292 metres
@@ -140,7 +152,7 @@ Every resident ends in exactly one of three states:
 
 ---
 
-## 4. Three honest limitations to state out loud
+## 4. Four honest limitations to state out loud
 
 1. **This measures exposure, not health.** The model never predicts an asthma attack, a
    hospital visit, or a death. Converting smoke exposure into health outcomes needs
@@ -152,23 +164,21 @@ Every resident ends in exactly one of three states:
 3. **The bed counts are not officially confirmed.** The 99-beds-per-shelter figure comes
    from contemporaneous news reporting, not an agency document. See
    [`SHELTER_CAPACITY_AUDIT.md`](SHELTER_CAPACITY_AUDIT.md).
+4. **The model shelters more people than the record shows.** In the historical
+   reference run both shelters fill (198 of 198). The one contemporaneous
+   observation — Street Roots, 16 September 2020 — records about **130** people
+   across both sites. The model over-predicts uptake by roughly 1.5×, because it
+   assumes everyone knows the shelters exist. This is reported, not hidden.
 
 ---
 
-## 5. ⚠️ About Scenario C (capacity-neutral demonstration)
+## 5. About the historical reference run
 
-Scenario C gives the shelters enough total space for the whole simulated population. **It
-is not a claim about what was available in 2020, and must never be presented as one.**
-
-Its purpose is to isolate one question: *if beds were not the bottleneck, would everyone
-be equally protected?* The answer turns out to be interesting — see
-[`FINAL_PRESENTATION_SUMMARY.md`](FINAL_PRESENTATION_SUMMARY.md).
-
-The shelters keep their real locations, real opening dates, and equal relative sizes, so
-they still fill up in sequence and residents still get redirected — the travel and
-exposure differences are still real. Only the total is artificial.
-
----
+Alongside the two experiment arms there is a **historical reference run** using
+the real 2 × 99 beds. It is not a scenario and carries no experimental result.
+Its only job is calibration: it lets us state plainly that the model shelters
+198 people where the historical record shows about 130, and to explain why
+(see §4, point 4).
 
 ## 6. How to run the simulation
 
@@ -214,14 +224,14 @@ cd C:\Users\Chick\OneDrive\Desktop\reu
 # Compile first if any Java changed
 cd Geography; .\gradlew.bat compileJava; cd ..
 
-# Scenario A — current placement (the headline result)
+# Arm A — current placement
 powershell -File scripts\run-headless.ps1 -ParamsFile batch\batch_params_final_A_seed42.xml
 
-# Scenario B — optimized placement
+# Arm B — optimized placement
 powershell -File scripts\run-headless.ps1 -ParamsFile batch\batch_params_final_B_seed42.xml
 
-# Scenario C — capacity-neutral demonstration
-powershell -File scripts\run-headless.ps1 -ParamsFile batch\batch_params_final_C_seed42.xml
+# Historical capacity reference (not a study arm)
+powershell -File scripts\run-headless.ps1 -ParamsFile batch\batch_params_histref_seed42.xml
 
 # The small, fast regression fixture (n=50, ~20 seconds)
 powershell -File scripts\run-headless.ps1
@@ -265,7 +275,7 @@ writes to `docs\final\`:
 |---|---|
 | `QUICK_RESULTS_SUMMARY.csv` | **Open this one first** — every resident, plain-English column names |
 | `FINAL_PRESENTATION_SUMMARY.md` | What the simulation found, in one page |
-| `FINAL_RESULTS_REPORT.md` | The full scientific write-up |
+| `UPDATED_FINAL_RESULTS_REPORT.md` | The full scientific write-up |
 | `analysis/scenario_comparison.csv` | Population-level results, one row per scenario × seed |
 | `analysis/stratified_exposure.csv` | Results broken down by age, mobility, asthma, COPD |
 | `analysis/shelter_utilization.csv` | Per-shelter occupancy and refusals |
@@ -286,9 +296,11 @@ writes to `docs\final\`:
 
 | Question | File |
 |---|---|
-| "What did you find?" | [`FINAL_PRESENTATION_SUMMARY.md`](FINAL_PRESENTATION_SUMMARY.md) |
+| "What did you find?" | [`UPDATED_FINAL_RESULTS_REPORT.md`](UPDATED_FINAL_RESULTS_REPORT.md) §3 |
 | "Show me the data" | [`QUICK_RESULTS_SUMMARY.csv`](QUICK_RESULTS_SUMMARY.csv) |
-| "Is this scientifically defensible?" | [`FINAL_RESULTS_REPORT.md`](FINAL_RESULTS_REPORT.md) |
+| "Is this scientifically defensible?" | [`UPDATED_FINAL_RESULTS_REPORT.md`](UPDATED_FINAL_RESULTS_REPORT.md) |
+| "How is smoke distributed in space?" | [`SMOKE_FIELD_AUDIT.md`](SMOKE_FIELD_AUDIT.md) |
+| "Which claims survived audit?" | [`CLAIM_VALIDATION_AUDIT.md`](CLAIM_VALIDATION_AUDIT.md) |
 | "How is vulnerability modelled?" | [`VULNERABILITY_MECHANISM_AUDIT.md`](VULNERABILITY_MECHANISM_AUDIT.md) |
 | "Where do the bed counts come from?" | [`SHELTER_CAPACITY_AUDIT.md`](SHELTER_CAPACITY_AUDIT.md) |
 | "What does column X mean exactly?" | [`../science/METRICS.md`](../science/METRICS.md) |

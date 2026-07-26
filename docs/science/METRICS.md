@@ -17,36 +17,61 @@ V1–V16), [`VARIABLES.md`](VARIABLES.md), [`DATA_SOURCES.md`](DATA_SOURCES.md),
 
 ---
 
-## 1. `agents.csv` — one row per resident
+## 1. `agents.csv` - one row per resident
 
-| Column | Units | Meaning & calculation | Interpretation / limitations |
-|---|---|---|---|
-| `agent_id` | — | Synthetic resident id (`Site N`). | Identity key. |
-| `encampment_id` | — | `inc_id` of the real IRP campsite report this resident was placed at (D2b). | Traceable to a real Portland encampment point — but a 2025–26 report used as a 2020 proxy (see DATA_SOURCES D2b). |
-| `start_node` | RLIS node id | Street-graph node the start location snapped to. | Reproducibility/debug. |
-| `assigned_shelter` | — | Shelter id the resident is/was routed to (`` if none chosen). | The network-nearest operating shelter with space at selection. |
-| `final_state` | enum | `SHELTERED` / `EN_ROUTE` / `UNREACHABLE` / `REFUSED_ALL_FULL` (V12, DESIGN_SPEC Decision 3). | Every resident ends in exactly one state; the full population is accounted for (no silent deletion). |
-| `arrival_tick` | tick | Tick of admission (`` if never admitted). | ×`minutesPerTick` = simulated minutes to shelter. |
-| `distance_traveled_m` | metres | Cumulative geodesic distance walked (V9). | Cost of access; en-route exposure accrues over this. Geodesic on WGS84 (Karney 2013). |
-| `network_dist_to_shelter_m` | metres | Shortest-path street distance to the chosen shelter at selection (V11); `-1` if none. | "Nearest shelter you can actually reach" (slide 7). Dijkstra 1959. |
-| `exposure_ugm3h` | µg·m⁻³·h | Σ over ticks of C_breathed·Δt (V6). | Raw cumulative exposure **index**, not an inhaled dose (no breathing rate / deposition). |
-| `exposure_while_traveling_ugm3h` | µg·m⁻³·h | Exposure accrued only while `EN_ROUTE`. | The portion of exposure that shelter placement can actually change. |
-| `vwe_ugm3h` | µg·m⁻³·h | Σ C_breathed·RR_age·RR_com·Δt (V7). | Vulnerability-weighted exposure. **Equals `exposure` until RR_age/RR_com are sourced** (both default 1.0; DATA_SOURCES D5/D6). |
-| `hours_above_unhealthy` | hours | Σ Δt where C_breathed > 55.5 µg/m³ (V8). | Person-hours above the PM2.5 "Unhealthy" AQI concentration breakpoint — a concentration threshold, **not** the 24-h-average AQI category (DATA_SOURCES D9). |
-| `peak_conc_ugm3` | µg/m³ | Maximum C_breathed experienced. | — |
-| `age_rr` | dimensionless | RR_age applied (V2). | **1.0 = no age weighting** (unsourced; DATA_SOURCES D5). |
-| `comorbidity_rr` | dimensionless | RR_com applied (V4). | **1.0 = no comorbidity weighting** (unsourced; DATA_SOURCES D6). |
-| `planned_route_m` | metres | Sum of the network lengths of every planned route leg: the initial selection plus one leg per post-refusal re-route from the refusing shelter's node (D-6/A-17). | QC quantity, not a scientific variable. Invariant enforced by `analyze_run.py` as a **failing** check: `total_travel_distance_m` ≤ `planned_route_m` + `snap_gap_m` + 200 m tolerance. 0 for residents that never planned a route. |
-| `snap_gap_m` | metres | Off-network metres from where the resident stood to the first waypoint of each planned leg: encampment→street snap gap on leg 1 (hundreds of metres for campsites far from a mapped street), polyline endpoint gaps (≤ ~12 m) on re-routes. | Real walked distance not covered by network legs; makes the A-17 check exact. Also an honest record of how far each start point sits from the walkable graph. |
-| `door_refusals` | count | Capacity refusals this resident experienced at a shelter door (retarget count). | 0 unless capacity binds. A resident refused everywhere ends `REFUSED_ALL_FULL`; one later admitted ends `SHELTERED` with `door_refusals` > 0. |
-| `scenario` | — | `A_current_placement` or `B_optimized_placement`. | Scenario B relocates the same total capacity to the street-network p-median optimum; it is a theoretical siting bound, not a policy recommendation. |
-| `walking_speed_mps` | m/s | This resident's own comfortable gait speed (V10 revised). Empty when heterogeneity is disabled. | Sampled from Bohannon & Williams Andrews 2011 age×sex means (CV 0.13, Bohannon 1997), **replaced** by Boyce 1999 N(0.95, 0.32) for mobility-limited residents. Truncated to [0.40, 2.20] m/s (numerical guard, not a literature bound). |
-| `age_years`, `age_band` | years / band | Sampled age and its PIT band (`18-24`/`25-54`/`55-69`/`70+`). | Band shares measured (2019 PIT, D10); age uniform **within** band because nothing constrains the within-band shape. Adults only (D-4). |
-| `sex` | category | `MALE` / `FEMALE` / `OTHER` (2019 PIT shares). | Enters the model for exactly one mechanism — the sex column of the gait-speed table. **Not** a vulnerability weight; no verified sex-modification estimate exists. `OTHER` takes the mean of the two published speed columns. |
-| `mobility_limited`, `mobility_category` | 0/1, category | Mobility limitation and the movement-speed class applied. | 19.2% marginal is a **lower bound** (PIT asked only survey completers but divided by the full population); age gradient donor-imputed from CASPEH (A-18). All limited residents use the *fastest* impaired category, so the penalty is understated (A-19). |
-| `asthma_flag`, `copd_flag`, `any_respiratory` | 0/1 | Diagnosed asthma / COPD (Zellmer 2025 EHR rates, 0.15 / 0.105). | **Reporting strata only — never dose multipliers** (D-3). No local Multnomah prevalence exists; these are imported and labelled PROXY. |
-| `vulnerable_flag` | 0/1 | Age 55+ **or** mobility-limited **or** asthma **or** COPD. | A union of attributes for stratified reporting, **not a risk score**: no weights are attached, because the coefficients a weighted index needs do not exist for this population and could never be validated without simulating a health outcome. |
+**46 columns, verified against the shipped file at commit `b69fc6d`.**
 
+| Column | Meaning |
+|---|---|
+| `agent_id` | Synthetic resident id. |
+| `sim_id` | Run identifier. |
+| `commit` | Model git commit that produced the run. |
+| `random_seed` | RNG seed. |
+| `data_version` | Composite hash of the four model input datasets. |
+| `starting_encampment` | `inc_id` of the real campsite report this resident was placed at (D2b). |
+| `shelter_reached` | Shelter id admitted to (blank if never admitted). |
+| `reached_shelter` | yes / no. |
+| `time_started_tick` | Tick of departure. |
+| `time_started_local` | Local time of departure (Local Standard Time; see L13). |
+| `time_arrived_tick` | Tick of admission. |
+| `time_arrived_local` | Local time of admission. |
+| `travel_time_min` | Elapsed minutes from departure to admission. **Includes any wait** for a second shelter to open; not pure walking time. |
+| `total_travel_distance_m` | Geodesic metres actually walked along street paths (V9). |
+| `network_dist_to_shelter_m` | Network distance from the START node to the FIRST selected shelter (V11). |
+| `avg_pm25_ugm3` | Mean PM2.5 experienced while outdoors. |
+| `peak_pm25_ugm3` | Maximum PM2.5 experienced. |
+| `cumulative_dose_ugm3h` | **Exposure** (V6): sum of C(t)*dt. A concentration-time index, NOT an inhaled mass (A-15). |
+| `exposure_while_traveling_ugm3h` | Exposure accrued only while EN_ROUTE. |
+| `vwe_ugm3h` | Exposure Burden Index (V7). **Identical to `cumulative_dose_ugm3h`** while RR weights are 1.0 (A-09). |
+| `hours_above_unhealthy` | Hours outdoors with C > 55.5 ug/m3 (V8). |
+| `age` | Sampled age (duplicate of `age_years`; retained for schema stability). |
+| `asthma` | Asthma flag (duplicate of `asthma_flag`). |
+| `copd` | COPD flag (duplicate of `copd_flag`). |
+| `age_rr` | RR_age applied. **Always 1.0** (V2, placeholder). |
+| `comorbidity_rr` | RR_comorbidity applied. **Always 1.0** (V4, placeholder). |
+| `final_state` | SHELTERED / REFUSED_ALL_FULL / UNREACHABLE / EN_ROUTE / PRE_EVAC. |
+| `planned_route_m` | Sum of network lengths of all planned legs (QC). |
+| `snap_gap_m` | Off-network metres from the resident to each leg's first waypoint (QC). |
+| `door_refusals` | Refusals recorded at a shelter door. **Under-reports** - resets on waiting-state re-entry; use `shelters.csv refused_count` for totals. |
+| `scenario` | `A_placement_current`, `B_placement_optimized`, or the historical reference. |
+| `walking_speed_mps` | This resident's comfortable gait speed (V10 revised). |
+| `age_years` | Sampled age in years (V18). |
+| `age_band` | PIT age band (V18). |
+| `sex` | MALE / FEMALE / OTHER (V19). |
+| `mobility_limited` | 0/1 mobility limitation (V20). |
+| `mobility_category` | Movement-speed class applied (V20). |
+| `asthma_flag` | 0/1 diagnosed asthma (V21a). |
+| `copd_flag` | 0/1 diagnosed COPD (V21b). |
+| `any_respiratory` | asthma OR copd. |
+| `vulnerable_flag` | 55+ OR mobility-limited OR asthma OR COPD. A reporting stratum, **not** a risk score. |
+| `air_volume_breathed_m3` | Total air volume breathed outdoors, m3 (V25). |
+| `mean_ventilation_m3h` | Realised mean ventilation rate; makes the dose auditable. |
+| `inhaled_dose_ug` | **Inhaled dose** (V25): sum of C(t)*IR(activity)*dt, micrograms. Activity-weighted, NOT health-weighted. |
+| `health_risk_multiplier` | Susceptibility weight. **Always 1.0** by design (HEALTH_MODEL_AUDIT). |
+| `health_risk_score` | inhaled_dose * risk multiplier. Identical to inhaled dose while the weight is 1.0. |
+
+> **Exposure, dose and risk are three different quantities** and are never
+> multiplied together by accident. See `docs/final/HEALTH_MODEL_AUDIT.md`.
 ## 2. `shelters.csv` — one row per shelter
 
 | Column | Units | Meaning & calculation | Interpretation / limitations |
@@ -84,7 +109,7 @@ which return 0 rather than a fabricated value — must be 0 for a clean run).
 |---|---|---|
 | `n_agents`, `sheltered`/`en_route`/`unreachable`/`refused_all_full` | count | Outcome census; the four states sum to `n_agents`. |
 | `exposure_ugm3h.{mean,median,min,p25,p75,p90,max,total}` | µg·m⁻³·h | Distribution of raw exposure across residents. |
-| `exposure_ugm3h.gini` | dimensionless [0,1) | **Gini of exposure (V14):** `ΣᵢΣⱼ|xᵢ−xⱼ| / (2n²x̄)`. 0 = everyone equally exposed; →(n−1)/n = maximally unequal. Now driven by travel-time inequality (exposure ends at arrival), so it is > 0 and discriminating (≈0.63 in the reference run). Its meaning will shift again once vulnerability weighting and realistic evacuation timing land. |
+| `exposure_ugm3h.gini` | dimensionless [0,1) | **Gini of exposure (V14):** `ΣᵢΣⱼ|xᵢ−xⱼ| / (2n²x̄)`. 0 = everyone equally exposed; →(n−1)/n = maximally unequal. Now driven by travel-time inequality (exposure ends at arrival), so it is > 0 and discriminating (0.091 in the final placement runs). Its meaning will shift again once vulnerability weighting and realistic evacuation timing land. |
 | `vwe_ugm3h.{mean,median,total,gini}` | µg·m⁻³·h | Same for vulnerability-weighted exposure. Report both so equity claims are separable from the RR weighting assumption. |
 | `total_person_hours_above_unhealthy` | person·hours | Σ over residents of `hours_above_unhealthy`. Headline burden metric (slide 6). |
 | `travel_m.{mean,median,max}` | metres | Travel-distance distribution. |
@@ -106,10 +131,10 @@ refusals (mirrors `shelters.csv`).
    shelter arrival (the study endpoint); a better-placed / more-accessible
    shelter lowers exposure by ending outdoor time sooner. Indoor air quality is
    out of scope (γ removed; AUDIT.md §0).
-3b. **Absolute exposure currently reflects a Sept-7 evacuation start**, before
-   the smoke peak, so absolute `exposure_ugm3h` and `hours_above_unhealthy` are
-   not yet research-grade (AUDIT.md issue #1); their *relative* ordering by
-   travel time is meaningful (exposure Gini ≈ 0.63).
+3b. **Departure is gated on the real shelter opening dates.** Residents depart
+   2020-09-10 07:00, the first PM2.5 threshold crossing after the Oregon
+   Convention Center opened. The earlier Sept-7 departure artefact is
+   resolved (A-02 mitigated).
 4. **The smoke field is spatially uniform** (2 in-county monitors). Strategy
    differences therefore come only from travel/access, not from spatial
    exposure gradients, until IDW is justified by cross-validation (V5).
