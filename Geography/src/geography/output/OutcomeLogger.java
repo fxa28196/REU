@@ -15,6 +15,7 @@ import geography.agents.GisAgent;
 import geography.agents.Shelter;
 import geography.env.SmokeField;
 import geography.routing.StreetNetwork;
+import geography.science.ScienceRegistry;
 
 import repast.simphony.context.Context;
 
@@ -49,10 +50,11 @@ public class OutcomeLogger {
 	private final String simId;
 	private final String dataVersionTag;
 	private final StreetNetwork.ValidationReport netReport;
+	private final ScienceRegistry registry;
 
 	public OutcomeLogger(Context<Object> context, SmokeField smokeField, long seed,
 			String[] paramNames, Object[] paramValues, String[] inputDataFiles,
-			StreetNetwork.ValidationReport netReport) {
+			StreetNetwork.ValidationReport netReport, ScienceRegistry registry) {
 		this.context = context;
 		this.smokeField = smokeField;
 		this.seed = seed;
@@ -60,6 +62,7 @@ public class OutcomeLogger {
 		this.paramValues = paramValues;
 		this.inputDataFiles = inputDataFiles;
 		this.netReport = netReport;
+		this.registry = registry;
 		this.simId = "sim-" + java.time.LocalDateTime.now()
 				.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")) + "-seed" + seed;
 		StringBuilder cat = new StringBuilder();
@@ -218,6 +221,7 @@ public class OutcomeLogger {
 			w.println("    \"out_of_range_lookups\": " + smokeField.getOutOfRangeLookups());
 			w.println("  },");
 			writeNetworkValidation(w);
+			writeGovernance(w);
 			w.println("  \"population\": {");
 			w.println("    \"n_agents\": " + n + ",");
 			w.println("    \"pre_evac\": " + preEvac + ", \"sheltered\": " + sheltered
@@ -283,6 +287,43 @@ public class OutcomeLogger {
 		}
 		w.println("    ]");
 		w.println("  },");
+	}
+
+	/** Scientific governance block (docs/science/REGISTRY_SCHEMA.md §3): what the
+	 *  model claims to know, how well, and what is still inert. Registry
+	 *  checksums are reported here rather than in {@code input_datasets} because
+	 *  they are governance metadata, not model inputs — adding them there would
+	 *  change {@code data_version_tag} and sever comparability with the archived
+	 *  baseline without any change to what the model reads. */
+	private void writeGovernance(PrintWriter w) {
+		if (registry == null) {
+			return;
+		}
+		w.println("  \"governance\": {");
+		w.println("    \"variables_file\": \"" + jsonEsc(registry.getVariablesPath())
+				+ "\", \"variables_sha256\": \"" + registry.getVariablesSha256() + "\",");
+		w.println("    \"assumptions_file\": \"" + jsonEsc(registry.getAssumptionsPath())
+				+ "\", \"assumptions_sha256\": \"" + registry.getAssumptionsSha256() + "\",");
+		w.println("    \"variable_count\": " + registry.variableCount()
+				+ ", \"assumption_count\": " + registry.assumptionCount() + ",");
+		w.print("    \"evidence_class_census\": {");
+		boolean first = true;
+		for (java.util.Map.Entry<String, Integer> e : registry.evidenceClassCensus().entrySet()) {
+			w.print((first ? "" : ", ") + "\"" + e.getKey() + "\": " + e.getValue());
+			first = false;
+		}
+		w.println("},");
+		w.println("    \"placeholder_variables\": " + jsonStringArray(registry.placeholderVariableIds()) + ",");
+		w.println("    \"blocking_assumptions\": " + jsonStringArray(registry.blockingAssumptionIds()));
+		w.println("  },");
+	}
+
+	private static String jsonStringArray(java.util.List<String> items) {
+		StringBuilder sb = new StringBuilder("[");
+		for (int i = 0; i < items.size(); i++) {
+			sb.append(i == 0 ? "" : ", ").append('"').append(jsonEsc(items.get(i))).append('"');
+		}
+		return sb.append(']').toString();
 	}
 
 	// --- statistics ----------------------------------------------------------
