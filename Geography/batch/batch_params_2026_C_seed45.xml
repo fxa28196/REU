@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!-- PRESENT-DAY THREE-ARM EXPERIMENT - ARM C, SEED 45
+     B's capacity OPTIMALLY PLACED. Facility count and per-facility capacity identical to B; only coordinates differ. Any B->C difference is attributable to placement alone.
+
+     Population n = 6842 is the 2025 Tri-County Point-in-Time count for
+     Multnomah County (PSU HRAC, published 2025-11-04): 10,526 people
+     experiencing homelessness, of whom more than 65% were unsheltered.
+     The model represents the UNSHELTERED only - people outdoors during the
+     smoke episode. See docs/final/FINAL_DATA_VALIDATION_REPORT.md Task 2,
+     including the report's own caveat that administrative-data changes
+     augmented the 2025 unsheltered count.
+
+     enableHeterogeneity=1        residents carry sourced age / sex / mobility /
+                                  asthma / COPD attributes and walk at their own
+                                  speed (01-POPULATION.md, 03-MOVEMENT.md).
+     respectShelterOpeningDates=1 shelters open on their real dates (A-02).
+
+     walkingSpeedMps is declared but IGNORED when heterogeneity is on; it
+     applies only to heterogeneity=0 runs. -->
+<sweep runs="1">
+	<parameter name="numAgents" type="constant" constant_type="int" value="6842"/>
+	<parameter name="randomSeed" type="constant" constant_type="int" value="45"/>
+	<parameter name="minutesPerTick" type="constant" constant_type="number" value="1.0"/>
+	<parameter name="walkingSpeedMps" type="constant" constant_type="number" value="1.30"/>
+	<parameter name="shelterArrivalDistanceM" type="constant" constant_type="number" value="200.0"/>
+	<parameter name="evacuationThresholdUgM3" type="constant" constant_type="number" value="55.5"/>
+	<parameter name="simulationHours" type="constant" constant_type="int" value="312"/>
+	<parameter name="scenarioCode" type="constant" constant_type="int" value="2"/>
+	<parameter name="enableHeterogeneity" type="constant" constant_type="int" value="1"/>
+	<parameter name="respectShelterOpeningDates" type="constant" constant_type="int" value="1"/>
+</sweep>
