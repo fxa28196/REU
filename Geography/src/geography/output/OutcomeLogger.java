@@ -101,12 +101,18 @@ public class OutcomeLogger {
 			// self-describing and analysable standalone. age/asthma/copd are
 			// intentionally EMPTY: not implemented (see CURRENT_MODEL_RUN.md);
 			// no value is invented.
+			// planned_route_m / snap_gap_m / door_refusals are appended per the
+			// append-only CSV contract (07-OUTPUTS.md, D-2): QC quantities for
+			// the A-17 walked-vs-planned routing-integrity check
+			// (total_travel_distance_m <= planned_route_m + snap_gap_m + tol),
+			// not new science.
 			w.println("agent_id,sim_id,commit,random_seed,data_version,"
 					+ "starting_encampment,shelter_reached,reached_shelter,"
 					+ "time_started_tick,time_started_local,time_arrived_tick,time_arrived_local,"
 					+ "travel_time_min,total_travel_distance_m,network_dist_to_shelter_m,"
 					+ "avg_pm25_ugm3,peak_pm25_ugm3,cumulative_dose_ugm3h,exposure_while_traveling_ugm3h,"
-					+ "vwe_ugm3h,hours_above_unhealthy,age,asthma,copd,age_rr,comorbidity_rr,final_state");
+					+ "vwe_ugm3h,hours_above_unhealthy,age,asthma,copd,age_rr,comorbidity_rr,final_state,"
+					+ "planned_route_m,snap_gap_m,door_refusals");
 			for (GisAgent a : agents) {
 				boolean reached = a.getState() == GisAgent.State.SHELTERED;
 				String shelter = reached && a.getTargetShelter() != null ? a.getTargetShelter().getId() : "";
@@ -123,7 +129,7 @@ public class OutcomeLogger {
 				String netDist = Double.isNaN(a.getNetworkDistToShelterM()) ? ""
 						: String.format(Locale.US, "%.2f", a.getNetworkDistToShelterM());
 				w.printf(Locale.US,
-						"%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s,%.2f,%.4f,%.4f,%.4f,%.4f,%s,%s,%s,%.3f,%.3f,%s%n",
+						"%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s,%.2f,%.4f,%.4f,%.4f,%.4f,%s,%s,%s,%.3f,%.3f,%s,%.2f,%.2f,%d%n",
 						a.getName(), simId, commit, seed, dataVersionTag,
 						a.getEncampmentId(), shelter, reached ? "yes" : "no",
 						startTick, startLocal, arrTick, arrLocal,
@@ -131,7 +137,8 @@ public class OutcomeLogger {
 						avgPm, a.getPeakConcUgM3(), a.getExposureUgM3h(), a.getExposureWhileTravelingUgM3h(),
 						a.getVweUgM3h(), a.getHoursAboveUnhealthy(),
 						"", "", "",
-						a.getAgeRR(), a.getComorbidityRR(), a.getState());
+						a.getAgeRR(), a.getComorbidityRR(), a.getState(),
+						a.getPlannedRouteM(), a.getSnapGapM(), a.getRetargetCount());
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("writeAgents failed", e);

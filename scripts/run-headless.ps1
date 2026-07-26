@@ -13,7 +13,14 @@
 #   JAVA_HOME    JDK 17  (default C:\Users\Chick\tools\jdk-17.0.19+10)
 #   REPAST_HOME  Repast Simphony 2.11.0 (default %USERPROFILE%\RepastSimphony-2.11.0)
 
-param([int]$TimeoutSec = 600)
+param(
+  [int]$TimeoutSec = 600,
+  # Repast sweep/params file, relative to the Geography project dir. Default is
+  # the OFFICIAL BASELINE (batch_params.xml); pass e.g. batch\batch_params_capacity400.xml
+  # for the capacity-binding reference or a production config. Never edit the
+  # baseline file for experiments.
+  [string]$ParamsFile = 'batch\batch_params.xml'
+)
 
 $ErrorActionPreference = 'Stop'
 $javaHome   = if ($env:JAVA_HOME)   { $env:JAVA_HOME }   else { 'C:\Users\Chick\tools\jdk-17.0.19+10' }
@@ -51,7 +58,7 @@ try {
   $p = Start-Process -FilePath (Join-Path $javaHome 'bin\java.exe') `
         -ArgumentList ($jvmArgs + @('-cp', "`"$cp`"",
             'repast.simphony.runtime.RepastBatchMain',
-            '-params', 'batch\batch_params.xml', "`"$rs`"")) `
+            '-params', $ParamsFile, "`"$rs`"")) `
         -WorkingDirectory $projectDir -NoNewWindow -PassThru
   Wait-Process -Id $p.Id -Timeout $TimeoutSec -ErrorAction SilentlyContinue
   if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force; Write-Host "Stopped after ${TimeoutSec}s cap" }

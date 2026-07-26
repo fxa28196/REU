@@ -37,7 +37,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
-SCRIPT_VERSION = "1.0.2"
+SCRIPT_VERSION = "1.1.0"
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 # ---------------------------------------------------------------------------
@@ -206,15 +206,35 @@ def verify(run, agents, shelters, manifest):
 
 # ---------------------------------------------------------------------------
 def routing_anomaly(agents):
-    """Walked distance vs shortest-path distance surplus (detour) per agent.
+    """Walked distance vs PLANNED-route surplus (detour) per agent — a FAILING
+    check (assumption A-17, 10-FAILURE-MODES.md Finding A).
 
-    In a correct run walked ~= network shortest path (+ a small snap gap).
-    Surpluses above DETOUR_FLAG_M indicate a street-graph/path-materialisation
-    artifact and inflate travel time AND exposure for the affected agents."""
-    a = agents.dropna(subset=["network_dist_to_shelter_m"]).copy()
-    a["detour_m"] = a["total_travel_distance_m"] - a["network_dist_to_shelter_m"]
+    `planned_route_m` (sum of the network lengths of every planned leg,
+    including re-routes after a capacity refusal) is the reference when the run
+    exported it. Older runs fall back to `network_dist_to_shelter_m`
+    (single-leg V11 — identical whenever no agent was ever refused, which holds
+    for every archived pre-fix run). In a correct run
+    walked <= planned + snap gap; surpluses above DETOUR_FLAG_M indicate a
+    routing/path-materialisation defect and inflate travel time AND exposure
+    for the affected agents."""
+    a = agents.copy()
+    if "planned_route_m" in a.columns:
+        basis = "planned_route_m (per-leg, refusal-aware)"
+        a["planned_m"] = a["planned_route_m"]
+        if "snap_gap_m" in a.columns:
+            # snap gap is real walked distance the network legs cannot cover
+            # (encampment -> first street node; tiny endpoint gaps per leg)
+            basis = "planned_route_m + snap_gap_m (per-leg, refusal-aware)"
+            a["planned_m"] = a["planned_m"] + a["snap_gap_m"].fillna(0)
+        a = a[a["planned_m"].notna() & (a["planned_m"] > 0)]
+    else:
+        basis = "network_dist_to_shelter_m (single-leg fallback, pre-fix runs)"
+        a["planned_m"] = a["network_dist_to_shelter_m"]
+        a = a.dropna(subset=["planned_m"])
+    a["detour_m"] = a["total_travel_distance_m"] - a["planned_m"]
     flagged = a[a["detour_m"] > DETOUR_FLAG_M].sort_values("detour_m", ascending=False)
     return {
+        "basis": basis,
         "n_with_route": int(len(a)),
         "n_flagged": int(len(flagged)),
         "flag_threshold_m": DETOUR_FLAG_M,
@@ -225,7 +245,7 @@ def routing_anomaly(agents):
         "flagged_agents": [
             {"agent_id": r.agent_id,
              "walked_m": round(r.total_travel_distance_m, 1),
-             "shortest_path_m": round(r.network_dist_to_shelter_m, 1),
+             "planned_m": round(r.planned_m, 1),
              "detour_m": round(r.detour_m, 1),
              "shelter": r.shelter_reached if isinstance(r.shelter_reached, str) else ""}
             for r in flagged.itertuples()],
@@ -283,6 +303,17 @@ def summarize(agents, shelters, manifest):
                 agents["exposure_while_traveling_ugm3h"].mean()), 2),
         },
     }
+
+    # Door-refusal census (exported since the A-17 fix; absent in older runs)
+    if "door_refusals" in agents.columns:
+        refused_once = agents[agents["door_refusals"] > 0]
+        summary["capacity_refusals"] = {
+            "agents_refused_at_least_once": int(len(refused_once)),
+            "total_door_refusals": int(agents["door_refusals"].sum()),
+            "max_refusals_one_agent": int(agents["door_refusals"].max()),
+            "refused_then_sheltered": int(
+                (refused_once["final_state"] == "SHELTERED").sum()),
+        }
 
     # ---- shelter statistics
     shelter_stats = []
@@ -560,6 +591,12 @@ def write_markdown(path, manifest, checks, summary, shelter_stats, exposure_anal
     sp = s["exposure_split_mean_ugm3h"]
     a(f"| Mean dose split | {sp['while_waiting_pre_evac']:.0f} waiting pre-evac + "
       f"{sp['while_traveling_or_stranded']:.0f} traveling/stranded |")
+    if "capacity_refusals" in s:
+        cr = s["capacity_refusals"]
+        a(f"| Capacity refusals | {cr['agents_refused_at_least_once']} agents refused ≥1× "
+          f"({cr['refused_then_sheltered']} later sheltered) · "
+          f"{cr['total_door_refusals']} door refusals total · "
+          f"max {cr['max_refusals_one_agent']} per agent |")
     a("")
     a("## Shelter statistics")
     a("")
@@ -598,18 +635,19 @@ def write_markdown(path, manifest, checks, summary, shelter_stats, exposure_anal
     a("")
     a("## Routing/data integrity flag")
     a("")
+    a(f"Reference: {anomaly['basis']}.")
+    a("")
     if anomaly["n_flagged"]:
-        a(f"{anomaly['n_flagged']} of {anomaly['n_with_route']} routed agents walked "
-          f"substantially farther than their recorded shortest-path distance "
-          f"(surplus > {anomaly['flag_threshold_m']:.0f} m). The surpluses cluster at "
-          f"{anomaly['distinct_detour_values_m']} m — near-constant values shared across "
-          "agents from different encampments, the signature of a street-graph data "
-          "artifact (a mis-oriented or multi-part feature on a shared path trunk), "
-          "NOT of random wandering. Travel time and exposure for these agents are "
-          "inflated accordingly. See docs/validation/gui-issue-diagnosis.md.")
+        a(f"**FAIL — {anomaly['n_flagged']} of {anomaly['n_with_route']} routed agents walked "
+          f"farther than their planned route** "
+          f"(surplus > {anomaly['flag_threshold_m']:.0f} m; clusters at "
+          f"{anomaly['distinct_detour_values_m']} m). Travel time and exposure for these "
+          "agents are inflated by a routing artifact; the run must not be quoted. "
+          "See docs/science/phase2-human-agents/10-FAILURE-MODES.md Finding A.")
     else:
-        a("All routed agents walked ≈ their shortest-path network distance "
-          f"(surplus ≤ {anomaly['flag_threshold_m']:.0f} m). No detour artifact detected.")
+        a("All routed agents walked ≈ their planned route "
+          f"(surplus ≤ {anomaly['flag_threshold_m']:.0f} m). No detour artifact detected "
+          "(A-17 failing check passed).")
     a("")
     a("## Figures")
     a("")
@@ -633,13 +671,22 @@ def analyze(run_dir):
     shelters = pd.read_csv(run / "shelters.csv")
 
     checks = verify(run, agents, shelters, manifest)
+
+    # A-17 routing-integrity gate: walked must not exceed planned + snap-gap
+    # tolerance. FAILING, not advisory (10-FAILURE-MODES.md Finding A said the
+    # print-only version would let a 10 km detour still report all-passed).
+    anomaly = routing_anomaly(agents)
+    ck_detail = (f"basis {anomaly['basis']}; max surplus "
+                 f"{anomaly['detour_max_m']} m over {anomaly['n_with_route']} routed agents")
+    checks.add(f"walked distance <= planned route + {DETOUR_FLAG_M:.0f} m (A-17)",
+               anomaly["n_flagged"] == 0, ck_detail)
+
     n_fail = len(checks.failed)
     print(f"  verification: {len(checks.results) - n_fail}/{len(checks.results)} passed")
     for c in checks.failed:
         print(f"    FAIL {c['name']}: {c['detail']}")
 
     summary, shelter_stats, exposure_analysis = summarize(agents, shelters, manifest)
-    anomaly = routing_anomaly(agents)
 
     rep = manifest["reproducibility"]
     meta = {

@@ -93,7 +93,13 @@ Format per variable: purpose · implementation location · scientific mechanism
   reach*" (slide 7) and the future Gap-index strategy input.
 - **Implementation:** `GisAgent.getNetworkDistToShelterM()`; computed at
   route selection from the chosen shelter's Dijkstra tree
-  (`geography.routing.StreetNetwork`).
+  (`geography.routing.StreetNetwork`). **Recorded at the FIRST selection
+  only** (initial accessibility from the start node). After a capacity
+  refusal the resident re-plans from the refusing shelter's node (D-6 /
+  A-17); those legs do not overwrite V11. Total planned walking across all
+  legs is the QC column `planned_route_m` (`GisAgent.getPlannedRouteM()`),
+  against which walked distance is checked (walked ≤ planned +
+  `snap_gap_m` + 200 m, a failing check in `scripts/analyze_run.py`).
 - **Scientific mechanism:** Shortest-path distance over the RLIS street
   graph (nodes = `PDX_F_NODE`/`PDX_T_NODE` intersection ids; edge weights =
   geodesic polyline lengths in metres). Undirected graph — pedestrians are
