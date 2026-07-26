@@ -67,6 +67,14 @@ public class ContextCreator implements ContextBuilder {
 	private static final String SHELTERS_CSV  = "data/shelters/shelters_2020-09.csv";
 	private static final String ENCAMPMENTS_CSV = "data/encampments/irp_campsite_reports_sample.csv";
 
+	/** Scenario A — the real September-2020 placement (docs/science/DATA_SOURCES D1). */
+	private static final String SCENARIO_A_NAME = "A_current_placement";
+	/** Scenario B — same total capacity relocated by street-network p-median
+	 *  optimisation (scripts/optimize_shelters.py). A THEORETICAL siting optimum,
+	 *  not a policy recommendation: see docs/runs/scenario-b-optimization/. */
+	private static final String SCENARIO_B_NAME = "B_optimized_placement";
+	private static final String SHELTERS_OPTIMIZED_CSV = "data/shelters/shelters_optimized_2020-09.csv";
+
 	// V13 anchor: simulation hour 0 = local midnight at the start of the study
 	// window (Portland's Sept 7-19 2020 smoke episode).
 	private static final LocalDateTime SIM_START = LocalDateTime.of(2020, 9, 7, 0, 0);
@@ -78,6 +86,21 @@ public class ContextCreator implements ContextBuilder {
 		double minutesPerTick = (Double) parm.getValue("minutesPerTick");
 		int simulationHours = (Integer) parm.getValue("simulationHours");
 		long seed = RandomHelper.getSeed();
+
+		// Scenario/feature switches. Declared as ints (0/1) rather than booleans
+		// so they use the same proven IntConverter as every other parameter here.
+		// All three default to the pre-existing behaviour, so the archived
+		// baseline reproduces byte-identically unless a switch is turned on.
+		// Read defensively: in batch mode Repast builds the parameter schema from
+		// the batch params file, so a params file written before these switches
+		// existed (notably the archived official baseline) simply does not carry
+		// them. Falling back to the behaviour-preserving default keeps every
+		// archived configuration runnable and reproducible exactly as filed.
+		int scenarioCode = intParam(parm, "scenarioCode", 0);
+		int enableHeterogeneity = intParam(parm, "enableHeterogeneity", 0);
+		int respectShelterOpeningDates = intParam(parm, "respectShelterOpeningDates", 0);
+		String scenarioName = (scenarioCode == 1) ? SCENARIO_B_NAME : SCENARIO_A_NAME;
+		String sheltersCsv = (scenarioCode == 1) ? SHELTERS_OPTIMIZED_CSV : SHELTERS_CSV;
 
 		// Scientific governance: validate the variable and assumption registries
 		// before anything else runs, so a registry defect stops the run rather
@@ -153,8 +176,9 @@ public class ContextCreator implements ContextBuilder {
 				smokeField.hours(), SIM_START, smokeField.peakHourly());
 
 		// ---- Real shelters (Sept 2020) -------------------------------------
-		List<Map<String, String>> shelterRows = CsvLoader.read(SHELTERS_CSV);
+		List<Map<String, String>> shelterRows = CsvLoader.read(sheltersCsv);
 		int operatingCount = 0;
+		double ticksPerHour = 60.0 / minutesPerTick;
 		for (Map<String, String> r : shelterRows) {
 			String capStr = r.get("capacity");
 			Integer capacity = (capStr == null || capStr.isEmpty()) ? null : Integer.valueOf(capStr);
@@ -162,6 +186,13 @@ public class ContextCreator implements ContextBuilder {
 			double lon = Double.parseDouble(r.get("lon"));
 			double lat = Double.parseDouble(r.get("lat"));
 			Shelter shelter = new Shelter(r.get("shelter_id"), r.get("name"), capacity, operating, lon, lat);
+			// Real opening/closing dates (D1). Gate OFF => always open, which is
+			// exactly the behaviour of every run before this commit.
+			if (respectShelterOpeningDates == 1) {
+				shelter.setOpenWindowTicks(
+						tickForDate(r.get("opened"), ticksPerHour, Double.NEGATIVE_INFINITY, 0),
+						tickForDate(r.get("closed"), ticksPerHour, Double.POSITIVE_INFINITY, 1));
+			}
 			context.add(shelter);
 			Coordinate c = new Coordinate(lon, lat);
 			geography.move(shelter, fac.createPoint(c));
@@ -170,8 +201,23 @@ public class ContextCreator implements ContextBuilder {
 			shelter.setRouteTree(network.computeTree(nodeId));
 			if (operating) operatingCount++;
 		}
-		System.out.println("[Shelters] " + shelterRows.size() + " loaded, "
-				+ operatingCount + " operating (status-quo scenario)");
+		System.out.println("[Shelters] " + shelterRows.size() + " loaded from " + sheltersCsv
+				+ ", " + operatingCount + " operating (scenario " + scenarioName + ")");
+		if (respectShelterOpeningDates == 1) {
+			for (Object o : context.getObjects(Shelter.class)) {
+				Shelter s = (Shelter) o;
+				if (s.isOperating()) {
+					System.out.printf("[Shelters] %s open window ticks %.0f..%.0f "
+							+ "(%.1f h after simulation start)%n",
+							s.getId(), s.getOpenTick(), s.getCloseTick(),
+							s.getOpenTick() / ticksPerHour);
+				}
+			}
+		} else {
+			System.out.println("[Shelters][WARN] opening-date gate DISABLED: every shelter is "
+					+ "open from tick 0, which is counterfactual (the real sites opened "
+					+ "2020-09-10/11). See assumption A-02.");
+		}
 
 		// ---- Residents at real encampment locations (D2b) ------------------
 		List<Map<String, String>> campRows = CsvLoader.read(ENCAMPMENTS_CSV);
@@ -189,16 +235,39 @@ public class ContextCreator implements ContextBuilder {
 			} catch (Exception ignore) { /* skip malformed row */ }
 		}
 
+		// Heterogeneous attributes (V18-V22) are drawn from a SEPARATE RNG stream
+		// (see PopulationSampler): the RandomHelper draw below stays the only
+		// default-stream draw per resident, so start locations are bit-identical
+		// whether heterogeneity is on or off.
+		PopulationSampler sampler = (enableHeterogeneity == 1) ? new PopulationSampler(seed) : null;
+
 		for (int i = 0; i < numAgents; i++) {
 			int idx = campCoords.isEmpty() ? -1 : RandomHelper.nextIntFromTo(0, campCoords.size() - 1);
 			Coordinate coord = (idx < 0) ? new Coordinate(0, 0) : campCoords.get(idx);
 			String encampmentId = (idx < 0) ? "none" : campIds.get(idx);
 			long startNode = network.nearestNode(coord);
 			GisAgent agent = new GisAgent("Site " + i, network, startNode, encampmentId, smokeField);
+			if (sampler != null) {
+				agent.setAttributes(sampler.sample());
+			}
 			context.add(agent);
 			geography.move(agent, fac.createPoint(coord));
 		}
 		System.out.println("[Residents] " + numAgents + " placed at real encampment points");
+		if (sampler != null) {
+			// Realised marginals printed against the published ones: sampling is
+			// verified at load time, not trusted (01-POPULATION.md §6.3).
+			System.out.printf("[Population] heterogeneity ON - realised: mobility %.3f | "
+					+ "asthma %.3f | COPD %.3f | any respiratory %.3f | age 55+ %.3f | "
+					+ "mean walking speed %.3f m/s%n",
+					sampler.getMobilityLimitedShare(), sampler.getAsthmaShare(),
+					sampler.getCopdShare(), sampler.getAnyRespiratoryShare(),
+					sampler.getAge55PlusShare(), sampler.getMeanWalkingSpeedMps());
+			System.out.println("[Population] " + PopulationSampler.publishedTargets());
+		} else {
+			System.out.println("[Population] heterogeneity OFF - every resident walks at the "
+					+ "run-wide walkingSpeedMps and carries no attributes");
+		}
 
 		// ---- Run length + end-of-run export --------------------------------
 		int endHours = Math.min(simulationHours, smokeField.hours());
@@ -206,20 +275,64 @@ public class ContextCreator implements ContextBuilder {
 		RunEnvironment.getInstance().endAt(endTick);
 
 		String[] pNames = { "numAgents", "minutesPerTick", "walkingSpeedMps",
-				"shelterArrivalDistanceM", "simulationHours", "randomSeed" };
+				"shelterArrivalDistanceM", "simulationHours", "randomSeed",
+				"evacuationThresholdUgM3", "scenarioCode", "enableHeterogeneity",
+				"respectShelterOpeningDates" };
 		Object[] pVals = { numAgents, minutesPerTick, parm.getValue("walkingSpeedMps"),
-				parm.getValue("shelterArrivalDistanceM"), simulationHours, seed };
-		String[] dataFiles = { STREETS_SHP, SMOKE_CSV, SHELTERS_CSV, ENCAMPMENTS_CSV };
+				parm.getValue("shelterArrivalDistanceM"), simulationHours, seed,
+				paramOrDefault(parm, "evacuationThresholdUgM3", "unset"), scenarioCode,
+				enableHeterogeneity, respectShelterOpeningDates };
+		String[] dataFiles = { STREETS_SHP, SMOKE_CSV, sheltersCsv, ENCAMPMENTS_CSV };
 
 		@SuppressWarnings("unchecked")
 		OutcomeLogger logger = new OutcomeLogger(context, smokeField, seed, pNames, pVals,
-				dataFiles, netReport, registry);
+				dataFiles, netReport, registry, scenarioName, sampler);
 		ISchedule schedule = RunEnvironment.getInstance().getCurrentSchedule();
 		schedule.schedule(ScheduleParameters.createAtEnd(ScheduleParameters.LAST_PRIORITY), logger, "export");
 
 		System.out.printf("[Run] ends at tick %.0f (%d event hours at %.1f min/tick)%n",
 				endTick, endHours, minutesPerTick);
 		return context;
+	}
+
+	/** Integer parameter, or {@code fallback} when this run's schema omits it. */
+	private static int intParam(Parameters parm, String name, int fallback) {
+		try {
+			Object v = parm.getValue(name);
+			return (v instanceof Number) ? ((Number) v).intValue() : fallback;
+		} catch (RuntimeException absentFromSchema) {
+			return fallback;
+		}
+	}
+
+	/** Parameter value for the manifest, or the fallback when absent. */
+	private static Object paramOrDefault(Parameters parm, String name, Object fallback) {
+		try {
+			Object v = parm.getValue(name);
+			return v == null ? fallback : v;
+		} catch (RuntimeException absentFromSchema) {
+			return fallback;
+		}
+	}
+
+	/**
+	 * Tick at 00:00 local on the given ISO date, relative to {@link #SIM_START}.
+	 * Blank/absent dates return {@code fallback} (an always-open bound).
+	 *
+	 * @param dayOffset 0 for an opening date (the site is open from 00:00 that
+	 *                  day), 1 for a closing date (the site operates through the
+	 *                  END of the stated day). The source gives dates, not hours;
+	 *                  this is the documented reading (see Shelter.openTick).
+	 */
+	private static double tickForDate(String isoDate, double ticksPerHour,
+			double fallback, int dayOffset) {
+		if (isoDate == null || isoDate.trim().isEmpty()) {
+			return fallback;
+		}
+		LocalDateTime moment = java.time.LocalDate.parse(isoDate.trim())
+				.plusDays(dayOffset).atStartOfDay();
+		double hours = java.time.Duration.between(SIM_START, moment).toMinutes() / 60.0;
+		return hours * ticksPerHour;
 	}
 
 	private static String attr(SimpleFeature feature, String name) {

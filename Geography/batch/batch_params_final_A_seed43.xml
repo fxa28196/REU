@@ -1,0 +1,29 @@
+﻿<?xml version="1.0"?>
+<!-- FINAL STUDY CONFIGURATION - SCENARIO A (current shelter placement).
+     n = 2,037 (D-5: the measured January-2019 PIT unsheltered count) against the
+     real September-2020 sites (OCC + Charles Jordan, 99 beds each, D1).
+
+     Differences from the earlier production runs, both deliberate:
+       enableHeterogeneity=1        residents carry sourced age / sex / mobility /
+                                    asthma / COPD attributes and walk at their own
+                                    speed (01-POPULATION.md, 03-MOVEMENT.md).
+       respectShelterOpeningDates=1 the shelters open on their real dates
+                                    (OCC 2020-09-10, CJ 2020-09-11), the
+                                    mitigation for blocking assumption A-02.
+
+     walkingSpeedMps remains declared but is IGNORED for residents with sampled
+     attributes; it applies only to heterogeneity=0 runs. Scenario B differs from
+     this file in exactly one value: scenarioCode. -->
+<sweep runs="1">
+	<parameter name="numAgents" type="constant" constant_type="int" value="2037"/>
+	<parameter name="randomSeed" type="constant" constant_type="int" value="43"/>
+	<parameter name="minutesPerTick" type="constant" constant_type="number" value="1.0"/>
+	<parameter name="walkingSpeedMps" type="constant" constant_type="number" value="1.30"/>
+	<parameter name="shelterArrivalDistanceM" type="constant" constant_type="number" value="200.0"/>
+	<parameter name="evacuationThresholdUgM3" type="constant" constant_type="number" value="55.5"/>
+	<parameter name="simulationHours" type="constant" constant_type="int" value="312"/>
+	<parameter name="scenarioCode" type="constant" constant_type="int" value="0"/>
+	<parameter name="enableHeterogeneity" type="constant" constant_type="int" value="1"/>
+	<parameter name="respectShelterOpeningDates" type="constant" constant_type="int" value="1"/>
+</sweep>
+
