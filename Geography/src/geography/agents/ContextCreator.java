@@ -78,13 +78,13 @@ public class ContextCreator implements ContextBuilder {
 	// street network, total capacity and the 1:1 capacity split.
 
 	/** Arm A — the real September-2020 shelter locations (DATA_SOURCES D1). */
-	private static final String SCENARIO_A_NAME = "A_placement_current";
-	private static final String SHELTERS_A_CSV = "data/shelters/shelters_A_placement_current.csv";
+	private static final String SCENARIO_A_NAME = "A_present_day_current_network";
+	private static final String SHELTERS_A_CSV = "data/shelters/shelters_2026_current_placement.csv";
 	/** Arm B — the same two-site system relocated to the street-network p-median
 	 *  optimum (scripts/optimize_shelters.py). THEORETICAL sites, not verified
 	 *  venues: see docs/runs/scenario-b-optimization/optimization_report.json. */
-	private static final String SCENARIO_B_NAME = "B_placement_optimized";
-	private static final String SHELTERS_B_CSV = "data/shelters/shelters_B_placement_optimized.csv";
+	private static final String SCENARIO_B_NAME = "B_present_day_optimized_network";
+	private static final String SHELTERS_B_CSV = "data/shelters/shelters_2026_optimized_placement.csv";
 	/** NOT a scenario — the historical-capacity reference run (2 x 99 real beds)
 	 *  retained solely so the model can be compared against the one observed
 	 *  occupancy record (~130 of 198 on 2020-09-16, Street Roots). Used for the
