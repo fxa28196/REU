@@ -7,7 +7,7 @@
 **The exact answer: we do not interpolate. There is no spatial model. Every
 resident in the county breathes the same concentration at the same hour.**
 
-**Audit date:** 2026-07-26 · **Model commit:** `b69fc6d`
+**Audit date:** 2026-07-26 · **Model commit:** `02c3181`
 
 ---
 

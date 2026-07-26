@@ -2,7 +2,7 @@
 
 Complete software audit of the wildfire-smoke shelter ABM at submission state.
 
-**Audit date:** 2026-07-26 · **Model commit:** `b69fc6d` · **Working tree:** clean
+**Audit date:** 2026-07-26 · **Model commit:** `02c3181` · **Working tree:** clean
 
 ---
 
@@ -103,8 +103,8 @@ graph — was **not checksummed**.
 
 ### What was done
 
-1. **All code committed first** (`b69fc6d`), then every run re-executed from a
-   clean tree. Manifests now stamp `b69fc6d`.
+1. **All code committed first** (`02c3181`), then every run re-executed from a
+   clean tree. Manifests now stamp `02c3181`.
 2. **New `source_integrity` manifest block** checksums **12 files**:
    `Streets.shp/.dbf/.shx/.prj/.cpg`, the PM2.5 CSV, all three shelter CSVs, the
    encampment CSV, and **both governance registries**.
@@ -118,7 +118,7 @@ graph — was **not checksummed**.
 
 | Check | Result |
 |---|---|
-| Commit stamped | `b69fc6d` — the code that ran |
+| Commit stamped | `02c3181` — the code that ran |
 | Working tree dirty | `false` |
 | Files checksummed | 12, including `Streets.dbf` and both registries |
 | Governance counts | 27 variables / 24 assumptions — matches disk |

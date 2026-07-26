@@ -3,7 +3,7 @@
 **Question:** does this model represent human biology defensibly, and is every
 biological quantity separated from every physical one?
 
-**Audit date:** 2026-07-26 · **Model commit:** `b69fc6d`
+**Audit date:** 2026-07-26 · **Model commit:** `02c3181`
 
 ---
 

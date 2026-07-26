@@ -4,7 +4,7 @@ Every major conclusion, tested against the evidence that supports it. Claims tha
 failed were **rewritten, not preserved**. The rewritten wording is given in each
 case and is what appears in `UPDATED_FINAL_RESULTS_REPORT.md`.
 
-**Audit date:** 2026-07-26 · **Model commit:** `b69fc6d` · **Evidence:**
+**Audit date:** 2026-07-26 · **Model commit:** `02c3181` · **Evidence:**
 `docs/runs/final-placement-experiment/{A,B}-seed{42,43,44}/`,
 `docs/runs/historical-capacity-reference/`
 
@@ -228,8 +228,8 @@ Previously **false**: nine archived runs stamped commit `6616232`, which contain
 neither the COPD speed effect nor the third scenario, and the report cited a third
 commit `ccad7b7`.
 
-**Fixed this pass.** All runs re-executed from a clean tree at `b69fc6d`;
-manifests stamp `b69fc6d`, `git_working_tree_dirty: false`, governance counts
+**Fixed this pass.** All runs re-executed from a clean tree at `02c3181`;
+manifests stamp `02c3181`, `git_working_tree_dirty: false`, governance counts
 27 variables / 24 assumptions matching the registry on disk, and a new
 `source_integrity` block checksums 12 files — including `Streets.dbf`, which
 holds the node IDs that build the routing graph and was previously unchecksummed.
