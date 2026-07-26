@@ -19,7 +19,7 @@ V1–V16), [`VARIABLES.md`](VARIABLES.md), [`DATA_SOURCES.md`](DATA_SOURCES.md),
 
 ## 1. `agents.csv` - one row per resident
 
-**46 columns, verified against the shipped file at commit `b69fc6d`.**
+**46 columns, verified against the shipped file at commit `02c3181`.**
 
 | Column | Meaning |
 |---|---|
