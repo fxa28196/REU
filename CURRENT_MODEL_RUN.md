@@ -1,4 +1,9 @@
-# Current Model — Run Guide & State
+﻿> **SUPERSEDED — HISTORICAL RECORD ONLY.** This document describes an earlier
+> state of the model and does not reflect the final submission. For the current
+> model and results see `docs/final/UPDATED_FINAL_RESULTS_REPORT.md` and the
+> audits alongside it. Retained for provenance.
+
+# Current Model â€” Run Guide & State
 
 How to run the wildfire-smoke shelter model as it stands, what it does and does
 not implement, and the exact meaning of every output. This is the runnable
@@ -7,8 +12,8 @@ research-prototype reference; the scientific rationale lives in
 
 **Research question:** *How does shelter placement affect wildfire-smoke
 exposure experienced by unhoused residents while traveling from encampments to
-cleaner-air shelters?* Exposure is measured from encampment → walking route →
-time outdoors → arrival at shelter. **The shelter is the destination / end
+cleaner-air shelters?* Exposure is measured from encampment â†’ walking route â†’
+time outdoors â†’ arrival at shelter. **The shelter is the destination / end
 condition, not a smoke-reduction mechanism** (no indoor filtration is modelled).
 
 ---
@@ -25,7 +30,7 @@ cd Geography
 $env:JAVA_HOME = "C:\Users\Chick\tools\jdk-17.0.19+10"
 .\gradlew.bat compileJava
 ```
-In VS Code: **Terminal → Run Task → "Repast: Compile"** (or `Ctrl+Shift+B`).
+In VS Code: **Terminal â†’ Run Task â†’ "Repast: Compile"** (or `Ctrl+Shift+B`).
 Classes compile to `Geography\bin\`.
 
 ### Launch the interactive GUI
@@ -33,11 +38,11 @@ Classes compile to `Geography\bin\`.
 cd Geography
 .\gradlew.bat runModel
 ```
-In VS Code: **Run Task → "Repast: Run GUI"**. The Repast window opens with the
-scenario loaded; click **Initialize (⏻)** then **Run (▶)**. (Fallback without
+In VS Code: **Run Task â†’ "Repast: Run GUI"**. The Repast window opens with the
+scenario loaded; click **Initialize (â»)** then **Run (â–¶)**. (Fallback without
 Gradle: `powershell -File scripts\run-model.ps1`.)
 
-### Run headless (no GUI) — this is what produces result files
+### Run headless (no GUI) â€” this is what produces result files
 ```powershell
 powershell -File scripts\run-headless.ps1
 # or with a longer cap:  powershell -File scripts\run-headless.ps1 -TimeoutSec 600
@@ -48,7 +53,7 @@ horizon (`simulationHours`) and writes results; the `-TimeoutSec` cap is only a
 safety net.
 
 ### Where outputs appear
-`Geography\output\run_seed<seed>\` — three files:
+`Geography\output\run_seed<seed>\` â€” three files:
 `agents.csv`, `shelters.csv`, `simulation.json`. The `output\` tree is gitignored
 (results are regenerated from the manifest, not versioned).
 
@@ -64,7 +69,7 @@ Parameters panel. Current parameters:
 | `walkingSpeedMps` | comfortable gait speed (Bohannon 1997) | 1.30 |
 | `shelterArrivalDistanceM` | arrival radius (currently informational) | 200 |
 | `evacuationThresholdUgM3` | PM2.5 that triggers evacuation (EPA "Unhealthy") | 55.5 |
-| `simulationHours` | event window length (Sept 7–19 ≈ 312 h) | 312 |
+| `simulationHours` | event window length (Sept 7â€“19 â‰ˆ 312 h) | 312 |
 
 ### How to select the random seed
 Set `randomSeed` in `batch_params.xml` to any integer for a reproducible run
@@ -77,7 +82,7 @@ recorded in `simulation.json` and on every row of `agents.csv`.
 ## 2. What is implemented
 
 - **Real geography:** City-of-Portland RLIS street centerlines (112,070
-  segments) → an undirected pedestrian graph (89,345 nodes) with geodesic edge
+  segments) â†’ an undirected pedestrian graph (89,345 nodes) with geodesic edge
   lengths; Dijkstra shortest paths. A **street-network validation layer**
   corrects 27 corrupt `PDX_F_NODE`/`PDX_T_NODE` attribute IDs at load time
   (provenance in every `simulation.json` under `street_network_validation`;
@@ -90,7 +95,7 @@ recorded in `simulation.json` and on every row of `agents.csv`.
   walk the shortest street path to the network-nearest operating shelter that
   has capacity.
 - **Exposure:** cumulative PM2.5 dose, average and peak concentration, hours
-  above the "Unhealthy" breakpoint — accrued **only while outdoors**;
+  above the "Unhealthy" breakpoint â€” accrued **only while outdoors**;
   accumulation **stops at shelter arrival** (the study endpoint).
 - **Capacity:** shelters admit up to capacity; refused residents re-route
   (`REFUSED_ALL_FULL` if none reachable has room).
@@ -100,72 +105,72 @@ recorded in `simulation.json` and on every row of `agents.csv`.
 
 ## 3. What is NOT implemented (and therefore not to be concluded from)
 
-- **Vulnerability attributes:** `age`, `asthma`, `copd` are **not implemented** —
+- **Vulnerability attributes:** `age`, `asthma`, `copd` are **not implemented** â€”
   they appear as **empty columns** in `agents.csv` (no values are invented).
   `age_rr` and `comorbidity_rr` are **placeholders = 1.0**, so
   **VWE is currently identical to raw exposure** and carries no vulnerability
-  signal (the slide-cited RR values are unverified — DATA_SOURCES D5/D6).
-- **Placement strategies / sensitivity sweeps / BenMAP** — not started.
+  signal (the slide-cited RR values are unverified â€” DATA_SOURCES D5/D6).
+- **Placement strategies / sensitivity sweeps / BenMAP** â€” not started.
 - **Spatial smoke gradient:** the PM2.5 field is county-uniform (only 2 in-county
   monitors); no wind/transport model.
-- **Indoor protection (γ):** deliberately out of scope — shelters end exposure
+- **Indoor protection (Î³):** deliberately out of scope â€” shelters end exposure
   by being reached, not by filtering air.
 
 ## 4. Current limitations (affecting interpretation)
 
 1. **Evacuation timing:** all residents currently evacuate when PM2.5 first
-   crosses 55.5 µg/m³, which happens on a brief **Sept-7 spike — before the real
-   shelters opened (Sept 10–11)**. Absolute exposure is therefore an
-   underestimate of the sustained Sept 10–18 episode for those who shelter
+   crosses 55.5 Âµg/mÂ³, which happens on a brief **Sept-7 spike â€” before the real
+   shelters opened (Sept 10â€“11)**. Absolute exposure is therefore an
+   underestimate of the sustained Sept 10â€“18 episode for those who shelter
    quickly. Tracked refinement (AUDIT.md #1): also gate evacuation on shelter
    operating dates.
-2. **Population scale:** at `numAgents` ≤ 198 the two shelters' combined capacity
-   (2×99) never binds, so nobody is refused; the real event had ~2,000
+2. **Population scale:** at `numAgents` â‰¤ 198 the two shelters' combined capacity
+   (2Ã—99) never binds, so nobody is refused; the real event had ~2,000
    unsheltered people for ~198 beds. Raise `numAgents` to exercise refusals.
-3. **Encampment locations** are real but from **2025–26** (no 2020 data exists
-   in the open feed) — a spatial proxy (DATA_SOURCES D2b).
+3. **Encampment locations** are real but from **2025â€“26** (no 2020 data exists
+   in the open feed) â€” a spatial proxy (DATA_SOURCES D2b).
 4. **Shelter capacity (99)** is newsroom-sourced, unconfirmed.
-5. **Uniform smoke field** — no intra-city gradient.
+5. **Uniform smoke field** â€” no intra-city gradient.
 
-Metric-by-metric validity verdicts are in `docs/science/AUDIT.md` §4.
+Metric-by-metric validity verdicts are in `docs/science/AUDIT.md` Â§4.
 
 ---
 
 ## 5. Exact meaning of every output metric
 
-### `agents.csv` — one row per resident (the complete journey record)
+### `agents.csv` â€” one row per resident (the complete journey record)
 
 | Column | Units | Meaning |
 |---|---|---|
-| `agent_id` | — | resident identifier (`Site N`) |
-| `sim_id` | — | unique run instance id (`sim-<timestamp>-seed<seed>`) |
-| `commit` | — | git commit the run executed at |
-| `random_seed` | — | RNG seed used |
-| `data_version` | — | 12-hex tag = hash of all input-dataset SHA-256s (full list in `simulation.json`) |
-| `starting_encampment` | — | `inc_id` of the real IRP campsite report the resident started at |
-| `shelter_reached` | — | shelter id admitted to (blank if none) |
-| `reached_shelter` | yes/no | success flag (yes ⇔ `final_state`=SHELTERED) |
+| `agent_id` | â€” | resident identifier (`Site N`) |
+| `sim_id` | â€” | unique run instance id (`sim-<timestamp>-seed<seed>`) |
+| `commit` | â€” | git commit the run executed at |
+| `random_seed` | â€” | RNG seed used |
+| `data_version` | â€” | 12-hex tag = hash of all input-dataset SHA-256s (full list in `simulation.json`) |
+| `starting_encampment` | â€” | `inc_id` of the real IRP campsite report the resident started at |
+| `shelter_reached` | â€” | shelter id admitted to (blank if none) |
+| `reached_shelter` | yes/no | success flag (yes â‡” `final_state`=SHELTERED) |
 | `time_started_tick` / `_local` | tick / local time | when the resident began evacuating (smoke trigger fired) |
 | `time_arrived_tick` / `_local` | tick / local time | when admitted to shelter (blank if never) |
-| `travel_time_min` | minutes | arrival − start (walking duration) |
+| `travel_time_min` | minutes | arrival âˆ’ start (walking duration) |
 | `total_travel_distance_m` | metres | cumulative geodesic distance walked |
 | `network_dist_to_shelter_m` | metres | shortest-path street distance to the chosen shelter at selection |
-| `avg_pm25_ugm3` | µg/m³ | cumulative dose ÷ hours outdoors (mean concentration breathed) |
-| `peak_pm25_ugm3` | µg/m³ | highest concentration breathed |
-| `cumulative_dose_ugm3h` | µg·m⁻³·h | Σ concentration × time outdoors (the exposure index) |
-| `exposure_while_traveling_ugm3h` | µg·m⁻³·h | portion accrued while walking (vs waiting at the encampment) |
-| `vwe_ugm3h` | µg·m⁻³·h | vulnerability-weighted exposure = dose × age_rr × comorbidity_rr (**= dose now**, RRs=1) |
-| `hours_above_unhealthy` | hours | time breathing > 55.5 µg/m³ |
-| `age`, `asthma`, `copd` | — | **empty — not implemented** |
-| `age_rr`, `comorbidity_rr` | — | vulnerability multipliers (**placeholder 1.0**) |
+| `avg_pm25_ugm3` | Âµg/mÂ³ | cumulative dose Ã· hours outdoors (mean concentration breathed) |
+| `peak_pm25_ugm3` | Âµg/mÂ³ | highest concentration breathed |
+| `cumulative_dose_ugm3h` | ÂµgÂ·mâ»Â³Â·h | Î£ concentration Ã— time outdoors (the exposure index) |
+| `exposure_while_traveling_ugm3h` | ÂµgÂ·mâ»Â³Â·h | portion accrued while walking (vs waiting at the encampment) |
+| `vwe_ugm3h` | ÂµgÂ·mâ»Â³Â·h | vulnerability-weighted exposure = dose Ã— age_rr Ã— comorbidity_rr (**= dose now**, RRs=1) |
+| `hours_above_unhealthy` | hours | time breathing > 55.5 Âµg/mÂ³ |
+| `age`, `asthma`, `copd` | â€” | **empty â€” not implemented** |
+| `age_rr`, `comorbidity_rr` | â€” | vulnerability multipliers (**placeholder 1.0**) |
 | `final_state` | enum | `PRE_EVAC` / `EN_ROUTE` / `SHELTERED` / `UNREACHABLE` / `REFUSED_ALL_FULL` |
 
-### `shelters.csv` — one row per shelter
+### `shelters.csv` â€” one row per shelter
 `shelter_id, name, lon, lat, capacity, operating, peak_occupancy,
 final_occupancy, refused_count, utilization (occupancy/capacity),
 mean_travel_dist_m_admitted (mean walk of its admitted residents)`.
 
-### `simulation.json` — run summary + reproducibility manifest
+### `simulation.json` â€” run summary + reproducibility manifest
 `reproducibility` (seed, sim_id, data_version_tag, git_commit, java/repast
 versions, all parameters, per-dataset SHA-256); `smoke_field` (hours, peak,
 out-of-range lookups); `population` (state census; exposure and VWE
@@ -219,3 +224,4 @@ Import-Csv Geography\output\run_seed42\agents.csv |
 To reproduce a run exactly: set `randomSeed` in `batch_params.xml` to the
 `random_seed` in the target `simulation.json`, check out its `git_commit`, and
 confirm the input `data_version`/dataset SHA-256s match, then run headless.
+
