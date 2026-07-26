@@ -1,0 +1,40 @@
+Scenario,Group,People in this group,Share of everyone (%),Got inside,Got inside (%),Turned away,Average walk (metres),Average hours in bad smoke,Average smoke breathed (micrograms),Average walking speed (m/s)
+"A - Today (real shelters, real number of beds)",Everyone,6842,100.0,2060,30.1,4766,18260,135.8,23374,1.28
+"A - Today (real shelters, real number of beds)",Age 18-44,3612,52.8,1107,30.6,2497,18417,134.7,23194,1.3
+"A - Today (real shelters, real number of beds)",Age 45-64,2877,42.0,874,30.4,1996,18158,135.3,23285,1.28
+"A - Today (real shelters, real number of beds)",Age 65+,353,5.2,79,22.4,273,17495,150.7,25944,1.06
+"A - Today (real shelters, real number of beds)",Male,4691,68.6,1417,30.2,3259,18448,135.6,23342,1.3
+"A - Today (real shelters, real number of beds)",Female,2001,29.2,595,29.7,1405,17846,136.5,23496,1.24
+"A - Today (real shelters, real number of beds)",Other / not stated,150,2.2,48,32.0,102,17923,132.1,22752,1.27
+"A - Today (real shelters, real number of beds)",Has trouble walking,1360,19.9,268,19.7,1089,17231,155.9,26842,0.98
+"A - Today (real shelters, real number of beds)",Walks without difficulty,5482,80.1,1792,32.7,3677,18516,130.8,22514,1.36
+"A - Today (real shelters, real number of beds)",Has asthma,1011,14.8,295,29.2,713,18516,137.6,23684,1.29
+"A - Today (real shelters, real number of beds)",Has COPD,738,10.8,164,22.2,572,18770,151.0,25995,1.15
+"A - Today (real shelters, real number of beds)",Long-term physical condition,2712,39.6,819,30.2,1889,18124,135.6,23341,1.28
+"A - Today (real shelters, real number of beds)",Counted as more vulnerable,4866,71.1,1371,28.2,3485,18210,139.5,24017,1.24
+"B - More beds, in the places we already have",Everyone,6842,100.0,6264,91.6,562,7938,17.5,3056,1.28
+"B - More beds, in the places we already have",Age 18-44,3612,52.8,3362,93.1,242,7593,14.6,2547,1.3
+"B - More beds, in the places we already have",Age 45-64,2877,42.0,2611,90.8,259,8064,19.1,3321,1.28
+"B - More beds, in the places we already have",Age 65+,353,5.2,291,82.4,61,10434,35.3,6104,1.06
+"B - More beds, in the places we already have",Male,4691,68.6,4319,92.1,357,7659,16.5,2879,1.3
+"B - More beds, in the places we already have",Female,2001,29.2,1812,90.6,188,8527,19.5,3398,1.24
+"B - More beds, in the places we already have",Other / not stated,150,2.2,133,88.7,17,8783,23.1,4014,1.27
+"B - More beds, in the places we already have",Has trouble walking,1360,19.9,978,71.9,379,11481,55.5,9585,0.98
+"B - More beds, in the places we already have",Walks without difficulty,5482,80.1,5286,96.4,183,7059,8.1,1436,1.36
+"B - More beds, in the places we already have",Has asthma,1011,14.8,916,90.6,92,8617,19.4,3379,1.29
+"B - More beds, in the places we already have",Has COPD,738,10.8,636,86.2,100,9758,28.0,4859,1.15
+"B - More beds, in the places we already have",Long-term physical condition,2712,39.6,2470,91.1,238,8008,18.4,3213,1.28
+"B - More beds, in the places we already have",Counted as more vulnerable,4866,71.1,4320,88.8,536,8565,22.9,3980,1.24
+"C - The same extra beds, in better places",Everyone,6842,100.0,6804,99.4,0,5466,2.2,419,1.28
+"C - The same extra beds, in better places",Age 18-44,3612,52.8,3593,99.5,0,5136,2.1,400,1.3
+"C - The same extra beds, in better places",Age 45-64,2877,42.0,2860,99.4,0,5578,2.3,434,1.28
+"C - The same extra beds, in better places",Age 65+,353,5.2,351,99.4,0,7926,2.7,487,1.06
+"C - The same extra beds, in better places",Male,4691,68.6,4661,99.4,0,5385,2.3,444,1.3
+"C - The same extra beds, in better places",Female,2001,29.2,1993,99.6,0,5603,1.9,373,1.24
+"C - The same extra beds, in better places",Other / not stated,150,2.2,150,100.0,0,6167,1.2,249,1.27
+"C - The same extra beds, in better places",Has trouble walking,1360,19.9,1353,99.5,0,8391,2.7,491,0.98
+"C - The same extra beds, in better places",Walks without difficulty,5482,80.1,5451,99.4,0,4741,2.1,401,1.36
+"C - The same extra beds, in better places",Has asthma,1011,14.8,1005,99.4,0,5214,2.2,424,1.29
+"C - The same extra beds, in better places",Has COPD,738,10.8,733,99.3,0,6196,2.6,479,1.15
+"C - The same extra beds, in better places",Long-term physical condition,2712,39.6,2703,99.7,0,5478,1.8,346,1.28
+"C - The same extra beds, in better places",Counted as more vulnerable,4866,71.1,4840,99.5,0,5854,2.2,423,1.24

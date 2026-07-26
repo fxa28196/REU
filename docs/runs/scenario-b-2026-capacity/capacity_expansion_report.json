@@ -1,0 +1,35 @@
+{
+  "derived_from": "Scenario A measured outcome",
+  "a_result": {
+    "population": 6842,
+    "capacity": 2234,
+    "sheltered": 2060,
+    "refused_all_full": 4766,
+    "facilities_full": "33/36",
+    "beds_left_empty": 174
+  },
+  "binding_constraint_identified": "capacity",
+  "method": "uniform proportional scale-up, largest-remainder apportionment",
+  "scale_factor": 3.062668,
+  "facilities": 36,
+  "capacity_before": 2234,
+  "capacity_after": 6842,
+  "held_fixed": [
+    "facility count",
+    "every coordinate",
+    "opening dates",
+    "population",
+    "demographics",
+    "PM2.5 field",
+    "relative facility size"
+  ],
+  "changed": [
+    "per-facility capacity only"
+  ],
+  "why_total_equals_population": "makes aggregate capacity non-binding, so any residual failure in B is geography rather than scarcity - which is what Scenario C tests",
+  "limitations": [
+    "a uniform scale-up is a modelling construct, not an operational plan: real sites have building-specific physical limits",
+    "it assumes added spaces are equivalent in kind to existing ones",
+    "no staffing, cost or siting feasibility is represented"
+  ]
+}

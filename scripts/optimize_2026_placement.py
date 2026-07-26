@@ -25,17 +25,47 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from test_routing import build_graphs
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-SRC = ROOT / "Geography/data/shelters/shelters_2026_current_placement.csv"
-RUN = ROOT / "Geography/output/finalA-n2037-seed42/agents.csv"
 CAMPS = ROOT / "Geography/data/encampments/irp_campsite_reports_sample.csv"
-DEST = ROOT / "Geography/data/shelters/shelters_2026_optimized_placement.csv"
-REPORT = ROOT / "docs/runs/scenario-b-2026-optimization/optimization_report.json"
+
+# Paths are arguments, not constants. They used to be hardcoded to a specific
+# run directory ("finalA-n2037-seed42"), which silently broke the moment the
+# population changed - the directory name encodes n, so a stale path either
+# vanishes or, worse, feeds a previous population's demand into a new optimum.
+DEFAULT_SRC = "Geography/data/shelters/shelters_2026_expanded_capacity.csv"
+DEFAULT_RUN = "Geography/output/B2026-n6842-seed42/agents.csv"
+DEFAULT_DEST = "Geography/data/shelters/shelters_2026_expanded_optimized.csv"
+DEFAULT_REPORT = "docs/runs/scenario-c-2026-optimization/optimization_report.json"
 
 GRID_M = 600.0
 MAX_CANDIDATES = 500
 
 
+def parse_args():
+    import argparse
+    p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument("--src", default=DEFAULT_SRC,
+                   help="shelter CSV whose facility count and capacities are held fixed")
+    p.add_argument("--run", default=DEFAULT_RUN,
+                   help="agents.csv of the run whose demand geography is optimised against")
+    p.add_argument("--dest", default=DEFAULT_DEST, help="output shelter CSV")
+    p.add_argument("--report", default=DEFAULT_REPORT, help="output JSON provenance report")
+    a = p.parse_args()
+    for name in ("src", "run", "dest", "report"):
+        setattr(a, name, ROOT / getattr(a, name))
+    if not a.src.exists():
+        sys.exit(f"ERROR: shelter file not found: {a.src}")
+    if not a.run.exists():
+        sys.exit(f"ERROR: run file not found: {a.run}\n"
+                 f"       Run the source scenario first, and rename "
+                 f"Geography/output/run_seed<seed> to the expected directory.")
+    return a
+
+
 def main():
+    args = parse_args()
+    SRC, RUN, DEST, REPORT = args.src, args.run, args.dest, args.report
+    print(f"holding fixed: {SRC.name}")
+    print(f"demand from:   {RUN.parent.name}/{RUN.name}")
     import pandas as pd
     print("building validated street graph ...")
     adj, coords, _audit = build_graphs()
@@ -137,7 +167,7 @@ def main():
         r["lon"], r["lat"] = f"{lo:.6f}", f"{la:.6f}"
         r["coord_source"] = "greedy_capacity_aware_p_median_over_rlis_graph"
         r["coord_confidence"] = "theoretical_site_not_a_real_facility"
-        r["capacity_basis"] = f["capacity_basis"] + "_RELOCATED_scenarioB"
+        r["capacity_basis"] = f["capacity_basis"] + "_RELOCATED_scenarioC"
         rows.append(r)
     with open(DEST, "w", encoding="utf-8", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=cols)
@@ -145,6 +175,8 @@ def main():
 
     REPORT.parent.mkdir(parents=True, exist_ok=True)
     REPORT.write_text(json.dumps({
+        "scenario": "C - B's capacity, optimally placed",
+        "derived_from": str(RUN.parent.name),
         "method": "capacity-aware greedy p-median, largest facility first",
         "facilities": len(rows),
         "total_capacity": sum(int(r["capacity"]) for r in rows),

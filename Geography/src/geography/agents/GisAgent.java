@@ -100,6 +100,13 @@ public class GisAgent {
 	private final StreetNetwork network;
 	private final long startNodeId;
 	private final String encampmentId;
+
+	/** WGS84 coordinates of the real encampment report this resident starts at.
+	 *  Recorded so every result row carries the actual start location, not just
+	 *  the encampment id: the demand geography is an input the reader must be
+	 *  able to audit without re-joining to the campsite file. NaN until set. */
+	private double startLon = Double.NaN;
+	private double startLat = Double.NaN;
 	private final SmokeField smokeField;
 
 	private State state = State.PRE_EVAC;
@@ -404,6 +411,16 @@ public class GisAgent {
 	public String getName() { return name; }
 	public String getEncampmentId() { return encampmentId; }
 	public long getStartNodeId() { return startNodeId; }
+
+	/** Records where this resident actually started, in WGS84. Called once at
+	 *  construction time by ContextCreator; no random draws, no effect on
+	 *  movement or exposure — this is provenance, not behaviour. */
+	public void setStartCoord(double lon, double lat) {
+		this.startLon = lon;
+		this.startLat = lat;
+	}
+	public double getStartLon() { return startLon; }
+	public double getStartLat() { return startLat; }
 	public State getState() { return state; }
 	public double getArrivalTick() { return arrivalTick; }
 	public double getEvacuationTick() { return evacuationTick; }
