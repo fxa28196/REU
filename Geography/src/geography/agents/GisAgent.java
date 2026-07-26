@@ -51,6 +51,36 @@ import repast.simphony.util.ContextUtils;
  */
 public class GisAgent {
 
+	// ---- THREE DISTINCT QUANTITIES, DELIBERATELY NOT MIXED ------------------
+	// 1. EXPOSURE  (exposureUgM3h)  = SUM C(t)*dt              [ug/m3 * h]
+	//    Environmental concentration-time. Physics of the AIR. Verified against
+	//    raw EPA AQS data to a ratio of 1.0000. Untouched by this block.
+	// 2. INHALED DOSE (inhaledDoseUg) = SUM C(t)*IR(activity)*dt   [ug]
+	//    Physics of the PERSON: how much particulate mass actually entered the
+	//    airway. Differs from exposure only by ventilation rate, which depends
+	//    on ACTIVITY (walking vs waiting), not on diagnosis.
+	// 3. HEALTH RISK (healthRiskMultiplier) = a susceptibility weight.
+	//    Biology. Currently 1.0 for everyone because no defensible
+	//    population-specific coefficient exists (A-09, A-22). The slot exists so
+	//    that risk can never be silently folded into dose.
+	// The cardinal rule: ventilation is PHYSICS and may vary with activity;
+	// susceptibility is BIOLOGY and stays out of the dose term entirely.
+
+	/** Ventilation while walking, m3/h. Activity-level inhalation rate for adults
+	 *  at moderate intensity, U.S. EPA Exposure Factors Handbook (2011) Ch. 6.
+	 *  Comfortable walking (~1.3 m/s, ~3.3 METs) sits at the light/moderate
+	 *  boundary; the moderate cell is used because evacuation walking is
+	 *  sustained and often loaded.
+	 *  <b>Class L, VERIFIED-IN-SECONDARY</b> — the EFH table cell was not
+	 *  re-read from the primary during this implementation, so the value carries
+	 *  a sweep range and must be confirmed before publication. Sweep 1.2-2.0. */
+	public static final double INHALATION_WALKING_M3H = 1.62;
+
+	/** Ventilation while outdoors but not walking (awaiting the smoke trigger, or
+	 *  stranded after refusal), m3/h. Light-activity adult cell, same source and
+	 *  same caveat. Sweep 0.4-0.8. */
+	public static final double INHALATION_RESTING_M3H = 0.61;
+
 	/** Person-hours are counted above this PM2.5 concentration (µg/m³): the EPA
 	 *  "Unhealthy" AQI breakpoint lower bound, stable across the pre/post-2024
 	 *  tables (DATA_SOURCES D9). This is a concentration threshold, not the
@@ -114,6 +144,12 @@ public class GisAgent {
 	private double vweUgM3h = 0;                        // V7 vulnerability-weighted
 	private double exposureWhileTravelingUgM3h = 0;     // exposure accrued EN_ROUTE
 	private double hoursAboveUnhealthy = 0;             // V8
+	/** V25 — inhaled PM2.5 mass, µg. Exposure weighted by activity-dependent
+	 *  ventilation. NOT weighted by any health characteristic. */
+	private double inhaledDoseUg = 0;
+	/** Ventilation-weighted hours outdoors, m3 of air breathed. Exported so the
+	 *  dose can be decomposed into concentration and volume by a reviewer. */
+	private double airVolumeBreathedM3 = 0;
 	private double peakConcUgM3 = 0;
 	private double outdoorHours = 0;                    // total hours outdoors (for average PM2.5 reporting)
 
@@ -151,6 +187,14 @@ public class GisAgent {
 			double c = smokeField.concentrationForTick(tick, minutesPerTick);
 			exposureUgM3h += c * dtHours;
 			vweUgM3h += c * ageRR * comorbidityRR * dtHours;
+			// Inhaled dose: ventilation depends on ACTIVITY only. A resident who
+			// is walking breathes more air than one waiting, so inhales more
+			// particulate from the same concentration. No health attribute
+			// enters here - susceptibility is applied downstream, if ever.
+			double ventilationM3h = (state == State.EN_ROUTE)
+					? INHALATION_WALKING_M3H : INHALATION_RESTING_M3H;
+			airVolumeBreathedM3 += ventilationM3h * dtHours;
+			inhaledDoseUg += c * ventilationM3h * dtHours;
 			if (state == State.EN_ROUTE) {
 				exposureWhileTravelingUgM3h += c * dtHours;
 			}
@@ -374,6 +418,27 @@ public class GisAgent {
 	public double getVweUgM3h() { return vweUgM3h; }
 	public double getExposureWhileTravelingUgM3h() { return exposureWhileTravelingUgM3h; }
 	public double getHoursAboveUnhealthy() { return hoursAboveUnhealthy; }
+	/** V25 — inhaled PM2.5 mass in µg (activity-weighted, NOT health-weighted). */
+	public double getInhaledDoseUg() { return inhaledDoseUg; }
+	/** Total air volume breathed outdoors, m3. */
+	public double getAirVolumeBreathedM3() { return airVolumeBreathedM3; }
+	/** Mean ventilation rate actually realised, m3/h — makes the dose auditable. */
+	public double getMeanVentilationM3h() {
+		return outdoorHours > 0 ? airVolumeBreathedM3 / outdoorHours : Double.NaN;
+	}
+	/**
+	 * Susceptibility weight applied to inhaled dose to obtain health risk.
+	 * <b>Returns 1.0 for every resident.</b> This is deliberate and is the
+	 * structural guarantee that biology is never folded into the physics: no
+	 * defensible person-level susceptibility coefficient exists for this
+	 * population (A-09, A-22; docs/final/HEALTH_MODEL_AUDIT.md). The method
+	 * exists so a sourced coefficient has exactly one place to land, and so a
+	 * reader can see that risk weighting is switched off rather than absent.
+	 */
+	public double getHealthRiskMultiplier() { return 1.0; }
+	/** Health-risk score = inhaled dose × susceptibility weight. Numerically
+	 *  identical to inhaled dose while the weight is 1.0, by design. */
+	public double getHealthRiskScore() { return inhaledDoseUg * getHealthRiskMultiplier(); }
 	public double getPeakConcUgM3() { return peakConcUgM3; }
 	public double getOutdoorHours() { return outdoorHours; }
 	public double getAgeRR() { return ageRR; }

@@ -67,23 +67,29 @@ public class ContextCreator implements ContextBuilder {
 	private static final String SHELTERS_CSV  = "data/shelters/shelters_2020-09.csv";
 	private static final String ENCAMPMENTS_CSV = "data/encampments/irp_campsite_reports_sample.csv";
 
-	/** Scenario A — the real September-2020 placement (docs/science/DATA_SOURCES D1). */
-	private static final String SCENARIO_A_NAME = "A_current_placement";
-	/** Scenario B — same total capacity relocated by street-network p-median
-	 *  optimisation (scripts/optimize_shelters.py). A THEORETICAL siting optimum,
-	 *  not a policy recommendation: see docs/runs/scenario-b-optimization/. */
-	private static final String SCENARIO_B_NAME = "B_optimized_placement";
-	private static final String SHELTERS_OPTIMIZED_CSV = "data/shelters/shelters_optimized_2020-09.csv";
-	/** Scenario C — DEMONSTRATION ONLY. Real shelter locations and opening dates,
-	 *  but total capacity raised to equal the simulated population so that
-	 *  capacity is no longer the binding constraint and the exposure effect of
-	 *  travel alone becomes visible. Relative site capacities stay 1:1, matching
-	 *  the equal capacities the source reports, so shelters still fill in
-	 *  sequence and residents still redirect. <b>This is not real-world shelter
-	 *  availability and must never be presented as such.</b> */
-	private static final String SCENARIO_C_NAME = "C_capacity_neutral_demonstration";
-	private static final String SHELTERS_CAPACITY_NEUTRAL_CSV =
-			"data/shelters/shelters_capacity_neutral_2020-09.csv";
+	// ---- THE PLACEMENT EXPERIMENT (the study's only two scenarios) -----------
+	// Research question: does shelter PLACEMENT change outcomes?
+	// To isolate placement, both arms hold system capacity equal to the
+	// population (2 sites summing to 2,037 spaces) so that total capacity is NOT
+	// the binding constraint. Individual sites still have finite capacity, so
+	// shelters fill in sequence, residents are refused at a full door and
+	// re-route. Everything except the two coordinate pairs is identical between
+	// arms: population, demographics, health attributes, PM2.5, opening dates,
+	// street network, total capacity and the 1:1 capacity split.
+
+	/** Arm A — the real September-2020 shelter locations (DATA_SOURCES D1). */
+	private static final String SCENARIO_A_NAME = "A_placement_current";
+	private static final String SHELTERS_A_CSV = "data/shelters/shelters_A_placement_current.csv";
+	/** Arm B — the same two-site system relocated to the street-network p-median
+	 *  optimum (scripts/optimize_shelters.py). THEORETICAL sites, not verified
+	 *  venues: see docs/runs/scenario-b-optimization/optimization_report.json. */
+	private static final String SCENARIO_B_NAME = "B_placement_optimized";
+	private static final String SHELTERS_B_CSV = "data/shelters/shelters_B_placement_optimized.csv";
+	/** NOT a scenario — the historical-capacity reference run (2 x 99 real beds)
+	 *  retained solely so the model can be compared against the one observed
+	 *  occupancy record (~130 of 198 on 2020-09-16, Street Roots). Used for the
+	 *  calibration section of the results report, never as a study arm. */
+	private static final String HISTORICAL_REFERENCE_NAME = "HISTORICAL_capacity_reference_not_a_scenario";
 
 	// V13 anchor: simulation hour 0 = local midnight at the start of the study
 	// window (Portland's Sept 7-19 2020 smoke episode).
@@ -113,13 +119,13 @@ public class ContextCreator implements ContextBuilder {
 		String sheltersCsv;
 		if (scenarioCode == 1) {
 			scenarioName = SCENARIO_B_NAME;
-			sheltersCsv = SHELTERS_OPTIMIZED_CSV;
+			sheltersCsv = SHELTERS_B_CSV;
 		} else if (scenarioCode == 2) {
-			scenarioName = SCENARIO_C_NAME;
-			sheltersCsv = SHELTERS_CAPACITY_NEUTRAL_CSV;
+			scenarioName = HISTORICAL_REFERENCE_NAME;
+			sheltersCsv = SHELTERS_CSV;   // the real 2 x 99 beds
 		} else {
 			scenarioName = SCENARIO_A_NAME;
-			sheltersCsv = SHELTERS_CSV;
+			sheltersCsv = SHELTERS_A_CSV;
 		}
 
 		// Scientific governance: validate the variable and assumption registries

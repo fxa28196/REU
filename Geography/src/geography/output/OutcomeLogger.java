@@ -123,7 +123,11 @@ public class OutcomeLogger {
 					// heterogeneity is disabled - never a fabricated default.
 					+ "scenario,walking_speed_mps,age_years,age_band,sex,"
 					+ "mobility_limited,mobility_category,asthma_flag,copd_flag,"
-					+ "any_respiratory,vulnerable_flag");
+					+ "any_respiratory,vulnerable_flag,"
+					// Exposure / dose / risk kept as three separate columns so
+					// physics and biology are never conflated (HEALTH_MODEL_AUDIT).
+					+ "air_volume_breathed_m3,mean_ventilation_m3h,"
+					+ "inhaled_dose_ug,health_risk_multiplier,health_risk_score");
 			for (GisAgent a : agents) {
 				boolean reached = a.getState() == GisAgent.State.SHELTERED;
 				String shelter = reached && a.getTargetShelter() != null ? a.getTargetShelter().getId() : "";
@@ -155,7 +159,7 @@ public class OutcomeLogger {
 								(at.asthma || at.copd) ? 1 : 0,
 								isVulnerable(at) ? 1 : 0);
 				w.printf(Locale.US,
-						"%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s,%.2f,%.4f,%.4f,%.4f,%.4f,%s,%s,%s,%.3f,%.3f,%s,%.2f,%.2f,%d,%s,%s%n",
+						"%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s,%.2f,%.4f,%.4f,%.4f,%.4f,%s,%s,%s,%.3f,%.3f,%s,%.2f,%.2f,%d,%s,%s,%.4f,%.4f,%.4f,%.3f,%.4f%n",
 						a.getName(), simId, commit, seed, dataVersionTag,
 						a.getEncampmentId(), shelter, reached ? "yes" : "no",
 						startTick, startLocal, arrTick, arrLocal,
@@ -165,7 +169,10 @@ public class OutcomeLogger {
 						legacyAge, legacyAsthma, legacyCopd,
 						a.getAgeRR(), a.getComorbidityRR(), a.getState(),
 						a.getPlannedRouteM(), a.getSnapGapM(), a.getRetargetCount(),
-						csv(scenarioName), het);
+						csv(scenarioName), het,
+						a.getAirVolumeBreathedM3(), a.getMeanVentilationM3h(),
+						a.getInhaledDoseUg(), a.getHealthRiskMultiplier(),
+						a.getHealthRiskScore());
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("writeAgents failed", e);
@@ -245,7 +252,8 @@ public class OutcomeLogger {
 				w.println("      {\"file\": \"" + jsonEsc(inputDataFiles[i]) + "\", \"sha256\": \""
 						+ sha256(inputDataFiles[i]) + "\"}" + (i < inputDataFiles.length - 1 ? "," : ""));
 			}
-			w.println("    ]");
+			w.println("    ],");
+			writeSourceIntegrity(w);
 			w.println("  },");
 			w.println("  \"smoke_field\": {");
 			w.println("    \"county\": \"" + jsonEsc(smokeField.getCounty()) + "\",");
@@ -303,6 +311,83 @@ public class OutcomeLogger {
 		} catch (Exception e) {
 			throw new RuntimeException("writeSimulation failed", e);
 		}
+	}
+
+	/**
+	 * Complete file-integrity census, added after an audit found that
+	 * {@code input_datasets} checksummed only {@code Streets.shp} while the
+	 * routing graph is built from the node-ID attributes in {@code Streets.dbf}
+	 * — a modified .dbf with an unchanged .shp would have produced different
+	 * routing under an identical {@code data_version_tag}.
+	 *
+	 * <p>Deliberately a SEPARATE block: {@code data_version_tag} is left hashing
+	 * only the four model inputs so that it stays comparable with every
+	 * previously archived run. This block adds the sidecars and the governance
+	 * registries, plus a working-tree dirty flag, so a reviewer can verify the
+	 * full chain without breaking the existing one.
+	 */
+	private void writeSourceIntegrity(PrintWriter w) {
+		String[] files = {
+			"data/Streets.shp", "data/Streets.dbf", "data/Streets.shx",
+			"data/Streets.prj", "data/Streets.cpg",
+			"data/airnow/aqs_hourly_pm25_portland_2020-09.csv",
+			"data/shelters/shelters_2020-09.csv",
+			"data/shelters/shelters_A_placement_current.csv",
+			"data/shelters/shelters_B_placement_optimized.csv",
+			"data/encampments/irp_campsite_reports_sample.csv",
+			"data/registry/variables.csv", "data/registry/assumptions.csv",
+		};
+		w.println("    \"source_integrity\": {");
+		w.println("      \"note\": \"Full checksum census including shapefile sidecars and the "
+				+ "governance registries. data_version_tag intentionally covers only the four "
+				+ "model inputs, to stay comparable with earlier archived runs.\",");
+		w.println("      \"git_working_tree_dirty\": " + gitWorkingTreeDirty() + ",");
+		w.println("      \"files\": [");
+		for (int i = 0; i < files.length; i++) {
+			w.println("        {\"file\": \"" + jsonEsc(files[i]) + "\", \"sha256\": \""
+					+ sha256(files[i]) + "\"}" + (i < files.length - 1 ? "," : ""));
+		}
+		w.println("      ]");
+		w.println("    }");
+	}
+
+	/**
+	 * True when tracked model sources are newer than the recorded git HEAD, i.e.
+	 * the run may have executed uncommitted code. An audit found nine archived
+	 * runs stamped a commit that could not reproduce them; this flag makes that
+	 * condition visible in the manifest instead of silent. Heuristic and
+	 * deliberately conservative: it compares file modification times against the
+	 * HEAD ref's own timestamp, so it errs toward reporting "true".
+	 */
+	private static String gitWorkingTreeDirty() {
+		try {
+			File head = new File(".git/HEAD");
+			if (!head.exists()) head = new File("../.git/HEAD");
+			if (!head.exists()) return "\"unknown\"";
+			String h = new String(Files.readAllBytes(head.toPath()), StandardCharsets.UTF_8).trim();
+			File ref = head;
+			if (h.startsWith("ref:")) {
+				File candidate = new File(head.getParentFile(), h.substring(4).trim());
+				if (candidate.exists()) ref = candidate;
+			}
+			long headTime = ref.lastModified();
+			File src = new File("src/geography");
+			if (!src.exists()) src = new File("Geography/src/geography");
+			return String.valueOf(newestFileTime(src) > headTime);
+		} catch (Exception e) {
+			return "\"unknown\"";
+		}
+	}
+
+	private static long newestFileTime(File dir) {
+		long newest = 0;
+		File[] kids = dir.listFiles();
+		if (kids == null) return newest;
+		for (File f : kids) {
+			long t = f.isDirectory() ? newestFileTime(f) : f.lastModified();
+			if (t > newest) newest = t;
+		}
+		return newest;
 	}
 
 	/** Street-graph validation provenance (docs/validation/STREET_NETWORK_VALIDATION.md):
