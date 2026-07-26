@@ -91,6 +91,11 @@ public class GisAgent {
 	private double ageRR = 1.0;
 	private double comorbidityRR = 1.0;
 
+	/** Heterogeneous attributes (V18–V22), null when heterogeneity is disabled —
+	 *  in which case this resident walks at the run-wide {@code walkingSpeedMps}
+	 *  parameter and exports empty attribute columns, exactly as before. */
+	private PopulationSampler.Attributes attributes = null;
+
 	// Exported scientific quantities -----------------------------------------
 	private double networkDistToShelterM = Double.NaN;  // V11
 	private double distanceTraveledM = 0;               // V9
@@ -129,7 +134,12 @@ public class GisAgent {
 
 		Parameters params = RunEnvironment.getInstance().getParameters();
 		double minutesPerTick = (Double) params.getValue("minutesPerTick");
-		double walkingSpeedMps = (Double) params.getValue("walkingSpeedMps");
+		// Per-agent speed when heterogeneity is enabled (V10 revised: Bohannon &
+		// Williams Andrews 2011 age×sex means, or Boyce 1999 by replacement for
+		// mobility-limited residents); otherwise the run-wide constant.
+		double walkingSpeedMps = (attributes != null)
+				? attributes.walkingSpeedMps
+				: (Double) params.getValue("walkingSpeedMps");
 		double tick = RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
 		double dtHours = minutesPerTick / 60.0;
 
@@ -162,12 +172,38 @@ public class GisAgent {
 			double evacThreshold = (Double) params.getValue("evacuationThresholdUgM3");
 			double cNow = (smokeField == null) ? 0.0
 					: smokeField.concentrationForTick(tick, minutesPerTick);
-			if (cNow >= evacThreshold) {
+			// Departure requires BOTH the smoke trigger and somewhere open to walk
+			// to. With the opening-date gate enabled this is the A-02 mitigation:
+			// the real shelters opened on Sept 10-11, days after the first
+			// threshold crossing, so residents cannot arrive before a door exists
+			// to arrive at. With the gate disabled every shelter is open from tick
+			// 0 and this reduces to the previous smoke-only trigger.
+			if (cNow >= evacThreshold && anyShelterOpen(context, tick)) {
 				state = State.EN_ROUTE;
 				evacuationTick = tick;
 			} else {
 				return; // still waiting outdoors; exposure already accrued above
 			}
+		}
+
+		// REFUSED_ALL_FULL means "no shelter is available to me RIGHT NOW". Once
+		// shelters open on different real dates (OCC 2020-09-10, CJ 2020-09-11)
+		// that is no longer a permanent condition: a resident turned away from
+		// the only open shelter must be able to try the second when it opens.
+		// Treating it as terminal left CJ's 99 real beds entirely unused.
+		// It is re-evaluated each tick and is final only at end of run.
+		// This cannot livelock: capacity never increases (no departures are
+		// modelled) and each shelter opens once, so re-entry is bounded by the
+		// number of opening events.
+		if (state == State.REFUSED_ALL_FULL) {
+			if (!anyShelterAvailable(context, tick)) {
+				return; // still nowhere to go; keeps accruing exposure outdoors
+			}
+			state = State.EN_ROUTE;
+			retargetCount = 0;
+			targetShelter = null;
+			routePath = null;
+			pathIndex = 0;
 		}
 
 		if (state != State.EN_ROUTE) {
@@ -176,7 +212,7 @@ public class GisAgent {
 
 		// --- Routing (capacity-aware) ---------------------------------------
 		if (routePath == null) {
-			chooseNetworkNearestShelter(context);
+			chooseNetworkNearestShelter(context, tick);
 			if (routePath == null) {
 				// state was set by chooseNetworkNearestShelter (UNREACHABLE or
 				// REFUSED_ALL_FULL); the agent persists and keeps accruing.
@@ -211,7 +247,7 @@ public class GisAgent {
 
 		if (pathIndex >= routePath.size()) {
 			// Reached the shelter's street node: request admission (V12).
-			if (targetShelter.admit()) {
+			if (targetShelter.isOpenAt(tick) && targetShelter.admit()) {
 				state = State.SHELTERED;
 				arrivalTick = tick;
 			} else {
@@ -242,14 +278,15 @@ public class GisAgent {
 	 * REFUSED_ALL_FULL if reachable shelters exist but are all full,
 	 * otherwise UNREACHABLE.
 	 */
-	private void chooseNetworkNearestShelter(Context context) {
+	private void chooseNetworkNearestShelter(Context context, double tick) {
 		double bestDistM = Double.POSITIVE_INFINITY;
 		Shelter best = null;
 		boolean anyReachable = false;
 
 		for (Object obj : context.getObjects(Shelter.class)) {
 			Shelter shelter = (Shelter) obj;
-			if (!shelter.isOperating() || shelter.getRouteTree() == null) {
+			if (!shelter.isOperating() || !shelter.isOpenAt(tick)
+					|| shelter.getRouteTree() == null) {
 				continue;
 			}
 			double dM = shelter.getRouteTree().distanceTo(currentNodeId);
@@ -282,9 +319,42 @@ public class GisAgent {
 		}
 	}
 
+	/** True if at least one operating shelter is open at this tick. Cheap: the
+	 *  scenario has three shelters. */
+	private static boolean anyShelterOpen(Context context, double tick) {
+		for (Object obj : context.getObjects(Shelter.class)) {
+			Shelter shelter = (Shelter) obj;
+			if (shelter.isOperating() && shelter.isOpenAt(tick)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** True if some operating shelter is open, has space, and is reachable from
+	 *  where this resident currently stands — i.e. it is worth setting out. */
+	private boolean anyShelterAvailable(Context context, double tick) {
+		for (Object obj : context.getObjects(Shelter.class)) {
+			Shelter shelter = (Shelter) obj;
+			if (shelter.isAvailableAt(tick) && shelter.getRouteTree() != null
+					&& !Double.isInfinite(shelter.getRouteTree().distanceTo(currentNodeId))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	// --- Vulnerability setters (used by ContextCreator once sourced) ---------
 	public void setAgeRR(double ageRR) { this.ageRR = ageRR; }
 	public void setComorbidityRR(double comorbidityRR) { this.comorbidityRR = comorbidityRR; }
+	public void setAttributes(PopulationSampler.Attributes attributes) { this.attributes = attributes; }
+	/** Sampled heterogeneous attributes, or null when heterogeneity is disabled. */
+	public PopulationSampler.Attributes getAttributes() { return attributes; }
+	/** Speed this resident actually walks at (m/s): its own when heterogeneity is
+	 *  enabled, otherwise NaN meaning "the run-wide parameter applies". */
+	public double getPersonalWalkingSpeedMps() {
+		return attributes == null ? Double.NaN : attributes.walkingSpeedMps;
+	}
 
 	// --- Accessors for export (geography.output.OutcomeLogger) ---------------
 	public String getName() { return name; }

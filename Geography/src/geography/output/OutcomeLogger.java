@@ -51,10 +51,16 @@ public class OutcomeLogger {
 	private final String dataVersionTag;
 	private final StreetNetwork.ValidationReport netReport;
 	private final ScienceRegistry registry;
+	private final String scenarioName;
+	/** Null when heterogeneity is disabled; supplies realised-marginal reporting. */
+	private final geography.agents.PopulationSampler sampler;
 
 	public OutcomeLogger(Context<Object> context, SmokeField smokeField, long seed,
 			String[] paramNames, Object[] paramValues, String[] inputDataFiles,
-			StreetNetwork.ValidationReport netReport, ScienceRegistry registry) {
+			StreetNetwork.ValidationReport netReport, ScienceRegistry registry,
+			String scenarioName, geography.agents.PopulationSampler sampler) {
+		this.scenarioName = scenarioName;
+		this.sampler = sampler;
 		this.context = context;
 		this.smokeField = smokeField;
 		this.seed = seed;
@@ -112,7 +118,12 @@ public class OutcomeLogger {
 					+ "travel_time_min,total_travel_distance_m,network_dist_to_shelter_m,"
 					+ "avg_pm25_ugm3,peak_pm25_ugm3,cumulative_dose_ugm3h,exposure_while_traveling_ugm3h,"
 					+ "vwe_ugm3h,hours_above_unhealthy,age,asthma,copd,age_rr,comorbidity_rr,final_state,"
-					+ "planned_route_m,snap_gap_m,door_refusals");
+					+ "planned_route_m,snap_gap_m,door_refusals,"
+					// Heterogeneity block (V18-V22, V10 revised). EMPTY when
+					// heterogeneity is disabled - never a fabricated default.
+					+ "scenario,walking_speed_mps,age_years,age_band,sex,"
+					+ "mobility_limited,mobility_category,asthma_flag,copd_flag,"
+					+ "any_respiratory,vulnerable_flag");
 			for (GisAgent a : agents) {
 				boolean reached = a.getState() == GisAgent.State.SHELTERED;
 				String shelter = reached && a.getTargetShelter() != null ? a.getTargetShelter().getId() : "";
@@ -128,17 +139,33 @@ public class OutcomeLogger {
 				String avgPm = outH > 0 ? String.format(Locale.US, "%.2f", a.getExposureUgM3h() / outH) : "";
 				String netDist = Double.isNaN(a.getNetworkDistToShelterM()) ? ""
 						: String.format(Locale.US, "%.2f", a.getNetworkDistToShelterM());
+				// age/asthma/copd legacy columns are filled from the sampled
+				// attributes when heterogeneity is on, and stay EMPTY when it is
+				// off (they were always "not implemented, no invented value").
+				geography.agents.PopulationSampler.Attributes at = a.getAttributes();
+				String legacyAge = at == null ? "" : String.valueOf(at.ageYears);
+				String legacyAsthma = at == null ? "" : (at.asthma ? "1" : "0");
+				String legacyCopd = at == null ? "" : (at.copd ? "1" : "0");
+				String het = (at == null)
+						? ",,,,,,,,,"
+						: String.format(Locale.US, "%.4f,%d,%s,%s,%d,%s,%d,%d,%d,%d",
+								at.walkingSpeedMps, at.ageYears, at.ageBand.label, at.sex,
+								at.mobilityLimited ? 1 : 0, at.mobilityCategory.label,
+								at.asthma ? 1 : 0, at.copd ? 1 : 0,
+								(at.asthma || at.copd) ? 1 : 0,
+								isVulnerable(at) ? 1 : 0);
 				w.printf(Locale.US,
-						"%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s,%.2f,%.4f,%.4f,%.4f,%.4f,%s,%s,%s,%.3f,%.3f,%s,%.2f,%.2f,%d%n",
+						"%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s,%.2f,%.4f,%.4f,%.4f,%.4f,%s,%s,%s,%.3f,%.3f,%s,%.2f,%.2f,%d,%s,%s%n",
 						a.getName(), simId, commit, seed, dataVersionTag,
 						a.getEncampmentId(), shelter, reached ? "yes" : "no",
 						startTick, startLocal, arrTick, arrLocal,
 						travelMin, a.getDistanceTraveledM(), netDist,
 						avgPm, a.getPeakConcUgM3(), a.getExposureUgM3h(), a.getExposureWhileTravelingUgM3h(),
 						a.getVweUgM3h(), a.getHoursAboveUnhealthy(),
-						"", "", "",
+						legacyAge, legacyAsthma, legacyCopd,
 						a.getAgeRR(), a.getComorbidityRR(), a.getState(),
-						a.getPlannedRouteM(), a.getSnapGapM(), a.getRetargetCount());
+						a.getPlannedRouteM(), a.getSnapGapM(), a.getRetargetCount(),
+						csv(scenarioName), het);
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("writeAgents failed", e);
@@ -229,6 +256,22 @@ public class OutcomeLogger {
 			w.println("  },");
 			writeNetworkValidation(w);
 			writeGovernance(w);
+			writeStratifiedExposure(w, agents);
+			w.println("  \"scenario\": \"" + jsonEsc(scenarioName) + "\",");
+			if (sampler != null) {
+				w.printf(Locale.US, "  \"population_sampling\": {\"heterogeneity\": true, "
+						+ "\"n_sampled\": %d, \"realised_mobility_limited\": %.4f, "
+						+ "\"realised_asthma\": %.4f, \"realised_copd\": %.4f, "
+						+ "\"realised_any_respiratory\": %.4f, \"realised_age_55plus\": %.4f, "
+						+ "\"mean_walking_speed_mps\": %.4f, \"published_targets\": \"%s\"},%n",
+						sampler.getSampledCount(), sampler.getMobilityLimitedShare(),
+						sampler.getAsthmaShare(), sampler.getCopdShare(),
+						sampler.getAnyRespiratoryShare(), sampler.getAge55PlusShare(),
+						sampler.getMeanWalkingSpeedMps(),
+						jsonEsc(geography.agents.PopulationSampler.publishedTargets()));
+			} else {
+				w.println("  \"population_sampling\": {\"heterogeneity\": false},");
+			}
 			w.println("  \"population\": {");
 			w.println("    \"n_agents\": " + n + ",");
 			w.println("    \"pre_evac\": " + preEvac + ", \"sheltered\": " + sheltered
@@ -331,6 +374,119 @@ public class OutcomeLogger {
 			sb.append(i == 0 ? "" : ", ").append('"').append(jsonEsc(items.get(i))).append('"');
 		}
 		return sb.append(']').toString();
+	}
+
+	/**
+	 * "Vulnerable" for stratified reporting: aged 55+ (the PIT's own older-adult
+	 * boundary), OR mobility-limited, OR living with asthma or COPD.
+	 *
+	 * <p>This is a <b>reporting stratum, not a risk score</b>. It is a union of
+	 * measured/imported attributes with no weights attached, precisely because
+	 * decision D-3 rejected a multiplied vulnerability index: the coefficients
+	 * such an index needs do not exist for this population and could never be
+	 * validated here, since no health outcome is simulated. Reporting exposure
+	 * separately for this group supports the claim the model CAN make ("this
+	 * group accrued more exposure, and here is the mechanism") and not the one it
+	 * cannot ("this group suffered more harm").
+	 */
+	private static boolean isVulnerable(geography.agents.PopulationSampler.Attributes at) {
+		return at.ageYears >= 55 || at.mobilityLimited || at.asthma || at.copd;
+	}
+
+	/** Mean of a per-agent quantity over a stratum, or NaN if the stratum is empty. */
+	private static double strataMean(List<GisAgent> agents, String stratum, boolean wantMember,
+			java.util.function.ToDoubleFunction<GisAgent> value) {
+		double sum = 0;
+		int n = 0;
+		for (GisAgent a : agents) {
+			geography.agents.PopulationSampler.Attributes at = a.getAttributes();
+			if (at == null) {
+				continue;
+			}
+			if (inStratum(at, stratum) == wantMember) {
+				double v = value.applyAsDouble(a);
+				// NaN means "not applicable to this resident" (e.g. travel time
+				// for someone who never arrived); such residents are excluded
+				// from that mean rather than zero-filled, which would understate it.
+				if (!Double.isNaN(v)) {
+					sum += v;
+					n++;
+				}
+			}
+		}
+		return n == 0 ? Double.NaN : sum / n;
+	}
+
+	private static int strataCount(List<GisAgent> agents, String stratum, boolean wantMember) {
+		int n = 0;
+		for (GisAgent a : agents) {
+			geography.agents.PopulationSampler.Attributes at = a.getAttributes();
+			if (at != null && inStratum(at, stratum) == wantMember) {
+				n++;
+			}
+		}
+		return n;
+	}
+
+	private static boolean inStratum(geography.agents.PopulationSampler.Attributes at, String stratum) {
+		if ("age55plus".equals(stratum)) return at.ageYears >= 55;
+		if ("mobility_limited".equals(stratum)) return at.mobilityLimited;
+		if ("asthma".equals(stratum)) return at.asthma;
+		if ("copd".equals(stratum)) return at.copd;
+		if ("any_respiratory".equals(stratum)) return at.asthma || at.copd;
+		return isVulnerable(at);
+	}
+
+	/**
+	 * Susceptibility-stratified exposure and access (decision D-3, the study's
+	 * PRIMARY equity metric). For each stratum: how many, what share reached
+	 * shelter, mean dose, mean walked distance and mean walking speed — for
+	 * members and non-members alike, so every difference is reported with the
+	 * mechanism (speed → time outdoors) beside it rather than as a bare contrast.
+	 * Emitted only when heterogeneity is enabled; otherwise the strata do not exist.
+	 */
+	private void writeStratifiedExposure(PrintWriter w, List<GisAgent> agents) {
+		if (sampler == null) {
+			return;
+		}
+		String[] strata = { "vulnerable_any", "age55plus", "mobility_limited",
+				"asthma", "copd", "any_respiratory" };
+		w.println("  \"stratified_exposure\": {");
+		w.println("    \"definition\": \"vulnerable_any = age 55+ OR mobility-limited OR "
+				+ "asthma OR COPD; a REPORTING STRATUM, not a risk score (decision D-3)\",");
+		w.println("    \"strata\": [");
+		for (int i = 0; i < strata.length; i++) {
+			String s = strata[i];
+			for (int m = 0; m < 2; m++) {
+				boolean member = (m == 0);
+				int n = strataCount(agents, s, member);
+				w.printf(Locale.US,
+						"      {\"stratum\": \"%s\", \"member\": %b, \"n\": %d, "
+						+ "\"sheltered_share\": %.4f, \"mean_exposure_ugm3h\": %.2f, "
+						+ "\"mean_travel_m\": %.2f, \"mean_travel_time_min\": %.2f, "
+						+ "\"mean_walking_speed_mps\": %.4f}%s%n",
+						s, member, n,
+						strataMean(agents, s, member,
+								a -> a.getState() == GisAgent.State.SHELTERED ? 1.0 : 0.0),
+						strataMean(agents, s, member, a -> a.getExposureUgM3h()),
+						strataMean(agents, s, member, a -> a.getDistanceTraveledM()),
+						strataMean(agents, s, member, a -> travelMinutes(a)),
+						strataMean(agents, s, member, a -> a.getPersonalWalkingSpeedMps()),
+						(i == strata.length - 1 && m == 1) ? "" : ",");
+			}
+		}
+		w.println("    ]");
+		w.println("  },");
+	}
+
+	/** Minutes between departure and admission, NaN if the resident never arrived. */
+	private double travelMinutes(GisAgent a) {
+		double evac = a.getEvacuationTick();
+		double arr = a.getArrivalTick();
+		if (Double.isNaN(evac) || Double.isNaN(arr)) {
+			return Double.NaN;
+		}
+		return (arr - evac) * param("minutesPerTick");
 	}
 
 	// --- statistics ----------------------------------------------------------

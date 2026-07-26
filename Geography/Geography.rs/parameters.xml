@@ -50,4 +50,33 @@
 		isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 	/>
+	<!-- Final study scenarios (09-DECISIONS.md; only two exist by design):
+	     0 = A, the real September-2020 shelter placement (DATA_SOURCES D1);
+	     1 = B, the same total capacity relocated to the street-network p-median
+	         optimum (scripts/optimize_shelters.py). B is a THEORETICAL siting
+	         optimum, not a policy recommendation - it ignores building
+	         availability, ownership, zoning, staffing and ADA access. -->
+	<parameter name="scenarioCode" displayName="Scenario (0=current placement, 1=optimized)" type="int"
+		defaultValue="0"
+		isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+	/>
+	<!-- Heterogeneous residents (V18-V22, V10 revised): per-agent age, sex,
+	     mobility limitation, asthma, COPD and walking speed sampled from the
+	     sourced distributions in docs/science/phase2-human-agents/01-POPULATION.md
+	     and 03-MOVEMENT.md. 0 = every resident walks at the run-wide
+	     walkingSpeedMps and carries no attributes (the archived baseline). -->
+	<parameter name="enableHeterogeneity" displayName="Heterogeneous residents (0/1)" type="int"
+		defaultValue="0"
+		isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+	/>
+	<!-- Honour the real shelter opening dates (OCC 2020-09-10, CJ 2020-09-11;
+	     DATA_SOURCES D1). 0 = every shelter open from tick 0, which is
+	     counterfactual and is the source of blocking assumption A-02. -->
+	<parameter name="respectShelterOpeningDates" displayName="Honour shelter opening dates (0/1)" type="int"
+		defaultValue="0"
+		isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+	/>
 </parameters>
