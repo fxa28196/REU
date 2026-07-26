@@ -164,7 +164,39 @@ are flagged rather than silently carried forward.
 
 ---
 
-## TASK 4 — Full scenario re-run: NOT EXECUTED
+## TASK 4 — COMPLETED. See `PRESENT_DAY_THREE_ARM_RESULTS.md`
+
+**Superseded.** Everything below this heading described why the re-run had not
+been started. It has since been executed in full, with the experiment
+restructured so that each arm answers what the previous arm measured:
+
+- **Population corrected to 6,842** and **capacity to 2,234** (36 facilities;
+  five villages plus Doreen's Place geocoded from recovered addresses, and the
+  two intersection-only sites resolved to hundred-block addresses).
+- **A (reality) reported that CAPACITY binds**: 2,060 sheltered of 6,842, 4,766
+  turned away, 33 of 36 facilities completely full.
+- **B therefore adds capacity at the real locations** — 91.6% sheltered, but it
+  leaves 578 beds empty while 562 people are refused, exposing a second,
+  geographic constraint.
+- **C places B's identical beds optimally** — 99.4% sheltered, zero turned away.
+- The optimizer's hardcoded `n2037` path was replaced with CLI arguments, so it
+  can no longer silently consume a previous population's demand.
+
+**The headline survived and strengthened.** The prediction recorded below — that
+the direction would hold while the magnitude fell — was **wrong in an
+informative way**: placement's benefit *grew*, because at 6,842 people the
+spatial mismatch between where residents are and where beds are is far more
+severe than it was at 2,037. The earlier design could not have seen this,
+because capacity was never relieved first.
+
+**New finding this pass:** capacity expansion alone *widens* the equity gap
+(mobility-limited access trails by 13 points in A and 24.5 points in B), and
+placement closes it to 0.1 points. Placement is not just more efficient than
+capacity — it is the only one of the two that is equitable.
+
+Retained below for the record: the reasoning as it stood before the re-run.
+
+### (superseded) Why the re-run had not been started
 
 **Deliberately not started.** Tasks 1 and 2 change the two largest inputs
 (capacity +18%, population ×3.4). Applying them requires: rebuild the shelter

@@ -1,0 +1,10 @@
+Scenario,Seed,People in the simulation,Shelters,Total beds,Got inside,Got inside (%),Turned away (every shelter full),Could not reach a shelter,Beds left empty,Average walk (metres),Average hours in bad smoke,Average smoke breathed (micrograms),Total smoke exposure (all people),Total person-hours in unhealthy air
+"A - Today (real shelters, real number of beds)",42,6842,36,2234,2060,30.1,4766,16,174,18260,135.8,23374,258641539,928934
+"A - Today (real shelters, real number of beds)",43,6842,36,2234,2055,30.0,4762,25,179,18356,135.9,23400,258912202,929924
+"A - Today (real shelters, real number of beds)",44,6842,36,2234,2056,30.0,4762,24,178,18281,135.9,23395,258859976,929750
+"B - More beds, in the places we already have",42,6842,36,6842,6264,91.6,562,16,578,7938,17.5,3056,32765083,119921
+"B - More beds, in the places we already have",43,6842,36,6842,6259,91.5,558,25,583,7939,17.7,3080,33034278,120881
+"B - More beds, in the places we already have",44,6842,36,6842,6260,91.5,558,24,582,8085,17.7,3077,32989513,120805
+"C - The same extra beds, in better places",42,6842,36,6842,6804,99.4,0,38,38,5466,2.2,419,3671260,14944
+"C - The same extra beds, in better places",43,6842,36,6842,6800,99.4,0,42,42,5279,2.3,436,3879046,15650
+"C - The same extra beds, in better places",44,6842,36,6842,6800,99.4,0,42,42,5184,2.3,434,3870239,15551

@@ -77,14 +77,26 @@ public class ContextCreator implements ContextBuilder {
 	// arms: population, demographics, health attributes, PM2.5, opening dates,
 	// street network, total capacity and the 1:1 capacity split.
 
-	/** Arm A — the real September-2020 shelter locations (DATA_SOURCES D1). */
-	private static final String SCENARIO_A_NAME = "A_present_day_current_network";
+	/** Arm A — REALITY. Every clean-air-capable facility the county actually
+	 *  operates today, at its real address and real capacity. A is a measurement,
+	 *  not a treatment: it establishes WHICH constraint actually binds. */
+	private static final String SCENARIO_A_NAME = "A_present_day_reality";
 	private static final String SHELTERS_A_CSV = "data/shelters/shelters_2026_current_placement.csv";
-	/** Arm B — the same two-site system relocated to the street-network p-median
-	 *  optimum (scripts/optimize_shelters.py). THEORETICAL sites, not verified
-	 *  venues: see docs/runs/scenario-b-optimization/optimization_report.json. */
-	private static final String SCENARIO_B_NAME = "B_present_day_optimized_network";
-	private static final String SHELTERS_B_CSV = "data/shelters/shelters_2026_optimized_placement.csv";
+
+	/** Arm B — the response to what A measured. A leaves most residents outdoors
+	 *  because there are not enough spaces, so B relieves exactly that constraint:
+	 *  capacity is raised to meet demand AT THE REAL LOCATIONS. Placement is held
+	 *  identical to A, so any A->B difference is attributable to capacity alone. */
+	private static final String SCENARIO_B_NAME = "B_capacity_meets_demand_real_locations";
+	private static final String SHELTERS_B_CSV = "data/shelters/shelters_2026_expanded_capacity.csv";
+
+	/** Arm C — B's capacity, optimally placed. Holds B's facility count and
+	 *  per-facility capacity EXACTLY and changes only the coordinates, so any
+	 *  B->C difference is attributable to placement alone. Sites are street-network
+	 *  nodes chosen by capacity-aware greedy p-median (scripts/optimize_2026_placement.py):
+	 *  THEORETICAL locations, not verified venues with filtered indoor air. */
+	private static final String SCENARIO_C_NAME = "C_capacity_meets_demand_optimized_locations";
+	private static final String SHELTERS_C_CSV = "data/shelters/shelters_2026_expanded_optimized.csv";
 	/** NOT a scenario — the historical-capacity reference run (2 x 99 real beds)
 	 *  retained solely so the model can be compared against the one observed
 	 *  occupancy record (~130 of 198 on 2020-09-16, Street Roots). Used for the
@@ -121,6 +133,9 @@ public class ContextCreator implements ContextBuilder {
 			scenarioName = SCENARIO_B_NAME;
 			sheltersCsv = SHELTERS_B_CSV;
 		} else if (scenarioCode == 2) {
+			scenarioName = SCENARIO_C_NAME;
+			sheltersCsv = SHELTERS_C_CSV;
+		} else if (scenarioCode == 3) {
 			scenarioName = HISTORICAL_REFERENCE_NAME;
 			sheltersCsv = SHELTERS_CSV;   // the real 2 x 99 beds
 		} else {
@@ -273,6 +288,10 @@ public class ContextCreator implements ContextBuilder {
 			String encampmentId = (idx < 0) ? "none" : campIds.get(idx);
 			long startNode = network.nearestNode(coord);
 			GisAgent agent = new GisAgent("Site " + i, network, startNode, encampmentId, smokeField);
+			// Provenance only: records the real campsite-report coordinate this
+			// resident starts from so it appears in every result row. No random
+			// draw, so the population stays bit-identical.
+			agent.setStartCoord(coord.x, coord.y);
 			if (sampler != null) {
 				agent.setAttributes(sampler.sample());
 			}

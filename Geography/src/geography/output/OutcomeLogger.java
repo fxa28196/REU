@@ -113,7 +113,7 @@ public class OutcomeLogger {
 			// (total_travel_distance_m <= planned_route_m + snap_gap_m + tol),
 			// not new science.
 			w.println("agent_id,sim_id,commit,random_seed,data_version,"
-					+ "starting_encampment,shelter_reached,reached_shelter,"
+					+ "starting_encampment,start_lon,start_lat,shelter_reached,reached_shelter,"
 					+ "time_started_tick,time_started_local,time_arrived_tick,time_arrived_local,"
 					+ "travel_time_min,total_travel_distance_m,network_dist_to_shelter_m,"
 					+ "avg_pm25_ugm3,peak_pm25_ugm3,cumulative_dose_ugm3h,exposure_while_traveling_ugm3h,"
@@ -143,6 +143,13 @@ public class OutcomeLogger {
 				String avgPm = outH > 0 ? String.format(Locale.US, "%.2f", a.getExposureUgM3h() / outH) : "";
 				String netDist = Double.isNaN(a.getNetworkDistToShelterM()) ? ""
 						: String.format(Locale.US, "%.2f", a.getNetworkDistToShelterM());
+				// Real encampment start location (WGS84), 6 dp ~= 0.1 m. Empty
+				// rather than 0,0 if unset, so a missing coordinate can never be
+				// mistaken for a point in the Gulf of Guinea.
+				String startLonS = Double.isNaN(a.getStartLon()) ? ""
+						: String.format(Locale.US, "%.6f", a.getStartLon());
+				String startLatS = Double.isNaN(a.getStartLat()) ? ""
+						: String.format(Locale.US, "%.6f", a.getStartLat());
 				// age/asthma/copd legacy columns are filled from the sampled
 				// attributes when heterogeneity is on, and stay EMPTY when it is
 				// off (they were always "not implemented, no invented value").
@@ -160,9 +167,10 @@ public class OutcomeLogger {
 								at.chronicPhysical ? 1 : 0,
 								isVulnerable(at) ? 1 : 0);
 				w.printf(Locale.US,
-						"%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s,%.2f,%.4f,%.4f,%.4f,%.4f,%s,%s,%s,%.3f,%.3f,%s,%.2f,%.2f,%d,%s,%s,%.4f,%.4f,%.4f,%.3f,%.4f%n",
+						"%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s,%.2f,%.4f,%.4f,%.4f,%.4f,%s,%s,%s,%.3f,%.3f,%s,%.2f,%.2f,%d,%s,%s,%.4f,%.4f,%.4f,%.3f,%.4f%n",
 						a.getName(), simId, commit, seed, dataVersionTag,
-						a.getEncampmentId(), shelter, reached ? "yes" : "no",
+						a.getEncampmentId(), startLonS, startLatS,
+						shelter, reached ? "yes" : "no",
 						startTick, startLocal, arrTick, arrLocal,
 						travelMin, a.getDistanceTraveledM(), netDist,
 						avgPm, a.getPeakConcUgM3(), a.getExposureUgM3h(), a.getExposureWhileTravelingUgM3h(),
