@@ -111,7 +111,7 @@ heterogeneity leaves the archived baseline population bit-identical.
 ### 3.5 Scenario B — the siting counterfactual
 
 `scripts/optimize_shelters.py` places the **same total capacity** (2 sites × 99 beds) at
-the street-network p-median optimum over 558 candidate nodes, using a capacity-aware
+the street-network p-median optimum over 790 candidate nodes, using a capacity-aware
 greedy assignment that mirrors the simulation's own mechanism, then the ABM is re-run at
 those coordinates with **identical opening dates** so A and B differ in location only.
 
@@ -301,7 +301,7 @@ dose, exposure burden index, and hours above Unhealthy.
   from time outdoors, none from spatial gradients.
 - **L7 (A-19).** Mobility-limited residents use the fastest impaired speed category; the
   real disparity is likely **larger** than reported.
-- **L8 (A-22 / A-08).** Admission is first-come-first-served within a tick; which
+- **L8 (A-08).** Admission is first-come-first-served within a tick; which
   specific residents get marginal beds varies by seed, though stratum-level rates are
   stable. A vulnerability-prioritised admission policy is an obvious untested scenario.
 - **L9.** `travel_time_min` is elapsed time from departure to admission and **includes
