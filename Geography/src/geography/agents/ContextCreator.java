@@ -23,6 +23,7 @@ import geography.data.CsvLoader;
 import geography.env.SmokeField;
 import geography.output.OutcomeLogger;
 import geography.routing.StreetNetwork;
+import geography.science.ScienceRegistry;
 
 import repast.simphony.context.Context;
 import repast.simphony.context.space.gis.GeographyFactoryFinder;
@@ -58,6 +59,9 @@ import repast.simphony.space.gis.GeographyParameters;
  */
 public class ContextCreator implements ContextBuilder {
 
+	private static final String VARIABLES_CSV   = "data/registry/variables.csv";
+	private static final String ASSUMPTIONS_CSV = "data/registry/assumptions.csv";
+
 	private static final String STREETS_SHP  = "data/Streets.shp";
 	private static final String SMOKE_CSV     = "data/airnow/aqs_hourly_pm25_portland_2020-09.csv";
 	private static final String SHELTERS_CSV  = "data/shelters/shelters_2020-09.csv";
@@ -74,6 +78,21 @@ public class ContextCreator implements ContextBuilder {
 		double minutesPerTick = (Double) parm.getValue("minutesPerTick");
 		int simulationHours = (Integer) parm.getValue("simulationHours");
 		long seed = RandomHelper.getSeed();
+
+		// Scientific governance: validate the variable and assumption registries
+		// before anything else runs, so a registry defect stops the run rather
+		// than surfacing as an unexplained number later. Pure I/O + validation:
+		// no random draws, so the agent population is unaffected.
+		ScienceRegistry registry = ScienceRegistry.load(VARIABLES_CSV, ASSUMPTIONS_CSV);
+		System.out.println(registry.summaryLine());
+		if (!registry.placeholderVariableIds().isEmpty()) {
+			System.out.println("[ScienceRegistry][WARN] placeholder variables are inert and must not be "
+					+ "quoted as results: " + registry.placeholderVariableIds());
+		}
+		if (!registry.blockingAssumptionIds().isEmpty()) {
+			System.out.println("[ScienceRegistry][WARN] assumptions blocking publication: "
+					+ registry.blockingAssumptionIds());
+		}
 
 		GeographyParameters geoParams = new GeographyParameters();
 		Geography geography = GeographyFactoryFinder.createGeographyFactory(null)
@@ -194,7 +213,7 @@ public class ContextCreator implements ContextBuilder {
 
 		@SuppressWarnings("unchecked")
 		OutcomeLogger logger = new OutcomeLogger(context, smokeField, seed, pNames, pVals,
-				dataFiles, netReport);
+				dataFiles, netReport, registry);
 		ISchedule schedule = RunEnvironment.getInstance().getCurrentSchedule();
 		schedule.schedule(ScheduleParameters.createAtEnd(ScheduleParameters.LAST_PRIORITY), logger, "export");
 
