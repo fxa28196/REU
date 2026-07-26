@@ -230,7 +230,7 @@ commit `ccad7b7`.
 
 **Fixed this pass.** All runs re-executed from a clean tree at `02c3181`;
 manifests stamp `02c3181`, `git_working_tree_dirty: false`, governance counts
-27 variables / 24 assumptions matching the registry on disk, and a new
+28 variables / 26 assumptions matching the registry on disk, and a new
 `source_integrity` block checksums 12 files — including `Streets.dbf`, which
 holds the node IDs that build the routing graph and was previously unchecksummed.
 

@@ -121,7 +121,7 @@ graph — was **not checksummed**.
 | Commit stamped | `02c3181` — the code that ran |
 | Working tree dirty | `false` |
 | Files checksummed | 12, including `Streets.dbf` and both registries |
-| Governance counts | 27 variables / 24 assumptions — matches disk |
+| Governance counts | 28 variables / 26 assumptions — matches disk |
 | Input hashes | match files on disk in every run |
 
 **Every final run now reproduces from code + parameters + datasets + registry.**
