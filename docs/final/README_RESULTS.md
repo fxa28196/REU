@@ -184,11 +184,27 @@ This opens the Repast Simphony GUI. Then, in the window:
 2. Press **Start** to run it, or **Step** to advance one tick at a time.
 3. The map display shows the street network, shelter locations, and residents as points.
 
-Parameters can be edited in the GUI's **Parameters** panel before initializing. Loading
-the 112,070-street network takes roughly 30–60 seconds before the display appears.
+This script compiles the model *and* launches the GUI, so no separate compile step is
+needed. Loading the 112,070-street network takes roughly 30–60 seconds before the display
+appears.
 
-> Note: the GUI is for *demonstrating and inspecting* the model. All research results in
-> this package come from the headless runs below, because those write the full data export.
+**The GUI defaults are set to the final study configuration**, so what you see is the real
+model, not a superseded one:
+
+| Parameter | GUI default | Why |
+|---|---|---|
+| `numAgents` | **500** | Small enough to render smoothly, large enough that 198 beds run out — so the demo shows the actual finding |
+| `enableHeterogeneity` | **1** | Residents carry real age / mobility / asthma / COPD attributes and walk at their own speeds |
+| `respectShelterOpeningDates` | **1** | Shelters open on their real dates (10 and 11 September) |
+| `scenarioCode` | **0** | Scenario A, the real placement. Set **1** for optimized, **2** for the capacity-neutral demo |
+
+All of these can be changed in the GUI's **Parameters** panel before you press Initialize.
+
+> These defaults affect the GUI only. Headless runs read their own parameter file, so the
+> archived baseline is unaffected.
+>
+> The GUI is for *demonstrating and inspecting* the model. All research results in this
+> package come from the headless runs below, because only those write the full data export.
 
 ### 6.2 The headless research simulation (produces the data)
 
