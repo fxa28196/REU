@@ -10,9 +10,14 @@ published 2025-11-04): 10,526 people experiencing homelessness in Multnomah
 County, more than 65% of them unsheltered. Only the unsheltered are modelled,
 because only they are outdoors.
 
-**Shelters 36 facilities / 2,234 spaces** — every clean-air-capable facility in
-the county inventory that could be geocoded, at its real address and real
-capacity.
+**Shelters 36 facilities / 2,234 spaces** — every shelter facility in the county
+inventory that could be geocoded, at its real address and real capacity.
+
+*Wording note: earlier drafts called these "clean-air-capable" facilities. That
+was an overstatement and is corrected here. Nothing in the sources establishes
+that these buildings filter their air, and the model does not simulate indoor air
+at all — the study endpoint is arrival at the door. They are the county's
+existing shelter facilities, catalogued for a different purpose.*
 
 ---
 

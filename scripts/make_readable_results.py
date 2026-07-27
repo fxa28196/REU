@@ -317,9 +317,11 @@ along real Portland streets toward the nearest shelter that still has room.
 We ran three scenarios. **Each one exists to answer the question the previous
 one raised.**
 
-* **Scenario A - today.** The {t['A']['Shelters']} clean-air-capable facilities the county
+* **Scenario A - today.** The {t['A']['Shelters']} shelter facilities the county
   actually operates, at their real addresses, with their real
-  {t['A']['Total beds available']:,} spaces.
+  {t['A']['Total beds available']:,} spaces. (They are not established to filter
+  their air, and the model does not simulate indoor air - reaching the door is
+  where it stops measuring.)
 * **Scenario B - more beds, same buildings.** Every real facility grows about
   3x, so the system holds exactly {t['B']['Total beds available']:,} - one bed per person. Nothing
   moves.
