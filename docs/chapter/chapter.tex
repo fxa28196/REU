@@ -1,0 +1,868 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  2026 Summer Proceedings -- student chapter
+%  "More Beds or Better Beds?"  Fatima Asghar
+%  Built on the official svmult template. Compile with pdfLaTeX:
+%      pdflatex chapter -> bibtex chapter -> pdflatex chapter -> pdflatex chapter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[graybox]{svmult}
+
+\usepackage{type1cm}          % activate if the standard fonts are unavailable
+\usepackage{makeidx}          % allows index generation
+\usepackage{graphicx}         % standard LaTeX graphics tool
+\usepackage{multicol}         % used for the two-column index
+\usepackage[bottom]{footmisc} % places footnotes at page bottom
+\usepackage{url}              % the template recommends this for web addresses
+
+\usepackage{newtxtext}        %
+\usepackage{newtxmath}        % selects Times Roman as basic font
+
+\graphicspath{{figures/}}
+
+\makeindex
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\title*{More Beds or Better Beds? Agent-Based Modeling of Clean-Air Shelter
+Access for Unsheltered Residents During Wildfire Smoke}
+\titlerunning{More Beds or Better Beds?}
+\author{Fatima Asghar}
+\authorrunning{Fatima Asghar}
+\institute{Fatima Asghar \at Harrisburg Area Community College, Harrisburg, PA,
+\email{fxa28196@hawkmail.hacc.edu}}
+
+\maketitle
+
+\abstract{Wildfire smoke is now a recurring hazard in the Pacific Northwest, and
+people living unsheltered cannot go indoors when it arrives. This chapter asks
+which intervention helps them most: more clean-air shelter capacity, or
+better-placed capacity. I built an agent-based model in Repast Simphony in which
+6,842 unsheltered residents---the 2025 Point-in-Time count for Multnomah
+County---start at real reported campsite locations, carry individually sampled
+age, sex, mobility, asthma and COPD attributes, and walk Portland's real street
+network toward the nearest shelter with room, driven by measured hourly
+PM$_{2.5}$ from the September 2020 smoke event. Three scenarios were compared
+across nine random seeds each. Today's 36-facility system shelters 30.1\% of
+residents. Raising capacity to meet demand at the same locations shelters
+91.6\%, but leaves 578 spaces empty while turning 562 people away. Spending that
+identical capacity on ten optimally placed new sites shelters 96.0\% and halves
+refusals. Capacity expansion alone widens the gap between residents who walk
+easily and those who do not, from 13.0 to 24.5 percentage points; well-placed
+capacity returns it to 12.9. No health outcome is modelled, and modelled uptake
+is an upper bound.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+\label{sec:intro}
+
+In September 2020, wildfire smoke settled over Portland, Oregon for nine days.
+Hourly PM$_{2.5}$ measured by the county's regulatory monitors peaked at
+562.7~$\mu$g~m$^{-3}$ and stayed above the U.S.\ Environmental Protection
+Agency's ``Unhealthy'' threshold for 194 of 312 hours. Oregon's Department of
+Environmental Quality reports that this was Portland's first experience of air
+that bad from wildfire: the city had recorded no unhealthy-or-worse smoke days
+between 1985 and 2014, and in 2020 it recorded three very unhealthy days and
+five hazardous ones \cite{deq2023trends}.
+
+The public-health advice during such an episode is to stay indoors. That advice
+is unavailable to people who have no indoors. Multnomah County opened clean-air
+shelters in response, and the question this chapter addresses is what would
+happen if the same smoke arrived today, against the shelter system that actually
+exists now, and what would help most.
+
+Two interventions present themselves, and they are not the same. The county
+could add capacity---more spaces in the buildings it already operates---or it
+could add capacity in better places. These sound like variations on one idea.
+They are not, and the difference turns out to matter both for how many people
+get indoors and for \emph{which} people do.
+
+\runinhead{Research question.} For a fixed total shelter capacity, does the
+spatial placement of that capacity change how many unsheltered residents reach a
+clean-air shelter during a smoke episode, and does it change who reaches one?
+
+I address this with an agent-based model, because the question is fundamentally
+about individuals interacting with a constrained resource. A shelter that is
+full turns away the next person to arrive; who arrives first depends on where
+they started and how fast they walk; how fast they walk depends on their age and
+their health. None of that survives aggregation. A gravity model or an
+accessibility index would report an average travel distance; it would not report
+that 578 spaces sat empty while 562 people were turned away, which is the
+central finding here.
+
+The model is deliberately narrow in what it claims. It measures smoke exposure
+and inhaled particulate mass. It does not predict illness, hospitalization or
+death, and Section~\ref{subsec:health} explains why I removed the health-risk
+weighting that the project originally specified rather than repair it.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Related Work and Background}
+\label{sec:related}
+
+\runinhead{Wildfire smoke and health.} Reid et al.\ \cite{reid2016critical}
+review the health effects of wildfire smoke exposure and find consistent
+evidence for respiratory morbidity, with weaker and less consistent evidence for
+cardiovascular endpoints. DeFlorio-Barker et al.\
+\cite{deflorio2019cardiopulmonary} compare wildfire and non-wildfire PM$_{2.5}$
+periods among older adults across the United States. DeVries et al.\
+\cite{devries2017} pool 37 studies covering approximately 1.1 million
+COPD-related acute events and report a 2.5\% (95\% CI 1.6--3.4\%) increase in
+COPD-related emergency visits and admissions per 10~$\mu$g~m$^{-3}$ of
+PM$_{2.5}$.
+
+That last figure is worth pausing on, because it is the kind of number that is
+easy to misuse. It is an association between ambient PM$_{2.5}$ and COPD-related
+events. It is \emph{not} a susceptibility multiplier comparing a person who has
+COPD with a person who does not. Those are different quantities, and
+Section~\ref{subsec:health} describes what happened when I tried to use
+published relative risks as exposure weights.
+
+\runinhead{Health of people experiencing homelessness.} Fazel et al.\
+\cite{fazel2014health} summarize the descriptive epidemiology in high-income
+countries. For respiratory prevalence specifically, the standard national
+surveys are unusable: their housing-unit sampling frames structurally exclude
+people who are unsheltered. Zellmer et al.\ \cite{zellmer2025} instead use
+electronic health records for 20,139 adults with recent homelessness and report
+diagnosed asthma at 14.9\% and COPD at 10.5\%, against 7.1\% and 3.0\% in a
+housed comparison group. Brown et al.\ \cite{brown2017} study 350 homeless
+adults aged 50 and over and report asthma-or-COPD at 26.3\%, essentially equal
+to the all-ages figure from a large California study \cite{caspeh2023}---which
+is the evidence on which I sample respiratory conditions independently of age.
+
+\runinhead{Movement.} Bohannon and Williams Andrews \cite{bohannon2011} provide
+comfortable walking speeds by age decade and sex from a meta-analysis of 41
+studies and 23,111 participants. Bohannon \cite{bohannon1997} supplies the
+within-population coefficient of variation. For residents with mobility
+limitations, Boyce et al.\ \cite{boyce1999} report movement speeds by impairment
+category from building-evacuation research. Buekers et al.\ \cite{buekers2024}
+meta-analyze 25 studies comparing 1,015 people with COPD against 2,229 healthy
+controls and report a usual gait-speed difference of $-19$~cm~s$^{-1}$ (95\% CI
+$-28$ to $-11$), rating the evidence low quality.
+
+I searched for an equivalent estimate for asthma and did not find one. The
+literature supports lower physical \emph{activity} among adults with asthma, but
+no quantitative comfortable-gait-speed decrement.
+Section~\ref{subsec:results-equity} reports the resulting asymmetry as a finding
+rather than concealing it.
+
+\runinhead{Modeling platform and algorithms.} The model is built on Repast
+Simphony \cite{north2013}, and uses Dijkstra's algorithm \cite{dijkstra1959}
+over a graph whose edges are weighted by geodesic length computed with Karney's
+algorithms \cite{karney2013}. The placement problem is a capacitated
+$p$-median, which is NP-hard; I use a greedy heuristic and state in
+Section~\ref{subsec:scenarios} what guarantee that does \emph{not} carry.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Data and Methodologies}
+\label{sec:methods}
+
+\subsection{Data Collection}
+\label{subsec:data}
+
+Every dataset is recorded in a provenance registry in the repository with its
+source, URL, retrieval date, license, SHA-256 checksum and every transformation
+applied. Table~\ref{tab:data} summarizes the five inputs.
+
+\begin{table}
+\caption{Model inputs. Each row's checksum is recorded in the repository's data
+registry and re-verified into every run manifest, so a result can be tied to the
+exact bytes that produced it.}
+\label{tab:data}
+\begin{tabular}{p{2.5cm}p{3.3cm}p{1.5cm}p{3.1cm}}
+\hline\noalign{\smallskip}
+Dataset & Source & Retrieved & Content \\
+\noalign{\smallskip}\svhline\noalign{\smallskip}
+Hourly PM$_{2.5}$ & U.S.\ EPA Air Quality System, parameter 88502
+  \cite{epa2020aqs} & 2026-07-24 & 4,795 rows; 312 hourly slices, no gaps \\
+Street centerlines & Portland Metro RLIS & unknown & 112,070 polylines;
+  89,322-node graph \\
+Encampment points & City of Portland campsite reports \cite{portlandirp}
+  & 2026-07-24 & 3,400 points; 2,981 used \\
+Shelter inventory & Multnomah County HSD \cite{multcoshelters}; City of
+  Portland \cite{portlandsrv} & 2026-07-24 & 36 facilities, 2,234 spaces \\
+Population count & 2025 Tri-County Point-in-Time count \cite{pitc2025}
+  & 2026-07-25 & 6,842 unsheltered \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+\end{tabular}
+\end{table}
+
+\subsubsection{The smoke event}
+
+I use EPA AQS parameter 88502 rather than the Federal Reference Method series
+88101 for a specific reason: I downloaded and inspected the 2020 hourly 88101
+file first, and it contains \emph{no Multnomah County monitors}. Only Harney,
+Klamath and Lane County sites report hourly 88101 in Oregon. Parameter 88502 is
+what Oregon DEQ's Portland-area continuous monitors report and what feeds
+AirNow's real-time index. The trade-off is that 88502 is designated acceptable
+for index reporting but is not a reference method.
+
+Filtering the national archive to Oregon and to the three tri-county counties
+yields 4,795 hourly rows from seven monitors, two of them inside Multnomah
+County. No value was altered, rounded, unit-converted, gap-filled or averaged
+during extraction; the fetch script reproduces the file exactly. Averaging the
+two in-county monitors by hour gives the series in Fig.~\ref{fig:event}, which
+covers all 312 hours of the event window with no missing slices. EPA's own
+informational qualifier \texttt{IT}, ``Wildfire -- U.S.'', is set on 1,576 rows
+spanning exactly 7--19 September, which is the agency itself attesting that
+these observations are smoke-influenced.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{fig1_event}
+  \caption{Measured hourly PM$_{2.5}$ in Multnomah County, 7--19 September 2020,
+  averaged across the two in-county regulatory monitors. The air stayed above the
+  ``Unhealthy'' threshold for 194 of 312 hours and peaked at
+  562.7~$\mu$g~m$^{-3}$. This is the driver of every result in the chapter; it is
+  measured rather than modelled, and it is identical in all three scenarios.}
+  \label{fig:event}
+\end{figure}
+
+All seven monitors use a single method---heated-inlet nephelometry---with no
+method diversity and no co-located reference instrument, and the
+per-observation uncertainty column is empty in all 4,795 rows. A heated inlet
+volatilizes semi-volatile organic compounds, which are a large mass fraction of
+fresh wood smoke, so these readings most likely \emph{understate} true
+PM$_{2.5}$ during the event.
+
+\subsubsection{Where people are}
+
+The unsheltered population count comes from the 2025 Tri-County Point-in-Time
+count \cite{pitc2025}: 10,526 people experiencing homelessness in Multnomah
+County, more than 65\% of them unsheltered, giving 6,842. I use the unsheltered
+subset rather than the total, because sheltered people are already indoors and
+do not walk anywhere; and rather than the county's annual service count of
+6,731, because that counts turnover across a year rather than people outside on
+one night. The report's own caveat travels with the number: changes in how
+administrative data were incorporated substantially augmented the 2025
+unsheltered count, so the 2019--2025 comparison is not a clean time series and
+is not presented as one.
+
+Residents start at real locations. The City of Portland publishes campsite
+reports through its Impact Reduction Program, and 3,400 of them were retrieved
+through the city's open-data endpoint \cite{portlandirp}. Two limitations are
+important. The feed is a rolling recent window and retains \emph{zero} records
+from 2020, so 2025--26 locations serve as a spatial proxy for the 2020
+distribution; the model prints this warning at the start of every run. And the
+reports are complaint-driven, so they are biased toward visible camps. The
+reported runs place residents at 2,981 distinct such locations.
+
+\subsubsection{Where the shelters are}
+\label{subsec:shelters}
+
+The county's published shelter list \cite{multcoshelters} mixes five
+incompatible units---beds, motel rooms, village units and pods, family units,
+and unlabeled counts---so it cannot be summed directly. I converted each to
+people using explicit ranges rather than point values: a bed is exactly one
+person; a motel room serving ``individuals and couples'' is 1.0--1.5; a village
+unit is 1.0--1.2; a family unit is 2.5--4.0 and is the weakest conversion in the
+set; an unstated count is treated as people, which is the most conservative
+reading because it cannot inflate the total. Applying midpoints to the full
+county list gives roughly 1,900--2,200 people of year-round capacity, and the 36
+modelled facilities total 2,234 spaces.
+
+No coordinate was guessed. The raw inventory file is deliberately
+coordinate-free, and every location was geocoded from a published address, with
+each row recording which geocoder produced it and at what confidence. Six City
+Safe Rest Village addresses were recovered from municipal announcements
+\cite{portlandsrv}. Two of those publish only an intersection or a block, and
+the geocoder refuses intersection queries, so they were resolved to the
+corresponding hundred-block address---an approximation of a few hundred metres,
+recorded as such in the confidence column rather than presented as a street
+address. Three of the 36 coordinates are block- or intersection-level; the other
+33 are full street addresses.
+
+Two facilities remain excluded because neither publishes any street address:
+Clinton Triangle, at 160 units the largest single site in the inventory, and
+Multnomah Safe Rest Village at 28. Real capacity is therefore about 207 people
+higher than modelled. Ten day centers are also excluded because none publishes a
+capacity, and this exclusion cuts against my own framing: during a \emph{daytime}
+smoke episode, day centers are plausibly the most relevant clean-air spaces that
+exist, so scenario A understates daytime availability.
+
+\subsection{Methods}
+\label{subsec:methods}
+
+\subsubsection{Platform, languages and tools}
+
+The simulation is written in Java~17 on Repast Simphony 2.11 \cite{north2013},
+built with Gradle, and uses the GeographicLib library for geodesic computation
+and the JTS Topology Suite for spatial indexing. Analysis, figure generation,
+scenario construction and the placement optimizer are Python 3.14 using pandas
+and Matplotlib. All source, data, configuration and run manifests are in the
+repository named in the code-availability note.
+
+\runinhead{Use of AI.} I directed this research, made all research decisions,
+and wrote this manuscript. I used Claude (Anthropic) as a coding and
+verification assistant: it helped write Java and Python source, build the
+data-acquisition and analysis scripts, draft documentation, and check
+bibliographic records against publisher pages. The citation audit reported in
+Section~\ref{subsec:health}---which found that two parameters in my original
+design were attributed to papers that do not report them, and one to a paper
+that does not exist---was carried out with that assistance and then verified by
+me against the publisher records. I reviewed, revised and approved all outputs
+and take full responsibility for the final text and for every number in it.
+
+\subsubsection{Agents}
+
+Each resident is an agent with a state, a position, an origin, a walking speed
+and a set of sampled attributes. The state set is $\{$\textsc{pre-evac},
+\textsc{en-route}, \textsc{sheltered}, \textsc{unreachable},
+\textsc{refused-all-full}$\}$. A resident begins in \textsc{pre-evac} at their
+encampment and departs only when both conditions in Eq.~\ref{eq:evac} hold:
+
+\begin{equation}
+\label{eq:evac}
+C(t) \geq 55.5\ \mu\mathrm{g\ m}^{-3}
+\quad\wedge\quad
+\exists\, s \in S : \mathrm{open}(s, t)
+\end{equation}
+
+\noindent where $C(t)$ is the county PM$_{2.5}$ concentration at time $t$ and
+$S$ is the shelter set. The threshold is the lower bound of EPA's ``Unhealthy''
+category. I chose that particular breakpoint because it is stable across both
+the pre-2024 and post-2024 breakpoint tables, unlike the categories above it.
+Because index categories are defined on 24-hour averages while this model counts
+hourly observations, the derived metric is named and defined as hours above a
+concentration and is never described as an index category.
+
+Attributes are drawn from the sources in Table~\ref{tab:params}. One engineering
+detail is load-bearing. Repast shuffles agent execution order each tick using
+its default random stream, which is the same stream that assigns each resident
+an encampment. Drawing a single additional number from it would silently
+regenerate the entire population. The sampler therefore uses a private stream
+derived from the run seed as $\mathrm{seed} \times 1000003 + 17$; the verified
+consequence is that adding the whole attribute layer left the archived baseline
+run byte-identical.
+
+\begin{table}
+\caption{Sampled resident attributes with their sources and realized marginals
+at seed 42. Every value is either measured (M) or from published literature (L);
+the model refuses to start if a variable in either class lacks a resolvable
+identifier for its source.}
+\label{tab:params}
+\begin{tabular}{p{3.0cm}p{1.9cm}p{1.5cm}p{3.5cm}}
+\hline\noalign{\smallskip}
+Attribute & Target & Realized & Source \\
+\noalign{\smallskip}\svhline\noalign{\smallskip}
+Age 18--44 / 45--64 / 65+ (\%) & 52.7 / 42.3 / 5.0 & 52.8 / 42.0 / 5.2 &
+  Pathways Study 2026, $N=541$, local (M) \\
+Sex M / F / other (\%) & 68.4 / 29.3 / 2.3 & 68.6 / 29.2 / 2.2 &
+  2019 Multnomah PIT (M) \\
+Mobility limitation (\%) & 19.2 & 19.9 & 2019 PIT; a lower bound (M) \\
+Asthma (\%) & 15.0 & 14.8 & Zellmer et al.\ \cite{zellmer2025} (L) \\
+COPD (\%) & 10.5 & 10.8 & Zellmer et al.\ \cite{zellmer2025} (L) \\
+Chronic physical condition (\%) & 39.1 & 39.6 & Pathways 2026, local (M) \\
+Walking speed (m~s$^{-1}$) & --- & 1.28 mean & Bohannon and Williams Andrews
+  \cite{bohannon2011} (L) \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+\end{tabular}
+\end{table}
+
+\subsubsection{Walking speed}
+
+Walking speed is the only attribute permitted to change an outcome; everything
+else is a reporting stratum. A resident without a mobility limitation draws from
+a truncated normal centred on the Bohannon age-by-sex cell for their decade and
+sex, with standard deviation $\mathrm{CV} \times \mu$ where $\mathrm{CV}=0.13$.
+A resident with COPD has that mean shifted additively by $-0.19$~m~s$^{-1}$,
+matching how Buekers et al.\ report the difference. A resident with a mobility
+limitation instead draws from $\mathcal{N}(0.95, 0.32)$, \emph{replacing} the
+age-by-sex mean rather than scaling it, and the COPD decrement is not stacked on
+top of it, because the impaired categories already embed a slower walker:
+
+\begin{equation}
+\label{eq:speed}
+v_i \sim
+\begin{cases}
+\mathcal{N}_{[0.4,\,2.2]}(0.95,\ 0.32) & \text{mobility limited}\\[3pt]
+\mathcal{N}_{[0.4,\,2.2]}\!\left(\mu_{a,s} - 0.19\,\delta^{\mathrm{COPD}}_i,\
+  0.13\,\mu_{a,s}\right) & \text{otherwise}
+\end{cases}
+\end{equation}
+
+\noindent where $\mu_{a,s}$ is the published mean for age decade $a$ and sex $s$,
+and $\delta^{\mathrm{COPD}}_i \in \{0,1\}$. The standard deviation comes from
+Bohannon's \emph{within-population} coefficient of variation, never from the
+2011 meta-analysis's confidence intervals. Those are between-study intervals;
+using them would understate the spread of individual walking speeds by a factor
+of three to five. Fig.~\ref{fig:speed} shows the resulting distributions.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{fig6_speed}
+  \caption{Sampled comfortable walking speeds by group. The mobility-limited
+  distribution is a replacement for, not a rescaling of, the age-by-sex
+  distribution. Asthma appears in no group here, because no published gait-speed
+  decrement exists for it; that absence propagates directly into the equity
+  result in Fig.~\ref{fig:equity}.}
+  \label{fig:speed}
+\end{figure}
+
+\subsubsection{Movement and routing}
+
+The street layer is reprojected to WGS84 at load and converted into an
+undirected graph of 89,322 nodes and 112,070 edges, with each edge weighted by
+its geodesic polyline length \cite{karney2013}. The shapefile's own length
+attribute is deliberately not trusted, because its unit is undocumented. One
+Dijkstra tree \cite{dijkstra1959} is computed per shelter at setup; because the
+graph is undirected, the distance from any agent's node to a shelter is then a
+constant-time lookup, which is what allows a 312-hour run at $n=6{,}842$ to
+complete in under a minute. Each tick, an agent consumes a budget of
+$v_i \times 60 \times \Delta t$ metres along its routed polyline, finishing any
+partial segment with a geodesic direct solve, so movement follows the street
+network at exact arc length rather than interpolating in a straight line.
+
+\runinhead{A defect in the street data.} During validation I found that 27 node
+identifiers were claimed by different street features at locations 9 to 18.5~km
+apart. The shapefile contains no multi-part geometry, so this was a pure
+attribute defect. Its effect was severe: the affected edges were \emph{weighted}
+in metres but \emph{spanned} kilometres, so the shortest-path search
+under-costed them, agents routed through them, and then traversed the gap in a
+straight line. Twenty-two of fifty agents in a test run had inflated journeys,
+with travel distance up to 15 times too large and inhaled dose three times too
+large, and shelter \emph{choice} could be wrong rather than merely shelter
+distance.
+
+I corrected it without deleting anything. Every duplicate claim beyond the first
+is either reattached to a geometrically coincident junction within 10~m (4
+cases) or split onto a new synthetic node at its true location (23 cases), with
+every correction written into the run manifest. The 100~m clustering threshold
+sits in an empty band in the data: legitimate endpoint scatter is sub-metre and
+the smallest corrupt displacement is about 1.65~km, so any threshold between
+those regimes yields the identical graph. After correction, impossible edges
+fell from 50 to 0, the maximum endpoint gap from 18.5~km to 11.9~m, and the
+component structure was unchanged.
+
+\subsubsection{Exposure, dose and health risk}
+\label{subsec:health}
+
+The model computes three quantities and never multiplies them together by
+accident. Exposure is the environmental integral, a property of the air:
+
+\begin{equation}
+\label{eq:exposure}
+E_i = \sum_{t} C(t)\,\Delta t
+\qquad [\mu\mathrm{g\ m}^{-3}\,\mathrm{h}]
+\end{equation}
+
+Inhaled dose is a property of the person, differing from exposure only by
+ventilation rate, which depends on activity and on nothing else:
+
+\begin{equation}
+\label{eq:dose}
+D_i = \sum_{t} C(t)\,\mathrm{IR}\!\left(\alpha_i(t)\right)\Delta t,
+\qquad
+\mathrm{IR} =
+\begin{cases}
+1.62\ \mathrm{m^3\,h^{-1}} & \alpha_i(t) = \text{walking}\\
+0.61\ \mathrm{m^3\,h^{-1}} & \text{otherwise}
+\end{cases}
+\end{equation}
+
+\noindent with rates from the EPA Exposure Factors Handbook \cite{epaefh2011}.
+Health risk is a third, separate quantity, $R_i = D_i \cdot w_i$, and
+$w_i = 1.0$ for every resident by design. Accrual stops when a resident is
+admitted; residents who are walking, stranded or turned away are all still
+outdoors and keep accruing.
+
+The reason $w_i$ is inert deserves a full account, because it is the single
+largest methodological change I made. The project originally specified an
+exposure weighted by relative risks: 1.45 for adults 65 and over, attributed to
+Di et al.\ \cite{di2017}, and 1.80 for chronic obstructive pulmonary disease,
+attributed to ``Anderson et al.\ 2013''. Checking those against the publisher
+records found three problems.
+
+First, Di et al.\ is a real and excellent study of 60.9 million Medicare
+beneficiaries, and it reports a hazard ratio of 1.073 per 10~$\mu$g~m$^{-3}$ of
+annual PM$_{2.5}$---not 1.45. More fundamentally, its cohort is \emph{entirely}
+aged 65 and over, so the study design cannot produce an age contrast at all.
+Second, no paper matching ``Anderson et al.\ 2013'' with that finding exists.
+The nearest record is a 2013 study whose first author is Atkinson
+\cite{atkinson2013}, published in a different journal, examining cardiovascular
+disease incidence, and reporting no COPD effect-modification estimate. Third,
+and independent of the citations, multiplying an exposure by a relative risk is
+a category error: a relative risk is a ratio of outcome \emph{rates} between
+groups, not a multiplier on \emph{exposure}. The correct object would be a ratio
+of exposure--response coefficients, which is a different quantity, and the same
+underlying data yield an age multiplier anywhere between 1.008 and 2.5 depending
+only on which scale is chosen.
+
+There is also direct evidence against the specific value. A meta-analysis of
+eight studies reports an elderly-to-adult relative-risk ratio of 1.008 (95\% CI
+0.996--1.020)---a null result. The proposed 1.45 was not merely unsourced; the
+best available evidence suggests the true value is close to one.
+
+I therefore set all susceptibility weights to 1.0 and made \emph{stratified
+reporting} the primary equity metric: outcomes are reported separately for each
+group rather than collapsed into a weighted index that no source can justify.
+The weighting slot remains in the code so that a sourced coefficient has exactly
+one place to land, and so a reader can see that risk weighting is switched off
+rather than absent. For the same reason, inhalation rate is held constant across
+health status: no defensible population-specific ventilation multiplier for
+adults with asthma or COPD during walking was identified, and any figure would
+have been an assumption wearing a citation.
+
+\subsubsection{The three scenarios}
+\label{subsec:scenarios}
+
+The scenarios are not three guesses. Each answers the question the previous one
+measured. Scenario A is a \emph{measurement} rather than a treatment: its only
+job is to reveal which constraint binds. It reported capacity, so B relieves
+capacity and changes nothing else. B then revealed a second constraint, so C
+spends the identical total capacity differently.
+
+\begin{itemize}
+\item \textbf{A --- today.} All 36 clean-air-capable facilities at their real
+geocoded coordinates with their real capacities: 2,234 spaces.
+\item \textbf{B --- capacity meets demand.} Every real facility scaled by
+$6842/2234 = 3.0627$, apportioned by largest remainder so the system total is
+exactly 6,842. Coordinates, facility count and relative facility size unchanged.
+\item \textbf{C --- the same capacity, better placed.} Real facilities grow by
+only $1.5\times$; the remaining capacity becomes ten new facilities at
+algorithmically chosen street-network nodes. Total capacity is held identical to
+B at 6,842.
+\end{itemize}
+
+Because B and C hold total capacity exactly equal, a B$\rightarrow$C difference
+isolates \emph{where} the marginal capacity sits and nothing else. C never moves
+an existing facility: all 36 stay at their real coordinates, because a real
+shelter system cannot be picked up and set down elsewhere.
+
+The ten new locations come from a capacitated greedy $p$-median over candidate
+street nodes thinned to one per 600~m grid cell. The objective minimizes
+$\sum_{i,j} d_{ij} q_{ij}$, the network distance times residents served, plus a
+declared penalty per unfilled space. Facilities are placed largest-first and
+served demand is decremented before the next placement. This is a heuristic: it
+does not carry the $(1-1/e)$ submodularity guarantee, because shelter catchments
+overlap. The result is a good placement, not a provably near-optimal one, and
+the $1.5\times$ factor and the choice of ten sites are policy parameters rather
+than measured quantities.
+
+\subsubsection{Experimental design}
+
+Everything except the shelter file is held identical across arms: the same
+6,842 residents with the same identifiers, start coordinates, ages, sexes,
+mobility statuses, respiratory conditions and walking speeds; the same smoke
+field; the same street graph; the same parameters. Each arm was run with nine
+random seeds (42--50), giving 27 runs. Every reported result is seed 42, with
+the range across all nine seeds given alongside.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Results}
+\label{sec:results}
+
+\subsection{Verification}
+\label{subsec:verification}
+
+Before reporting outcomes I report what was checked, including several tests
+whose answers can be worked out by hand.
+
+The exposure integral was recomputed in Python directly from the raw EPA file,
+independently of the model. A resident who never reaches shelter should
+accumulate the full-window integral of 54,002.7~$\mu$g~m$^{-3}$~h; the model
+reports 54,002.8, a ratio of 1.0000. The same residents show a mean of
+173.09~$\mu$g~m$^{-3}$, a peak of 562.7, and 194.0 hours above threshold, each
+matching the independently computed value exactly.
+
+Routing was validated against a separate Python implementation of Dijkstra's
+algorithm over the same graph, which reproduces the Java network distances
+exactly across five tests. Realized walking speeds recovered from exported
+distance and time fall in 1.300--1.376~m~s$^{-1}$, inside the published Bohannon
+bounds. Re-running at seed 42 reproduces output bit-for-bit.
+
+A specific defect motivated one further check. A resident turned away at a full
+shelter originally re-planned its route from its immutable start node, which
+meant it walked back to its encampment before setting out again---inflating both
+distance and dose. The bug was invisible at the 50-agent test scale because no
+shelter ever filled there. After the fix, every run is checked against
+$\mathrm{walked} \leq \mathrm{planned} + \mathrm{snap\ gap} + 200$~m for every
+agent; in a capacity-binding reference run where 250 of 400 agents were refused
+at least once, the maximum unexplained distance was 8.9~m.
+
+Across the 27 production runs, six cross-run invariants hold: manifest seed and
+scenario code match the run; the working tree was clean for every run; the data
+version is identical across all nine seeds within each arm; the source-file
+checksum set is identical across all 27; each run exports exactly 6,842 resident
+records; and within each seed the population is byte-identical across arms,
+verified by SHA-256 over the joined attribute vector.
+
+\subsection{Access}
+\label{subsec:results-access}
+
+Table~\ref{tab:results} gives the headline outcomes and
+Fig.~\ref{fig:outcomes}(a) shows the access result.
+
+\begin{table}
+\caption{Outcomes at seed 42, with the range across all nine seeds in brackets.
+No range overlaps between arms on any metric. B and C hold identical total
+capacity, so the B$\rightarrow$C difference is attributable to placement alone.}
+\label{tab:results}
+\begin{tabular}{p{3.9cm}p{2.3cm}p{2.3cm}p{2.3cm}}
+\hline\noalign{\smallskip}
+ & A: today & B: more beds & C: better placed \\
+\noalign{\smallskip}\svhline\noalign{\smallskip}
+Facilities & 36 & 36 & 46 \\
+Total spaces & 2,234 & 6,842 & 6,842 \\
+Sheltered & 2,060 (30.1\%) & 6,264 (91.6\%) & \textbf{6,570 (96.0\%)} \\
+\quad range, 9 seeds & [2,053--2,064] & [6,257--6,268] & [6,563--6,574] \\
+Turned away, all full & 4,766 & 562 & \textbf{256} \\
+Spaces left empty & 174 & \textbf{578} & 272 \\
+No shelter reachable & 16 & 16 & 16 \\
+Mean distance walked (m) & 18,260 & 7,938 & \textbf{5,689} \\
+Mean hours above threshold & 135.8 & 17.5 & \textbf{8.6} \\
+Mean inhaled dose ($\mu$g) & 23,374 & 3,056 & \textbf{1,534} \\
+Person-hours above threshold & 928,934 & 119,921 & \textbf{59,060} \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+\end{tabular}
+\end{table}
+
+Today's system shelters 2,060 of 6,842 residents, or 30.1\%. Capacity binds
+hard: 4,766 residents are turned away because every reachable facility is full,
+and 33 of the 36 facilities finish at capacity. Raising capacity to meet demand
+at the same locations lifts this to 6,264 (91.6\%), a factor of 3.04. Total
+exposure falls 87.3\% and mean walking distance falls 56.5\%.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{fig2_outcomes}
+  \caption{(a) Residents reaching a shelter. (b) Spare capacity and unmet need in
+  the same run. Panel (b) is the central result: scenario B leaves 578 spaces
+  empty while turning 562 people away, so B has no shortage---it has exactly one
+  space per person---and fails anyway, because the spaces are where the buildings
+  are rather than where the people are.}
+  \label{fig:outcomes}
+\end{figure}
+
+\subsection{The geography failure}
+\label{subsec:results-geo}
+
+Scenario B leaves \textbf{578 spaces empty while turning 562 people away}. Those
+two numbers are nearly equal, and they are the reason scenario C exists. B has
+enough capacity for the entire population and still fails 562 people, because
+the added capacity went to the buildings that already exist rather than to the
+places where people are. That is a geography failure, and the design separates it
+cleanly from a capacity failure, because capacity is not binding in aggregate in
+B.
+
+Scenario C spends the identical 6,842 spaces. Refusals fall from 562 to 256,
+empty spaces from 578 to 272, mean walking distance by 28.3\%, total exposure by
+a further 50.7\%, and mean inhaled dose from 3,056 to 1,534~$\mu$g.
+Fig.~\ref{fig:map} shows the spatial arrangement that produces this.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{fig4_map}
+  \caption{Resident start points (grey) against facility locations, sized by
+  capacity. In (a) the existing facilities cluster away from much of the demand;
+  in (b) the ten new sites are placed into the demand surface itself. The
+  existing 36 facilities are unmoved between panels---only the new capacity is
+  placed.}
+  \label{fig:map}
+\end{figure}
+
+Relative to today, scenario C shelters 3.19 times as many residents, reduces
+total exposure by 93.8\%, person-hours above threshold by 93.6\%, and mean
+distance walked by 68.8\%. The ranking of interventions is therefore
+unambiguous: adding capacity is the first-order effect and placing it well is
+the second-order effect---but the second-order effect costs no additional
+spaces.
+
+\subsection{Equity}
+\label{subsec:results-equity}
+
+The second finding is one that an aggregate analysis cannot produce, because an
+evaluation tracking only total access would score scenario B as a near-complete
+success. Table~\ref{tab:equity} and Fig.~\ref{fig:equity} report access by
+group.
+
+\begin{table}
+\caption{Percentage of each group reaching a shelter, seed 42. Adding capacity at
+existing sites widens the mobility gap from 13.0 to 24.5 percentage points;
+spending the same capacity on well-placed sites returns it to 12.9 while lifting
+the slowest group from 71.9\% to 85.7\%.}
+\label{tab:equity}
+\begin{tabular}{p{4.3cm}p{1.5cm}p{1.5cm}p{1.5cm}p{1.5cm}}
+\hline\noalign{\smallskip}
+Group & Share (\%) & A (\%) & B (\%) & C (\%) \\
+\noalign{\smallskip}\svhline\noalign{\smallskip}
+Everyone & 100.0 & 30.1 & 91.6 & 96.0 \\
+Walks without difficulty & 80.1 & 32.7 & 96.4 & 98.6 \\
+Mobility limitation & 19.9 & 19.7 & 71.9 & 85.7 \\
+Age 65 and over & 5.2 & 22.4 & 82.4 & 89.8 \\
+COPD & 10.8 & 22.2 & 86.2 & 93.8 \\
+Asthma & 14.8 & 29.2 & 90.6 & 95.7 \\
+Chronic physical condition & 39.6 & 30.2 & 91.1 & 95.8 \\
+\noalign{\smallskip}\svhline\noalign{\smallskip}
+Mobility gap (points) & --- & 13.0 & 24.5 & 12.9 \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{fig3_equity}
+  \caption{Access by mobility status. Pouring 4,608 additional spaces into the
+  same buildings widens the gap, because extra capacity at an existing site is
+  captured first by whoever can walk there fastest; well-placed capacity narrows
+  it again. The gap is narrowed, not closed---14.3\% of residents with mobility
+  limitations are still outside in scenario C.}
+  \label{fig:equity}
+\end{figure}
+
+Capacity expansion alone \emph{widens} the equity gap. In scenario A the
+difference in access between residents who walk without difficulty and residents
+with a mobility limitation is 13.0 percentage points. Adding 4,608 spaces to the
+same buildings takes it to 24.5, because additional capacity at an existing site
+is claimed first by whoever reaches it fastest. Spending that identical capacity
+on well-placed new sites brings the gap back to 12.9 while raising the slowest
+group from 71.9\% to 85.7\%. The same pattern holds for residents aged 65 and
+over (22.4, 82.4, 89.8) and for residents with COPD (22.2, 86.2, 93.8).
+
+Asthma shows almost no access penalty while COPD shows a large one. This
+asymmetry is a direct consequence of the evidence, not an omission. A diagnosis
+can only affect an outcome in this model by affecting movement, because
+diagnosis is never a dose multiplier; COPD carries a published gait-speed
+decrement and asthma does not. Had I borrowed the COPD estimate for asthma to
+make the treatment symmetric, I would have manufactured a finding. The asymmetry
+is therefore evidence that the model is not inventing effects.
+
+\subsection{Robustness}
+\label{subsec:results-robust}
+
+Fig.~\ref{fig:seeds} shows every one of the 27 runs. The largest seed-to-seed
+spread on residents sheltered is 11 people; the smallest gap between two arms is
+306. The between-arm signal is approximately 28 times the within-arm noise, and
+no range overlaps between arms on any headline metric.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{fig5_seeds}
+  \caption{Residents sheltered in all 27 runs, on a logarithmic scale. The
+  vertical separation between arms is roughly 28 times the seed-to-seed spread
+  within an arm, so the ordering A $<$ B $<$ C is not an artifact of any
+  particular random draw.}
+  \label{fig:seeds}
+\end{figure}
+
+One detail falls out of the design as a free consistency check. The count of
+residents who can reach no shelter at all is identical across all three arms
+within each seed---16, 16, 16 at seed 42. Those residents sit on street-graph
+components containing no facility, so no amount of capacity or re-placement
+reaches them, and the number varies only with which residents were sampled.
+
+\subsection{Calibration}
+\label{subsec:calibration}
+
+Against the one observed occupancy record I could locate---a contemporaneous
+news report of approximately 130 of 198 spaces occupied on 16 September
+2020---a historical reference configuration of the model fills all 198. That is
+a 1.52 times over-prediction. I attribute it to the assumption that every
+resident knows the shelters exist, against local survey evidence that 65\% of
+unsheltered respondents had never heard of them. Every ``reached a shelter''
+figure in this chapter is therefore an \emph{upper bound}, and the wording used
+throughout is that placement improves outcomes \emph{under the modelled
+assumptions}, never that the model reproduces what happened.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusion}
+\label{sec:conclusion}
+
+\subsection{Applications}
+
+The practical implication is a ranking. If Multnomah County can add clean-air
+shelter capacity, that dominates every other intervention modelled here: it
+moves access from 30.1\% to 91.6\% and cuts total exposure by 87.3\%. But the
+second finding is the one with no budget attached. Once capacity is adequate in
+aggregate, \emph{where} the marginal capacity sits determines whether it is
+usable, and the model puts a number on that: the same 6,842 spaces halve
+refusals and halve inhaled dose depending only on placement.
+
+The equity result sharpens this into an operational warning. A capacity
+expansion evaluated on aggregate access would look like a success while the gap
+between residents who walk easily and residents who do not nearly doubled. Any
+real expansion should be evaluated on stratified access, not on totals.
+
+The method generalizes beyond smoke. The same structure---a hazard field, a
+population with heterogeneous mobility at real locations, and a capacitated set
+of refuges on a real network---applies to extreme-heat cooling centers, warming
+shelters, and emergency distribution points. The specific finding that
+capacity-at-existing-sites widens mobility gaps is a hypothesis those settings
+could test.
+
+\subsection{Concerns and Next Steps}
+
+\runinhead{What this does not claim.} No health outcome is modelled. The model
+measures exposure and inhaled particulate mass, and predicts no illness,
+hospitalization or death. The ten new sites are street-network nodes, not
+buildings: no zoning, cost, staffing or indoor-air-filtration analysis stands
+behind them. The $1.5\times$ expansion factor, the choice of ten sites, and B's
+uniform $3.06\times$ scale-up are policy parameters, not measurements; the
+comparison establishes direction, and magnitudes would move with different
+values.
+
+\runinhead{Limitations that cut against the result.} Several known problems work
+against the conclusions rather than for them, and are stated for that reason.
+Ten day centers are excluded because none publishes a capacity, yet in a daytime
+smoke episode they are plausibly the most relevant clean-air spaces that
+exist---so scenario A understates present-day daytime availability, which is the
+baseline the other arms are compared against. Every mobility-limited resident is
+assigned the \emph{fastest} of the published impaired-movement categories, so the
+modelled mobility penalty is conservative and the real access disparity is
+probably larger than reported. Two real facilities totalling about 207 people of
+capacity are missing entirely because neither publishes an address.
+
+\runinhead{Limitations of the inputs.} The PM$_{2.5}$ field is spatially uniform,
+because with two in-county monitors any interpolation would manufacture gradients
+the data cannot support; a consequence is that placement can only help by
+reducing time outdoors, never by moving people into cleaner air. The monitors are
+non-reference instruments that most likely understate true concentrations during
+fresh wood smoke. Encampment locations are 2025--26 complaint-driven reports used
+as a spatial proxy for 2020. Sex and mobility distributions are 2019 inside an
+otherwise 2026 study, and asthma and COPD prevalences are imported from a
+Minnesota cohort because no local equivalent exists. Admission is
+order-dependent: residents are served in shuffle order rather than by need, which
+matters most in scenario A where capacity binds hardest.
+
+\runinhead{Next steps.} The most valuable single addition is an awareness model.
+The one sourced behavioral parameter available---that 65\% of surveyed
+unsheltered residents had never heard of the clean-air shelters---is not yet
+implemented, and implementing it as a Bernoulli draw with a swept rate would
+convert every access figure from an upper bound into an interval. Second,
+order-independent two-phase admission would remove the shuffle-order dependence
+that currently affects scenario A. Third, a needs-based triage policy could be
+compared against the current first-come-first-served rule, which would let the
+equity result be attacked by policy rather than only by geometry. Finally, the
+$1.5\times$ and ten-site parameters should be swept to trace the full trade-off
+curve between enlarging existing facilities and building new ones.
+
+\begin{acknowledgement}
+This work was completed through the National Science Foundation Research
+Experiences for Undergraduates program, Computational Modeling Serving Portland,
+hosted by Portland State University. I thank Prof.\ Christof Teuscher for his
+mentorship and guidance throughout the program.
+
+I directed the research, made all research decisions, and wrote the manuscript.
+Claude (Anthropic) assisted with coding, data-acquisition and analysis
+scripting, verification tooling, and documentation drafting, and assisted with
+the citation audit reported in Section~\ref{subsec:health}. I reviewed, revised
+and approved all outputs and take full responsibility for the final text.
+\end{acknowledgement}
+
+\runinhead{Code and data availability.} The full simulation source, analysis
+scripts, input data, configuration files and all 27 run manifests are available
+at \url{https://github.com/fxa28196/REU} under the MIT License. Every result in
+this chapter was produced from a clean working tree; each run manifest records
+its git commit, random seed, Java and Repast versions, every parameter value,
+and a SHA-256 checksum for every input file. The reported results use seeds 42
+through 50, with seed 42 as the reported run. The EPA air-quality data and the
+City of Portland campsite reports are public and their retrieval scripts are
+included; the street centerline file is redistributed as received, and its
+original release version and license could not be recovered, so the repository's
+licence file states its terms as unverified rather than relicensing it.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliography{references}
+\bibliographystyle{plain}
+
+\end{document}

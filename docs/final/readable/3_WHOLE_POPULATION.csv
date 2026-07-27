@@ -1,0 +1,4 @@
+Scenario,Total people,Shelters,Total beds available,People who got indoors,Percent who got indoors,Got indoors - range across 9 re-runs,Beds left empty,People turned away (shelters full),Turned away - range across 9 re-runs,People who could not reach any shelter,Average distance walked (km),Average smoke breathed in (micrograms),Smoke breathed - range across 9 re-runs,Total hours everyone spent in dangerous air
+A - Shelters as they are today,6842,36,2234,2060,30.1,"2,053 - 2,064",174,4766,"4,762 - 4,773",16,18.26,23374,"23,357 - 23,410",928934
+"B - Enough beds, but in the buildings we already have",6842,36,6842,6264,91.6,"6,257 - 6,268",578,562,558 - 569,16,7.94,3056,"3,039 - 3,089",119921
+"C - Same number of beds, ten of the new ones placed well",6842,46,6842,6570,96.0,"6,563 - 6,574",272,256,252 - 263,16,5.69,1534,"1,513 - 1,566",59060

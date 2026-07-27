@@ -314,3 +314,78 @@ reaches the model must carry this provisional status until confirmed.
 > https://github.com/fxa28196/REU
 
 A `CITATION.cff` file and Zenodo DOI are scheduled for roadmap commit 16.
+
+
+---
+
+## Sources of the implemented Phase-2 parameters
+
+Added 2026-07-26. Every source below backs a parameter that is live in the final
+runs. Previously this file documented only the superseded uniform walking speed,
+which meant the citation registry was a generation behind the model.
+
+- **Bohannon RW & Williams Andrews A (2011).** Normal walking speed: a
+  descriptive meta-analysis. *Physiotherapy* 97(3):182–189.
+  DOI [10.1016/j.physio.2010.12.004](https://doi.org/10.1016/j.physio.2010.12.004).
+  41 studies, n = 23,111. → age × sex comfortable gait means (V10 revised).
+
+- **Bohannon RW (1997).** Comfortable and maximum walking speed of adults aged
+  20–79 years: reference values and determinants. *Age and Ageing* 26(1):15–19.
+  DOI [10.1093/ageing/26.1.15](https://doi.org/10.1093/ageing/26.1.15).
+  → within-population coefficient of variation 0.13.
+
+- **Boyce KE, Shields TJ & Silcock GWH (1999).** Toward the characterization of
+  building occupancies for fire safety engineering: capabilities of disabled
+  people moving horizontally. *Fire Technology* 35(1):51–67.
+  DOI [10.1023/A:1015339216366](https://doi.org/10.1023/A:1015339216366).
+  **VERIFIED-IN-SECONDARY** via Tinaburri (2018), FEMTC proceedings.
+  → mobility-limited movement speed N(0.95, 0.32) m/s (V20).
+
+- **Buekers J, et al. (2024).** Gait differences between COPD and healthy
+  controls: systematic review and meta-analysis. *European Respiratory Review*
+  33(172):230253.
+  DOI [10.1183/16000617.0253-2023](https://doi.org/10.1183/16000617.0253-2023).
+  PMID 38657998. 25 studies, 1,015 people with COPD vs 2,229 healthy controls;
+  usual gait speed −19 cm/s (95% CI −28 to −11); evidence rated **low** by the
+  authors. → COPD walking-speed decrement (V24).
+
+- **Zellmer S, et al. (2025).** *Journal of General Internal Medicine*.
+  DOI [10.1007/s11606-025-09814-x](https://doi.org/10.1007/s11606-025-09814-x).
+  n = 20,139 adults with recent homelessness, EHR-diagnosed.
+  → asthma 0.15, COPD 0.105 (V21a, V21b).
+
+- **U.S. EPA (2011).** *Exposure Factors Handbook: 2011 Edition*, Chapter 6:
+  Inhalation Rates. EPA/600/R-09/052F. **VERIFIED-IN-SECONDARY.**
+  → activity-level ventilation rates, walking 1.62 m³/h and resting 0.61 m³/h
+  (V25), both carried with sweep ranges.
+
+- **UCSF Benioff Homelessness and Housing Initiative (2023).** *Toward a New
+  Understanding: the California Statewide Study of People Experiencing
+  Homelessness.* n = 3,198. → mobility-limitation age gradient (A-18).
+
+- **Brown RT, et al. (2017).** *The Gerontologist*.
+  DOI [10.1093/geront/gnw011](https://doi.org/10.1093/geront/gnw011).
+  Homeless adults aged 50+, n = 350; asthma-or-COPD 26.3%. → evidence that
+  respiratory prevalence has no material age gradient in this population, which
+  justifies sampling V21a/V21b independently of age.
+
+- **Lewer D, et al. (2019).** *BMJ Open*.
+  DOI [10.1136/bmjopen-2018-025192](https://doi.org/10.1136/bmjopen-2018-025192).
+  n = 1,336. → self-report upper bound bracketing asthma/COPD prevalence.
+
+- **Alman BL, et al. (2016).** *Environmental Health* 15:64.
+  DOI [10.1186/s12940-016-0146-8](https://doi.org/10.1186/s12940-016-0146-8).
+  → context for respiratory susceptibility during smoke; explicitly **not** used
+  as a per-agent multiplier (population-rate estimate).
+
+- **DeFlorio-Barker S, et al. (2019).** *Environmental Health Perspectives*
+  127(3):037006. DOI [10.1289/EHP3860](https://doi.org/10.1289/EHP3860).
+  → same role and same exclusion.
+
+- **Portland State University.** *Stories from the Outside* (n = 73). → the local
+  finding that 65% of surveyed unsheltered residents had never heard of the
+  clean-air shelters; the basis for treating modelled uptake as an upper bound
+  (A-12).
+
+- **Street Roots, 16 September 2020.** → observed shelter occupancy
+  (~130 of 198 beds) and the 99-bed capacity figure (D14, A-04).

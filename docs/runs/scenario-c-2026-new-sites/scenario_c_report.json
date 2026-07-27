@@ -1,0 +1,97 @@
+{
+  "scenario": "C - existing shelters slightly larger, plus new optimal sites",
+  "derived_from": "B2026-n6842-seed42",
+  "design": {
+    "existing_facilities": 36,
+    "existing_expansion_factor": 1.5,
+    "existing_capacity_before": 2234,
+    "existing_capacity_after": 3350,
+    "new_facilities": 10,
+    "new_capacity_total": 3492,
+    "total_capacity": 6842
+  },
+  "held_fixed_vs_scenario_B": [
+    "total system capacity (6,842)",
+    "population",
+    "demographics",
+    "PM2.5 field",
+    "street network",
+    "opening dates",
+    "every existing facility's real coordinates"
+  ],
+  "changed_vs_scenario_B": [
+    "existing sites grow 1.5x instead of 3.06x",
+    "the difference is built as new facilities at optimized locations"
+  ],
+  "method": "existing facilities fixed; demand assigned to the network-nearest facility with room; residual demand served by greedy capacity-aware p-median placement of new sites",
+  "demand_absorbed_by_existing_sites": 3069,
+  "demand_left_for_new_sites": 3773,
+  "new_sites": [
+    {
+      "id": "NEW_optimized_site_01",
+      "capacity": 350,
+      "lon": -122.684239,
+      "lat": 45.525066
+    },
+    {
+      "id": "NEW_optimized_site_02",
+      "capacity": 350,
+      "lon": -122.674314,
+      "lat": 45.514205
+    },
+    {
+      "id": "NEW_optimized_site_03",
+      "capacity": 349,
+      "lon": -122.685357,
+      "lat": 45.536118
+    },
+    {
+      "id": "NEW_optimized_site_04",
+      "capacity": 349,
+      "lon": -122.544555,
+      "lat": 45.489718
+    },
+    {
+      "id": "NEW_optimized_site_05",
+      "capacity": 349,
+      "lon": -122.574416,
+      "lat": 45.540881
+    },
+    {
+      "id": "NEW_optimized_site_06",
+      "capacity": 349,
+      "lon": -122.686929,
+      "lat": 45.58579
+    },
+    {
+      "id": "NEW_optimized_site_07",
+      "capacity": 349,
+      "lon": -122.675258,
+      "lat": 45.500394
+    },
+    {
+      "id": "NEW_optimized_site_08",
+      "capacity": 349,
+      "lon": -122.571918,
+      "lat": 45.465833
+    },
+    {
+      "id": "NEW_optimized_site_09",
+      "capacity": 349,
+      "lon": -122.543241,
+      "lat": 45.555387
+    },
+    {
+      "id": "NEW_optimized_site_10",
+      "capacity": 349,
+      "lon": -122.673484,
+      "lat": 45.519995
+    }
+  ],
+  "limitations": [
+    "new sites are street-network nodes, not verified venues with filtered indoor air",
+    "greedy p-median is a heuristic, not a proven global optimum",
+    "the 1.5x existing-expansion factor and the choice of 10 new sites are policy parameters, not measured quantities",
+    "no construction cost, staffing or siting feasibility is modelled"
+  ]
+}

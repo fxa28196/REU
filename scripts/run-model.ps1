@@ -25,22 +25,22 @@ $pluginsDir = Join-Path $repastHome 'eclipse\plugins'
 if (-not (Test-Path (Join-Path $javaHome 'bin\javac.exe'))) { throw "JDK not found at $javaHome (set JAVA_HOME)" }
 if (-not (Test-Path $pluginsDir)) { throw "Repast plugins not found at $pluginsDir (set REPAST_HOME)" }
 
-# ---- Build compile classpath: repast/libs/saf/groovy jars + unpacked plugin bin dirs ----
-$jars = Get-ChildItem $pluginsDir -Recurse -Filter *.jar |
-        Where-Object { $_.FullName -match 'repast\.simphony|[\\/]libs\.|[\\/]saf\.|groovy' } |
-        Select-Object -ExpandProperty FullName
-$binDirs = Get-ChildItem $pluginsDir -Directory |
-           ForEach-Object { Join-Path $_.FullName 'bin' } |
-           Where-Object { Test-Path $_ }
-$cp = ($jars + $binDirs) -join ';'
-
-# ---- Compile src -> bin (bin is what Geography.rs/user_path.xml expects) ----
-$srcFiles = Get-ChildItem (Join-Path $projectDir 'src') -Recurse -Filter *.java |
-            Select-Object -ExpandProperty FullName
-$argFile = Join-Path $PSScriptRoot 'cp.args'
-Set-Content -Path $argFile -Value ("-cp `"$cp`"") -Encoding utf8
-& (Join-Path $javaHome 'bin\javac.exe') "@$argFile" -encoding UTF8 -d (Join-Path $projectDir 'bin') @srcFiles
-if ($LASTEXITCODE -ne 0) { throw "javac failed with exit code $LASTEXITCODE" }
+# ---- Compile src -> bin via Gradle ----
+# Gradle owns the classpath (build.gradle resolves the ~1,265 Repast plugin jars
+# as a fileTree) and targets Geography/bin, which is the directory
+# Geography.rs/user_path.xml scans for agent classes.
+#
+# This previously invoked javac directly with an @argfile. That is not viable on
+# Windows: javac treats a backslash inside an argfile as an escape character, so
+# every path in the classpath was silently corrupted (C:\Users -> C:Users) and
+# every Repast/GeoTools import failed to resolve.
+Push-Location $projectDir
+try {
+    & (Join-Path $projectDir 'gradlew.bat') compileJava --console=plain
+    if ($LASTEXITCODE -ne 0) { throw "gradlew compileJava failed with exit code $LASTEXITCODE" }
+} finally {
+    Pop-Location
+}
 Write-Host "Compile OK -> $projectDir\bin"
 if ($CompileOnly) { exit 0 }
 
