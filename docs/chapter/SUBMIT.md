@@ -40,15 +40,46 @@ Before the **23 August camera-ready**, do one of:
 If you decide to keep it private, delete the sentence and say instead that code
 is available on request — but do not leave a dead URL in a published chapter.
 
-### 0.3 Two checklist items are genuinely not done
+### 0.3 Licence — done. Zenodo DOI — needs ten minutes of your clicking
 
 | Checklist item | Status |
 |---|---|
-| Zenodo DOI minted and cited | **Not done.** Needs a public repo first (§0.2), then zenodo.org → GitHub integration → tag a release. |
-| MIT `LICENSE` file present | **Not done.** No LICENSE file exists in the repo. |
+| MIT `LICENSE` file present | **Done.** `LICENSE` at the repo root. |
+| Citation metadata | **Done.** `CITATION.cff` gives GitHub a "Cite this repository" button. |
+| Zenodo DOI minted and cited | **Prepared, not minted.** `.zenodo.json` is written; the archive needs your GitHub account and a public repo. Steps below. |
 
-Neither blocks the July draft. Both are quick, and both should be done before
-23 August.
+**About the licence.** It is MIT, but *scoped* — because a blanket MIT grant
+over this repository would have been false. The repo contains Springer's
+`svmult.cls`, 41 Repast dependency licences, EPA and City of Portland data, and
+the RLIS street file whose redistribution terms could not be recovered. The
+`LICENSE` file grants MIT over the work you actually authored (the model, the
+scripts, the docs, the registries, the shelter inventory you compiled) and then
+lists, by path, everything it does not cover and why. Read the second half of
+that file once, so you can answer for it if a reviewer asks.
+
+**Minting the DOI.** Do this *after* making the repo public (§0.2):
+
+1. Go to <https://zenodo.org> and sign in **with GitHub** (top right → Log in →
+   GitHub). This authorises Zenodo to see your repositories.
+2. Go to <https://zenodo.org/account/settings/github/>. Find `fxa28196/REU` in
+   the list and flip its toggle **On**. Zenodo now watches for releases.
+   *If the repo is not listed, press Sync and reload — a private repo will not
+   appear at all, which is why §0.2 comes first.*
+3. On GitHub: **Releases → Create a new release**. Tag `v1.0.0`, title it
+   `v1.0.0 — proceedings chapter`, and publish.
+4. Wait a minute or two, then reload the Zenodo GitHub page. The release appears
+   with a DOI badge like `10.5281/zenodo.1234567`.
+5. **Use the "Concept DOI", not the version DOI.** Zenodo issues two: one that
+   always resolves to the newest version, and one pinned to `v1.0.0`. Cite the
+   concept DOI so the reference stays alive if you release again.
+6. Put it in three places:
+   - `CITATION.cff` — uncomment the `doi:` line and fill it in.
+   - `chapter.tex` — add it to the code-availability paragraph, e.g.
+     *"...under the MIT License, archived at
+     \\url{https://doi.org/10.5281/zenodo.XXXXXXX}."*
+   - A GitHub README, if you add one — Zenodo gives you a badge to paste.
+
+Nothing here blocks the July draft. Do it before 23 August.
 
 ---
 
