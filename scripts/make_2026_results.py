@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Turn the nine 2026 runs into results a non-specialist can read.
+"""Turn the 2026 three-arm runs into results a non-specialist can read.
 
-Reads Geography/output/{A,B,C}2026-n6842-seed{42,43,44}/ and writes
+Reads Geography/output/{A,B,C}2026-n6842-seed{42..50}/ (27 runs: nine seeds
+per arm after the second and third replication batches) and writes
 docs/final/results-2026/:
 
   1_EVERY_PERSON.csv        one row per resident per scenario, plain English
@@ -22,7 +23,7 @@ import matplotlib.pyplot as plt
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs/final/results-2026"
 FIG = OUT / "figures"
-SEEDS = [42, 43, 44]
+SEEDS = list(range(42, 51))   # 42..50 - all three replication batches
 ARMS = {
     "A": "A - Today (real shelters, real number of beds)",
     "B": "B - More beds, in the places we already have",

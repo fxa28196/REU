@@ -43,22 +43,32 @@ Because B and C hold total capacity equal at 6,842, a B→C difference isolates
 
 ## Results
 
-Seed 42; the range across seeds 42/43/44 is in brackets. **No range overlaps
-between arms.**
+Seed 42 is the reported run; the range across **all nine seeds (42–50)** is in
+brackets. Every run passed `scripts/verify_2026_runs.py` (clean git tree,
+matching source checksums, byte-identical population across arms within each
+seed); the full 27-run table is `results-2026/6_SEED_ROBUSTNESS.csv`.
+**No range overlaps between arms on any headline metric.**
 
 | | **A — today** | **B — bigger existing sites** | **C — modest growth + 10 new sites** |
 |---|---|---|---|
 | Facilities | 36 | 36 | **46** (36 real + 10 new) |
 | Total beds | 2,234 | 6,842 | 6,842 |
-| Got inside | **2,060 (30.1%)** [2,055–2,060] | **6,264 (91.6%)** [6,259–6,264] | **6,570 (96.0%)** [6,565–6,570] |
-| Turned away | **4,766** | **562** | **256** |
-| Couldn't reach any shelter | 16 | 16 | 16 |
-| Beds left empty | 174 | 578 | 272 |
-| Average walk | 18,260 m [18,260–18,356] | 7,938 m [7,938–8,085] | 5,689 m [5,198–5,689] |
+| Got inside | **2,060 (30.1%)** [2,053–2,064] | **6,264 (91.6%)** [6,257–6,268] | **6,570 (96.0%)** [6,563–6,574] |
+| Turned away | **4,766** [4,762–4,773] | **562** [558–569] | **256** [252–263] |
+| Couldn't reach any shelter | 16 [14–25] | 16 [14–25] | 16 [14–25] |
+| Beds left empty | 174 [170–181] | 578 [574–585] | 272 [268–279] |
+| Average walk | 18,260 m [17,996–18,410] | 7,938 m [7,841–8,522] | 5,689 m [5,198–5,689] |
 | Average hours in unhealthy air | 135.8 | 17.5 | **8.6** |
-| Person-hours in unhealthy air | 928,934 [928,934–929,924] | 119,921 [119,921–120,881] | **59,060** [59,060–59,724] |
-| Average smoke inhaled | 23,374 µg | 3,056 µg | **1,534 µg** |
+| Person-hours in unhealthy air | 928,934 [928,236–930,338] | 119,921 [119,155–121,255] | **59,060** [58,189–60,311] |
+| Average smoke inhaled | 23,374 µg [23,357–23,410] | 3,056 µg [3,039–3,089] | **1,534 µg** [1,513–1,566] |
 | Mean exposure (µg·m⁻³·h) | 37,802 | 4,789 | 2,361 |
+
+**Replication protocol.** The experiment was run three times with three seeds
+per batch: seeds 42/43/44 (the original set), 45/46/47 (second batch), and
+48/49/50 (third batch) — 27 runs in total, nine per arm. Batch parameter
+files are `Geography/batch/batch_params_2026_{A,B,C}_seed{42..50}.xml`;
+archived manifests for every run are under
+`docs/runs/present-day-three-arm/<arm>-seed<seed>/`.
 
 **A → B:** sheltered ×3.04, exposure **−87.3%**, person-hours **−87.1%**, walking **−56.5%**
 **B → C:** sheltered +4.9%, exposure **−50.7%**, person-hours **−50.8%**, walking **−28.3%**, **refusals cut in half (562 → 256)**
@@ -167,6 +177,7 @@ A, B and C for all three seeds). Only the shelters differ.
 | `figures/fig4_map.png` | where people are vs where the beds are |
 | `figures/fig5_walking.png` | how far people had to walk |
 | `figures/fig6_dose.png` | smoke actually breathed in |
+| `6_SEED_ROBUSTNESS.csv` | all 27 runs (9 seeds × 3 arms): every headline metric per run, plus per-arm min/mean/max |
 
 ---
 
