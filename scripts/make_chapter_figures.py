@@ -98,7 +98,9 @@ def fig_event():
     ax.fill_between(hrs, 0, pm, color="#8a6a4f", alpha=0.18, lw=0)
     ax.plot(hrs, pm, color="#6b4f38", lw=1.1)
     ax.axhline(55.5, color="#c4342c", ls="--", lw=1.0)
-    ax.annotate(r"EPA ``Unhealthy'' threshold, 55.5 $\mu$g m$^{-3}$",
+    # Plain text only: matplotlib is not running through LaTeX, so TeX quoting
+    # (``...'') and escapes (\%) would be drawn literally into the figure.
+    ax.annotate("EPA “Unhealthy” threshold, 55.5 $\\mu$g m$^{-3}$",
                 xy=(4, 70), fontsize=7.5, color="#c4342c", va="bottom")
     pk = max(range(312), key=lambda i: pm[i])
     ax.plot([pk], [pm[pk]], "o", ms=4, color="#6b4f38")
@@ -128,7 +130,7 @@ def fig_outcomes():
     ax.text(2.45, 6950, "population", ha="right", va="bottom",
             fontsize=7, color=GREY)
     for i, v in enumerate(got):
-        ax.text(i, v + 130, f"{v:,}\n{100*v/6842:.1f}\\%", ha="center",
+        ax.text(i, v + 130, f"{v:,}\n{100*v/6842:.1f}%", ha="center",
                 va="bottom", fontsize=7.5)
     ax.set_xticks(range(3))
     ax.set_xticklabels(arms)
@@ -189,7 +191,7 @@ def fig_equity():
     ax.set_yticklabels([LABEL[a] for a, _, _ in rows], fontsize=8)
     ax.set_xlim(0, 102)
     ax.set_ylim(-0.6, 2.8)
-    ax.set_xlabel(r"residents reaching a shelter (\%)")
+    ax.set_xlabel("residents reaching a shelter (%)")
     ax.plot([], [], "o", ms=6, color=GREY, label="walks without difficulty")
     ax.plot([], [], "s", ms=6, color=COL["A"], label="mobility limitation")
     ax.legend(frameon=False, loc="lower right", fontsize=7.5, ncol=2,
