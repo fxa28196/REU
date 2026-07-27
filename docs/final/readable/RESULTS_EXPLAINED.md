@@ -12,9 +12,11 @@ along real Portland streets toward the nearest shelter that still has room.
 We ran three scenarios. **Each one exists to answer the question the previous
 one raised.**
 
-* **Scenario A - today.** The 36 clean-air-capable facilities the county
+* **Scenario A - today.** The 36 shelter facilities the county
   actually operates, at their real addresses, with their real
-  2,234 spaces.
+  2,234 spaces. (They are not established to filter
+  their air, and the model does not simulate indoor air - reaching the door is
+  where it stops measuring.)
 * **Scenario B - more beds, same buildings.** Every real facility grows about
   3x, so the system holds exactly 6,842 - one bed per person. Nothing
   moves.
