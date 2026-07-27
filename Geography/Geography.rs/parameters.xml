@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <parameters>
+	<!-- NOTE ON DEFAULTS: these values are the GUI's schema. Headless batch runs read
+	     their OWN params file and fall back to the behaviour-preserving 0 when a switch
+	     is absent, so changing a default here affects the interactive GUI ONLY and cannot
+	     disturb the archived baseline. Defaults are set to the final study configuration
+	     (heterogeneous residents ON, real shelter opening dates ON) with numAgents=500 so
+	     that capacity binds and the GUI demonstrates the actual finding rather than a
+	     superseded configuration. -->
 	<parameter name="numAgents" displayName="Number of Agents" type="int"
-		defaultValue="100"
+		defaultValue="500"
 		isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 	/>
@@ -47,6 +54,38 @@
 	     length. Anchors the end-of-run export. -->
 	<parameter name="simulationHours" displayName="Simulated event hours" type="int"
 		defaultValue="312"
+		isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+	/>
+	<!-- Final study scenarios (09-DECISIONS.md; only two exist by design):
+	     0 = A, the real September-2020 shelter placement (DATA_SOURCES D1);
+	     1 = B, the same total capacity relocated to the street-network p-median
+	         optimum (scripts/optimize_shelters.py). B is a THEORETICAL siting
+	         optimum, not a policy recommendation - it ignores building
+	         availability, ownership, zoning, staffing and ADA access. -->
+	     2 = C, CAPACITY-NEUTRAL DEMONSTRATION ONLY - real locations and opening
+	         dates but total capacity raised to match the population, so that beds
+	         stop being the binding constraint. NOT real 2020 availability. -->
+	<parameter name="scenarioCode" displayName="Scenario (0=arm A current, 1=arm B optimized, 2=historical 2x99 beds)" type="int"
+		defaultValue="2"
+		isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+	/>
+	<!-- Heterogeneous residents (V18-V22, V10 revised): per-agent age, sex,
+	     mobility limitation, asthma, COPD and walking speed sampled from the
+	     sourced distributions in docs/science/phase2-human-agents/01-POPULATION.md
+	     and 03-MOVEMENT.md. 0 = every resident walks at the run-wide
+	     walkingSpeedMps and carries no attributes (the archived baseline). -->
+	<parameter name="enableHeterogeneity" displayName="Heterogeneous residents (0/1)" type="int"
+		defaultValue="1"
+		isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+	/>
+	<!-- Honour the real shelter opening dates (OCC 2020-09-10, CJ 2020-09-11;
+	     DATA_SOURCES D1). 0 = every shelter open from tick 0, which is
+	     counterfactual and is the source of blocking assumption A-02. -->
+	<parameter name="respectShelterOpeningDates" displayName="Honour shelter opening dates (0/1)" type="int"
+		defaultValue="1"
 		isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 	/>

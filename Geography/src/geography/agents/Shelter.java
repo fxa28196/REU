@@ -28,6 +28,20 @@ public class Shelter {
     private final double lon;
     private final double lat;
 
+    /** Tick this shelter opens / closes, from the real `opened`/`closed` dates in
+     *  the shelter CSV (D1: OCC 2020-09-10, CJ 2020-09-11, both to 2020-09-19).
+     *  Set by ContextCreator relative to the simulation start. Negative infinity
+     *  / positive infinity when the opening-date gate is disabled, which
+     *  reproduces the always-open behaviour of every run before this commit.
+     *
+     *  <p><b>Assumption (documented, A-02 mitigation).</b> The source gives a
+     *  DATE, not an hour, so opening is taken as 00:00 local on that date — the
+     *  earliest defensible reading. Real shelters opened later in the day, so
+     *  this UNDERSTATES pre-opening outdoor exposure; the direction of the bias
+     *  is known and stated rather than tuned away. */
+    private double openTick = Double.NEGATIVE_INFINITY;
+    private double closeTick = Double.POSITIVE_INFINITY;
+
     /** Street-graph node this shelter is snapped to (RLIS node id). */
     private long graphNodeId = -1;
     /** Dijkstra tree rooted at {@link #graphNodeId}; set once at context build. */
@@ -70,6 +84,26 @@ public class Shelter {
     public boolean hasSpace() {
         return capacity == null || occupancy < capacity;
     }
+
+    /** True if this shelter is physically open at the given tick. Always true
+     *  when the opening-date gate is disabled (openTick = -inf, closeTick = +inf). */
+    public boolean isOpenAt(double tick) {
+        return tick >= openTick && tick < closeTick;
+    }
+
+    /** True if this shelter can be selected and entered right now: operating in
+     *  the scenario, open on the calendar, and not yet full. */
+    public boolean isAvailableAt(double tick) {
+        return operating && isOpenAt(tick) && hasSpace();
+    }
+
+    public void setOpenWindowTicks(double openTick, double closeTick) {
+        this.openTick = openTick;
+        this.closeTick = closeTick;
+    }
+
+    public double getOpenTick() { return openTick; }
+    public double getCloseTick() { return closeTick; }
 
     public String getId() { return id; }
     public String getName() { return name; }

@@ -26,3 +26,4 @@ scripts/cp.args
 
 # ---- Redundant archive: the extracted, tracked copy lives at Geography/data/Streets.* ----
 /Streets.zip
+scripts/__pycache__/

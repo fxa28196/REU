@@ -64,6 +64,66 @@ public final class CsvLoader {
 		return rows;
 	}
 
+	/**
+	 * Strict variant of {@link #read(String)} for governance files, where a
+	 * silently mis-parsed row is worse than a failed run.
+	 *
+	 * <p>{@code read} pads short rows with {@code ""} and discards fields beyond
+	 * the header count, which is tolerant of the fetch-script outputs it was
+	 * written for. In a registry full of prose, one unquoted comma would shift
+	 * every later column and drop the last one entirely, with no error — so this
+	 * variant rejects any row whose field count differs from the header, and
+	 * rejects duplicate header names (which would otherwise overwrite silently).
+	 *
+	 * <p>Deliberately a separate method: {@code read} feeds the encampment
+	 * sampling that defines the baseline agent population, so its behaviour is
+	 * left untouched.
+	 */
+	public static List<Map<String, String>> readStrict(String path) {
+		List<Map<String, String>> rows = new ArrayList<Map<String, String>>();
+		try (BufferedReader br = new BufferedReader(
+				new InputStreamReader(new FileInputStream(path), StandardCharsets.UTF_8))) {
+			String headerLine = br.readLine();
+			if (headerLine == null) {
+				throw new IllegalStateException(path + ": file is empty");
+			}
+			if (!headerLine.isEmpty() && headerLine.charAt(0) == '﻿') {
+				headerLine = headerLine.substring(1);
+			}
+			String[] headers = splitCsv(headerLine);
+			for (int i = 0; i < headers.length; i++) {
+				for (int j = i + 1; j < headers.length; j++) {
+					if (headers[i].equals(headers[j])) {
+						throw new IllegalStateException(
+								path + ": duplicate column name '" + headers[i] + "'");
+					}
+				}
+			}
+			String line;
+			int lineNo = 1;
+			while ((line = br.readLine()) != null) {
+				lineNo++;
+				if (line.trim().isEmpty()) {
+					continue;
+				}
+				String[] fields = splitCsv(line);
+				if (fields.length != headers.length) {
+					throw new IllegalStateException(path + ": line " + lineNo + " has "
+							+ fields.length + " fields but the header declares " + headers.length
+							+ " (an unquoted comma in a prose field is the usual cause)");
+				}
+				Map<String, String> row = new LinkedHashMap<String, String>();
+				for (int i = 0; i < headers.length; i++) {
+					row.put(headers[i], fields[i]);
+				}
+				rows.add(row);
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Failed to read CSV: " + path, e);
+		}
+		return rows;
+	}
+
 	/** Splits one CSV line, honouring double-quoted fields and "" escapes. */
 	private static String[] splitCsv(String line) {
 		List<String> out = new ArrayList<String>();

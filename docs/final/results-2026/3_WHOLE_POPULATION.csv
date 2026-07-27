@@ -1,0 +1,28 @@
+Scenario,Seed,People in the simulation,Shelters,Total beds,Got inside,Got inside (%),Turned away (every shelter full),Could not reach a shelter,Beds left empty,Average walk (metres),Average hours in bad smoke,Average smoke breathed (micrograms),Total smoke exposure (all people),Total person-hours in unhealthy air
+"A - Today (real shelters, real number of beds)",42,6842,36,2234,2060,30.1,4766,16,174,18260,135.8,23374,258641539,928934
+"A - Today (real shelters, real number of beds)",43,6842,36,2234,2055,30.0,4762,25,179,18356,135.9,23400,258912202,929924
+"A - Today (real shelters, real number of beds)",44,6842,36,2234,2056,30.0,4762,24,178,18281,135.9,23395,258859976,929750
+"A - Today (real shelters, real number of beds)",45,6842,36,2234,2055,30.0,4771,16,179,18234,135.9,23399,258911050,929910
+"A - Today (real shelters, real number of beds)",46,6842,36,2234,2053,30.0,4773,16,181,17996,136.0,23405,259012014,930201
+"A - Today (real shelters, real number of beds)",47,6842,36,2234,2053,30.0,4771,18,181,18354,136.0,23410,259021883,930338
+"A - Today (real shelters, real number of beds)",48,6842,36,2234,2053,30.0,4766,23,181,18410,136.0,23410,259019858,930309
+"A - Today (real shelters, real number of beds)",49,6842,36,2234,2064,30.2,4764,14,170,18214,135.7,23357,258432011,928236
+"A - Today (real shelters, real number of beds)",50,6842,36,2234,2055,30.0,4767,20,179,18390,135.9,23402,258914152,929950
+"B - More beds, in the places we already have",42,6842,36,6842,6264,91.6,562,16,578,7938,17.5,3056,32765083,119921
+"B - More beds, in the places we already have",43,6842,36,6842,6259,91.5,558,25,583,7939,17.7,3080,33034278,120881
+"B - More beds, in the places we already have",44,6842,36,6842,6260,91.5,558,24,582,8085,17.7,3077,32989513,120805
+"B - More beds, in the places we already have",45,6842,36,6842,6259,91.5,567,16,583,8120,17.7,3082,33039715,120929
+"B - More beds, in the places we already have",46,6842,36,6842,6257,91.4,569,16,585,7841,17.7,3088,33134453,121188
+"B - More beds, in the places we already have",47,6842,36,6842,6257,91.4,567,18,585,7886,17.7,3088,33134856,121174
+"B - More beds, in the places we already have",48,6842,36,6842,6257,91.4,562,23,585,8002,17.7,3089,33140379,121255
+"B - More beds, in the places we already have",49,6842,36,6842,6268,91.6,560,14,574,8522,17.4,3039,32557100,119155
+"B - More beds, in the places we already have",50,6842,36,6842,6259,91.5,563,20,583,7898,17.7,3080,33033528,120867
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",42,6842,46,6842,6570,96.0,256,16,272,5689,8.6,1534,16156745,59060
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",43,6842,46,6842,6565,96.0,252,25,277,5198,8.7,1551,16399286,59659
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",44,6842,46,6842,6566,96.0,252,24,276,5443,8.7,1551,16364848,59724
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",45,6842,46,6842,6565,96.0,261,16,277,5637,8.8,1559,16429603,60088
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",46,6842,46,6842,6563,95.9,263,16,279,5434,8.8,1565,16520544,60244
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",47,6842,46,6842,6563,95.9,261,18,279,5387,8.8,1564,16515268,60154
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",48,6842,46,6842,6563,95.9,256,23,279,5603,8.8,1566,16525765,60311
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",49,6842,46,6842,6574,96.1,254,14,268,5415,8.5,1513,15934738,58189
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",50,6842,46,6842,6565,96.0,257,20,277,5507,8.8,1558,16425124,60015

@@ -15,6 +15,7 @@ import geography.agents.GisAgent;
 import geography.agents.Shelter;
 import geography.env.SmokeField;
 import geography.routing.StreetNetwork;
+import geography.science.ScienceRegistry;
 
 import repast.simphony.context.Context;
 
@@ -49,10 +50,17 @@ public class OutcomeLogger {
 	private final String simId;
 	private final String dataVersionTag;
 	private final StreetNetwork.ValidationReport netReport;
+	private final ScienceRegistry registry;
+	private final String scenarioName;
+	/** Null when heterogeneity is disabled; supplies realised-marginal reporting. */
+	private final geography.agents.PopulationSampler sampler;
 
 	public OutcomeLogger(Context<Object> context, SmokeField smokeField, long seed,
 			String[] paramNames, Object[] paramValues, String[] inputDataFiles,
-			StreetNetwork.ValidationReport netReport) {
+			StreetNetwork.ValidationReport netReport, ScienceRegistry registry,
+			String scenarioName, geography.agents.PopulationSampler sampler) {
+		this.scenarioName = scenarioName;
+		this.sampler = sampler;
 		this.context = context;
 		this.smokeField = smokeField;
 		this.seed = seed;
@@ -60,6 +68,7 @@ public class OutcomeLogger {
 		this.paramValues = paramValues;
 		this.inputDataFiles = inputDataFiles;
 		this.netReport = netReport;
+		this.registry = registry;
 		this.simId = "sim-" + java.time.LocalDateTime.now()
 				.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")) + "-seed" + seed;
 		StringBuilder cat = new StringBuilder();
@@ -98,12 +107,27 @@ public class OutcomeLogger {
 			// self-describing and analysable standalone. age/asthma/copd are
 			// intentionally EMPTY: not implemented (see CURRENT_MODEL_RUN.md);
 			// no value is invented.
+			// planned_route_m / snap_gap_m / door_refusals are appended per the
+			// append-only CSV contract (07-OUTPUTS.md, D-2): QC quantities for
+			// the A-17 walked-vs-planned routing-integrity check
+			// (total_travel_distance_m <= planned_route_m + snap_gap_m + tol),
+			// not new science.
 			w.println("agent_id,sim_id,commit,random_seed,data_version,"
-					+ "starting_encampment,shelter_reached,reached_shelter,"
+					+ "starting_encampment,start_lon,start_lat,shelter_reached,reached_shelter,"
 					+ "time_started_tick,time_started_local,time_arrived_tick,time_arrived_local,"
 					+ "travel_time_min,total_travel_distance_m,network_dist_to_shelter_m,"
 					+ "avg_pm25_ugm3,peak_pm25_ugm3,cumulative_dose_ugm3h,exposure_while_traveling_ugm3h,"
-					+ "vwe_ugm3h,hours_above_unhealthy,age,asthma,copd,age_rr,comorbidity_rr,final_state");
+					+ "vwe_ugm3h,hours_above_unhealthy,age,asthma,copd,age_rr,comorbidity_rr,final_state,"
+					+ "planned_route_m,snap_gap_m,door_refusals,"
+					// Heterogeneity block (V18-V22, V10 revised). EMPTY when
+					// heterogeneity is disabled - never a fabricated default.
+					+ "scenario,walking_speed_mps,age_years,age_band,sex,"
+					+ "mobility_limited,mobility_category,asthma_flag,copd_flag,"
+					+ "any_respiratory,chronic_physical,vulnerable_flag,"
+					// Exposure / dose / risk kept as three separate columns so
+					// physics and biology are never conflated (HEALTH_MODEL_AUDIT).
+					+ "air_volume_breathed_m3,mean_ventilation_m3h,"
+					+ "inhaled_dose_ug,health_risk_multiplier,health_risk_score");
 			for (GisAgent a : agents) {
 				boolean reached = a.getState() == GisAgent.State.SHELTERED;
 				String shelter = reached && a.getTargetShelter() != null ? a.getTargetShelter().getId() : "";
@@ -119,16 +143,45 @@ public class OutcomeLogger {
 				String avgPm = outH > 0 ? String.format(Locale.US, "%.2f", a.getExposureUgM3h() / outH) : "";
 				String netDist = Double.isNaN(a.getNetworkDistToShelterM()) ? ""
 						: String.format(Locale.US, "%.2f", a.getNetworkDistToShelterM());
+				// Real encampment start location (WGS84), 6 dp ~= 0.1 m. Empty
+				// rather than 0,0 if unset, so a missing coordinate can never be
+				// mistaken for a point in the Gulf of Guinea.
+				String startLonS = Double.isNaN(a.getStartLon()) ? ""
+						: String.format(Locale.US, "%.6f", a.getStartLon());
+				String startLatS = Double.isNaN(a.getStartLat()) ? ""
+						: String.format(Locale.US, "%.6f", a.getStartLat());
+				// age/asthma/copd legacy columns are filled from the sampled
+				// attributes when heterogeneity is on, and stay EMPTY when it is
+				// off (they were always "not implemented, no invented value").
+				geography.agents.PopulationSampler.Attributes at = a.getAttributes();
+				String legacyAge = at == null ? "" : String.valueOf(at.ageYears);
+				String legacyAsthma = at == null ? "" : (at.asthma ? "1" : "0");
+				String legacyCopd = at == null ? "" : (at.copd ? "1" : "0");
+				String het = (at == null)
+						? ",,,,,,,,,,"
+						: String.format(Locale.US, "%.4f,%d,%s,%s,%d,%s,%d,%d,%d,%d,%d",
+								at.walkingSpeedMps, at.ageYears, at.ageBand.label, at.sex,
+								at.mobilityLimited ? 1 : 0, at.mobilityCategory.label,
+								at.asthma ? 1 : 0, at.copd ? 1 : 0,
+								(at.asthma || at.copd) ? 1 : 0,
+								at.chronicPhysical ? 1 : 0,
+								isVulnerable(at) ? 1 : 0);
 				w.printf(Locale.US,
-						"%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s,%.2f,%.4f,%.4f,%.4f,%.4f,%s,%s,%s,%.3f,%.3f,%s%n",
+						"%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s,%.2f,%.4f,%.4f,%.4f,%.4f,%s,%s,%s,%.3f,%.3f,%s,%.2f,%.2f,%d,%s,%s,%.4f,%.4f,%.4f,%.3f,%.4f%n",
 						a.getName(), simId, commit, seed, dataVersionTag,
-						a.getEncampmentId(), shelter, reached ? "yes" : "no",
+						a.getEncampmentId(), startLonS, startLatS,
+						shelter, reached ? "yes" : "no",
 						startTick, startLocal, arrTick, arrLocal,
 						travelMin, a.getDistanceTraveledM(), netDist,
 						avgPm, a.getPeakConcUgM3(), a.getExposureUgM3h(), a.getExposureWhileTravelingUgM3h(),
 						a.getVweUgM3h(), a.getHoursAboveUnhealthy(),
-						"", "", "",
-						a.getAgeRR(), a.getComorbidityRR(), a.getState());
+						legacyAge, legacyAsthma, legacyCopd,
+						a.getAgeRR(), a.getComorbidityRR(), a.getState(),
+						a.getPlannedRouteM(), a.getSnapGapM(), a.getRetargetCount(),
+						csv(scenarioName), het,
+						a.getAirVolumeBreathedM3(), a.getMeanVentilationM3h(),
+						a.getInhaledDoseUg(), a.getHealthRiskMultiplier(),
+						a.getHealthRiskScore());
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("writeAgents failed", e);
@@ -208,7 +261,8 @@ public class OutcomeLogger {
 				w.println("      {\"file\": \"" + jsonEsc(inputDataFiles[i]) + "\", \"sha256\": \""
 						+ sha256(inputDataFiles[i]) + "\"}" + (i < inputDataFiles.length - 1 ? "," : ""));
 			}
-			w.println("    ]");
+			w.println("    ],");
+			writeSourceIntegrity(w);
 			w.println("  },");
 			w.println("  \"smoke_field\": {");
 			w.println("    \"county\": \"" + jsonEsc(smokeField.getCounty()) + "\",");
@@ -218,6 +272,23 @@ public class OutcomeLogger {
 			w.println("    \"out_of_range_lookups\": " + smokeField.getOutOfRangeLookups());
 			w.println("  },");
 			writeNetworkValidation(w);
+			writeGovernance(w);
+			writeStratifiedExposure(w, agents);
+			w.println("  \"scenario\": \"" + jsonEsc(scenarioName) + "\",");
+			if (sampler != null) {
+				w.printf(Locale.US, "  \"population_sampling\": {\"heterogeneity\": true, "
+						+ "\"n_sampled\": %d, \"realised_mobility_limited\": %.4f, "
+						+ "\"realised_asthma\": %.4f, \"realised_copd\": %.4f, "
+						+ "\"realised_any_respiratory\": %.4f, \"realised_age_55plus\": %.4f, "
+						+ "\"mean_walking_speed_mps\": %.4f, \"published_targets\": \"%s\"},%n",
+						sampler.getSampledCount(), sampler.getMobilityLimitedShare(),
+						sampler.getAsthmaShare(), sampler.getCopdShare(),
+						sampler.getAnyRespiratoryShare(), sampler.getAge55PlusShare(),
+						sampler.getMeanWalkingSpeedMps(),
+						jsonEsc(geography.agents.PopulationSampler.publishedTargets()));
+			} else {
+				w.println("  \"population_sampling\": {\"heterogeneity\": false},");
+			}
 			w.println("  \"population\": {");
 			w.println("    \"n_agents\": " + n + ",");
 			w.println("    \"pre_evac\": " + preEvac + ", \"sheltered\": " + sheltered
@@ -249,6 +320,89 @@ public class OutcomeLogger {
 		} catch (Exception e) {
 			throw new RuntimeException("writeSimulation failed", e);
 		}
+	}
+
+	/**
+	 * Complete file-integrity census, added after an audit found that
+	 * {@code input_datasets} checksummed only {@code Streets.shp} while the
+	 * routing graph is built from the node-ID attributes in {@code Streets.dbf}
+	 * — a modified .dbf with an unchanged .shp would have produced different
+	 * routing under an identical {@code data_version_tag}.
+	 *
+	 * <p>Deliberately a SEPARATE block: {@code data_version_tag} is left hashing
+	 * only the four model inputs so that it stays comparable with every
+	 * previously archived run. This block adds the sidecars and the governance
+	 * registries, plus a working-tree dirty flag, so a reviewer can verify the
+	 * full chain without breaking the existing one.
+	 */
+	private void writeSourceIntegrity(PrintWriter w) {
+		String[] files = {
+			"data/Streets.shp", "data/Streets.dbf", "data/Streets.shx",
+			"data/Streets.prj", "data/Streets.cpg",
+			"data/airnow/aqs_hourly_pm25_portland_2020-09.csv",
+			"data/shelters/shelters_2020-09.csv",
+			// The three present-day study arms. These replaced
+			// shelters_{A,B}_placement_*.csv, which belonged to the retired
+			// capacity-equalized 2020 design: those files still existed on disk,
+			// so this block kept checksumming them and silently omitted every
+			// shelter file that actually drove a run.
+			"data/shelters/shelters_2026_current_placement.csv",
+			"data/shelters/shelters_2026_expanded_capacity.csv",
+			"data/shelters/shelters_2026_expanded_plus_new_sites.csv",
+			"data/encampments/irp_campsite_reports_sample.csv",
+			"data/registry/variables.csv", "data/registry/assumptions.csv",
+		};
+		w.println("    \"source_integrity\": {");
+		w.println("      \"note\": \"Full checksum census including shapefile sidecars and the "
+				+ "governance registries. data_version_tag intentionally covers only the four "
+				+ "model inputs, to stay comparable with earlier archived runs.\",");
+		w.println("      \"git_working_tree_dirty\": " + gitWorkingTreeDirty() + ",");
+		w.println("      \"files\": [");
+		for (int i = 0; i < files.length; i++) {
+			w.println("        {\"file\": \"" + jsonEsc(files[i]) + "\", \"sha256\": \""
+					+ sha256(files[i]) + "\"}" + (i < files.length - 1 ? "," : ""));
+		}
+		w.println("      ]");
+		w.println("    }");
+	}
+
+	/**
+	 * True when tracked model sources are newer than the recorded git HEAD, i.e.
+	 * the run may have executed uncommitted code. An audit found nine archived
+	 * runs stamped a commit that could not reproduce them; this flag makes that
+	 * condition visible in the manifest instead of silent. Heuristic and
+	 * deliberately conservative: it compares file modification times against the
+	 * HEAD ref's own timestamp, so it errs toward reporting "true".
+	 */
+	private static String gitWorkingTreeDirty() {
+		try {
+			File head = new File(".git/HEAD");
+			if (!head.exists()) head = new File("../.git/HEAD");
+			if (!head.exists()) return "\"unknown\"";
+			String h = new String(Files.readAllBytes(head.toPath()), StandardCharsets.UTF_8).trim();
+			File ref = head;
+			if (h.startsWith("ref:")) {
+				File candidate = new File(head.getParentFile(), h.substring(4).trim());
+				if (candidate.exists()) ref = candidate;
+			}
+			long headTime = ref.lastModified();
+			File src = new File("src/geography");
+			if (!src.exists()) src = new File("Geography/src/geography");
+			return String.valueOf(newestFileTime(src) > headTime);
+		} catch (Exception e) {
+			return "\"unknown\"";
+		}
+	}
+
+	private static long newestFileTime(File dir) {
+		long newest = 0;
+		File[] kids = dir.listFiles();
+		if (kids == null) return newest;
+		for (File f : kids) {
+			long t = f.isDirectory() ? newestFileTime(f) : f.lastModified();
+			if (t > newest) newest = t;
+		}
+		return newest;
 	}
 
 	/** Street-graph validation provenance (docs/validation/STREET_NETWORK_VALIDATION.md):
@@ -283,6 +437,157 @@ public class OutcomeLogger {
 		}
 		w.println("    ]");
 		w.println("  },");
+	}
+
+	/** Scientific governance block (docs/science/REGISTRY_SCHEMA.md §3): what the
+	 *  model claims to know, how well, and what is still inert. Registry
+	 *  checksums are reported here rather than in {@code input_datasets} because
+	 *  they are governance metadata, not model inputs — adding them there would
+	 *  change {@code data_version_tag} and sever comparability with the archived
+	 *  baseline without any change to what the model reads. */
+	private void writeGovernance(PrintWriter w) {
+		if (registry == null) {
+			return;
+		}
+		w.println("  \"governance\": {");
+		w.println("    \"variables_file\": \"" + jsonEsc(registry.getVariablesPath())
+				+ "\", \"variables_sha256\": \"" + registry.getVariablesSha256() + "\",");
+		w.println("    \"assumptions_file\": \"" + jsonEsc(registry.getAssumptionsPath())
+				+ "\", \"assumptions_sha256\": \"" + registry.getAssumptionsSha256() + "\",");
+		w.println("    \"variable_count\": " + registry.variableCount()
+				+ ", \"assumption_count\": " + registry.assumptionCount() + ",");
+		w.print("    \"evidence_class_census\": {");
+		boolean first = true;
+		for (java.util.Map.Entry<String, Integer> e : registry.evidenceClassCensus().entrySet()) {
+			w.print((first ? "" : ", ") + "\"" + e.getKey() + "\": " + e.getValue());
+			first = false;
+		}
+		w.println("},");
+		w.println("    \"placeholder_variables\": " + jsonStringArray(registry.placeholderVariableIds()) + ",");
+		w.println("    \"blocking_assumptions\": " + jsonStringArray(registry.blockingAssumptionIds()));
+		w.println("  },");
+	}
+
+	private static String jsonStringArray(java.util.List<String> items) {
+		StringBuilder sb = new StringBuilder("[");
+		for (int i = 0; i < items.size(); i++) {
+			sb.append(i == 0 ? "" : ", ").append('"').append(jsonEsc(items.get(i))).append('"');
+		}
+		return sb.append(']').toString();
+	}
+
+	/**
+	 * "Vulnerable" for stratified reporting: aged 55+ (the PIT's own older-adult
+	 * boundary), OR mobility-limited, OR living with asthma or COPD.
+	 *
+	 * <p>This is a <b>reporting stratum, not a risk score</b>. It is a union of
+	 * measured/imported attributes with no weights attached, precisely because
+	 * decision D-3 rejected a multiplied vulnerability index: the coefficients
+	 * such an index needs do not exist for this population and could never be
+	 * validated here, since no health outcome is simulated. Reporting exposure
+	 * separately for this group supports the claim the model CAN make ("this
+	 * group accrued more exposure, and here is the mechanism") and not the one it
+	 * cannot ("this group suffered more harm").
+	 */
+	private static boolean isVulnerable(geography.agents.PopulationSampler.Attributes at) {
+		return at.ageYears >= 55 || at.mobilityLimited || at.asthma || at.copd
+				|| at.chronicPhysical;
+	}
+
+	/** Mean of a per-agent quantity over a stratum, or NaN if the stratum is empty. */
+	private static double strataMean(List<GisAgent> agents, String stratum, boolean wantMember,
+			java.util.function.ToDoubleFunction<GisAgent> value) {
+		double sum = 0;
+		int n = 0;
+		for (GisAgent a : agents) {
+			geography.agents.PopulationSampler.Attributes at = a.getAttributes();
+			if (at == null) {
+				continue;
+			}
+			if (inStratum(at, stratum) == wantMember) {
+				double v = value.applyAsDouble(a);
+				// NaN means "not applicable to this resident" (e.g. travel time
+				// for someone who never arrived); such residents are excluded
+				// from that mean rather than zero-filled, which would understate it.
+				if (!Double.isNaN(v)) {
+					sum += v;
+					n++;
+				}
+			}
+		}
+		return n == 0 ? Double.NaN : sum / n;
+	}
+
+	private static int strataCount(List<GisAgent> agents, String stratum, boolean wantMember) {
+		int n = 0;
+		for (GisAgent a : agents) {
+			geography.agents.PopulationSampler.Attributes at = a.getAttributes();
+			if (at != null && inStratum(at, stratum) == wantMember) {
+				n++;
+			}
+		}
+		return n;
+	}
+
+	private static boolean inStratum(geography.agents.PopulationSampler.Attributes at, String stratum) {
+		if ("age55plus".equals(stratum)) return at.ageYears >= 55;
+		if ("mobility_limited".equals(stratum)) return at.mobilityLimited;
+		if ("asthma".equals(stratum)) return at.asthma;
+		if ("copd".equals(stratum)) return at.copd;
+		if ("any_respiratory".equals(stratum)) return at.asthma || at.copd;
+		return isVulnerable(at);
+	}
+
+	/**
+	 * Susceptibility-stratified exposure and access (decision D-3, the study's
+	 * PRIMARY equity metric). For each stratum: how many, what share reached
+	 * shelter, mean dose, mean walked distance and mean walking speed — for
+	 * members and non-members alike, so every difference is reported with the
+	 * mechanism (speed → time outdoors) beside it rather than as a bare contrast.
+	 * Emitted only when heterogeneity is enabled; otherwise the strata do not exist.
+	 */
+	private void writeStratifiedExposure(PrintWriter w, List<GisAgent> agents) {
+		if (sampler == null) {
+			return;
+		}
+		String[] strata = { "vulnerable_any", "age55plus", "mobility_limited",
+				"asthma", "copd", "any_respiratory" };
+		w.println("  \"stratified_exposure\": {");
+		w.println("    \"definition\": \"vulnerable_any = age 55+ OR mobility-limited OR "
+				+ "asthma OR COPD; a REPORTING STRATUM, not a risk score (decision D-3)\",");
+		w.println("    \"strata\": [");
+		for (int i = 0; i < strata.length; i++) {
+			String s = strata[i];
+			for (int m = 0; m < 2; m++) {
+				boolean member = (m == 0);
+				int n = strataCount(agents, s, member);
+				w.printf(Locale.US,
+						"      {\"stratum\": \"%s\", \"member\": %b, \"n\": %d, "
+						+ "\"sheltered_share\": %.4f, \"mean_exposure_ugm3h\": %.2f, "
+						+ "\"mean_travel_m\": %.2f, \"mean_travel_time_min\": %.2f, "
+						+ "\"mean_walking_speed_mps\": %.4f}%s%n",
+						s, member, n,
+						strataMean(agents, s, member,
+								a -> a.getState() == GisAgent.State.SHELTERED ? 1.0 : 0.0),
+						strataMean(agents, s, member, a -> a.getExposureUgM3h()),
+						strataMean(agents, s, member, a -> a.getDistanceTraveledM()),
+						strataMean(agents, s, member, a -> travelMinutes(a)),
+						strataMean(agents, s, member, a -> a.getPersonalWalkingSpeedMps()),
+						(i == strata.length - 1 && m == 1) ? "" : ",");
+			}
+		}
+		w.println("    ]");
+		w.println("  },");
+	}
+
+	/** Minutes between departure and admission, NaN if the resident never arrived. */
+	private double travelMinutes(GisAgent a) {
+		double evac = a.getEvacuationTick();
+		double arr = a.getArrivalTick();
+		if (Double.isNaN(evac) || Double.isNaN(arr)) {
+			return Double.NaN;
+		}
+		return (arr - evac) * param("minutesPerTick");
 	}
 
 	// --- statistics ----------------------------------------------------------
