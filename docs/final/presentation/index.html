@@ -1,0 +1,1102 @@
+<title>More Beds or Better Beds — Wildfire Smoke Shelter Access in Multnomah County</title>
+<style>
+:root{
+  --paper:#faf9f7; --raised:#ffffff; --ink:#16191d; --ink-2:#454b53; --ink-3:#767d86;
+  --rule:#e2e0db; --rule-strong:#cbc8c1;
+  --arm-a:#c4342c; --arm-b:#1f6fb2; --arm-c:#0f7a5a;
+  --smoke:#8a6a4f; --smoke-fill:rgba(138,106,79,.16); --hazard:#c4342c;
+  --code-bg:#f3f1ec; --code-ink:#24272c; --code-key:#8a3f8f; --code-str:#0f6b4f;
+  --code-com:#7e848c; --code-num:#a8541c; --mark:#fff3c4;
+  --shadow:0 1px 2px rgba(20,23,28,.05),0 8px 24px -12px rgba(20,23,28,.14);
+  --sans:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+  --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,'Times New Roman',serif;
+  --mono:ui-monospace,'Cascadia Mono','Cascadia Code',Consolas,'SF Mono',Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#14171c; --raised:#1b1f25; --ink:#eceef1; --ink-2:#b3bac2; --ink-3:#818a95;
+    --rule:#2b3037; --rule-strong:#3d444d;
+    --arm-a:#e0655c; --arm-b:#4a9ad6; --arm-c:#2f9e78;
+    --smoke:#bd9b7c; --smoke-fill:rgba(189,155,124,.15); --hazard:#e0655c;
+    --code-bg:#111419; --code-ink:#d8dde3; --code-key:#c99bd0; --code-str:#7fc9a6;
+    --code-com:#6e7681; --code-num:#e0a06a; --mark:rgba(224,160,106,.22);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#14171c; --raised:#1b1f25; --ink:#eceef1; --ink-2:#b3bac2; --ink-3:#818a95;
+  --rule:#2b3037; --rule-strong:#3d444d;
+  --arm-a:#e0655c; --arm-b:#4a9ad6; --arm-c:#2f9e78;
+  --smoke:#bd9b7c; --smoke-fill:rgba(189,155,124,.15); --hazard:#e0655c;
+  --code-bg:#111419; --code-ink:#d8dde3; --code-key:#c99bd0; --code-str:#7fc9a6;
+  --code-com:#6e7681; --code-num:#e0a06a; --mark:rgba(224,160,106,.22);
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -14px rgba(0,0,0,.7);
+}
+:root[data-theme="light"]{
+  --paper:#faf9f7; --raised:#ffffff; --ink:#16191d; --ink-2:#454b53; --ink-3:#767d86;
+  --rule:#e2e0db; --rule-strong:#cbc8c1;
+  --arm-a:#c4342c; --arm-b:#1f6fb2; --arm-c:#0f7a5a;
+  --smoke:#8a6a4f; --smoke-fill:rgba(138,106,79,.16); --hazard:#c4342c;
+  --code-bg:#f3f1ec; --code-ink:#24272c; --code-key:#8a3f8f; --code-str:#0f6b4f;
+  --code-com:#7e848c; --code-num:#a8541c; --mark:#fff3c4;
+  --shadow:0 1px 2px rgba(20,23,28,.05),0 8px 24px -12px rgba(20,23,28,.14);
+}
+
+body{background:var(--paper);color:var(--ink);font-family:var(--serif);
+  font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+.wrap{max-width:78rem;margin:0 auto;padding:0 clamp(1.1rem,4vw,3rem);}
+.measure{max-width:38rem;}
+h1,h2,h3,h4,.ui{font-family:var(--sans);}
+h1,h2,h3{text-wrap:balance;letter-spacing:-.025em;font-weight:700;line-height:1.12;}
+h1{font-size:clamp(2.3rem,6.2vw,4.1rem);margin:0;font-weight:800;}
+h2{font-size:clamp(1.55rem,3.4vw,2.3rem);margin:0 0 .5rem;}
+h3{font-size:1.14rem;margin:2.2rem 0 .5rem;letter-spacing:-.012em;}
+p{margin:0 0 1.05rem;}
+a{color:inherit;text-underline-offset:.18em;text-decoration-color:var(--rule-strong);}
+a:hover{text-decoration-color:currentColor;}
+strong{font-weight:600;color:var(--ink);}
+em.q{font-style:italic;color:var(--ink-2);}
+:focus-visible{outline:2.5px solid var(--arm-b);outline-offset:3px;border-radius:3px;}
+
+.stage{display:grid;grid-template-columns:5.5rem 1fr;gap:0;
+  border-top:1px solid var(--rule);padding-top:2.6rem;margin-top:3.4rem;}
+.stage-tag{font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-3);padding-top:.42rem;line-height:1.5;}
+.stage-tag b{display:block;color:var(--ink);font-size:.78rem;letter-spacing:.06em;font-weight:600;}
+@media(max-width:720px){.stage{grid-template-columns:1fr;gap:.7rem;}.stage-tag{padding-top:0;}}
+
+.hero{padding:clamp(3rem,8vw,6rem) 0 1rem;}
+.eyebrow{font-family:var(--mono);font-size:.7rem;letter-spacing:.19em;
+  text-transform:uppercase;color:var(--ink-3);margin:0 0 1.5rem;line-height:1.9;}
+.eyebrow span{color:var(--hazard);}
+.deck{font-size:clamp(1.08rem,2.1vw,1.3rem);color:var(--ink-2);
+  max-width:36rem;margin:1.6rem 0 0;line-height:1.55;}
+.byline{font-family:var(--mono);font-size:.74rem;color:var(--ink-3);
+  margin-top:2.4rem;line-height:1.9;letter-spacing:.02em;}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr));
+  gap:1px;background:var(--rule);border:1px solid var(--rule);
+  margin:3rem 0 0;border-radius:4px;overflow:hidden;}
+.kpi{background:var(--raised);padding:1.15rem 1.15rem 1.3rem;}
+.kpi .n{font-family:var(--sans);font-size:clamp(1.6rem,3.6vw,2.15rem);
+  font-weight:700;letter-spacing:-.03em;line-height:1.05;
+  font-variant-numeric:tabular-nums;display:block;}
+.kpi .l{font-family:var(--mono);font-size:.63rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);margin-top:.5rem;display:block;line-height:1.5;}
+.a-ink{color:var(--arm-a);} .b-ink{color:var(--arm-b);} .c-ink{color:var(--arm-c);}
+
+figure{margin:2.2rem 0;}
+.fig-head{font-family:var(--sans);font-weight:600;font-size:1rem;
+  letter-spacing:-.008em;margin-bottom:.15rem;}
+.fig-sub{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;
+  color:var(--ink-3);text-transform:uppercase;margin-bottom:1.1rem;}
+figcaption{font-size:.9rem;color:var(--ink-2);margin-top:.9rem;
+  max-width:40rem;line-height:1.55;}
+figcaption b{color:var(--ink);}
+.chart{background:var(--raised);border:1px solid var(--rule);border-radius:5px;
+  padding:1.35rem 1.2rem 1rem;box-shadow:var(--shadow);position:relative;}
+svg{display:block;width:100%;height:auto;overflow:visible;}
+.legend{display:flex;flex-wrap:wrap;gap:.35rem 1.15rem;margin-top:.95rem;
+  font-family:var(--mono);font-size:.68rem;color:var(--ink-2);letter-spacing:.03em;}
+.legend i{width:.72rem;height:.72rem;border-radius:2px;display:inline-block;
+  vertical-align:-1px;margin-right:.42rem;}
+.tick{font-family:var(--mono);font-size:9.5px;fill:var(--ink-3);letter-spacing:.04em;}
+.vlab{font-family:var(--sans);font-size:11.5px;font-weight:600;fill:var(--ink);
+  font-variant-numeric:tabular-nums;}
+.glab{font-family:var(--mono);font-size:10px;fill:var(--ink-2);}
+.grid{stroke:var(--rule);stroke-width:1;}
+
+.spec{margin:1.8rem 0 2rem;border:1px solid var(--rule);border-radius:5px;
+  overflow:hidden;background:var(--raised);box-shadow:var(--shadow);}
+.spec-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:.5rem .9rem;
+  padding:.62rem .95rem;border-bottom:1px solid var(--rule);background:var(--raised);}
+.spec-path{font-family:var(--mono);font-size:.72rem;color:var(--ink);}
+.spec-what{font-family:var(--sans);font-size:.72rem;color:var(--ink-3);
+  margin-left:auto;letter-spacing:.02em;}
+.spec-code{background:var(--code-bg);overflow-x:auto;padding:.9rem 0;}
+.spec-code pre{margin:0;font-family:var(--mono);font-size:.755rem;line-height:1.72;
+  color:var(--code-ink);}
+.spec-code code{display:block;padding:0 1rem;white-space:pre;}
+.k{color:var(--code-key);} .s{color:var(--code-str);} .c{color:var(--code-com);font-style:italic;}
+.nm{color:var(--code-num);}
+.hl{background:var(--mark);border-radius:2px;padding:.05em 0;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;}
+.spec-notes{padding:.95rem 1.05rem 1.05rem;font-size:.885rem;border-top:1px solid var(--rule);}
+.spec-notes ol{margin:0;padding-left:1.15rem;display:grid;gap:.6rem;}
+.spec-notes li{color:var(--ink-2);line-height:1.55;}
+.spec-notes li b{color:var(--ink);}
+.spec-notes code,p code,td code,li code,.byline code{font-family:var(--mono);font-size:.86em;
+  background:var(--code-bg);padding:.1em .34em;border-radius:3px;color:var(--code-ink);}
+
+.tbl-wrap{overflow-x:auto;margin:1.5rem 0;border:1px solid var(--rule);
+  border-radius:5px;background:var(--raised);}
+table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:.84rem;}
+th,td{padding:.55rem .85rem;text-align:right;white-space:nowrap;
+  border-bottom:1px solid var(--rule);font-variant-numeric:tabular-nums;}
+th:first-child,td:first-child{text-align:left;white-space:normal;min-width:11rem;}
+thead th{font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-3);font-weight:400;
+  border-bottom:1.5px solid var(--rule-strong);white-space:normal;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr.tot td{font-weight:600;background:color-mix(in srgb,var(--rule) 34%,transparent);}
+td.hi{font-weight:600;}
+td.lt{text-align:left;white-space:normal;min-width:14rem;}
+
+.pull{border-left:3px solid var(--hazard);padding:.15rem 0 .15rem 1.15rem;
+  margin:1.9rem 0;font-family:var(--sans);font-size:clamp(1.06rem,2.2vw,1.28rem);
+  font-weight:600;letter-spacing:-.016em;line-height:1.4;max-width:34rem;}
+.pull.c{border-color:var(--arm-c);}
+.note{background:var(--raised);border:1px solid var(--rule);border-radius:5px;
+  padding:1rem 1.15rem;margin:1.6rem 0;font-size:.9rem;color:var(--ink-2);
+  line-height:1.58;max-width:42rem;}
+.note h4{margin:0 0 .4rem;font-size:.68rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:600;font-family:var(--mono);}
+.note.warn{border-left:3px solid var(--hazard);}
+.note b{color:var(--ink);}
+
+.arms{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));
+  gap:1rem;margin:1.8rem 0;}
+.arm{background:var(--raised);border:1px solid var(--rule);border-top:3px solid;
+  border-radius:5px;padding:1.1rem 1.15rem 1.2rem;box-shadow:var(--shadow);}
+.arm.a{border-top-color:var(--arm-a);} .arm.b{border-top-color:var(--arm-b);}
+.arm.c{border-top-color:var(--arm-c);}
+.arm h4{margin:0 0 .1rem;font-family:var(--sans);font-size:1.02rem;letter-spacing:-.014em;}
+.arm .cap{font-family:var(--mono);font-size:.66rem;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-3);margin-bottom:.7rem;}
+.arm p{font-size:.885rem;color:var(--ink-2);margin:0;line-height:1.55;}
+
+.srcs{font-size:.83rem;color:var(--ink-2);line-height:1.5;
+  display:grid;gap:.55rem;padding-left:1.2rem;margin:1rem 0;}
+.srcs li::marker{color:var(--ink-3);font-family:var(--mono);font-size:.75rem;}
+footer{border-top:1px solid var(--rule);margin-top:4rem;padding:2.2rem 0 3.5rem;
+  font-family:var(--mono);font-size:.72rem;color:var(--ink-3);line-height:1.9;}
+.tip{position:fixed;pointer-events:none;opacity:0;transition:opacity .1s;
+  background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:.7rem;
+  padding:.4rem .55rem;border-radius:4px;z-index:60;line-height:1.5;white-space:nowrap;
+  box-shadow:0 4px 14px rgba(0,0,0,.3);left:0;top:0;}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <p class="eyebrow">NSF REU · Computational Modeling Serving Portland · Portland State University<br>
+    Agent-based model · 6,842 residents · 27 simulation runs · <span>PM2.5 peak 562.7 µg/m³</span></p>
+  <h1>More beds,<br>or better beds?</h1>
+  <p class="deck">If the September 2020 wildfire smoke returned today, Multnomah County's
+    shelter system would reach fewer than one unsheltered person in three. This model asks
+    which fix actually works — and finds that the second-best intervention is free.</p>
+  <p class="byline">Fatima Asghar · mentor Prof. Christof Teuscher<br>
+    Repast Simphony 2.11 · Java 17 · commit <code>c0cd113</code></p>
+</header>
+
+<figure>
+  <div class="fig-head">The event that drives everything</div>
+  <div class="fig-sub">Hourly PM2.5, Multnomah County monitor mean · 7–19 September 2020 · EPA AQS parameter 88502</div>
+  <div class="chart"><svg id="pm25" viewBox="0 0 900 260" role="img"
+      aria-label="Hourly PM2.5 concentration over 312 hours, peaking at 562.7 micrograms per cubic metre on 12 September and remaining above the Unhealthy threshold for 194 of 312 hours."></svg></div>
+  <figcaption>Every value is measured, not modelled. The dashed line is
+    <b>55.5 µg/m³</b>, the lower bound of EPA's <em>Unhealthy</em> air-quality
+    category and the concentration at which residents in the model begin to
+    evacuate. The air stayed above it for <b>194 of 312 hours</b>. EPA's own
+    <code>IT</code> "Wildfire — U.S." qualifier is set on 1,576 rows spanning
+    exactly this window.</figcaption>
+</figure>
+
+<div class="kpis">
+  <div class="kpi"><span class="n a-ink">30.1%</span><span class="l">reach a shelter today</span></div>
+  <div class="kpi"><span class="n b-ink">91.6%</span><span class="l">with capacity raised to demand</span></div>
+  <div class="kpi"><span class="n c-ink">96.0%</span><span class="l">same beds, better placed</span></div>
+  <div class="kpi"><span class="n">27</span><span class="l">runs · 9 seeds × 3 arms</span></div>
+</div>
+
+<section class="stage">
+  <div class="stage-tag"><b>Question</b>Why three<br>scenarios</div>
+  <div>
+    <h2>Each scenario answers what the last one measured</h2>
+    <div class="measure">
+      <p>The three arms are not three guesses. Scenario A is a <em class="q">measurement,
+        not a treatment</em> — its only job is to reveal which constraint actually binds.
+        It reported: capacity. So B relieves capacity and changes nothing else. B then
+        revealed a second constraint, so C spends the <strong>identical</strong> total
+        capacity differently.</p>
+      <p>Because B and C both hold system capacity at exactly 6,842 spaces, any B→C
+        difference isolates <em>where the marginal capacity sits</em>, and nothing else.</p>
+    </div>
+
+    <div class="arms">
+      <div class="arm a"><h4>A · Today</h4><div class="cap">36 sites · 2,234 spaces</div>
+        <p>Every clean-air-capable facility the county actually operates, at its real
+          geocoded address with its real capacity. A measurement of the present system.</p></div>
+      <div class="arm b"><h4>B · More beds</h4><div class="cap">36 sites · 6,842 spaces</div>
+        <p>Every real facility scaled by 3.0627× so the system holds one space per
+          person. Locations untouched. Isolates capacity.</p></div>
+      <div class="arm c"><h4>C · Better beds</h4><div class="cap">46 sites · 6,842 spaces</div>
+        <p>Real facilities grow only 1.5×; the difference becomes ten new shelters
+          at algorithmically chosen locations. Same total. Isolates placement.</p></div>
+    </div>
+
+    <div class="note"><h4>What C does not do</h4>
+      <b>C never moves an existing shelter.</b> All 36 real facilities stay at their real
+      coordinates — a real shelter system cannot be picked up and set down somewhere else.
+      C only decides where <em>new</em> capacity goes.</div>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="stage-tag"><b>Stage 1</b>Population<br>6,842 people</div>
+  <div>
+    <h2>Every resident is a separate person</h2>
+    <div class="measure">
+      <p>The population count is the 2025 Tri-County Point-in-Time count: 10,526 people
+        experiencing homelessness in Multnomah County, more than 65% of them unsheltered
+        — about 6,842. Only the unsheltered are modelled, because only they are outdoors.</p>
+      <p>Each one is placed at one of <strong>2,981 distinct real campsite-report
+        locations</strong> and given an age, a sex, a mobility status, an asthma and COPD
+        status, and their own walking speed, each drawn from a published source.</p>
+    </div>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Target</th><th>Realised</th><th class="lt">Source</th></tr></thead>
+      <tbody>
+        <tr><td>Age 18–44 / 45–64 / 65+</td><td>52.7 / 42.3 / 5.0%</td><td>52.8 / 42.0 / 5.2%</td><td class="lt">Pathways Study 2026 · local, N=541</td></tr>
+        <tr><td>Male / female / other</td><td>68.4 / 29.3 / 2.3%</td><td>68.6 / 29.2 / 2.2%</td><td class="lt">2019 Multnomah PIT</td></tr>
+        <tr><td>Mobility limitation</td><td>19.2%</td><td>19.9%</td><td class="lt">2019 PIT — <em>a lower bound</em></td></tr>
+        <tr><td>Asthma</td><td>15.0%</td><td>14.8%</td><td class="lt">Zellmer 2025 · EHR, n=20,139</td></tr>
+        <tr><td>COPD</td><td>10.5%</td><td>10.8%</td><td class="lt">Zellmer 2025</td></tr>
+        <tr><td>Chronic physical condition</td><td>39.1%</td><td>39.6%</td><td class="lt">Pathways 2026 · local</td></tr>
+      </tbody></table></div>
+
+    <h3>The line of code that protects the whole experiment</h3>
+    <div class="measure">
+      <p>Repast shuffles agent execution order each tick using its default random stream
+        — the same stream that placed every resident at their encampment. Drawing a single
+        extra number from it would silently rewrite the entire population, and the result
+        would look completely normal.</p>
+    </div>
+
+    <div class="spec">
+      <div class="spec-head"><span class="spec-path">PopulationSampler.java:251</span>
+        <span class="spec-what">a private random stream</span></div>
+      <div class="spec-code"><pre><code><span class="c">/**
+ * @param seed the run's random seed; the attribute stream is derived from it
+ *             deterministically but kept separate from Repast's default
+ *             stream (see class doc).
+ */</span>
+<span class="k">public</span> PopulationSampler(<span class="k">long</span> seed) {
+    <span class="hl"><span class="k">this</span>.rng = <span class="k">new</span> Random(seed * <span class="nm">1000003L</span> + <span class="nm">17L</span>);</span>
+}
+
+<span class="c">/** Samples one resident. Call order defines the population for a given seed. */</span>
+<span class="k">public</span> Attributes sample() {
+    AgeBand band = AGE_BANDS[pick(AGE_WEIGHTS)];
+    <span class="c">// Age uniform within the published band (01-POPULATION.md §3.2 Option A:
+    // "sample age uniformly within published bands; zero invented structure").
+    // A fitted continuous distribution was considered and REJECTED — nothing
+    // constrains the within-band shape, so a curve would manufacture precision.</span>
+    <span class="k">int</span> ageYears = band.lowInclusive + rng.nextInt(band.highExclusive - band.lowInclusive);
+
+    Sex sex = SEXES[pick(SEX_WEIGHTS)];
+
+    <span class="k">boolean</span> mobilityLimited =
+            rng.nextDouble() &lt; (ageYears &gt;= <span class="nm">55</span> ? MOBILITY_P_55_PLUS : MOBILITY_P_UNDER_55);</code></pre></div>
+      <div class="spec-notes"><ol>
+        <li><b>The highlighted line is the whole safeguard.</b> A dedicated
+          <code>Random</code> seeded from <code>seed × 1000003 + 17</code> means attribute
+          draws never touch Repast's default stream. Verified consequence: adding the
+          entire heterogeneity layer left the archived baseline <b>byte-identical</b>.</li>
+        <li><b>The comment records a rejected alternative.</b> Age is uniform within each
+          published band because nothing constrains the within-band shape. Fitting a smooth
+          curve would have looked more sophisticated and manufactured precision no source
+          supports.</li>
+        <li><b>Mobility carries an age gradient, but the local total is held exact.</b>
+          The two probabilities (0.1522 under 55, 0.3478 at 55+) come from borrowing
+          <em>the ratio</em> in a California study while pinning <em>the marginal</em> to
+          Multnomah's measured 19.2%.</li>
+      </ol></div>
+    </div>
+
+    <h3>Walking speed is where demography becomes access</h3>
+    <div class="measure">
+      <p>Every other attribute is a reporting stratum. Speed is the only one that changes
+        who reaches a bed — so it is the only one allowed to.</p>
+    </div>
+
+    <div class="spec">
+      <div class="spec-head"><span class="spec-path">PopulationSampler.java:280</span>
+        <span class="spec-what">three evidence rules in eleven lines</span></div>
+      <div class="spec-code"><pre><code><span class="k">double</span> speed;
+<span class="k">if</span> (mobilityLimited) {
+    <span class="c">// Boyce's impaired categories already embed a slower, less able
+    // walker, so the COPD decrement is NOT stacked on top of them —
+    // same no-double-counting rule that makes mobility a replacement
+    // rather than a multiplier (03-MOVEMENT.md §3).</span>
+    <span class="hl">speed = truncatedNormal(IMPAIRED_SPEED_MEAN, IMPAIRED_SPEED_SD);</span>
+} <span class="k">else</span> {
+    <span class="k">double</span> mu = freeSpeedMean(ageYears, sex);
+    <span class="k">if</span> (copd) {
+        <span class="hl">mu = Math.max(SPEED_MIN_MPS, mu + COPD_SPEED_DELTA_MPS);</span>
+    }
+    speed = truncatedNormal(mu, SPEED_CV * mu);
+}</code></pre></div>
+      <div class="spec-notes"><ol>
+        <li><b>Mobility limitation replaces the speed; it does not scale it.</b>
+          <code>N(0.95, 0.32)</code> m/s from Boyce, Shields &amp; Silcock 1999. Multiplying
+          an age×sex mean by a factor would have been easier and wrong.</li>
+        <li><b>COPD is an additive −0.19 m/s</b>, matching how the source reports it:
+          Buekers et al. 2024, <em>European Respiratory Review</em>, 25 studies, 1,015
+          people with COPD vs 2,229 controls, usual gait speed <b>−19 cm/s (95% CI −28 to
+          −11)</b>. The authors rate the evidence <em>low</em> quality, so the registry
+          carries the full CI as a sweep range.</li>
+        <li><b>The two are never stacked.</b> A resident who is both mobility-limited and
+          has COPD gets Boyce's distribution only — the impaired categories already embed a
+          slower walker.</li>
+        <li><b>Asthma appears nowhere in this block.</b> That is deliberate and
+          searched-for: the literature supports lower physical <em>activity</em> among
+          adults with asthma, but no quantitative gait-speed decrement exists. Borrowing
+          COPD's number for symmetry would have manufactured a finding.</li>
+      </ol></div>
+    </div>
+
+    <div class="note"><h4>The trap that was avoided</h4>
+      The standard deviation comes from Bohannon 1997's <em>within-population</em>
+      coefficient of variation (0.13) — never from the 2011 meta-analysis's confidence
+      intervals. Those are <b>between-study</b> intervals; using them would understate the
+      real spread of individual walking speeds by three to five times.</div>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="stage-tag"><b>Stage 2</b>The city<br>89,322 nodes</div>
+  <div>
+    <h2>Real streets, and a real bug in them</h2>
+    <div class="measure">
+      <p>Residents walk on Portland's actual street centrelines — 112,070 polylines
+        forming an 89,322-node pedestrian graph, with every edge weighted by its
+        <strong>geodesic</strong> length on the WGS84 ellipsoid rather than the
+        shapefile's undocumented length column.</p>
+      <p>Then the graph turned out to be lying.</p>
+    </div>
+
+    <div class="note warn"><h4>The wormhole defect</h4>
+      27 node identifiers were claimed by different street features at locations
+      <b>9 to 18.5 km apart</b>. The shapefile contains zero multi-part geometry, so this
+      was a pure attribute defect in the <code>.dbf</code>. The effect: those edges
+      <em>weighed</em> metres but <em>spanned</em> kilometres. Dijkstra under-costed them,
+      agents routed through them, and then walked the gap in a straight line. Twenty-two of
+      fifty agents had journeys inflated — travel ×15, inhaled dose ×3 — and shelter
+      <em>choice</em> could be wrong, not merely shelter distance.</div>
+
+    <div class="spec">
+      <div class="spec-head"><span class="spec-path">StreetNetwork.java:286</span>
+        <span class="spec-what">correct, record, delete nothing</span></div>
+      <div class="spec-code"><pre><code><span class="c">// Pass 2 -- every ADDITIONAL site of an ID is a corrupt-attribute
+// symptom: correct it (reattach by geometry, else split), with provenance.</span>
+<span class="k">for</span> (List&lt;NodeSite&gt; sites : sitesByAttrId.values()) {
+    <span class="k">if</span> (sites.size() == <span class="nm">1</span>) { <span class="k">continue</span>; }
+    report.affectedAttrIds++;
+    NodeSite primary = sites.get(<span class="nm">0</span>);
+    <span class="k">for</span> (<span class="k">int</span> i = <span class="nm">1</span>; i &lt; sites.size(); i++) {
+        NodeSite s = sites.get(i);
+        s.distFromPrimaryM = geodesicDistanceM(s.anchor, primary.anchor);
+        NodeSite near = (NodeSite) primaryIndex.nearestNeighbour(
+                <span class="k">new</span> Envelope(s.anchor), s, CENTRE_DISTANCE);
+        <span class="k">if</span> (near != <span class="k">null</span> &amp;&amp; geodesicDistanceM(s.anchor, near.anchor) &lt;= REATTACH_TOLERANCE_M) {
+            <span class="hl">s.graphId = near.graphId;  s.reattached = <span class="k">true</span>;</span>
+            report.reattachedSites++;
+            report.corrections.add(<span class="k">new</span> Correction(<span class="s">"REATTACHED"</span>, s));
+        } <span class="k">else</span> {
+            <span class="hl">s.graphId = nextSyntheticId--;</span>
+            report.splitSites++;
+            report.corrections.add(<span class="k">new</span> Correction(<span class="s">"SPLIT"</span>, s));
+        }
+    }
+}</code></pre></div>
+      <div class="spec-notes"><ol>
+        <li><b>Two corrections, both conservative.</b> A duplicate site within 10 m of a
+          real junction is <em>reattached</em> to it (4 cases). Anything further away is
+          <em>split</em> onto a new synthetic node at its true location (23 cases). Nothing
+          is deleted, and no geometry is edited.</li>
+        <li><b>The 100 m threshold sits in an empty band.</b> Legitimate endpoint scatter
+          in this data is sub-metre; the smallest corrupt displacement is ~1.65 km. Any
+          threshold between those two regimes produces the identical graph — which is
+          exactly the registered sensitivity test.</li>
+        <li><b>Every correction is written to the run manifest</b> under
+          <code>street_network_validation</code>, so a reader can see precisely which nodes
+          were touched and why.</li>
+      </ol></div>
+    </div>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>After the fix</th><th>Before</th><th>After</th></tr></thead>
+      <tbody>
+        <tr><td>Impossible edges</td><td>50</td><td class="hi">0</td></tr>
+        <tr><td>Maximum endpoint gap</td><td>18.5 km</td><td class="hi">11.9 m</td></tr>
+        <tr><td>Graph components</td><td>154 / 60,444</td><td>unchanged</td></tr>
+        <tr><td>Longest journey, seed 42</td><td>875 min / 68.3 km</td><td class="hi">212 min / 16.5 km</td></tr>
+      </tbody></table></div>
+
+    <p style="font-size:.9rem;color:var(--ink-2);max-width:40rem"><b>Independent
+      validation.</b> A separate Python Dijkstra implementation
+      (<code>scripts/test_routing.py</code>) reproduces the Java distances exactly across
+      tests T1–T5, and confirms realised walking speeds of 1.300–1.376 m/s sit inside the
+      published Bohannon bounds.</p>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="stage-tag"><b>Stage 3</b>Behaviour<br>state machine</div>
+  <div>
+    <h2>When people leave, and what happens at the door</h2>
+    <div class="measure">
+      <p>Residents shelter in place, accruing exposure, until two conditions hold at once:
+        the air crosses 55.5 µg/m³ <strong>and</strong> somewhere is open to walk to. Then
+        they walk the routed path at their own speed to the nearest shelter that still has
+        room, re-evaluating whenever they are turned away.</p>
+    </div>
+
+    <div class="spec">
+      <div class="spec-head"><span class="spec-path">GisAgent.java:299</span>
+        <span class="spec-what">the refusal bug, and its fix</span></div>
+      <div class="spec-code"><pre><code><span class="k">if</span> (pathIndex &gt;= routePath.size()) {
+    <span class="c">// Reached the shelter's street node: request admission (V12).</span>
+    <span class="k">if</span> (targetShelter.isOpenAt(tick) &amp;&amp; targetShelter.admit()) {
+        state = State.SHELTERED;
+        arrivalTick = tick;
+    } <span class="k">else</span> {
+        <span class="c">// Filled since selection: the resident REMAINS at this
+        // shelter's street node and re-plans from there next tick,
+        // excluding full shelters (A-17 / Finding A: never re-plan
+        // from the immutable start node — that walked refused agents
+        // back to their encampment, inflating distance and dose).
+        // Bounded to avoid livelock.</span>
+        <span class="hl">currentNodeId = targetShelter.getGraphNodeId();</span>
+        targetShelter = <span class="k">null</span>;
+        routePath = <span class="k">null</span>;
+        pathIndex = <span class="nm">0</span>;
+        retargetCount++;
+        <span class="k">if</span> (retargetCount &gt; MAX_RETARGETS) { state = State.REFUSED_ALL_FULL; }
+    }
+}</code></pre></div>
+      <div class="spec-notes"><ol>
+        <li><b>The bug.</b> A resident turned away used to re-plan from
+          <code>startNodeId</code>, which is immutable and points at their encampment. They
+          were standing at the shelter door, so every new route began by walking all the way
+          back to where they started.</li>
+        <li><b>Why it stayed hidden.</b> At the 50-agent test scale no shelter ever filled,
+          so the code path never executed and every byte-identity regression gate passed.
+          It would have first appeared as a corrupted headline number at production
+          scale.</li>
+        <li><b>The highlighted line is the fix</b> — the routing origin moves to where the
+          resident actually is.</li>
+        <li><b>It is now guarded arithmetically.</b> Analysis check #38 asserts
+          <code>walked ≤ planned_route_m + snap_gap_m + 200 m</code> for every agent. In the
+          capacity-binding reference run — 250 of 400 agents refused at least once — the
+          maximum unexplained distance was <b>8.9 m</b>.</li>
+      </ol></div>
+    </div>
+
+    <div class="note"><h4>A second bug, found by adding a feature</h4>
+      Once real shelter opening dates were honoured, <code>REFUSED_ALL_FULL</code> being
+      terminal meant residents turned away from the Convention Center on 10 September never
+      tried Charles Jordan when it opened on the 11th — leaving <b>99 real beds at zero
+      occupancy</b>. Refusal is now a waiting state, re-evaluated every tick. It cannot
+      livelock: capacity never grows and each shelter opens exactly once.</div>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="stage-tag"><b>Stage 4</b>Metrics<br>three quantities</div>
+  <div>
+    <h2>Exposure, dose, and risk are not the same thing</h2>
+    <div class="measure">
+      <p>This separation is the most important scientific correction in the project, and it
+        is enforced structurally rather than by discipline.</p>
+    </div>
+
+    <div class="spec">
+      <div class="spec-head"><span class="spec-path">GisAgent.java:54</span>
+        <span class="spec-what">a contract written as a comment</span></div>
+      <div class="spec-code"><pre><code><span class="c">// ---- THREE DISTINCT QUANTITIES, DELIBERATELY NOT MIXED ------------------
+// 1. EXPOSURE  (exposureUgM3h)  = SUM C(t)*dt              [ug/m3 * h]
+//    Environmental concentration-time. Physics of the AIR. Verified against
+//    raw EPA AQS data to a ratio of 1.0000. Untouched by this block.
+// 2. INHALED DOSE (inhaledDoseUg) = SUM C(t)*IR(activity)*dt   [ug]
+//    Physics of the PERSON: how much particulate mass actually entered the
+//    airway. Differs from exposure only by ventilation rate, which depends
+//    on ACTIVITY (walking vs waiting), not on diagnosis.
+// 3. HEALTH RISK (healthRiskMultiplier) = a susceptibility weight.
+//    Biology. Currently 1.0 for everyone because no defensible
+//    population-specific coefficient exists (A-09, A-22). The slot exists so
+//    that risk can never be silently folded into dose.
+// The cardinal rule: ventilation is PHYSICS and may vary with activity;
+// susceptibility is BIOLOGY and stays out of the dose term entirely.</span>
+
+<span class="k">if</span> (smokeField != <span class="k">null</span> &amp;&amp; state != State.SHELTERED) {
+    <span class="k">double</span> c = smokeField.concentrationForTick(tick, minutesPerTick);
+    <span class="hl">exposureUgM3h += c * dtHours;</span>
+    <span class="k">double</span> ventilationM3h = (state == State.EN_ROUTE)
+            ? INHALATION_WALKING_M3H : INHALATION_RESTING_M3H;
+    <span class="hl">inhaledDoseUg += c * ventilationM3h * dtHours;</span>
+    <span class="k">if</span> (c &gt; UNHEALTHY_UGM3) { hoursAboveUnhealthy += dtHours; }
+}</code></pre></div>
+      <div class="spec-notes"><ol>
+        <li><b>Exposure</b> is Σ C·dt — a property of the air. Recomputed independently in
+          Python from the raw EPA file, it matches the model to a ratio of
+          <b>1.0000</b>.</li>
+        <li><b>Dose</b> multiplies by ventilation rate — 1.62 m³/h walking, 0.61 m³/h
+          waiting (EPA <em>Exposure Factors Handbook</em> 2011, Ch. 6). The rate depends on
+          <em>activity</em> and never on diagnosis.</li>
+        <li><b>Risk</b> is a separate multiplier that returns <code>1.0</code> for every
+          resident, by design, so that biology can never leak into the physics.</li>
+        <li><b>Accrual stops at <code>SHELTERED</code> and nowhere else.</b> Residents who
+          are walking, stranded, or turned away are all still outdoors and keep
+          accruing.</li>
+      </ol></div>
+    </div>
+
+    <h3>Why the risk weights are switched off</h3>
+    <div class="measure">
+      <p>The project's original design specified <code>VWE = PM2.5 × RR_age ×
+        RR_comorbidity</code>, with RR<sub>age</sub> = 1.45 for adults 65+ and
+        RR<sub>COPD</sub> = 1.80. Checking those citations against the publisher record
+        found something worse than wrong numbers.</p>
+    </div>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Claimed</th><th class="lt">Cited to</th><th class="lt">What the record says</th></tr></thead>
+      <tbody>
+        <tr><td>RR age ×1.45</td><td class="lt">Di et al. 2017</td>
+          <td class="lt">A real, excellent paper — but it reports HR 1.073 per 10 µg/m³, and its cohort is <b>entirely aged 65+</b>, so it cannot produce an age contrast at all.</td></tr>
+        <tr><td>RR COPD ×1.80</td><td class="lt">"Anderson et al. 2013"</td>
+          <td class="lt"><b>No such paper exists.</b> The nearest record is Atkinson et al. 2013 — a <em>cardiovascular</em> study with no COPD estimate.</td></tr>
+        <tr><td>RR asthma ×1.40</td><td class="lt">Zanobetti &amp; Schwartz 2009</td>
+          <td class="lt">Wrong journal, volume and pages; the real paper is a mortality time series that does not report asthma as an effect modifier.</td></tr>
+        <tr><td>RR under-18 ×1.22</td><td class="lt">"GBD MAPS / Kloog 2013"</td>
+          <td class="lt">Not a resolvable reference. "GBD MAPS" is a report series, not a paper.</td></tr>
+      </tbody></table></div>
+
+    <div class="pull">Even with correct numbers, multiplying exposure by a relative risk is
+      a category error — a relative risk is a ratio of outcome <em>rates</em>, not a
+      multiplier on <em>exposure</em>. And no weight could ever be validated here, because
+      no health outcome is simulated.</div>
+
+    <div class="measure">
+      <p>Independent check on the age question: Kondo et al. 2019's meta-analysis reports an
+        elderly-to-adult relative-risk ratio of <strong>1.008 (95% CI 0.996–1.020)</strong>
+        across eight studies — a null result. The proposed 1.45 was not merely unsourced;
+        the best available evidence says the true value is close to 1.</p>
+      <p>The resolution: weights are held at 1.0, and <strong>stratified reporting is the
+        primary metric</strong>. Outcomes are reported separately for each group rather
+        than collapsed into a weighted index that no source can justify.</p>
+    </div>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="stage-tag"><b>Stage 5</b>Results<br>27 runs</div>
+  <div>
+    <h2>Capacity is the first-order effect. Placement is free.</h2>
+
+    <figure>
+      <div class="fig-head">Who gets indoors</div>
+      <div class="fig-sub">Seed 42 · 6,842 residents · B and C hold identical total capacity</div>
+      <div class="chart"><svg id="c-inside" viewBox="0 0 900 300" role="img"
+        aria-label="Bar chart: scenario A shelters 2,060 people (30.1%), scenario B 6,264 (91.6%), scenario C 6,570 (96.0%)."></svg></div>
+      <div class="legend"><span><i style="background:var(--arm-a)"></i>A · today</span>
+        <span><i style="background:var(--arm-b)"></i>B · more beds</span>
+        <span><i style="background:var(--arm-c)"></i>C · better-placed beds</span>
+        <span><i style="background:var(--rule)"></i>left outside</span></div>
+      <figcaption>Raising capacity to meet demand is the dominant intervention. But B still
+        fails 562 people — and it does so while holding beds it cannot fill.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="fig-head">Empty beds and turned-away people, at the same moment</div>
+      <div class="fig-sub">Seed 42 · when both bars are tall, the beds exist in the wrong places</div>
+      <div class="chart"><svg id="c-geo" viewBox="0 0 900 290" role="img"
+        aria-label="Paired bars per scenario. A: 174 beds empty, 4,766 turned away. B: 578 empty, 562 turned away — nearly equal. C: 272 empty, 256 turned away."></svg></div>
+      <div class="legend"><span><i style="background:var(--ink-3)"></i>beds left empty</span>
+        <span><i style="background:var(--arm-a)"></i>people turned away</span></div>
+      <figcaption><b>This is the finding.</b> Scenario B leaves <b>578 beds empty while
+        turning 562 people away.</b> Those numbers are nearly equal. B has no shortage — it
+        has exactly one bed per person — and it still fails, because the beds went where the
+        <em>buildings</em> are rather than where the <em>people</em> are. That is a
+        geography failure, cleanly separated from a capacity failure.</figcaption>
+    </figure>
+
+    <div class="pull c">C spends the identical 6,842 beds. Refusals halve, empty beds halve,
+      walking drops 28%, and inhaled dose halves again.</div>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Seed 42 · range across nine seeds</th>
+        <th>A — today</th><th>B — more beds</th><th>C — better placed</th></tr></thead>
+      <tbody>
+        <tr><td>Facilities</td><td>36</td><td>36</td><td>46</td></tr>
+        <tr><td>Total spaces</td><td>2,234</td><td>6,842</td><td>6,842</td></tr>
+        <tr><td>Got inside</td><td class="hi">2,060 (30.1%)</td><td class="hi">6,264 (91.6%)</td><td class="hi">6,570 (96.0%)</td></tr>
+        <tr><td>&nbsp;&nbsp;<span style="color:var(--ink-3);font-family:var(--mono);font-size:.85em">range over 9 seeds</span></td>
+          <td style="color:var(--ink-3)">2,053–2,064</td><td style="color:var(--ink-3)">6,257–6,268</td><td style="color:var(--ink-3)">6,563–6,574</td></tr>
+        <tr><td>Turned away</td><td>4,766</td><td>562</td><td class="hi">256</td></tr>
+        <tr><td>Beds left empty</td><td>174</td><td class="hi">578</td><td>272</td></tr>
+        <tr><td>Could not reach any shelter</td><td>16</td><td>16</td><td>16</td></tr>
+        <tr><td>Average walk</td><td>18,260 m</td><td>7,938 m</td><td class="hi">5,689 m</td></tr>
+        <tr><td>Average hours in unhealthy air</td><td>135.8</td><td>17.5</td><td class="hi">8.6</td></tr>
+        <tr><td>Average smoke inhaled</td><td>23,374 µg</td><td>3,056 µg</td><td class="hi">1,534 µg</td></tr>
+        <tr class="tot"><td>Person-hours in unhealthy air</td><td>928,934</td><td>119,921</td><td>59,060</td></tr>
+      </tbody></table></div>
+
+    <div class="note"><h4>Signal against noise</h4>
+      Every arm was run with nine random seeds — 27 runs in total. The largest
+      seed-to-seed spread on "got inside" is <b>11 people</b>; the smallest gap between two
+      arms is <b>306</b>. The between-arm signal is roughly <b>28×</b> the within-arm noise,
+      and <b>no range overlaps between arms on any headline metric</b>.
+      <br><br>One detail falls out of the design as a free consistency check: <em>could not
+      reach any shelter</em> is identical across all three arms within each seed (16, 16,
+      16 in seed 42). Those residents sit on street-graph components containing no shelter
+      at all — no amount of capacity or re-placement reaches them, and the number varies
+      only with which residents were sampled.</div>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="stage-tag"><b>Stage 6</b>Equity<br>who is left</div>
+  <div>
+    <h2>Adding beds alone widens the gap</h2>
+    <div class="measure">
+      <p>This is the second finding, and it is the one a capacity-only analysis cannot
+        produce. An evaluation that tracked only aggregate access would score scenario B as
+        a near-total success.</p>
+    </div>
+
+    <figure>
+      <div class="fig-head">The mobility gap</div>
+      <div class="fig-sub">Percentage reaching a shelter · residents who walk without difficulty vs residents who do not</div>
+      <div class="chart"><svg id="c-gap" viewBox="0 0 900 260" role="img"
+        aria-label="Dumbbell chart. Scenario A: 32.7 percent versus 19.7 percent, a 13.0 point gap. Scenario B: 96.4 versus 71.9, a 24.5 point gap. Scenario C: 98.6 versus 85.7, a 12.9 point gap."></svg></div>
+      <div class="legend"><span><i style="background:var(--ink-3);border-radius:50%"></i>walks without difficulty</span>
+        <span><i style="background:var(--hazard);border-radius:50%"></i>has trouble walking</span></div>
+      <figcaption>Pouring 4,608 extra beds into the <em>same</em> buildings widens the
+        mobility gap from <b>13.0 to 24.5 percentage points</b> — extra capacity at an
+        existing site is captured first by whoever can walk there fastest. Spending that
+        identical capacity on well-placed new sites returns the gap to <b>12.9</b> while
+        lifting the slowest group from 71.9% to 85.7%.</figcaption>
+    </figure>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Group</th><th>Share</th><th>A</th><th>B</th><th>C</th></tr></thead>
+      <tbody>
+        <tr><td>Everyone</td><td>100%</td><td>30.1</td><td>91.6</td><td class="hi">96.0</td></tr>
+        <tr><td>Walks without difficulty</td><td>80.1%</td><td>32.7</td><td>96.4</td><td>98.6</td></tr>
+        <tr><td>Has trouble walking</td><td>19.9%</td><td class="hi">19.7</td><td class="hi">71.9</td><td class="hi">85.7</td></tr>
+        <tr><td>Age 65+</td><td>5.2%</td><td>22.4</td><td>82.4</td><td>89.8</td></tr>
+        <tr><td>Has COPD</td><td>10.8%</td><td>22.2</td><td>86.2</td><td>93.8</td></tr>
+        <tr><td>Has asthma</td><td>14.8%</td><td>29.2</td><td>90.6</td><td>95.7</td></tr>
+        <tr><td>Counted as more vulnerable</td><td>71.1%</td><td>28.2</td><td>88.8</td><td>94.7</td></tr>
+      </tbody></table></div>
+
+    <div class="pull">Asthma shows almost no access penalty. COPD shows a large one. That
+      asymmetry is not an omission — it is evidence the model is not inventing effects.</div>
+
+    <div class="measure">
+      <p>A diagnosis can only change an outcome here by changing <em>movement</em>, because
+        diagnosis is never a dose multiplier. COPD carries a published gait-speed decrement;
+        asthma does not. So COPD tracks the mobility pattern and asthma tracks the
+        population average — which is exactly what an honest model should produce.</p>
+      <p><strong>And the gap is narrowed, not closed.</strong> 14.3% of residents with
+        mobility limitations are still outside in scenario C. Ten well-placed shelters are a
+        large improvement, not a solution.</p>
+    </div>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="stage-tag"><b>Stage 7</b>Limits<br>what it can't say</div>
+  <div>
+    <h2>What this does not claim</h2>
+    <div class="measure">
+      <p>The claim is narrow and deliberate: <em class="q">for a fixed total capacity,
+        placing new capacity at optimized locations outperforms enlarging existing
+        facilities — under the modelled assumptions.</em></p>
+    </div>
+
+    <div class="note warn"><h4>The calibration result, reported against interest</h4>
+      Against the one observed occupancy record — Street Roots, 16 September 2020:
+      approximately 130 of 198 beds occupied — the historical reference configuration fills
+      <b>198 of 198</b>. That is a <b>1.52× over-prediction</b>, attributed to the
+      assumption that everyone knows the shelters exist. A local survey found <b>65% of
+      unsheltered residents had never heard of them.</b> Every "got inside" figure in this
+      study is therefore an <b>upper bound</b>.</div>
+
+    <h3>Named limitations</h3>
+    <div class="measure">
+      <ul class="srcs" style="padding-left:1.1rem">
+        <li>The ten new sites are <b>street-network nodes, not buildings</b>. No zoning,
+          cost, staffing or air-filtration analysis stands behind them.</li>
+        <li>The 1.5× expansion factor, the choice of ten sites, and B's uniform 3.06×
+          scale-up are <b>policy parameters, not measurements</b>. The comparison
+          establishes direction; magnitudes would move with different values.</li>
+        <li>Two real facilities are <b>missing entirely</b> — Clinton Triangle (160 units,
+          the largest single site) and Multnomah Safe Rest Village (28) — because neither
+          publishes a street address. Real capacity is ≈207 people higher than modelled.</li>
+        <li>Ten day centres are excluded because none publishes a capacity. In a
+          <em>daytime</em> smoke episode these are plausibly the most relevant clean-air
+          spaces that exist, so scenario A understates daytime availability. <b>This cuts
+          against the paper's own framing and is stated anyway.</b></li>
+        <li>The PM2.5 field is <b>spatially uniform</b> — with two in-county monitors, any
+          interpolation would manufacture gradients the data cannot support. Placement can
+          therefore only help by reducing time outdoors, never by moving people into
+          cleaner air.</li>
+        <li>The monitors are non-reference heated-inlet nephelometers, which likely
+          <b>understate</b> true PM2.5 during a fresh wood-smoke event.</li>
+        <li>Encampment locations are 2025–26 complaint-driven reports used as a spatial
+          proxy for 2020, so they carry visibility bias.</li>
+        <li>Sex and mobility distributions are 2019 inside an otherwise 2026 study; asthma
+          and COPD prevalences are imported from Minnesota.</li>
+        <li>Admission is order-dependent: residents are served in shuffle order rather than
+          by need. This matters most in scenario A, where capacity binds hard.</li>
+        <li><b>No health outcome is modelled.</b> The study measures smoke exposure and
+          inhaled mass. It does not predict illness, hospitalisation, or death, and does
+          not claim to.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="stage-tag"><b>Stage 8</b>Method<br>reproducibility</div>
+  <div>
+    <h2>A run that cannot be reproduced is not a result</h2>
+    <div class="measure">
+      <p>Every run writes a manifest carrying its seed, its git commit, the Java and Repast
+        versions, every parameter value, a SHA-256 for each input file, and a flag for
+        whether the working tree was clean. The protocol — <strong>commit the code first,
+        then run, then verify the manifest</strong> — exists because it was violated twice
+        and caught both times by audit.</p>
+    </div>
+
+    <div class="spec">
+      <div class="spec-head"><span class="spec-path">OutcomeLogger.java:369</span>
+        <span class="spec-what">a flag that admits its own limits</span></div>
+      <div class="spec-code"><pre><code><span class="c">/**
+ * True when tracked model sources are newer than the recorded git HEAD, i.e.
+ * the run may have executed uncommitted code. An audit found nine archived
+ * runs stamped a commit that could not reproduce them; this flag makes that
+ * condition visible in the manifest instead of silent. Heuristic and
+ * deliberately conservative: it compares file modification times against the
+ * HEAD ref's own timestamp, so it errs toward reporting "true".
+ */</span>
+<span class="k">private static</span> String gitWorkingTreeDirty() {
+    <span class="k">try</span> {
+        File head = <span class="k">new</span> File(<span class="s">".git/HEAD"</span>);
+        <span class="k">if</span> (!head.exists()) head = <span class="k">new</span> File(<span class="s">"../.git/HEAD"</span>);
+        <span class="k">if</span> (!head.exists()) <span class="k">return</span> <span class="s">"\"unknown\""</span>;
+        <span class="c">/* ... resolve the ref, read its timestamp ... */</span>
+        <span class="hl"><span class="k">return</span> String.valueOf(newestFileTime(src) &gt; headTime);</span>
+    } <span class="k">catch</span> (Exception e) {
+        <span class="k">return</span> <span class="s">"\"unknown\""</span>;
+    }
+}</code></pre></div>
+      <div class="spec-notes"><ol>
+        <li><b>It exists because of a real failure.</b> Nine archived runs were stamped
+          with a commit that lacked the code which produced them — they had been run from a
+          dirty tree. All nine were re-run from committed code.</li>
+        <li><b>It is honest about being a heuristic.</b> The comment says so, and says
+          which way it errs: toward false alarms rather than false assurance.</li>
+        <li><b>Three states, not two.</b> It can return <code>"unknown"</code>. A check that
+          cannot answer says so instead of guessing.</li>
+      </ol></div>
+    </div>
+
+    <h3>Six invariants, checked across all 27 runs</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Invariant</th><th class="lt">Result</th></tr></thead>
+      <tbody>
+        <tr><td>Manifest seed, scenario code, population match the run</td><td class="lt">pass · 27/27</td></tr>
+        <tr><td>Working tree clean in every manifest</td><td class="lt">pass · 27/27</td></tr>
+        <tr><td>Identical data version across all nine seeds within each arm</td><td class="lt">pass</td></tr>
+        <tr><td>Identical source checksums across all 27 runs</td><td class="lt">pass</td></tr>
+        <tr><td>Exactly 6,842 exported resident records per run</td><td class="lt">pass · 27/27</td></tr>
+        <tr><td>Population byte-identical across arms within each seed</td><td class="lt">pass · SHA-256 match</td></tr>
+      </tbody></table></div>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>What was verified, and how</th><th class="lt">Result</th></tr></thead>
+      <tbody>
+        <tr><td>Exposure integral recomputed in Python from the raw EPA file</td><td class="lt"><b>ratio 1.0000</b></td></tr>
+        <tr><td>Routing — independent Python Dijkstra, tests T1–T5</td><td class="lt">distances match exactly</td></tr>
+        <tr><td>Determinism — re-run at seed 42</td><td class="lt">bit-for-bit identical</td></tr>
+        <tr><td>Baseline invariance after adding the heterogeneity layer</td><td class="lt">byte-identical</td></tr>
+        <tr><td>Per-run internal consistency (<code>analyze_run.py</code>)</td><td class="lt">37/37 checks pass</td></tr>
+        <tr><td>Walked ≤ planned + snap + 200 m, per agent</td><td class="lt">max unexplained 8.9 m</td></tr>
+      </tbody></table></div>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="stage-tag"><b>Sources</b>where every<br>number came from</div>
+  <div>
+    <h2>Provenance</h2>
+    <div class="measure">
+      <p>The model refuses to start if any variable claiming to be measured or
+        literature-derived lacks a resolvable DOI, or if any literature value lacks a sweep
+        range. A citation defect stops the simulation; it cannot quietly become a result.
+        The registry holds <strong>28 variables and 26 assumptions</strong>, four of which
+        are marked blocking.</p>
+    </div>
+
+    <h3>Data</h3>
+    <ol class="srcs">
+      <li><b>U.S. EPA Air Quality System</b>, hourly PM2.5, parameter 88502, 2020.
+        Retrieved 2026-07-24. Public domain. 4,795 rows, SHA-256 recorded.
+        <em>Parameter 88101 was checked first and contains no Multnomah monitors.</em></li>
+      <li><b>2025 Tri-County Point-in-Time Count</b>, PSU Homelessness Research &amp; Action
+        Collaborative, published 2025-11-04. Population denominator.</li>
+      <li><b>Pathways Study 2026</b>, PSU HRAC / OHSU, N=541 — local age and
+        chronic-condition distributions.</li>
+      <li><b>Multnomah County HSD shelter inventory</b>, July 2026, plus City of Portland
+        Safe Rest Village addresses. 36 facilities geocoded, 2,234 spaces.</li>
+      <li><b>City of Portland IRP Campsite Reports</b>, ArcGIS open data. 2,981 distinct
+        real start locations.</li>
+      <li><b>Portland Metro RLIS street centrelines</b> — 112,070 features.</li>
+    </ol>
+
+    <h3>Literature</h3>
+    <ol class="srcs" start="7">
+      <li><b>Bohannon &amp; Williams Andrews (2011)</b>, <em>Physiotherapy</em>
+        97(3):182–189, DOI 10.1016/j.physio.2010.12.004 — age×sex gait speed, 41 studies,
+        n=23,111.</li>
+      <li><b>Bohannon (1997)</b>, <em>Age and Ageing</em> 26(1):15–19,
+        DOI 10.1093/ageing/26.1.15 — within-population variation.</li>
+      <li><b>Boyce, Shields &amp; Silcock (1999)</b>, <em>Fire Technology</em> 35(1):51–67,
+        DOI 10.1023/A:1015339216366 — mobility-impaired movement speeds.</li>
+      <li><b>Buekers et al. (2024)</b>, <em>European Respiratory Review</em> 33(172):230253,
+        DOI 10.1183/16000617.0253-2023 — COPD gait-speed decrement.</li>
+      <li><b>Zellmer et al. (2025)</b>, <em>J Gen Intern Med</em>,
+        DOI 10.1007/s11606-025-09814-x — asthma and COPD prevalence, n=20,139.</li>
+      <li><b>U.S. EPA (2011)</b>, <em>Exposure Factors Handbook</em>, Ch. 6,
+        EPA/600/R-09/052F — activity-level inhalation rates.</li>
+      <li><b>Karney (2013)</b>, <em>J Geodesy</em> 87(1):43–55,
+        DOI 10.1007/s00190-012-0578-z · <b>Dijkstra (1959)</b>,
+        <em>Numerische Mathematik</em> 1(1):269–271, DOI 10.1007/BF01386390.</li>
+      <li><b>North et al. (2013)</b>, <em>Complex Adaptive Systems Modeling</em> 1(1):3,
+        DOI 10.1186/2194-3206-1-3 — Repast Simphony.</li>
+    </ol>
+
+    <div class="note"><h4>Deliberately not used</h4>
+      <b>Bell, Zanobetti &amp; Dominici (2014)</b> — a real, well-conducted paper about
+      <em>ozone</em>; it cannot support a PM2.5 parameter. <b>Atkinson et al. (2013)</b> —
+      the correct record behind a miscitation; a cardiovascular study with no COPD
+      estimate. <b>Zanobetti &amp; Schwartz (2009)</b> — does not report asthma as an effect
+      modifier. Each is listed so a reader can see what was checked and rejected, not only
+      what was kept.</div>
+  </div>
+</section>
+
+<footer>
+  Fatima Asghar · NSF REU <em>Computational Modeling Serving Portland</em> · Portland State University · mentor Prof. Christof Teuscher<br>
+  Code, data and all 27 run manifests: github.com/fxa28196/REU · branch phase2/human-agent-modeling · commit c0cd113<br><br>
+  I directed this research, made all research decisions, and wrote the manuscript.
+  Claude (Anthropic) assisted with coding, verification tooling and documentation drafting.
+  I reviewed, revised and approved all outputs and take full responsibility for the final text.
+</footer>
+</div>
+
+<div class="tip" id="tip"></div>
+
+<script>
+(function(){
+"use strict";
+const PM=[5.5,5.6,5.6,5.8,6.8,7,7.2,6.7,6.7,6.8,6.8,6.5,5.7,5.3,14.4,43.2,82.5,73.8,112.1,63.5,61.4,64.7,24.2,12.4,5.2,3.5,3.2,3.5,3.3,3.4,3.5,4.6,5,4.9,4.7,4,3.8,4.3,4.3,4.7,4.5,4.2,3.8,3.5,3.3,3.5,4,3.6,3.6,4.8,13.7,22.7,24.6,25.1,24.6,23.4,20.2,18.9,18,19.1,19.4,15.3,13.7,11.3,11.1,13.4,17.4,21.5,22.5,23.6,22.2,21.5,20.5,20,20.1,22.6,25.2,29.5,47,59.8,66.6,96.9,96.8,94.6,125.5,189.2,276.8,291.1,262.9,238.6,223.7,264.6,295.5,299.6,298.5,291.2,286.4,282,278.4,271.4,258.8,232.3,203.3,194.9,189.6,162.2,171.8,178.7,195.8,186.9,190.2,196.8,205.2,205.4,201.8,198.6,196.8,191.1,186.4,184.2,178.6,174.2,175.7,179,176.4,174.6,205.4,219.9,229.3,241.2,255.7,266.1,276.4,296.4,298.9,320.9,345.3,393.2,469.6,548.8,562.7,559.5,552,550.2,531.8,474.6,419.4,392.6,384.5,352.6,309.7,313.1,324.4,347.5,370.2,372.4,379.4,383.6,418.2,444.1,441.5,441.8,451.4,490.4,530.5,560.9,558.3,552,555.9,552.2,488.9,373.4,370.1,379.9,339.6,268.5,257.5,269.5,275.4,293.2,314.4,349.7,405.6,417.9,427.4,439.2,430.4,426.5,414.2,389.8,395.5,407.8,379.9,361,347.4,333.6,312,290.6,247.8,254.4,271.4,260.1,233.9,225.4,222.3,211.1,204.6,194.6,189.8,188.9,188.5,173.6,162.2,171.4,172.2,175.6,175.6,173.8,166.6,160.5,155.4,149.8,158.1,177.5,189.9,216.2,221.4,292.1,297,312.2,299.9,348.8,361.2,334.1,322.9,318.4,294.8,280.9,285.5,280.1,272,278.3,292.5,270.1,225.2,197.2,223.4,237.2,201.2,191.8,178.3,187.7,147.2,129.6,107.3,106.3,115.1,122.9,133.7,136.6,136.2,138.4,130.8,128.4,136.5,117,80.3,41.8,46.7,41.9,35.6,32.5,33.9,35.9,40.8,43,38.6,33.3,7.5,3.5,4.2,5.4,6.3,6.9,9.1,7.6,8.3,7.6,9.1,7.9,8.4,7.7,8.9,9.2,7.3,6.4,6.2,5.8,5.2,4.8,3.5,2.8,2.7,3,3.1,3.8,4.5,5.9,5.2,3.9,3,4.5];
+const NS="http://www.w3.org/2000/svg";
+const tip=document.getElementById("tip");
+const el=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;};
+const cv=(n)=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt=(n)=>n.toLocaleString("en-US");
+
+function showTip(ev,html){tip.innerHTML=html;tip.style.opacity="1";
+  const r=tip.getBoundingClientRect();
+  let x=ev.clientX+14,y=ev.clientY-r.height-10;
+  if(x+r.width>innerWidth-8)x=ev.clientX-r.width-14;
+  if(y<8)y=ev.clientY+18;
+  tip.style.left=x+"px";tip.style.top=y+"px";}
+function hideTip(){tip.style.opacity="0";}
+function hookTip(node,html){
+  node.style.cursor="default";
+  node.addEventListener("pointerenter",e=>showTip(e,html));
+  node.addEventListener("pointermove",e=>showTip(e,html));
+  node.addEventListener("pointerleave",hideTip);
+  node.setAttribute("tabindex","0");
+  node.addEventListener("focus",()=>{const b=node.getBoundingClientRect();
+    showTip({clientX:b.left+b.width/2,clientY:b.top},html);});
+  node.addEventListener("blur",hideTip);
+}
+
+function drawPM(){
+  const s=document.getElementById("pm25");if(!s)return;s.innerHTML="";
+  const W=900,H=260,L=48,R=14,T=18,B=32;
+  const pw=W-L-R,ph=H-T-B,maxV=600;
+  const X=i=>L+(i/(PM.length-1))*pw, Y=v=>T+ph-(v/maxV)*ph;
+  [0,150,300,450,600].forEach(v=>{
+    s.appendChild(el("line",{x1:L,x2:W-R,y1:Y(v),y2:Y(v),class:"grid"}));
+    const t=el("text",{x:L-8,y:Y(v)+3.2,class:"tick","text-anchor":"end"});
+    t.textContent=v;s.appendChild(t);});
+  let d=`M ${X(0)} ${Y(0)}`;
+  PM.forEach((v,i)=>{d+=` L ${X(i)} ${Y(v)}`;});
+  d+=` L ${X(PM.length-1)} ${Y(0)} Z`;
+  s.appendChild(el("path",{d,fill:cv("--smoke-fill"),stroke:"none"}));
+  let l=`M ${X(0)} ${Y(PM[0])}`;
+  PM.forEach((v,i)=>{if(i)l+=` L ${X(i)} ${Y(v)}`;});
+  s.appendChild(el("path",{d:l,fill:"none",stroke:cv("--smoke"),"stroke-width":2,
+    "stroke-linejoin":"round"}));
+  s.appendChild(el("line",{x1:L,x2:W-R,y1:Y(55.5),y2:Y(55.5),stroke:cv("--hazard"),
+    "stroke-width":1.5,"stroke-dasharray":"5 4"}));
+  const tl=el("text",{x:W-R,y:Y(55.5)-7,class:"glab","text-anchor":"end"});
+  tl.setAttribute("fill",cv("--hazard"));
+  tl.textContent="55.5 µg/m³ — EPA “Unhealthy” threshold";s.appendChild(tl);
+  const pi=PM.indexOf(Math.max.apply(null,PM));
+  s.appendChild(el("circle",{cx:X(pi),cy:Y(PM[pi]),r:4,fill:cv("--smoke"),
+    stroke:cv("--raised"),"stroke-width":2}));
+  const pk=el("text",{x:X(pi)+10,y:Y(PM[pi])+4,class:"vlab"});
+  pk.textContent="562.7 peak · 12 Sep 20:00";s.appendChild(pk);
+  for(let day=0;day<13;day+=2){
+    const t=el("text",{x:X(day*24),y:H-10,class:"tick","text-anchor":"middle"});
+    t.textContent=(7+day)+" Sep";s.appendChild(t);}
+  const yl=el("text",{x:L-8,y:T-6,class:"tick","text-anchor":"end"});
+  yl.textContent="µg/m³";s.appendChild(yl);
+  const cl=el("line",{x1:0,x2:0,y1:T,y2:T+ph,stroke:cv("--rule-strong"),
+    "stroke-width":1,opacity:0});
+  s.appendChild(cl);
+  const hit=el("rect",{x:L,y:T,width:pw,height:ph,fill:"transparent"});
+  s.appendChild(hit);
+  const days=["7","8","9","10","11","12","13","14","15","16","17","18","19"];
+  hit.addEventListener("pointermove",e=>{
+    const bb=s.getBoundingClientRect();
+    const i=Math.max(0,Math.min(PM.length-1,
+      Math.round((((e.clientX-bb.left)/bb.width*W)-L)/pw*(PM.length-1))));
+    cl.setAttribute("x1",X(i));cl.setAttribute("x2",X(i));cl.setAttribute("opacity","1");
+    showTip(e,days[Math.floor(i/24)]+" Sep, "+String(i%24).padStart(2,"0")+":00<br><b>"
+      +PM[i].toFixed(1)+" µg/m³</b>"+(PM[i]>55.5?" · above threshold":""));});
+  hit.addEventListener("pointerleave",()=>{cl.setAttribute("opacity","0");hideTip();});
+}
+
+function drawInside(){
+  const s=document.getElementById("c-inside");if(!s)return;s.innerHTML="";
+  const W=900,H=300,L=56,R=18,T=26,B=52;
+  const pw=W-L-R,ph=H-T-B,maxV=6842;
+  const data=[{k:"A",lab:"A · today",v:2060,p:"30.1%",c:"--arm-a",cap:"2,234 spaces"},
+              {k:"B",lab:"B · more beds",v:6264,p:"91.6%",c:"--arm-b",cap:"6,842 spaces"},
+              {k:"C",lab:"C · better-placed beds",v:6570,p:"96.0%",c:"--arm-c",cap:"6,842 spaces"}];
+  const gap=pw/data.length,bw=gap*0.42;
+  const Y=v=>T+ph-(v/maxV)*ph;
+  [0,2000,4000,6000].forEach(v=>{
+    s.appendChild(el("line",{x1:L,x2:W-R,y1:Y(v),y2:Y(v),class:"grid"}));
+    const t=el("text",{x:L-8,y:Y(v)+3.2,class:"tick","text-anchor":"end"});
+    t.textContent=fmt(v);s.appendChild(t);});
+  s.appendChild(el("line",{x1:L,x2:W-R,y1:Y(6842),y2:Y(6842),stroke:cv("--rule-strong"),
+    "stroke-width":1.5,"stroke-dasharray":"4 4"}));
+  const rl=el("text",{x:W-R,y:Y(6842)-7,class:"glab","text-anchor":"end"});
+  rl.textContent="6,842 people outside";s.appendChild(rl);
+  data.forEach((d,i)=>{
+    const x=L+gap*i+gap/2-bw/2;
+    s.appendChild(el("rect",{x,y:Y(6842),width:bw,height:Math.max(0,Y(d.v)-Y(6842)-2),
+      fill:cv("--rule"),rx:4}));
+    const g=el("g");
+    g.appendChild(el("rect",{x,y:Y(d.v),width:bw,height:ph-(Y(d.v)-T),fill:cv(d.c),rx:4}));
+    g.appendChild(el("rect",{x,y:T+ph-4,width:bw,height:4,fill:cv(d.c)}));
+    s.appendChild(g);
+    hookTip(g,"<b>Scenario "+d.k+"</b><br>"+fmt(d.v)+" sheltered ("+d.p+")<br>"
+      +fmt(6842-d.v)+" left outside");
+    const n=el("text",{x:x+bw/2,y:Y(d.v)-23,class:"vlab","text-anchor":"middle"});
+    n.setAttribute("font-size","19");n.setAttribute("fill",cv(d.c));
+    n.textContent=fmt(d.v);s.appendChild(n);
+    const p=el("text",{x:x+bw/2,y:Y(d.v)-8,class:"glab","text-anchor":"middle"});
+    p.textContent=d.p;s.appendChild(p);
+    const lb=el("text",{x:x+bw/2,y:H-30,class:"glab","text-anchor":"middle"});
+    lb.setAttribute("font-size","11.5");lb.setAttribute("fill",cv("--ink"));
+    lb.textContent=d.lab;s.appendChild(lb);
+    const cp=el("text",{x:x+bw/2,y:H-14,class:"tick","text-anchor":"middle"});
+    cp.textContent=d.cap;s.appendChild(cp);});
+}
+
+function drawGeo(){
+  const s=document.getElementById("c-geo");if(!s)return;s.innerHTML="";
+  const W=900,H=290,L=58,R=18,T=26,B=54;
+  const pw=W-L-R,ph=H-T-B,maxV=5000;
+  const data=[{k:"A",empty:174,ref:4766,c:"--arm-a",lab:"A · today"},
+              {k:"B",empty:578,ref:562,c:"--arm-b",lab:"B · more beds"},
+              {k:"C",empty:272,ref:256,c:"--arm-c",lab:"C · better-placed"}];
+  const gap=pw/3,bw=gap*0.2;
+  const Y=v=>T+ph-(v/maxV)*ph;
+  [0,1000,2000,3000,4000,5000].forEach(v=>{
+    s.appendChild(el("line",{x1:L,x2:W-R,y1:Y(v),y2:Y(v),class:"grid"}));
+    const t=el("text",{x:L-8,y:Y(v)+3.2,class:"tick","text-anchor":"end"});
+    t.textContent=fmt(v);s.appendChild(t);});
+  data.forEach((d,i)=>{
+    const cx=L+gap*i+gap/2;
+    [[cv("--ink-3"),d.empty,"beds left empty"],
+     [cv(d.c),d.ref,"people turned away"]].forEach((b,j)=>{
+      const xx=j? cx+2 : cx-bw-2;
+      const g=el("g");
+      g.appendChild(el("rect",{x:xx,y:Y(b[1]),width:bw,height:ph-(Y(b[1])-T),fill:b[0],rx:4}));
+      g.appendChild(el("rect",{x:xx,y:T+ph-4,width:bw,height:4,fill:b[0]}));
+      s.appendChild(g);
+      hookTip(g,"<b>Scenario "+d.k+"</b><br>"+fmt(b[1])+" "+b[2]);
+      const n=el("text",{x:xx+bw/2,y:Y(b[1])-7,class:"vlab","text-anchor":"middle"});
+      n.setAttribute("fill",b[0]);n.textContent=fmt(b[1]);s.appendChild(n);});
+    const lb=el("text",{x:cx,y:H-32,class:"glab","text-anchor":"middle"});
+    lb.setAttribute("font-size","11.5");lb.setAttribute("fill",cv("--ink"));
+    lb.textContent=d.lab;s.appendChild(lb);});
+  const cxB=L+gap+gap/2;
+  const a=el("text",{x:cxB,y:H-14,class:"tick","text-anchor":"middle"});
+  a.setAttribute("fill",cv("--hazard"));
+  a.textContent="578 empty  ·  562 turned away";s.appendChild(a);
+}
+
+function drawGap(){
+  const s=document.getElementById("c-gap");if(!s)return;s.innerHTML="";
+  const W=900,H=260,L=150,R=92,T=32,B=44;
+  const pw=W-L-R,ph=H-T-B;
+  const rows=[{k:"A · today",easy:32.7,hard:19.7,gap:13.0},
+              {k:"B · more beds",easy:96.4,hard:71.9,gap:24.5},
+              {k:"C · better-placed",easy:98.6,hard:85.7,gap:12.9}];
+  const X=v=>L+(v/100)*pw, Yr=i=>T+ph/3*(i+0.5);
+  [0,25,50,75,100].forEach(v=>{
+    s.appendChild(el("line",{x1:X(v),x2:X(v),y1:T,y2:T+ph,class:"grid"}));
+    const t=el("text",{x:X(v),y:H-24,class:"tick","text-anchor":"middle"});
+    t.textContent=v+"%";s.appendChild(t);});
+  rows.forEach((r,i)=>{
+    const y=Yr(i);
+    const lb=el("text",{x:L-14,y:y+4,class:"glab","text-anchor":"end"});
+    lb.setAttribute("font-size","11.5");lb.setAttribute("fill",cv("--ink"));
+    lb.textContent=r.k;s.appendChild(lb);
+    s.appendChild(el("line",{x1:X(r.hard),x2:X(r.easy),y1:y,y2:y,
+      stroke:cv("--rule-strong"),"stroke-width":3,"stroke-linecap":"round"}));
+    const gh=el("circle",{cx:X(r.hard),cy:y,r:7,fill:cv("--hazard"),
+      stroke:cv("--raised"),"stroke-width":2});
+    const ge=el("circle",{cx:X(r.easy),cy:y,r:7,fill:cv("--ink-3"),
+      stroke:cv("--raised"),"stroke-width":2});
+    s.appendChild(gh);s.appendChild(ge);
+    hookTip(gh,"<b>"+r.k+"</b><br>Has trouble walking: "+r.hard+"%");
+    hookTip(ge,"<b>"+r.k+"</b><br>Walks without difficulty: "+r.easy+"%");
+    const h=el("text",{x:X(r.hard),y:y-14,class:"vlab","text-anchor":"middle"});
+    h.setAttribute("fill",cv("--hazard"));h.setAttribute("font-size","11");
+    h.textContent=r.hard+"%";s.appendChild(h);
+    const e2=el("text",{x:X(r.easy),y:y-14,class:"vlab","text-anchor":"middle"});
+    e2.setAttribute("font-size","11");e2.textContent=r.easy+"%";s.appendChild(e2);
+    const g=el("text",{x:W-R+14,y:y+4,class:"vlab"});
+    g.setAttribute("font-size","14");
+    g.setAttribute("fill",i===1?cv("--hazard"):cv("--ink"));
+    g.textContent=r.gap.toFixed(1)+" pts";s.appendChild(g);});
+  const gl=el("text",{x:W-R+14,y:T-12,class:"tick"});
+  gl.textContent="THE GAP";s.appendChild(gl);
+}
+
+function drawAll(){drawPM();drawInside();drawGeo();drawGap();}
+drawAll();
+let t;addEventListener("resize",function(){clearTimeout(t);t=setTimeout(drawAll,150);});
+new MutationObserver(drawAll).observe(document.documentElement,
+  {attributes:true,attributeFilter:["data-theme"]});
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",drawAll);
+})();
+</script>
