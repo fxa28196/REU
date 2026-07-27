@@ -1,0 +1,69 @@
+# Citation metadata. GitHub reads this file and shows a "Cite this repository"
+# button; Zenodo reads it when minting a DOI for a release.
+#
+# TWO FIELDS ARE COMMENTED OUT BELOW because they are not yet known:
+#   - doi     mint it first (see docs/chapter/SUBMIT.md section 0.3), then
+#             uncomment and fill in
+#   - orcid   add yours if you have one (free at https://orcid.org)
+# Everything else is complete and correct.
+
+cff-version: 1.2.0
+message: "If you use this model or its results, please cite it as below."
+type: software
+
+title: "Wildfire Smoke Shelter Placement Agent-Based Model"
+abstract: >-
+  An agent-based model of clean-air shelter access for unsheltered residents
+  of Multnomah County, Oregon during a wildfire smoke episode. 6,842 residents
+  with individually sampled age, sex, mobility, asthma and COPD attributes
+  start at real reported campsite locations and walk Portland's real street
+  network toward the nearest shelter with room, driven by measured hourly
+  PM2.5 from the September 2020 smoke event. Three scenarios isolate the
+  effect of shelter capacity from the effect of shelter placement.
+
+authors:
+  - family-names: Asghar
+    given-names: Fatima
+    # orcid: "https://orcid.org/0000-0000-0000-0000"
+
+version: "1.0.0"
+date-released: "2026-07-26"
+license: MIT
+repository-code: "https://github.com/fxa28196/REU"
+# doi: "10.5281/zenodo.XXXXXXX"
+
+keywords:
+  - agent-based modeling
+  - wildfire smoke
+  - PM2.5
+  - homelessness
+  - emergency shelter
+  - facility location
+  - environmental justice
+  - Repast Simphony
+
+references:
+  - type: article
+    title: "Complex adaptive systems modeling with Repast Simphony"
+    authors:
+      - family-names: North
+        given-names: Michael J.
+      - family-names: Collier
+        given-names: Nicholson T.
+      - family-names: Ozik
+        given-names: Jonathan
+      - family-names: Tatara
+        given-names: Eric R.
+      - family-names: Macal
+        given-names: Charles M.
+      - family-names: Bragen
+        given-names: Mark
+      - family-names: Sydelko
+        given-names: Pamela
+    journal: "Complex Adaptive Systems Modeling"
+    volume: 1
+    issue: 1
+    start: 3
+    year: 2013
+    doi: "10.1186/2194-3206-1-3"
+    notes: "The simulation framework this model is built on."
