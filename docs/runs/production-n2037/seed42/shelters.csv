@@ -1,4 +1,0 @@
-shelter_id,name,lon,lat,capacity,operating,peak_occupancy,final_occupancy,refused_count,utilization,mean_travel_dist_m_admitted
-CJ,Charles Jordan Community Center,-122.711387,45.587754,99,true,99,99,622,1.0000,2510.87
-OCC,Oregon Convention Center,-122.661771,45.528461,99,true,99,99,1722,1.0000,951.73
-MSCC,Mount Scott Community Center,-122.589160,45.482738,,false,0,0,0,,

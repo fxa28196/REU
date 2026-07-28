@@ -287,7 +287,7 @@ writes to `docs\final\`:
 |---|---|
 | `Parameter 'X' not found in the schema` | In batch mode Repast reads parameters from the *batch file*, not `parameters.xml`. Add the parameter to your batch XML. |
 | Results identical to a previous run | You reused a seed and the output folder was overwritten. Check `simulation.json` → `sim_id`. |
-| `JDK not found` | Set `JAVA_HOME`; see `ENVIRONMENT_SETUP.md`. |
+| `JDK not found` | Set `JAVA_HOME`; see `docs/setup/ENVIRONMENT_SETUP.md`. |
 | Red errors in VS Code but Gradle compiles fine | The Java language server lost its classpath. Touch `build.gradle` to force a re-sync; trust Gradle. |
 
 ---

@@ -171,7 +171,7 @@ Also required:
   speed matches its assigned speed; `hazards.csv` totals match the manifest;
   `reroute_count > 0` implies `walked > network_dist`.
 - **"37" is a function of shelter count** (39 with five shelters). State the
-  contract as **"zero failures"**, not "37 checks", in `CURRENT_MODEL_RUN.md` and
+  contract as **"zero failures"**, not "37 checks", in `docs/archive/CURRENT_MODEL_RUN.md` and
   `BASELINE_RESULTS.md`.
 
 Bump `SCRIPT_VERSION` on every such change; it is already recorded in

@@ -88,7 +88,7 @@ gate for the commit that introduces the mechanism.
 written to `output/run_seed<seed>`; two scenarios at seed 42 would silently
 overwrite each other, and an 18-run sweep would do it repeatedly. Fix: keep
 `output/run_seed<seed>` when `scenario == baseline` (preserving the documented
-path in `CURRENT_MODEL_RUN.md` and the re-verify command in
+path in `docs/archive/CURRENT_MODEL_RUN.md` and the re-verify command in
 `BASELINE_RESULTS.md`), otherwise `output/run_<scenario>_seed<seed>`. Both match
 the `run_*` glob the analysis scripts already use.
 

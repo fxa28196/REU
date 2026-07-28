@@ -90,7 +90,7 @@ Nine files, about **420 KB** total.
 ```
 chapter.tex           the chapter
 references.bib        23 entries, every one with a DOI or URL
-svmult.cls            the official class from rubrik/OFFICIAL-template/
+svmult.cls            the official class from docs/publication/template/OFFICIAL-template/
 figures/              <- keep this as a SUBFOLDER
   fig1_event.pdf        66 KB
   fig2_outcomes.pdf     65 KB

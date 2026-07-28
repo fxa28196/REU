@@ -1,15 +1,18 @@
 # run-headless.ps1 -- run the Geography model headless (no GUI, no Eclipse) and
 # write the agent/shelter/simulation result files.
 #
-# Usage (from the repo root):
-#   powershell -File scripts\run-headless.ps1
-#   powershell -File scripts\run-headless.ps1 -TimeoutSec 600
+# Usage (from the repo root) -- -ParamsFile is REQUIRED:
+#   powershell -File scripts\run-headless.ps1 -ParamsFile "batch\batch_params_2026_A_seed42.xml"
+#   powershell -File scripts\run-headless.ps1 -ParamsFile "batch\batch_params_2026_C_seed44.xml" -TimeoutSec 600
 #
 # Outputs land in Geography\output\run_seed<seed>\ (agents.csv, shelters.csv,
-# simulation.json). Parameters (including the random seed) come from
-# Geography\batch\batch_params.xml -- see CURRENT_MODEL_RUN.md.
+# simulation.json). NOTE the output directory is keyed by SEED ONLY, so rename it
+# immediately -- the next arm at the same seed will otherwise overwrite it.
 #
-# Environment defaults match ENVIRONMENT_SETUP.md:
+# Parameters, including the random seed, come from the -ParamsFile you pass.
+# The current pipeline is documented in docs/final/TECHNICAL_REFERENCE.md.
+#
+# Environment defaults match docs/setup/ENVIRONMENT_SETUP.md:
 #   JAVA_HOME    JDK 17  (default C:\Users\Chick\tools\jdk-17.0.19+10)
 #   REPAST_HOME  Repast Simphony 2.11.0 (default %USERPROFILE%\RepastSimphony-2.11.0)
 
