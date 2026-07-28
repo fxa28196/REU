@@ -1,6 +1,6 @@
 ﻿> **SUPERSEDED — HISTORICAL RECORD ONLY.** This document describes an earlier
 > state of the model and does not reflect the final submission. For the current
-> model and results see `docs/final/UPDATED_FINAL_RESULTS_REPORT.md` and the
+> model and results see `docs/final/PRESENT_DAY_THREE_ARM_RESULTS.md` and the
 > audits alongside it. Retained for provenance.
 
 # Current Model â€” Run Guide & State

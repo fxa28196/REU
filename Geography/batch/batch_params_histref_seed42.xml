@@ -22,7 +22,10 @@
 	<parameter name="shelterArrivalDistanceM" type="constant" constant_type="number" value="200.0"/>
 	<parameter name="evacuationThresholdUgM3" type="constant" constant_type="number" value="55.5"/>
 	<parameter name="simulationHours" type="constant" constant_type="int" value="312"/>
-	<parameter name="scenarioCode" type="constant" constant_type="int" value="2"/>
+	<!-- 3 = historical reference. This file said 2 until the v1.0 cleanup, but
+	     code 2 has meant Scenario C since the present-day design replaced the
+	     2020 one, so running it produced Scenario C under a "historical" label. -->
+	<parameter name="scenarioCode" type="constant" constant_type="int" value="3"/>
 	<parameter name="enableHeterogeneity" type="constant" constant_type="int" value="1"/>
 	<parameter name="respectShelterOpeningDates" type="constant" constant_type="int" value="1"/>
 </sweep>
