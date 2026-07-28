@@ -1,0 +1,20 @@
+# Python dependencies for the analysis, scenario-construction and figure pipeline.
+# The simulation itself is Java (Repast Simphony 2.11 / JDK 17) and needs none of
+# these -- see docs/setup/ENVIRONMENT_SETUP.md for that toolchain.
+#
+#   pip install -r requirements.txt
+#
+# Versions below are the ones the published results were produced with, recorded
+# as a floor rather than a pin: nothing here relies on version-specific
+# behaviour, and the run manifests carry the real provenance (git commit, seed,
+# and a SHA-256 for every input file).
+
+pandas>=2.0          # every analysis script; run loading and aggregation
+matplotlib>=3.8      # all figures, Agg backend only (no display required)
+pyshp>=2.3           # reads Streets.shp for routing; needed to rebuild scenario C
+
+# Deliberately absent:
+#   numpy      - arrives transitively with pandas; no script imports it directly
+#   requests   - the live geocoder (add_missing_shelters_2026.py) uses stdlib
+#                urllib on purpose, so there is no third-party HTTP dependency
+#   PyMuPDF    - not imported anywhere; no PDF is read programmatically

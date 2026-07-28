@@ -6,7 +6,7 @@
 #   powershell -File scripts\run-model.ps1 -CompileOnly   # compile only
 #   powershell -File scripts\run-model.ps1 -DebugJvm      # launch, wait for debugger on :5005
 #
-# Environment (defaults match ENVIRONMENT_SETUP.md):
+# Environment (defaults match docs/setup/ENVIRONMENT_SETUP.md):
 #   JAVA_HOME    JDK 17 install  (default C:\Users\Chick\tools\jdk-17.0.19+10)
 #   REPAST_HOME  Repast Simphony 2.11.0 install (default %USERPROFILE%\RepastSimphony-2.11.0)
 

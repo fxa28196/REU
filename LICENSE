@@ -44,12 +44,9 @@ here grants you any right to any of them.
 
 1. REPAST SIMPHONY AND ITS DEPENDENCIES
    Geography/repast-licenses/     (41 dependency license texts)
-   Geography/license.txt          (inherited statement from the stock demo)
-   Geography/data/Agents2.*, CookCounty.*, WaterLines.*, Zones2.*,
-   RGBTestPattern.*, SP27GTIF.TIF, UTM2GTIF.TIF, README.TXT
-                                  (stock Repast Simphony demo data; retained
-                                  because it is part of the inherited upstream
-                                  project, and loaded by no code path here)
+   (The inherited stock-demo data and Geography/license.txt were removed in the
+   v1.0 cleanup -- loaded by no code path, and that license.txt contradicted
+   this file. Both remain recoverable from git history.)
 
    Repast Simphony is distributed under its own terms; see
    Geography/repast-licenses/repast-license.txt. GeographicLib, the JTS
@@ -59,7 +56,7 @@ here grants you any right to any of them.
 
 2. THE SPRINGER CHAPTER CLASS
    docs/chapter/svmult.cls
-   rubrik/OFFICIAL-template/**
+   docs/publication/template/OFFICIAL-template/**
 
    Copyright Springer-Verlag. Redistributed here only as supplied with the
    2026 Summer Proceedings chapter template, for the purpose of compiling this
@@ -99,14 +96,15 @@ here grants you any right to any of them.
 
 
 5. THIRD-PARTY DOCUMENTS INCLUDED FOR REFERENCE
-   rubrik/EXAMPLE-chapter-VanPelt-2026.pdf
+   docs/publication/template/EXAMPLE-chapter-VanPelt-2026.pdf
        Copyright Darcy Van Pelt. Included only as a worked example of the
        proceedings format.
-   "Copy of Wildfires smoke.pdf"
+   docs/source/wildfire-smoke-project-slides.pdf
        Project presentation slides; not relicensed.
-   files (1)/wildfire-reu-package/**/source-pdfs/**
+   docs/evidence-package-2026/source-pdfs/**
        Published reports retained for provenance verification. Each remains
-       under its publisher's terms.
+       under its publisher's terms. (A duplicate copy under "files (1)/" was
+       removed in the v1.0 cleanup; this is now the only copy.)
 
 
 ================================================================================

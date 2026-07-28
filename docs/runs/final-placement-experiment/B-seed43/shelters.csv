@@ -1,3 +1,0 @@
-shelter_id,name,lon,lat,capacity,operating,peak_occupancy,final_occupancy,refused_count,utilization,mean_travel_dist_m_admitted
-OPT1,Optimized site 1 (theoretical  street node 49392),-122.673500,45.525975,1019,true,1019,1019,999,1.0000,3574.89
-OPT2,Optimized site 2 (theoretical  street node 52835),-122.655673,45.519355,1018,true,999,999,0,0.9813,13297.17
