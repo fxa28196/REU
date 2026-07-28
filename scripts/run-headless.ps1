@@ -15,11 +15,18 @@
 
 param(
   [int]$TimeoutSec = 600,
-  # Repast sweep/params file, relative to the Geography project dir. Default is
-  # the OFFICIAL BASELINE (batch_params.xml); pass e.g. batch\batch_params_capacity400.xml
-  # for the capacity-binding reference or a production config. Never edit the
-  # baseline file for experiments.
-  [string]$ParamsFile = 'batch\batch_params.xml'
+  # Repast sweep/params file, relative to the Geography project dir.
+  #
+  # REQUIRED -- there is deliberately no default. This used to default to
+  # batch\batch_params.xml, the retired n=50 regression fixture, so a bare
+  # invocation silently ran a 50-agent smoke test that looked like a real run.
+  # The current study arms are:
+  #   batch\batch_params_2026_A_seed42.xml   reality        (36 sites / 2,234)
+  #   batch\batch_params_2026_B_seed42.xml   more capacity  (36 sites / 6,842)
+  #   batch\batch_params_2026_C_seed42.xml   better placed  (46 sites / 6,842)
+  # Seeds 42-50 exist for each arm.
+  [Parameter(Mandatory = $true)]
+  [string]$ParamsFile
 )
 
 $ErrorActionPreference = 'Stop'

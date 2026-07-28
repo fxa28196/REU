@@ -57,17 +57,30 @@
 		isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 	/>
-	<!-- Final study scenarios (09-DECISIONS.md; only two exist by design):
-	     0 = A, the real September-2020 shelter placement (DATA_SOURCES D1);
-	     1 = B, the same total capacity relocated to the street-network p-median
-	         optimum (scripts/optimize_shelters.py). B is a THEORETICAL siting
-	         optimum, not a policy recommendation - it ignores building
-	         availability, ownership, zoning, staffing and ADA access. -->
-	     2 = C, CAPACITY-NEUTRAL DEMONSTRATION ONLY - real locations and opening
-	         dates but total capacity raised to match the population, so that beds
-	         stop being the binding constraint. NOT real 2020 availability. -->
-	<parameter name="scenarioCode" displayName="Scenario (0=arm A current, 1=arm B optimized, 2=historical 2x99 beds)" type="int"
-		defaultValue="2"
+	<!-- Present-day three-arm study (PRESENT_DAY_THREE_ARM_RESULTS.md). Each arm
+	     answers what the previous one measured, so the order is meaningful:
+	     0 = A, reality. Every shelter facility the county operates today, at its
+	         real geocoded address and real capacity (36 sites / 2,234 spaces).
+	         A is a MEASUREMENT, not a treatment: its job is to reveal which
+	         constraint binds. It reported capacity.
+	     1 = B, capacity raised to meet demand at the SAME locations (36 sites /
+	         6,842 spaces). Isolates capacity, because nothing moves.
+	     2 = C, B's identical total capacity placed differently: real sites grow
+	         only 1.5x and the remainder becomes ten new sites at street-network
+	         p-median optima (46 sites / 6,842 spaces). Because B and C hold
+	         capacity equal, a B->C difference isolates PLACEMENT alone. The ten
+	         new sites are theoretical optima, not buildings - no zoning, cost,
+	         staffing or indoor-air analysis stands behind them.
+	     3 = historical reference (the real 2020 2x99 beds). NOT a study arm; it
+	         exists solely for calibration against the one observed occupancy
+	         record, and it is the model's only empirical calibration point.
+
+	     Codes 2 and 3 were remapped when the present-day design replaced the
+	     2020 one. Any configuration predating that remap silently selects a
+	     different scenario than its own header claims - trust the code, not a
+	     stale comment. -->
+	<parameter name="scenarioCode" displayName="Scenario (0=A today, 1=B more capacity, 2=C better placed, 3=historical reference)" type="int"
+		defaultValue="0"
 		isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 	/>

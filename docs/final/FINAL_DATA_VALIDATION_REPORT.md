@@ -17,8 +17,13 @@ code changed in this pass.
 ## TASK 1 — Shelter inventory reconciliation
 
 **Currently modelled: 29 of 48 inventory rows.** The missing capacity is
-substantial and is quantified below. Full per-row detail is in
-`SHELTER_INVENTORY_RECONCILIATION.md`.
+substantial and is quantified below. Per-row detail is in
+`SHELTER_CAPACITY_AUDIT.md` and in the `capacity_basis` column of
+`Geography/data/shelters/shelters_2026_current_placement.csv`, which records the
+unit conversion applied to every facility.
+
+*(This previously pointed at `SHELTER_INVENTORY_RECONCILIATION.md`, a file that
+was never written. Corrected in the v1.0 cleanup.)*
 
 ### 1.1 Included (29 facilities, 1,816 people-capacity)
 
@@ -178,7 +183,12 @@ restructured so that each arm answers what the previous arm measured:
 - **B therefore adds capacity at the real locations** — 91.6% sheltered, but it
   leaves 578 beds empty while 562 people are refused, exposing a second,
   geographic constraint.
-- **C places B's identical beds optimally** — 99.4% sheltered, zero turned away.
+- **C places B's identical beds optimally** — 96.0% sheltered, 256 turned away.
+  *(Corrected in the v1.0 cleanup. This line previously read "99.4% sheltered,
+  zero turned away", written against a pre-`5f54f8e` Scenario C that relocated
+  existing facilities. The shipped design leaves all 36 real sites where they
+  are and places only new capacity, so it does not reach zero refusals. Shipped
+  figures: `PRESENT_DAY_THREE_ARM_RESULTS.md`.)*
 - The optimizer's hardcoded `n2037` path was replaced with CLI arguments, so it
   can no longer silently consume a previous population's demand.
 
