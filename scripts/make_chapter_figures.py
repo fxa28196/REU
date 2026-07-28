@@ -15,6 +15,7 @@ Geography/data/airnow/aqs_hourly_pm25_portland_2020-09.csv.
 import collections
 import csv
 import datetime
+import math
 import pathlib
 
 import matplotlib
@@ -31,7 +32,9 @@ SEEDS = list(range(42, 51))
 # Print-safe: distinct in colour, distinct in lightness, distinct in hatch.
 COL = {"A": "#c4342c", "B": "#1f6fb2", "C": "#0f7a5a"}
 HATCH = {"A": "", "B": "///", "C": "..."}
-LABEL = {"A": "A: today", "B": "B: more beds", "C": "C: better-placed beds"}
+# Wording must match the chapter's tables exactly; a reader looking from a table
+# to a figure must not see two different names for the same scenario.
+LABEL = {"A": "A: today", "B": "B: more capacity", "C": "C: better placed"}
 GREY = "#5b5f66"
 
 plt.rcParams.update({
@@ -57,18 +60,41 @@ def rdir(arm, seed):
     return ROOT / f"Geography/output/{arm}2026-n6842-seed{seed}"
 
 
+# The generator's internal names say what a figure IS; the chapter numbers them
+# by where they APPEAR. Those two schemes drifted, and the gap was being closed by
+# hand-renaming files on every copy into the submission folder -- an unreproducible
+# step. This table closes it in code. Keys are the internal names; values are what
+# Capacity_Is_Not_Access.tex actually \includegraphics.
+CHAPTER_FIGURE_NAMES = {
+    "fig1_event": "fig1_pm25",
+    "fig6_speed": "fig2_speeds",
+    "fig2_outcomes": "fig3_access",
+    "fig4_map": "fig4_map",
+}
+
+
 def save(fig, name):
-    fig.savefig(FIG / f"{name}.pdf", bbox_inches="tight", pad_inches=0.02)
+    """Write one figure under the name the chapter actually includes."""
+    out = CHAPTER_FIGURE_NAMES.get(name, name)
+    fig.savefig(FIG / f"{out}.pdf", bbox_inches="tight", pad_inches=0.02)
     plt.close(fig)
-    kb = (FIG / f"{name}.pdf").stat().st_size / 1024
-    print(f"  {name}.pdf  {kb:.0f} KB")
+    kb = (FIG / f"{out}.pdf").stat().st_size / 1024
+    print(f"  {out}.pdf  {kb:.0f} KB   (from {name})")
 
 
 agents = {a: pd.read_csv(rdir(a, 42) / "agents.csv") for a in "ABC"}
 shelters = {a: pd.read_csv(rdir(a, 42) / "shelters.csv") for a in "ABC"}
-robust = pd.read_csv(ROOT / "docs/final/results-2026/6_SEED_ROBUSTNESS.csv")
-robust = robust[robust.Seed.notna() & (robust.Seed.astype(str) != "")].copy()
-robust["Seed"] = robust["Seed"].astype(float).astype(int)
+def load_robustness():
+    """Per-run headline table, loaded on demand.
+
+    Read lazily rather than at import: it is produced by verify_2026_runs.py, so a
+    clean checkout does not have it yet, and reading it at module level crashed
+    every figure in this file over data only one figure needs.
+    """
+    df = pd.read_csv(ROOT / "docs/final/results-2026/6_SEED_ROBUSTNESS.csv")
+    df = df[df.Seed.notna() & (df.Seed.astype(str) != "")].copy()
+    df["Seed"] = df["Seed"].astype(float).astype(int)
+    return df
 
 
 def pm25_series():
@@ -127,7 +153,8 @@ def fig_outcomes():
     for bar, a in zip(b, arms):
         bar.set_hatch(HATCH[a])
     ax.axhline(6842, color=GREY, ls="--", lw=0.9)
-    ax.text(2.45, 6950, "population", ha="right", va="bottom",
+    # Left-aligned: on the right it collided with scenario C's value annotation.
+    ax.text(-0.42, 6950, "population", ha="left", va="bottom",
             fontsize=7, color=GREY)
     for i, v in enumerate(got):
         ax.text(i, v + 130, f"{v:,}\n{100*v/6842:.1f}%", ha="center",
@@ -169,8 +196,11 @@ def fig_equity():
     rows = []
     for a in "ABC":
         d = agents[a]
-        easy = 100 * (d[d.mobility_limited == 0].final_state == "SHELTERED").mean()
-        hard = 100 * (d[d.mobility_limited == 1].final_state == "SHELTERED").mean()
+        # Round to one decimal BEFORE differencing, so the gap printed here is
+        # the difference of the two numbers the chapter's tables show. Taking the
+        # difference at full precision first gives 12.8 where the table says 12.9.
+        easy = round(100 * (d[d.mobility_limited == 0].final_state == "SHELTERED").mean(), 1)
+        hard = round(100 * (d[d.mobility_limited == 1].final_state == "SHELTERED").mean(), 1)
         rows.append((a, easy, hard))
     ys = [2, 1, 0]
     for (a, easy, hard), y in zip(rows, ys):
@@ -222,6 +252,23 @@ def fig_map():
         ax.set_xlabel("longitude", fontsize=8)
         ax.set_aspect(1 / 0.70)
         ax.tick_params(labelsize=6.5)
+    # 2 km scale bar. One degree of longitude at 45.5 N is 111,320*cos(45.5)
+    # metres, so 2 km is that many degrees wide -- the bar is computed, not drawn
+    # by eye, and stays correct if the extent changes.
+    deg_per_2km = 2000.0 / (111320.0 * math.cos(math.radians(45.5)))
+    ax0 = axes[0]
+    x0, x1 = ax0.get_xlim()
+    y0, y1 = ax0.get_ylim()
+    bx = x0 + 0.06 * (x1 - x0)
+    by = y0 + 0.07 * (y1 - y0)
+    ax0.plot([bx, bx + deg_per_2km], [by, by], color="#2b2b2b", lw=1.6,
+             solid_capstyle="butt", zorder=6)
+    for xt in (bx, bx + deg_per_2km):
+        ax0.plot([xt, xt], [by - 0.004, by + 0.004], color="#2b2b2b", lw=1.0,
+                 zorder=6)
+    ax0.text(bx + deg_per_2km / 2, by + 0.006, "2 km", ha="center", va="bottom",
+             fontsize=6.5, color="#2b2b2b")
+
     axes[0].set_ylabel("latitude", fontsize=8)
     axes[0].scatter([], [], s=8, c="#a8a49b", label="resident start point")
     axes[0].scatter([], [], s=22, marker="o", facecolor="none",
@@ -236,6 +283,7 @@ def fig_map():
 
 def fig_seeds():
     fig, ax = plt.subplots(figsize=(5.5, 2.2))
+    robust = load_robustness()
     for a in "ABC":
         d = robust[robust.Scenario == a].sort_values("Seed")
         ax.plot(d.Seed, d["Got inside"], marker={"A": "o", "B": "s", "C": "^"}[a],
@@ -247,6 +295,9 @@ def fig_seeds():
     ax.set_yticks([2000, 3000, 5000, 7000])
     ax.get_yaxis().set_major_formatter(
         matplotlib.ticker.FuncFormatter(lambda v, p: f"{int(v):,}"))
+    # Silence the log minor ticks: left on, they print 4x10^3 alongside "3,000",
+    # so the same axis shows two different number formats.
+    ax.get_yaxis().set_minor_formatter(matplotlib.ticker.NullFormatter())
     ax.legend(frameon=False, fontsize=7.5, ncol=3, loc="center right")
     ax.grid(axis="y", color="#dddad4", lw=0.6)
     ax.set_axisbelow(True)
@@ -280,11 +331,14 @@ def fig_speed():
 
 if __name__ == "__main__":
     print(f"writing {FIG}")
-    fig_event()
-    fig_outcomes()
-    fig_equity()
-    fig_map()
-    fig_seeds()
-    fig_speed()
+    # The 15-page chapter carries four figures. The equity figure was cut because
+    # it duplicated the first three rows of the mobility-gap table exactly, and
+    # the 27-run figure because three near-flat lines said less than the sentence
+    # that reports the spread. fig_equity() and fig_seeds() are kept above but no
+    # longer called; re-enable them if a longer version needs them again.
+    fig_event()      # -> fig1_pm25
+    fig_speed()      # -> fig2_speeds
+    fig_outcomes()   # -> fig3_access
+    fig_map()        # -> fig4_map
     total = sum(p.stat().st_size for p in FIG.glob("*")) / 1024
     print(f"total figure payload: {total:.0f} KB")
