@@ -1,0 +1,18 @@
+﻿<?xml version="1.0"?>
+<!-- PRODUCTION CONFIGURATION (09-DECISIONS.md D-5): n = 2,037 - the measured
+     January-2019 PIT count of unsheltered people in Multnomah County
+     (01-POPULATION.md D10), the documented population choice - against
+     2x99 operating beds. Seed-43 companion (D-5 multi-seed refusal reporting); D-5 requires refusal
+     counts to be reported across >=3 seeds, so seed-43/44 companions exist
+     alongside this file. All other parameters identical to the official
+     baseline (batch_params.xml). -->
+<sweep runs="1">
+	<parameter name="numAgents" type="constant" constant_type="int" value="2037"/>
+	<parameter name="randomSeed" type="constant" constant_type="int" value="43"/>
+	<parameter name="minutesPerTick" type="constant" constant_type="number" value="1.0"/>
+	<parameter name="walkingSpeedMps" type="constant" constant_type="number" value="1.30"/>
+	<parameter name="shelterArrivalDistanceM" type="constant" constant_type="number" value="200.0"/>
+	<parameter name="evacuationThresholdUgM3" type="constant" constant_type="number" value="55.5"/>
+	<parameter name="simulationHours" type="constant" constant_type="int" value="312"/>
+</sweep>
+

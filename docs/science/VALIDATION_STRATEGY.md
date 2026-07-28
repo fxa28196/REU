@@ -1,6 +1,11 @@
+﻿> **SUPERSEDED — HISTORICAL RECORD ONLY.** This document describes an earlier
+> state of the model and does not reflect the final submission. For the current
+> model and results see `docs/final/UPDATED_FINAL_RESULTS_REPORT.md` and the
+> audits alongside it. Retained for provenance.
+
 # Validation Strategy
 
-How each subsystem will be shown to behave correctly — specified **before**
+How each subsystem will be shown to behave correctly â€” specified **before**
 implementation, so that tests are not written to fit whatever the code
 happens to do.
 
@@ -10,11 +15,11 @@ without a passing validation is reported as unvalidated in any results that
 depend on it.
 
 Levels used below:
-- **L1 Analytic** — closed-form expected value; exact or near-exact agreement.
-- **L2 Internal consistency** — invariants that must hold in every run.
-- **L3 Empirical** — comparison against independent observed data.
-- **L4 Behavioural/face validity** — qualitative pattern a domain expert expects.
-- **L5 Reproducibility** — identical inputs give identical outputs.
+- **L1 Analytic** â€” closed-form expected value; exact or near-exact agreement.
+- **L2 Internal consistency** â€” invariants that must hold in every run.
+- **L3 Empirical** â€” comparison against independent observed data.
+- **L4 Behavioural/face validity** â€” qualitative pattern a domain expert expects.
+- **L5 Reproducibility** â€” identical inputs give identical outputs.
 
 Test artefacts live in `Geography/test/` (to be created) and, where a full
 JUnit harness is not warranted, as documented headless-run checks recorded in
@@ -36,7 +41,7 @@ edge weights in wrong units; duplicated/one-way edges; features dropped.
 | L4 | Render the graph over the street layer in the GUI | Visual coincidence with the drawn streets |
 
 **Already observed (commit `5092fde`):** 89,322 nodes / 112,070 edges, 0
-missing node ids, 1 of 100 agents unreachable — consistent with a
+missing node ids, 1 of 100 agents unreachable â€” consistent with a
 non-trivially-disconnected real street file. The component analysis is the
 outstanding item.
 
@@ -49,9 +54,9 @@ in an undirected graph; path reconstruction not matching the reported distance.
 |---|---|---|
 | L1 | Hand-built 5-node toy graph with known optimum | Exact match of distance and path |
 | L2 | **Path/distance consistency**: recompute the geodesic length of the reconstructed polyline | Equals the tree's reported network distance within 1e-6 relative |
-| L2 | **Symmetry**: d(shelter→agent) from the tree vs a fresh Dijkstra from the agent | Equal within floating-point tolerance |
+| L2 | **Symmetry**: d(shelterâ†’agent) from the tree vs a fresh Dijkstra from the agent | Equal within floating-point tolerance |
 | L2 | **Triangle/monotonicity**: distances along a reconstructed path decrease monotonically toward the source | No increases |
-| L3 | 5 agent–shelter pairs vs an external routing engine (e.g. OSRM/Google walking distance) | Within ~15 % (different networks/rules; large deviations indicate a real defect) |
+| L3 | 5 agentâ€“shelter pairs vs an external routing engine (e.g. OSRM/Google walking distance) | Within ~15 % (different networks/rules; large deviations indicate a real defect) |
 
 ## 3. Movement kinematics
 
@@ -60,22 +65,22 @@ distance accumulator disagreeing with displacement; drift from the street line.
 
 | Level | Test | Pass criterion |
 |---|---|---|
-| L1 | Single agent, straight path, *n* ticks | `distanceTraveledM` = n · walkingSpeedMps · 60 · minutesPerTick, exactly, until arrival |
-| L2 | Per-tick displacement ≤ step length + ε for every agent, every tick | No violations |
+| L1 | Single agent, straight path, *n* ticks | `distanceTraveledM` = n Â· walkingSpeedMps Â· 60 Â· minutesPerTick, exactly, until arrival |
+| L2 | Per-tick displacement â‰¤ step length + Îµ for every agent, every tick | No violations |
 | L2 | Agent position lies on (or within cm of) its routed polyline | Max perpendicular deviation < 1 m |
 | L1 | Total path length walked = network distance reported at selection | Agreement < 0.5 % |
 | L4 | GUI: agents visibly track streets, no teleporting or oscillation | Qualitative pass (screenshot recorded) |
 
 ## 4. Exposure accumulation (V6/V7/V8)
 
-**Failure modes:** Δt unit errors (minutes vs hours) — the classic 60× error;
+**Failure modes:** Î”t unit errors (minutes vs hours) â€” the classic 60Ã— error;
 exposure not accruing in non-EN_ROUTE states; double counting at state changes.
 
 | Level | Test | Pass criterion |
 |---|---|---|
-| L1 | Constant field C = 100 µg/m³, agent alive 60 ticks at 1 min/tick | exposure = 100 µg·m⁻³·h exactly (this test *is* the unit check) |
-| L1 | Same with RR_age = 2, RR_com = 1.5 | vwe = 300 µg·m⁻³·h exactly |
-| L2 | Population invariant: Σ agent exposure equals Σ over ticks of (n_agents × C × Δt) under a uniform field | Equality within 1e-9 relative |
+| L1 | Constant field C = 100 Âµg/mÂ³, agent alive 60 ticks at 1 min/tick | exposure = 100 ÂµgÂ·mâ»Â³Â·h exactly (this test *is* the unit check) |
+| L1 | Same with RR_age = 2, RR_com = 1.5 | vwe = 300 ÂµgÂ·mâ»Â³Â·h exactly |
+| L2 | Population invariant: Î£ agent exposure equals Î£ over ticks of (n_agents Ã— C Ã— Î”t) under a uniform field | Equality within 1e-9 relative |
 | L2 | Every agent in every state accrues exposure (Decision 3) | No agent finishes with exposure = 0 while the field was non-zero |
 | L1 | Threshold counter (V8) with a synthetic square-wave field | Counted hours equal the constructed number exactly |
 
@@ -86,11 +91,11 @@ interpolation fabricating structure; missing-data holes filled silently.
 
 | Level | Test | Pass criterion |
 |---|---|---|
-| L2 | Field value at a monitor's own location and hour equals that monitor's reading | Exact (uniform field: equals the county mean by construction — state which) |
-| L1 | Tick→timestamp mapping: tick 0 = 2020-09-07T00:00; tick 1440 = 2020-09-08T00:00 | Exact; **and** the local/GMT column choice documented |
-| L3 | **Leave-one-out cross-validation** — the decision test between uniform and IDW (DESIGN_SPEC V5) | Report RMSE/MAE for both; adopt IDW **only** if it beats uniform on held-out monitors. A negative result is a publishable finding |
+| L2 | Field value at a monitor's own location and hour equals that monitor's reading | Exact (uniform field: equals the county mean by construction â€” state which) |
+| L1 | Tickâ†’timestamp mapping: tick 0 = 2020-09-07T00:00; tick 1440 = 2020-09-08T00:00 | Exact; **and** the local/GMT column choice documented |
+| L3 | **Leave-one-out cross-validation** â€” the decision test between uniform and IDW (DESIGN_SPEC V5) | Report RMSE/MAE for both; adopt IDW **only** if it beats uniform on held-out monitors. A negative result is a publishable finding |
 | L2 | Missing-hour policy | Gaps must be explicit (NaN/flag), never silently zero-filled; count and report any |
-| L4 | Time series plotted against the D3 daily table in `data/README.md` | Peak on Sep 13, ~589 µg/m³ max hourly, near-baseline by Sep 19 |
+| L4 | Time series plotted against the D3 daily table in `data/README.md` | Peak on Sep 13, ~589 Âµg/mÂ³ max hourly, near-baseline by Sep 19 |
 
 ## 6. Shelter assignment and capacity (V12)
 
@@ -99,30 +104,30 @@ re-routing; assignment ignoring network distance; order-dependence unreported.
 
 | Level | Test | Pass criterion |
 |---|---|---|
-| L2 | Occupancy ≤ capacity at every tick, every shelter | Never violated |
+| L2 | Occupancy â‰¤ capacity at every tick, every shelter | Never violated |
 | L2 | Conservation: sheltered + en-route + unreachable + refused = n_agents at all times | Exact |
 | L1 | Small scenario: 3 agents, capacity-1 shelter | Exactly 1 admitted; other 2 attempt the next-nearest; final states match hand-derived expectation |
 | L2 | Chosen shelter is the network-nearest *admitting* one at selection time | No agent has a strictly closer admitting alternative |
 | L4 | Capacity binding produces sensible queue behaviour, not deadlock | No agent stuck in an infinite re-target loop (bounded retarget count enforced) |
 
-## 7. Vulnerability weighting (V1–V4)
+## 7. Vulnerability weighting (V1â€“V4)
 
 **Failure modes:** RRs applied to the wrong agents; prevalence sampling biased;
 unsourced values entering results silently.
 
 | Level | Test | Pass criterion |
 |---|---|---|
-| L2 | Attribute distributions in a large run match the specified input distribution | χ² / KS test not rejected at α = 0.05 |
+| L2 | Attribute distributions in a large run match the specified input distribution | Ï‡Â² / KS test not rejected at Î± = 0.05 |
 | L1 | Two identical agents differing only in comorbidity | VWE ratio equals exactly RR_com |
 | L2 | **Provenance guard**: any RR flagged `UNSOURCED` must either be 1.0 or cause a loud warning in the run manifest | Enforced in code, verified by test |
-| — | Sensitivity: rerun with all RR ≡ 1 | Report how much of the strategy ranking is attributable to weighting |
+| â€” | Sensitivity: rerun with all RR â‰¡ 1 | Report how much of the strategy ranking is attributable to weighting |
 
 ## 8. Statistical outputs (V14, scoring)
 
 | Level | Test | Pass criterion |
 |---|---|---|
 | L1 | Gini of a perfectly equal vector | 0.0 (within 1e-12) |
-| L1 | Gini of a maximally unequal vector (one non-zero) | (n−1)/n |
+| L1 | Gini of a maximally unequal vector (one non-zero) | (nâˆ’1)/n |
 | L1 | Gini against an independently implemented reference (e.g. R/Python) on the same vector | Agreement < 1e-9 |
 | L2 | Metrics computed over the **full** population including unreachable agents | Denominator equals n_agents, verified |
 
@@ -137,16 +142,16 @@ wall-clock or filesystem dependence.
 | L5 | Different seeds | Outputs differ, but summary statistics stay within a reported Monte-Carlo band |
 | L2 | Run manifest completeness | seed, all parameter values, git SHA, and dataset checksums present in every run's manifest |
 | L5 | Fresh-clone reproduction | Another machine reproduces a stored reference run from documented steps alone |
-| L2 | Iteration-order determinism | Any iteration over `HashMap`/context collections that affects results must be explicitly ordered — audited, since Dijkstra tie-breaking and agent update order can otherwise vary |
+| L2 | Iteration-order determinism | Any iteration over `HashMap`/context collections that affects results must be explicitly ordered â€” audited, since Dijkstra tie-breaking and agent update order can otherwise vary |
 
 ## 10. Regression protection (every commit)
 
 The standing per-commit gate, already in force since commit `eaa9605`:
 
-1. `gradlew compileJava` — must be BUILD SUCCESSFUL.
-2. Headless `RepastBatchMain` run — no exceptions; outcome-count table recorded
+1. `gradlew compileJava` â€” must be BUILD SUCCESSFUL.
+2. Headless `RepastBatchMain` run â€” no exceptions; outcome-count table recorded
    in the commit message and compared with the previous commit.
-3. GUI launch — scenario loads; screenshot to `docs/validation/`.
+3. GUI launch â€” scenario loads; screenshot to `docs/validation/`.
 4. Any deviation in outcome counts must be **explained in the commit message**
    as intended or investigated as a regression.
 
@@ -160,15 +165,16 @@ graph 89,322 nodes / 112,070 edges (commit `7318f9b`).
 | Subsystem | Status |
 |---|---|
 | Street network | Partially validated (census + GUI); component analysis outstanding |
-| Routing | **Not yet formally validated** — toy-graph and symmetry tests to be written |
-| Movement | Partially validated (behavioural: arrivals rose 30→99); analytic tests outstanding |
+| Routing | **Not yet formally validated** â€” toy-graph and symmetry tests to be written |
+| Movement | Partially validated (behavioural: arrivals rose 30â†’99); analytic tests outstanding |
 | Exposure | Not implemented |
 | PM2.5 field | Not implemented (data acquired) |
 | Shelter/capacity | Not implemented |
 | Vulnerability | Not implemented (citations blocked) |
 | Statistics | Not implemented |
-| Reproducibility | Seed exists but is **not recorded** — first gap to close |
+| Reproducibility | Seed exists but is **not recorded** â€” first gap to close |
 
 **Priority:** the routing/movement analytic tests and the run manifest should
 land *before* commit 8, so that the first scientific results arrive on a
 validated mechanical substrate.
+

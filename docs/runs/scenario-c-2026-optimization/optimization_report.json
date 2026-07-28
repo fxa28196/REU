@@ -1,0 +1,246 @@
+{
+  "scenario": "C - B's capacity, optimally placed",
+  "derived_from": "B2026-n6842-seed42",
+  "method": "capacity-aware greedy p-median, largest facility first",
+  "facilities": 36,
+  "total_capacity": 6842,
+  "candidates": 500,
+  "grid_spacing_m": 600.0,
+  "held_fixed": [
+    "facility count",
+    "per-facility capacity",
+    "total capacity",
+    "opening dates",
+    "population",
+    "demographics",
+    "PM2.5 field"
+  ],
+  "changed": [
+    "facility coordinates only"
+  ],
+  "no_leakage": "optimiser sees only encampment demand, the street graph and capacity; not outcomes, speeds, health attributes or PM2.5",
+  "limitations": [
+    "greedy heuristic, not a proven global optimum",
+    "sites are street nodes, not verified venues with indoor filtered air",
+    "demand geography inherits the encampment dataset (2025-26 reports)",
+    "unfilled-capacity penalty of 60 km per unserved bed is a tuning constant, not a measured quantity"
+  ],
+  "placements": [
+    {
+      "shelter_id": "Bybee_Lakes_Hope_Center",
+      "capacity": 536,
+      "lon": "-122.677609",
+      "lat": "45.527327"
+    },
+    {
+      "shelter_id": "Roseway_Inn_Motel_Shelte",
+      "capacity": 459,
+      "lon": "-122.674314",
+      "lat": "45.514205"
+    },
+    {
+      "shelter_id": "Willamette_Center",
+      "capacity": 398,
+      "lon": "-122.689707",
+      "lat": "45.535665"
+    },
+    {
+      "shelter_id": "Lilac_Meadows",
+      "capacity": 389,
+      "lon": "-122.670296",
+      "lat": "45.523109"
+    },
+    {
+      "shelter_id": "Laurelwood_Center",
+      "capacity": 368,
+      "lon": "-122.571918",
+      "lat": "45.465833"
+    },
+    {
+      "shelter_id": "River_District_Navigatio",
+      "capacity": 306,
+      "lon": "-122.747506",
+      "lat": "45.590142"
+    },
+    {
+      "shelter_id": "Clark_Center",
+      "capacity": 276,
+      "lon": "-122.682750",
+      "lat": "45.584518"
+    },
+    {
+      "shelter_id": "Gresham_Womens_Shelter",
+      "capacity": 276,
+      "lon": "-122.544555",
+      "lat": "45.489718"
+    },
+    {
+      "shelter_id": "Doreens_Place",
+      "capacity": 276,
+      "lon": "-122.543241",
+      "lat": "45.555387"
+    },
+    {
+      "shelter_id": "Arbor_Lodge_Shelter",
+      "capacity": 270,
+      "lon": "-122.675258",
+      "lat": "45.500394"
+    },
+    {
+      "shelter_id": "Delta_Park_Motel_Shelter",
+      "capacity": 233,
+      "lon": "-122.574416",
+      "lat": "45.540881"
+    },
+    {
+      "shelter_id": "Walnut_Park_Shelter",
+      "capacity": 220,
+      "lon": "-122.664644",
+      "lat": "45.557667"
+    },
+    {
+      "shelter_id": "Banfield_Motel_Shelter",
+      "capacity": 220,
+      "lon": "-122.576346",
+      "lat": "45.541808"
+    },
+    {
+      "shelter_id": "Dignity_Village",
+      "capacity": 202,
+      "lon": "-122.521026",
+      "lat": "45.484303"
+    },
+    {
+      "shelter_id": "Peninsula_Crossing_SRV",
+      "capacity": 202,
+      "lon": "-122.673484",
+      "lat": "45.519995"
+    },
+    {
+      "shelter_id": "Reedway_SRV",
+      "capacity": 202,
+      "lon": "-122.608809",
+      "lat": "45.553917"
+    },
+    {
+      "shelter_id": "Sunderland_RV_Safe_Park",
+      "capacity": 187,
+      "lon": "-122.679366",
+      "lat": "45.498008"
+    },
+    {
+      "shelter_id": "Jeans_Place",
+      "capacity": 184,
+      "lon": "-122.678460",
+      "lat": "45.471261"
+    },
+    {
+      "shelter_id": "Menlo_Park_SRV",
+      "capacity": 168,
+      "lon": "-122.563081",
+      "lat": "45.561364"
+    },
+    {
+      "shelter_id": "Stark_Street_Motel_Shelt",
+      "capacity": 165,
+      "lon": "-122.679775",
+      "lat": "45.502990"
+    },
+    {
+      "shelter_id": "Rockwood_Bridge_Shelter",
+      "capacity": 159,
+      "lon": "-122.560499",
+      "lat": "45.563175"
+    },
+    {
+      "shelter_id": "Harrison_Community_Villa",
+      "capacity": 129,
+      "lon": "-122.681903",
+      "lat": "45.502294"
+    },
+    {
+      "shelter_id": "BIPOC_SRV",
+      "capacity": 129,
+      "lon": "-122.578550",
+      "lat": "45.559880"
+    },
+    {
+      "shelter_id": "Queer_Affinity_Village",
+      "capacity": 116,
+      "lon": "-122.683123",
+      "lat": "45.604416"
+    },
+    {
+      "shelter_id": "Behavioral_Health_Resour",
+      "capacity": 101,
+      "lon": "-122.550574",
+      "lat": "45.572563"
+    },
+    {
+      "shelter_id": "Oak_Street_Village",
+      "capacity": 98,
+      "lon": "-122.681624",
+      "lat": "45.509202"
+    },
+    {
+      "shelter_id": "Porch_Light_Youth_Shelte",
+      "capacity": 92,
+      "lon": "-122.581127",
+      "lat": "45.559140"
+    },
+    {
+      "shelter_id": "Street_Light_Youth_Shelt",
+      "capacity": 92,
+      "lon": "-122.679356",
+      "lat": "45.492386"
+    },
+    {
+      "shelter_id": "Thayer_Family_Foundation",
+      "capacity": 64,
+      "lon": "-122.573348",
+      "lat": "45.561882"
+    },
+    {
+      "shelter_id": "Kenton_Womens_Village",
+      "capacity": 64,
+      "lon": "-122.554744",
+      "lat": "45.573950"
+    },
+    {
+      "shelter_id": "St_Johns_Village",
+      "capacity": 64,
+      "lon": "-122.678756",
+      "lat": "45.514533"
+    },
+    {
+      "shelter_id": "Arbor_Lodge_Village_Pods",
+      "capacity": 61,
+      "lon": "-122.587379",
+      "lat": "45.562669"
+    },
+    {
+      "shelter_id": "Avalon_Village",
+      "capacity": 34,
+      "lon": "-122.555803",
+      "lat": "45.574513"
+    },
+    {
+      "shelter_id": "Beacon_Village",
+      "capacity": 34,
+      "lon": "-122.587383",
+      "lat": "45.563251"
+    },
+    {
+      "shelter_id": "Parkrose_Community_Villa",
+      "capacity": 34,
+      "lon": "-122.578039",
+      "lat": "45.569031"
+    },
+    {
+      "shelter_id": "St_Andrews_Village",
+      "capacity": 34,
+      "lon": "-122.591176",
+      "lat": "45.561328"
+    }
+  ]
+}

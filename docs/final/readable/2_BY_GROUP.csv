@@ -1,0 +1,43 @@
+Scenario,Group,How many people,Got indoors,Percent who got indoors,Average walking speed (m/s),Average distance walked (km),Average smoke breathed in (micrograms),Average hours in dangerous air
+A - Shelters as they are today,Everyone,6842,2060,30.1,1.28,18.26,23374,135.8
+A - Shelters as they are today,Trouble walking,1360,268,19.7,0.98,17.23,26842,155.9
+A - Shelters as they are today,No trouble walking,5482,1792,32.7,1.36,18.52,22514,130.8
+A - Shelters as they are today,Has COPD,738,164,22.2,1.15,18.77,25995,151.0
+A - Shelters as they are today,No COPD,6104,1896,31.1,1.3,18.2,23057,133.9
+A - Shelters as they are today,Has asthma,1011,295,29.2,1.29,18.52,23684,137.6
+A - Shelters as they are today,No asthma,5831,1765,30.3,1.28,18.22,23320,135.5
+A - Shelters as they are today,Chronic condition,2712,819,30.2,1.28,18.12,23341,135.6
+A - Shelters as they are today,No chronic condition,4130,1241,30.0,1.28,18.35,23396,135.9
+A - Shelters as they are today,Counted vulnerable,4866,1371,28.2,1.24,18.21,24017,139.5
+A - Shelters as they are today,Not vulnerable,1976,689,34.9,1.39,18.39,21790,126.6
+A - Shelters as they are today,Age 18-44,3612,1107,30.6,1.3,18.42,23194,134.7
+A - Shelters as they are today,Age 45-64,2877,874,30.4,1.28,18.16,23285,135.3
+A - Shelters as they are today,Age 65+,353,79,22.4,1.06,17.49,25944,150.7
+"B - Enough beds, but in the buildings we already have",Everyone,6842,6264,91.6,1.28,7.94,3056,17.5
+"B - Enough beds, but in the buildings we already have",Trouble walking,1360,978,71.9,0.98,11.48,9585,55.5
+"B - Enough beds, but in the buildings we already have",No trouble walking,5482,5286,96.4,1.36,7.06,1436,8.1
+"B - Enough beds, but in the buildings we already have",Has COPD,738,636,86.2,1.15,9.76,4859,28.0
+"B - Enough beds, but in the buildings we already have",No COPD,6104,5628,92.2,1.3,7.72,2838,16.3
+"B - Enough beds, but in the buildings we already have",Has asthma,1011,916,90.6,1.29,8.62,3379,19.4
+"B - Enough beds, but in the buildings we already have",No asthma,5831,5348,91.7,1.28,7.82,3000,17.2
+"B - Enough beds, but in the buildings we already have",Chronic condition,2712,2470,91.1,1.28,8.01,3213,18.4
+"B - Enough beds, but in the buildings we already have",No chronic condition,4130,3794,91.9,1.28,7.89,2953,16.9
+"B - Enough beds, but in the buildings we already have",Counted vulnerable,4866,4320,88.8,1.24,8.56,3980,22.9
+"B - Enough beds, but in the buildings we already have",Not vulnerable,1976,1944,98.4,1.39,6.39,780,4.3
+"B - Enough beds, but in the buildings we already have",Age 18-44,3612,3362,93.1,1.3,7.59,2547,14.6
+"B - Enough beds, but in the buildings we already have",Age 45-64,2877,2611,90.8,1.28,8.06,3321,19.1
+"B - Enough beds, but in the buildings we already have",Age 65+,353,291,82.4,1.06,10.43,6104,35.3
+"C - Same number of beds, ten of the new ones placed well",Everyone,6842,6570,96.0,1.28,5.69,1534,8.6
+"C - Same number of beds, ten of the new ones placed well",Trouble walking,1360,1166,85.7,0.98,8.19,4981,28.7
+"C - Same number of beds, ten of the new ones placed well",No trouble walking,5482,5404,98.6,1.36,5.07,679,3.7
+"C - Same number of beds, ten of the new ones placed well",Has COPD,738,692,93.8,1.15,6.5,2296,13.1
+"C - Same number of beds, ten of the new ones placed well",No COPD,6104,5878,96.3,1.3,5.59,1442,8.1
+"C - Same number of beds, ten of the new ones placed well",Has asthma,1011,968,95.7,1.29,6.31,1636,9.2
+"C - Same number of beds, ten of the new ones placed well",No asthma,5831,5602,96.1,1.28,5.58,1516,8.5
+"C - Same number of beds, ten of the new ones placed well",Chronic condition,2712,2598,95.8,1.28,5.79,1611,9.1
+"C - Same number of beds, ten of the new ones placed well",No chronic condition,4130,3972,96.2,1.28,5.62,1484,8.3
+"C - Same number of beds, ten of the new ones placed well",Counted vulnerable,4866,4606,94.7,1.24,6.18,1995,11.3
+"C - Same number of beds, ten of the new ones placed well",Not vulnerable,1976,1964,99.4,1.39,4.49,398,2.0
+"C - Same number of beds, ten of the new ones placed well",Age 18-44,3612,3496,96.8,1.3,5.35,1275,7.1
+"C - Same number of beds, ten of the new ones placed well",Age 45-64,2877,2757,95.8,1.28,5.9,1603,9.0
+"C - Same number of beds, ten of the new ones placed well",Age 65+,353,317,89.8,1.06,7.46,3614,20.7

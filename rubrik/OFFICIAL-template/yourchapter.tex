@@ -1,0 +1,177 @@
+%%%%%%%%%%%%%%%%%%%% author.tex %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% sample root file for your "contribution" to a contributed volume
+%
+% Use this file as a template for your own input.
+%
+%%%%%%%%%%%%%%%% Springer %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% RECOMMENDED %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[graybox]{svmult}
+
+% choose options for [] as required from the list
+% in the Reference Guide
+
+\usepackage{type1cm}        % activate if the above 3 fonts are
+                            % not available on your system
+%
+\usepackage{makeidx}         % allows index generation
+\usepackage{graphicx}        % standard LaTeX graphics tool
+                             % when including figure files
+\usepackage{multicol}        % used for the two-column index
+\usepackage[bottom]{footmisc}% places footnotes at page bottom
+
+
+\usepackage{newtxtext}       % 
+\usepackage{newtxmath}       % selects Times Roman as basic font
+
+% see the list of further useful packages
+% in the Reference Guide
+
+\makeindex             % used for the subject index
+                       % please use the style svind.ist with
+                       % your makeindex program
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\title*{Contribution Title}
+% Use \titlerunning{Short Title} for an abbreviated version of
+% your contribution title if the original one is too long
+\author{Name of First Author and Name of Second Author}
+% Use \authorrunning{Short Title} for an abbreviated version of
+% your contribution title if the original one is too long
+\institute{Name of First Author \at Name, Address of Institute, \email{name@email.address}
+\and Name of Second Author \at Name, Address of Institute \email{name@email.address}}
+%
+% Use the package "url.sty" to avoid
+% problems with special characters
+% used in your e-mail or web address
+%
+\maketitle
+
+
+\abstract{Each chapter should be preceded by an abstract (no more than 200 words) that summarizes the content.}
+
+\section{Introduction}
+\label{sec:1}
+Introduce your project! You can perhaps include what led you to choose this topic, or why you chose this certain project idea instead of other similar ideas.
+
+Instead of simply listing headings of different levels we recommend to let every heading be followed by at least a short passage of text.  Further on please use the \LaTeX\ automatism for all your cross-references and citations. And please note that the first line of text that follows a heading is not indented, whereas the first lines of all subsequent paragraphs are.
+
+\section{Related Work and Background}
+\label{sec:2}
+Use this section to go over any research papers you found useful in your project, or any papers that are relevant to your project topic.
+
+Instead of simply listing headings of different levels we recommend to let every heading be followed by at least a short passage of text.  Further on please use the \LaTeX\ automatism for all your cross-references and citations. And please note that the first line of text that follows a heading is not indented, whereas the first lines of all subsequent paragraphs are.
+
+This is how you \cite{slavova2022edge} articles.
+
+\section{Data and Methodologies}
+\label{sec:3}
+% Always give a unique label
+% and use \ref{<label>} for cross-references
+% and \cite{<label>} for bibliographic references
+% use \sectionmark{}
+% to alter or adjust the section heading in the running head
+Please include a brief intro for your process of gathering data, which methods you used, and/or why you chose these datasets and methods.
+
+
+\subsection{Data Collection}
+\label{subsec:2}
+This subsection is for describing your data collection. The different parts can be separated by types of data (spreadsheets? satellite images?) or categories of data (economic data? historical data?) , or however seems fit for your project.
+
+\begin{quotation}
+Please do not use quotation marks when quoting texts! Simply use the \verb|quotation| environment -- it will automatically be rendered in line with the preferred layout.
+\end{quotation}
+
+\subsubsection{Data Collection Section 1}
+\label{subsec:3}
+Feel free to use images, tables, etc.
+
+Please note that the first line of text that follows a heading is not indented, whereas the first lines of all subsequent paragraphs are.
+
+
+\subsubsection{Data Collection Section 2}
+\label{subsec:4}
+Include any additional images, tables, data etc. 
+
+Please note that the first line of text that follows a heading is not indented, whereas the first lines of all subsequent paragraphs are.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=.7\textwidth]{figure}
+  \caption{Figures should always have a caption.}
+  \label{fig:1}
+\end{figure}
+
+
+\subsection{Methods}
+\label{subsec:5}
+Please describe the methods you used in this subsection. This can include: what platforms did you use? what coding languages? did you use AI? what AI model? Did you use any libraries? etc. Also, we only added two subsections but feel free to add more. ~\ref{sec:2}.
+
+\begin{quotation}
+Please do not use quotation marks when quoting texts! Simply use the \verb|quotation| environment -- it will automatically be rendered in line with the preferred layout.
+\end{quotation}
+
+
+\subsubsection{Method Subsection 1}
+Again, feel free to add any images, tables, etc.
+Instead of simply listing headings of different levels we recommend to let every heading be followed by at least a short passage of text.  Further on please use the \LaTeX\ automatism for all your cross-references and citations as has already been described in Sect.~\ref{subsec:2}, see also Fig.~\ref{fig:1}\footnote{If you copy text passages, figures, or tables from other works, you must obtain \textit{permission} from the copyright holder (usually the original publisher). Please enclose the signed permission with the manuscript. The sources\index{permission to print} must be acknowledged either in the captions, as footnotes or in a separate section of the book.}
+
+Please note that the first line of text that follows a heading is not indented, whereas the first lines of all subsequent paragraphs are.
+
+
+\subsubsection{Method Subsection 2}
+Again, feel free to add any images, tables, etc.
+Instead of simply listing headings of different levels we recommend to let every heading be followed by at least a short passage of text.  Further on please use the \LaTeX\ automatism for all your cross-references and citations as has already been described in Sect.~\ref{sec:2}.
+
+Please note that the first line of text that follows a heading is not indented, whereas the first lines of all subsequent paragraphs are.
+
+\section{Results}
+\label{sec:4}
+% Always give a unique label
+% and use \ref{<label>} for cross-references
+% and \cite{<label>} for bibliographic references
+% use \sectionmark{}
+% to alter or adjust the section heading in the running head
+Provide a description of main findings in chronological order of the data represented in the methods section. Include a summary of research findings. Repeat questions to help readers understand results. Additionally, include a report about information collection, participants, and recruitment.
+
+Show data presented in tables, charts, graphs, and other figures.
+ 
+\subsubsection{Subsubsection Heading}
+Instead of simply listing headings of different levels we recommend to let every heading be followed by at least a short passage of text.  Further on please use the \LaTeX\ automatism for all your cross-references and citations as has already been described in Sect.~\ref{sec:2}.
+
+\section{Conclusion}
+\label{sec:5}
+% Always give a unique label
+% and use \ref{<label>} for cross-references
+% and \cite{<label>} for bibliographic references
+% use \sectionmark{}
+% to alter or adjust the section heading in the running head
+Please use this section to describe the applications of your findings. Can this be used in other fields? What are some concerns or problems with your results? What are the next steps, if you plan to continue the project after the summer? etc. Again, we added two subsections but feel free to add more.
+
+\subsection{Applications} %
+In order to avoid simply listing headings of different levels we recommend to let every heading be followed by at least a short passage of text. Use the \LaTeX\ automatism for all your cross-references and citations citations as has already been described in Sect.~\ref{sec:2}.
+
+Please note that the first line of text that follows a heading is not indented, whereas the first lines of all subsequent paragraphs are.
+
+\subsection{Concerns and Next Steps} %
+Instead of simply listing headings of different levels we recommend to let every heading be followed by at least a short passage of text.  Further on please use the \LaTeX\ automatism for all your cross-references and citations as has already been described in Sect.~\ref{sec:2}.
+
+Note that the first line of text that follows a heading is not indented, whereas the first lines of all subsequent paragraphs are.
+%
+
+\begin{acknowledgement}
+If you want to include acknowledgments of assistance and the like at the end of an individual chapter please use the \verb|acknowledgement| environment -- it will automatically be rendered in line with the preferred layout.
+\end{acknowledgement}
+
+
+
+% Bibliography
+\bibliography{yourchapter}
+\bibliographystyle{plain}
+
+\end{document}

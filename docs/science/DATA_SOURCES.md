@@ -275,3 +275,77 @@ convention this project adopts and why.
 | D7 | SVI / EJScreen | IDENTIFIED | 14 (validation) |
 | D8 | Walking speed | ACQUIRED (provisional) | — (done, commit 3) |
 | D9 | AQI breakpoints | IDENTIFIED | 14 |
+
+
+---
+
+## D10 — 2019 Multnomah County Point-in-Time Count
+
+**Status: ACQUIRED (aggregate tables).** Provider: Portland State University
+Regional Research Institute, for Multnomah County. Count night **2019-01-23**.
+Geography: CoC OR-501 (Portland / Gresham / Multnomah County).
+
+**Used for:** population size (n = 2,037 unsheltered), age bands, sex, and the
+mobility-limitation marginal (391 / 2,037 = 19.2%).
+
+**Limitations:** 20 months before the modelled event; documented undercount
+(707 refusals, 75 discarded surveys); the mobility figure is a **lower bound**,
+asked only of street-count survey completers but divided by the full population;
+the count is CoC-wide while modelled origins are City-of-Portland only, so
+Gresham and East County contribute to the denominator but not to the geography.
+
+## D11 — CASPEH, California Statewide Study of People Experiencing Homelessness
+
+**Status: ACQUIRED (published summary).** UCSF Benioff Homelessness and Housing
+Initiative, June 2023. n = 3,198, 78% unsheltered.
+
+**Used for:** the age gradient applied to mobility limitation (22% overall vs 32%
+at 50+), and as corroboration for respiratory prevalence (asthma-or-COPD 25%).
+
+**Limitations:** California, 2021–22 — a donor population, not local. Only the
+*ratio* is imported; the local marginal from D10 is held exactly.
+
+## D12 — Zellmer et al. 2025, adults with recent homelessness (EHR)
+
+**Status: ACQUIRED (published).** DOI 10.1007/s11606-025-09814-x. Minnesota,
+n = 20,139, diagnoses from electronic health records.
+
+**Used for:** asthma prevalence 0.149 and COPD prevalence 0.105.
+
+**Limitations:** Minnesota, not Oregon; EHR-diagnosed rates undercount the
+never-diagnosed. Selected over ACS / BRFSS / NHIS because those sampling frames
+(housing units, landline/cell households) structurally exclude unsheltered
+people, making them a category error for agent attributes.
+
+## D13 — Movement and ventilation literature
+
+**Status: ACQUIRED (published).**
+
+- Bohannon & Williams Andrews 2011, DOI 10.1016/j.physio.2010.12.004, n = 23,111
+  — age × sex comfortable gait means.
+- Bohannon 1997, DOI 10.1093/ageing/26.1.15 — within-population CV 0.13.
+- Boyce, Shields & Silcock 1999, DOI 10.1023/A:1015339216366 — impaired movement
+  speeds. **VERIFIED-IN-SECONDARY** via Tinaburri 2018.
+- Buekers et al. 2024, DOI 10.1183/16000617.0253-2023 — COPD gait-speed decrement
+  −19 cm/s (95% CI −28 to −11); evidence rated low by the authors.
+- U.S. EPA *Exposure Factors Handbook* (2011) Ch. 6 — activity-level inhalation
+  rates. **VERIFIED-IN-SECONDARY**, swept.
+
+**Limitations:** healthy-adult and clinical cohorts; none is
+unsheltered-specific. Boyce and the EFH table cells require confirmation against
+the primary documents before publication.
+
+## D14 — Street Roots, 16 September 2020 (shelter occupancy)
+
+**Status: ACQUIRED (news report).** The only quantitative behavioural calibration
+target the project possesses: approximately **90 occupants at the Oregon
+Convention Center and 40 at Charles Jordan (~130 of 198 beds)**, together with
+the 99-bed-per-site capacity figure.
+
+**Used for:** the historical calibration comparison in
+`docs/final/UPDATED_FINAL_RESULTS_REPORT.md` §4, where the model's 198/198
+occupancy is reported against this observation (1.52× over-prediction).
+
+**Limitations:** a single newsroom observation on one night, not an agency
+record. The **unit** of the 99 figure — cots, sleeping positions, or persons
+admitted — is never stated by the source (assumption A-04, blocking).

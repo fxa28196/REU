@@ -1,0 +1,120 @@
+MIT License
+
+Copyright (c) 2026 Fatima Asghar
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+================================================================================
+SCOPE OF THIS LICENSE, AND WHAT IT DOES NOT COVER
+================================================================================
+
+The MIT grant above covers the work authored for this project:
+
+  Geography/src/geography/**       the agent-based model (Java)
+  scripts/**                       data acquisition, analysis, scenario
+                                   construction, figure generation, validation
+  docs/**                          documentation written for this project,
+                                   EXCEPT the third-party items listed below
+  Geography/batch/**               run configuration files
+  Geography/data/registry/**       the variable and assumption registries
+  Geography/data/shelters/*.csv    the shelter inventory compiled for this
+                                   project from the public sources named in
+                                   Geography/data/README.md
+
+It does NOT cover the following, each of which carries its own terms. Nothing
+here grants you any right to any of them.
+
+
+1. REPAST SIMPHONY AND ITS DEPENDENCIES
+   Geography/repast-licenses/     (41 dependency license texts)
+   Geography/license.txt          (inherited statement from the stock demo)
+   Geography/data/Agents2.*, CookCounty.*, WaterLines.*, Zones2.*,
+   RGBTestPattern.*, SP27GTIF.TIF, UTM2GTIF.TIF, README.TXT
+                                  (stock Repast Simphony demo data; retained
+                                  because it is part of the inherited upstream
+                                  project, and loaded by no code path here)
+
+   Repast Simphony is distributed under its own terms; see
+   Geography/repast-licenses/repast-license.txt. GeographicLib, the JTS
+   Topology Suite and GeoTools likewise carry their own licenses, included in
+   that directory.
+
+
+2. THE SPRINGER CHAPTER CLASS
+   docs/chapter/svmult.cls
+   rubrik/OFFICIAL-template/**
+
+   Copyright Springer-Verlag. Redistributed here only as supplied with the
+   2026 Summer Proceedings chapter template, for the purpose of compiling this
+   chapter. Not relicensed.
+
+
+3. THE STREET CENTERLINE DATA  --  REDISTRIBUTION TERMS UNVERIFIED
+   Geography/data/Streets.shp, .dbf, .shx, .prj, .cpg
+   Streets.zip
+
+   Portland Metro Regional Land Information System (RLIS) street centerlines,
+   inferred from the attribute schema. This file was supplied with the
+   inherited project and predates version control here: its original download
+   date, RLIS release version, and redistribution license could NOT be
+   recovered. This is documented as a known provenance gap in
+   Geography/data/README.md and docs/science/DATA_SOURCES.md (source D0), and
+   is stated in the published chapter.
+
+   Treat its redistribution as unconfirmed. If you need this layer, obtain it
+   directly from Metro / gis-pdx.opendata.arcgis.com under their terms rather
+   than relying on the copy here.
+
+
+4. PUBLIC-SECTOR DATA (redistributed, not owned)
+   Geography/data/airnow/aqs_hourly_pm25_portland_2020-09.csv
+       U.S. Environmental Protection Agency, Air Quality System. A work of the
+       U.S. federal government and therefore in the public domain. EPA asks
+       that AQS be acknowledged as the source.
+
+   Geography/data/encampments/irp_campsite_reports_sample.csv
+       City of Portland open data (Impact Reduction Program campsite reports).
+       Subject to the City of Portland's open-data terms.
+
+   Both are reproducible from their original sources by the fetch scripts in
+   scripts/, and every file carries a SHA-256 checksum in
+   Geography/data/README.md.
+
+
+5. THIRD-PARTY DOCUMENTS INCLUDED FOR REFERENCE
+   rubrik/EXAMPLE-chapter-VanPelt-2026.pdf
+       Copyright Darcy Van Pelt. Included only as a worked example of the
+       proceedings format.
+   "Copy of Wildfires smoke.pdf"
+       Project presentation slides; not relicensed.
+   files (1)/wildfire-reu-package/**/source-pdfs/**
+       Published reports retained for provenance verification. Each remains
+       under its publisher's terms.
+
+
+================================================================================
+HOW TO CITE
+================================================================================
+
+If you use this model or its results, please cite the software (see
+CITATION.cff) rather than only this license file. Results in the published
+chapter were produced from a clean working tree; each run manifest records its
+git commit, random seed, and a SHA-256 checksum for every input file, so any
+reported number can be traced to the exact bytes that produced it.
