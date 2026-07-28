@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!-- MATCHED CONTROL FOR ARM C - "C-random-pool", DRAW r5, SEED 44
+
+     This is the control that actually isolates arm C's optimiser.
+
+     The bounding-box control (batch_params_2026_CR{1,2,3}_seed*.xml) draws the
+     ten new sites uniformly from street nodes across the whole demand bounding
+     box. That box is several times the area of the demand footprint, so that arm
+     differs from arm C in TWO ways at once - where it looks AND how it chooses.
+
+     This arm holds the SEARCH SPACE identical. The ten sites are drawn at random
+     from EXACTLY the 498-node candidate set arm C's greedy capacity-aware
+     p-median searched, rebuilt verbatim from build_scenario_c_2026.py (600 m grid
+     dedup of street nodes in the demand bbox, first 500 in node order, existing
+     facility nodes removed). The rebuild is verified: all ten sites arm C
+     actually chose are members of this set. Only the SELECTION RULE differs, so a
+     C-random-pool -> C gap is the optimiser's contribution and nothing else.
+
+     Everything else is identical to arms B, C and C-random:
+       * the same 36 real facilities at their real coordinates, expanded x1.5
+       * the same ten new sites
+       * the SAME per-site capacity vector, copied facility-for-facility from
+         arm C's own file
+       * the same total system capacity, 6,842
+       * the same population, demographics, PM2.5 field, street network and
+         opening dates, and every parameter below identical to arm C's file
+
+     Site selection used python random.Random(5) - a FIXED, STATED site-seed,
+     deliberately distinct from the bounding-box arm's site-seeds 1/2/3, and
+     unrelated to randomSeed below, which is the model's own RNG seed exactly as
+     in arms A/B/C.
+
+     Built by scripts/build_scenario_crandom_pool_2026.py ->
+     data/shelters/shelters_2026_random_sites_r5.csv (46 facilities, 6,842 spaces).
+
+     Population n = 6842 is the 2025 Tri-County Point-in-Time count for
+     Multnomah County (PSU HRAC, published 2025-11-04): 10,526 people
+     experiencing homelessness, of whom more than 65% were unsheltered.
+     The model represents the UNSHELTERED only.
+
+     enableHeterogeneity=1        residents carry sourced age / sex / mobility /
+                                  asthma / COPD attributes and walk at their own speed.
+     respectShelterOpeningDates=1 shelters open on their real dates (A-02).
+
+     walkingSpeedMps is declared but IGNORED when heterogeneity is on. -->
+<sweep runs="1">
+	<parameter name="numAgents" type="constant" constant_type="int" value="6842"/>
+	<parameter name="randomSeed" type="constant" constant_type="int" value="44"/>
+	<parameter name="minutesPerTick" type="constant" constant_type="number" value="1.0"/>
+	<parameter name="walkingSpeedMps" type="constant" constant_type="number" value="1.30"/>
+	<parameter name="shelterArrivalDistanceM" type="constant" constant_type="number" value="200.0"/>
+	<parameter name="evacuationThresholdUgM3" type="constant" constant_type="number" value="55.5"/>
+	<parameter name="simulationHours" type="constant" constant_type="int" value="312"/>
+	<parameter name="scenarioCode" type="constant" constant_type="int" value="9"/>
+	<parameter name="enableHeterogeneity" type="constant" constant_type="int" value="1"/>
+	<parameter name="respectShelterOpeningDates" type="constant" constant_type="int" value="1"/>
+</sweep>

@@ -100,11 +100,61 @@ public class ContextCreator implements ContextBuilder {
 	 *  be picked up and set down somewhere else. */
 	private static final String SCENARIO_C_NAME = "C_existing_expanded_plus_new_optimized_sites";
 	private static final String SHELTERS_C_CSV = "data/shelters/shelters_2026_expanded_plus_new_sites.csv";
+
+	/** Arm C-random — the CONTROL for arm C. C's ten new sites were placed by
+	 *  p-median against the same encampment demand points the run is then scored
+	 *  on, so "C beats B" could be partly definitional. C-random is arm C with the
+	 *  optimiser switched off and nothing else changed: same 36 real facilities at
+	 *  real coordinates expanded 1.5x, same ten new sites, the SAME per-site
+	 *  capacity vector copied facility-for-facility from C's own file, same total
+	 *  6,842 — but the ten new coordinates are drawn UNIFORMLY AT RANDOM from
+	 *  street-graph nodes inside the demand bounding box. A C-random -> C gap is
+	 *  attributable to OPTIMISATION; a B -> C-random gap is attributable to mere
+	 *  DISPERSION of the same capacity across ten extra doors.
+	 *  Three independent draws (site-seeds 1/2/3, python random.Random) exist so a
+	 *  single lucky or unlucky set cannot be mistaken for a result; they are three
+	 *  separate scenario codes rather than a new parameter, so no batch-params
+	 *  schema changes and every archived params file still runs unchanged.
+	 *  Built by scripts/build_scenario_crandom_2026.py. Like C's, these are
+	 *  street-network nodes: THEORETICAL locations, not verified venues. */
+	private static final String SCENARIO_CR1_NAME = "CRANDOM_r1_existing_expanded_plus_ten_RANDOM_sites";
+	private static final String SHELTERS_CR1_CSV = "data/shelters/shelters_2026_random_sites_r1.csv";
+	private static final String SCENARIO_CR2_NAME = "CRANDOM_r2_existing_expanded_plus_ten_RANDOM_sites";
+	private static final String SHELTERS_CR2_CSV = "data/shelters/shelters_2026_random_sites_r2.csv";
+	private static final String SCENARIO_CR3_NAME = "CRANDOM_r3_existing_expanded_plus_ten_RANDOM_sites";
+	private static final String SHELTERS_CR3_CSV = "data/shelters/shelters_2026_random_sites_r3.csv";
+
+	/** Arm C-random-POOL — the MATCHED control, and the one that actually isolates
+	 *  the optimiser. C-random (r1–r3) draws from the whole demand bounding box,
+	 *  which is several times the area of the demand footprint, so it differs from
+	 *  arm C in two ways at once: where it looks AND how it chooses. These three
+	 *  draws hold the search space identical — the sites are picked at random from
+	 *  EXACTLY the 498-node candidate set arm C's p-median searched (verified: all
+	 *  ten sites arm C chose are members of it) — so only the SELECTION RULE
+	 *  differs. A C-random-pool -> C gap is the optimiser's contribution, full stop.
+	 *  Site-seeds 4/5/6, deliberately distinct from the bounding-box arm's 1/2/3 so
+	 *  the two control families can never be confused.
+	 *  Built by scripts/build_scenario_crandom_pool_2026.py. */
+	private static final String SCENARIO_CP4_NAME = "CRANDOMPOOL_r4_random_from_arm_C_candidate_set";
+	private static final String SHELTERS_CP4_CSV = "data/shelters/shelters_2026_random_sites_r4.csv";
+	private static final String SCENARIO_CP5_NAME = "CRANDOMPOOL_r5_random_from_arm_C_candidate_set";
+	private static final String SHELTERS_CP5_CSV = "data/shelters/shelters_2026_random_sites_r5.csv";
+	private static final String SCENARIO_CP6_NAME = "CRANDOMPOOL_r6_random_from_arm_C_candidate_set";
+	private static final String SHELTERS_CP6_CSV = "data/shelters/shelters_2026_random_sites_r6.csv";
+
 	/** NOT a scenario — the historical-capacity reference run (2 x 99 real beds)
 	 *  retained solely so the model can be compared against the one observed
 	 *  occupancy record (~130 of 198 on 2020-09-16, Street Roots). Used for the
 	 *  calibration section of the results report, never as a study arm. */
 	private static final String HISTORICAL_REFERENCE_NAME = "HISTORICAL_capacity_reference_not_a_scenario";
+
+	/** Arm D — NEED-BASED ADMISSION. Identical to B in every physical respect:
+	 *  the same 36 real locations and the same 6,842 spaces, from B's own
+	 *  shelter file. The ONLY difference is the intake rule — a fraction
+	 *  {@code triageReserveFraction} of every shelter's capacity is held for
+	 *  mobility-limited arrivals instead of being handed out first-come,
+	 *  first-served. No building, no relocation, no extra bed. */
+	private static final String SCENARIO_D_NAME = "D_need_based_admission_real_locations";
 
 	// V13 anchor: simulation hour 0 = local midnight at the start of the study
 	// window (Portland's Sept 7-19 2020 smoke episode).
@@ -130,6 +180,11 @@ public class ContextCreator implements ContextBuilder {
 		int scenarioCode = intParam(parm, "scenarioCode", 0);
 		int enableHeterogeneity = intParam(parm, "enableHeterogeneity", 0);
 		int respectShelterOpeningDates = intParam(parm, "respectShelterOpeningDates", 0);
+		// Arm D's only lever. 0.0 = first-come-first-served, i.e. every arm that
+		// existed before arm D, bit-for-bit — the reserve is subtracted from a
+		// capacity comparison in Shelter.hasSpaceFor(), so at 0 the comparison is
+		// the identical expression it always was.
+		double triageReserveFraction = doubleParam(parm, "triageReserveFraction", 0.0);
 		String scenarioName;
 		String sheltersCsv;
 		if (scenarioCode == 1) {
@@ -141,6 +196,29 @@ public class ContextCreator implements ContextBuilder {
 		} else if (scenarioCode == 3) {
 			scenarioName = HISTORICAL_REFERENCE_NAME;
 			sheltersCsv = SHELTERS_CSV;   // the real 2 x 99 beds
+		} else if (scenarioCode == 4) {
+			scenarioName = SCENARIO_CR1_NAME;
+			sheltersCsv = SHELTERS_CR1_CSV;
+		} else if (scenarioCode == 5) {
+			scenarioName = SCENARIO_CR2_NAME;
+			sheltersCsv = SHELTERS_CR2_CSV;
+		} else if (scenarioCode == 6) {
+			scenarioName = SCENARIO_CR3_NAME;
+			sheltersCsv = SHELTERS_CR3_CSV;
+		} else if (scenarioCode == 7) {
+			// Arm D reads arm B's shelter file verbatim — same 36 sites, same
+			// 6,842 spaces. Only triageReserveFraction differs from arm B.
+			scenarioName = SCENARIO_D_NAME;
+			sheltersCsv = SHELTERS_B_CSV;
+		} else if (scenarioCode == 8) {
+			scenarioName = SCENARIO_CP4_NAME;
+			sheltersCsv = SHELTERS_CP4_CSV;
+		} else if (scenarioCode == 9) {
+			scenarioName = SCENARIO_CP5_NAME;
+			sheltersCsv = SHELTERS_CP5_CSV;
+		} else if (scenarioCode == 10) {
+			scenarioName = SCENARIO_CP6_NAME;
+			sheltersCsv = SHELTERS_CP6_CSV;
 		} else {
 			scenarioName = SCENARIO_A_NAME;
 			sheltersCsv = SHELTERS_A_CSV;
@@ -237,6 +315,15 @@ public class ContextCreator implements ContextBuilder {
 						tickForDate(r.get("opened"), ticksPerHour, Double.NEGATIVE_INFINITY, 0),
 						tickForDate(r.get("closed"), ticksPerHour, Double.POSITIVE_INFINITY, 1));
 			}
+			// Need-based admission (arm D). The reserve is a FLOOR of the
+			// per-site capacity, not a round: rounding up would let a rule
+			// stated as "hold 10%" hold more than 10% at every odd-sized site,
+			// and the conservative direction is the one that cannot flatter the
+			// intervention. At fraction 0 this sets 0 and changes nothing.
+			if (capacity != null && triageReserveFraction > 0.0) {
+				shelter.setReservedForPriority(
+						(int) Math.floor(capacity.intValue() * triageReserveFraction));
+			}
 			context.add(shelter);
 			Coordinate c = new Coordinate(lon, lat);
 			geography.move(shelter, fac.createPoint(c));
@@ -257,7 +344,26 @@ public class ContextCreator implements ContextBuilder {
 							s.getOpenTick() / ticksPerHour);
 				}
 			}
+		}
+		if (triageReserveFraction > 0.0) {
+			int reservedTotal = 0, operatingCap = 0;
+			for (Object o : context.getObjects(Shelter.class)) {
+				Shelter s = (Shelter) o;
+				if (s.isOperating() && s.getCapacity() != null) {
+					reservedTotal += s.getReservedForPriority();
+					operatingCap += s.getCapacity().intValue();
+				}
+			}
+			System.out.printf("[Triage] need-based admission ON: reserve fraction %.3f -> "
+					+ "%d of %d operating spaces held for mobility-limited arrivals "
+					+ "(%.2f%% realised after per-site floor)%n",
+					triageReserveFraction, reservedTotal, operatingCap,
+					operatingCap == 0 ? 0.0 : 100.0 * reservedTotal / operatingCap);
 		} else {
+			System.out.println("[Triage] need-based admission OFF (triageReserveFraction=0): "
+					+ "admission is first-come, first-served exactly as in arms A/B/C.");
+		}
+		if (respectShelterOpeningDates != 1) {
 			System.out.println("[Shelters][WARN] opening-date gate DISABLED: every shelter is "
 					+ "open from tick 0, which is counterfactual (the real sites opened "
 					+ "2020-09-10/11). See assumption A-02.");
@@ -327,11 +433,11 @@ public class ContextCreator implements ContextBuilder {
 		String[] pNames = { "numAgents", "minutesPerTick", "walkingSpeedMps",
 				"shelterArrivalDistanceM", "simulationHours", "randomSeed",
 				"evacuationThresholdUgM3", "scenarioCode", "enableHeterogeneity",
-				"respectShelterOpeningDates" };
+				"respectShelterOpeningDates", "triageReserveFraction" };
 		Object[] pVals = { numAgents, minutesPerTick, parm.getValue("walkingSpeedMps"),
 				parm.getValue("shelterArrivalDistanceM"), simulationHours, seed,
 				paramOrDefault(parm, "evacuationThresholdUgM3", "unset"), scenarioCode,
-				enableHeterogeneity, respectShelterOpeningDates };
+				enableHeterogeneity, respectShelterOpeningDates, triageReserveFraction };
 		String[] dataFiles = { STREETS_SHP, SMOKE_CSV, sheltersCsv, ENCAMPMENTS_CSV };
 
 		@SuppressWarnings("unchecked")
@@ -343,6 +449,19 @@ public class ContextCreator implements ContextBuilder {
 		System.out.printf("[Run] ends at tick %.0f (%d event hours at %.1f min/tick)%n",
 				endTick, endHours, minutesPerTick);
 		return context;
+	}
+
+	/** Integer parameter, or {@code fallback} when this run's schema omits it. */
+	/** Double parameter, or {@code fallback} when this run's schema omits it.
+	 *  Same defensive contract as {@link #intParam}: every archived params file
+	 *  predates triageReserveFraction and must keep running unchanged. */
+	private static double doubleParam(Parameters parm, String name, double fallback) {
+		try {
+			Object v = parm.getValue(name);
+			return (v instanceof Number) ? ((Number) v).doubleValue() : fallback;
+		} catch (RuntimeException absentFromSchema) {
+			return fallback;
+		}
 	}
 
 	/** Integer parameter, or {@code fallback} when this run's schema omits it. */

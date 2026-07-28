@@ -298,7 +298,7 @@ public class GisAgent {
 
 		if (pathIndex >= routePath.size()) {
 			// Reached the shelter's street node: request admission (V12).
-			if (targetShelter.isOpenAt(tick) && targetShelter.admit()) {
+			if (targetShelter.isOpenAt(tick) && targetShelter.admit(isPriorityForAdmission())) {
 				state = State.SHELTERED;
 				arrivalTick = tick;
 			} else {
@@ -345,7 +345,7 @@ public class GisAgent {
 				continue;
 			}
 			anyReachable = true;
-			if (shelter.hasSpace() && dM < bestDistM) {
+			if (shelter.hasSpaceFor(isPriorityForAdmission()) && dM < bestDistM) {
 				bestDistM = dM;
 				best = shelter;
 			}
@@ -370,6 +370,26 @@ public class GisAgent {
 		}
 	}
 
+	/**
+	 * Whether this resident is a PRIORITY arrival under need-based admission
+	 * (arm D): the reserved fraction of each shelter's capacity is available
+	 * only to residents whose mobility is limited (V20, PopulationSampler).
+	 *
+	 * <p>The triage criterion is mobility limitation and nothing else. It is
+	 * the one attribute that both (a) is sampled from a sourced marginal and
+	 * (b) mechanically causes the access gap in this model, because a slower
+	 * walker reaches a door later and is refused by someone who walked faster.
+	 * Age, asthma and COPD are deliberately NOT part of the rule: they carry no
+	 * behavioural consequence in this model, so triaging on them would be a
+	 * claim the simulation cannot support.
+	 *
+	 * <p>Always false when heterogeneity is disabled (no resident has
+	 * attributes), which is one of the two reasons a reserve of 0 is inert.
+	 */
+	private boolean isPriorityForAdmission() {
+		return attributes != null && attributes.mobilityLimited;
+	}
+
 	/** True if at least one operating shelter is open at this tick. Cheap: the
 	 *  scenario has three shelters. */
 	private static boolean anyShelterOpen(Context context, double tick) {
@@ -387,7 +407,7 @@ public class GisAgent {
 	private boolean anyShelterAvailable(Context context, double tick) {
 		for (Object obj : context.getObjects(Shelter.class)) {
 			Shelter shelter = (Shelter) obj;
-			if (shelter.isAvailableAt(tick) && shelter.getRouteTree() != null
+			if (shelter.isAvailableAt(tick, isPriorityForAdmission()) && shelter.getRouteTree() != null
 					&& !Double.isInfinite(shelter.getRouteTree().distanceTo(currentNodeId))) {
 				return true;
 			}
