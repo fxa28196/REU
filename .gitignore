@@ -27,3 +27,9 @@ scripts/cp.args
 # ---- Redundant archive: the extracted, tracked copy lives at Geography/data/Streets.* ----
 /Streets.zip
 scripts/__pycache__/
+
+# ---- Overleaf submission staging (regenerable) ----
+# The canonical manuscript lives in docs/chapter/. This folder is assembled for
+# upload only; it was once the sole home of the current chapter, which is why the
+# v1.0 cleanup moved the .tex and .bib into docs/chapter/ before ignoring it.
+/overleaf 2/
