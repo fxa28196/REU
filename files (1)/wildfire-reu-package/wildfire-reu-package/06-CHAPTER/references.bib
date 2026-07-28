@@ -1,0 +1,218 @@
+% =====================================================================
+%  references.bib
+%  Vulnerability-Weighted Shelter Siting Under Wildfire Smoke
+%
+%  TWO SECTIONS BELOW. Read the divider before you cite anything.
+%
+%  SECTION A entries were checked against the publisher record: author list,
+%  journal, volume, pages, year, DOI. Every DOI below resolves.
+%
+%  SECTION B is commented out on purpose. Those entries are either wrong as
+%  previously cited, or cannot support the claim they were attached to.
+%  Uncommenting one without re-sourcing it reintroduces the exact error the
+%  citation audit found.
+% =====================================================================
+
+
+% =====================================================================
+%  SECTION A --- VERIFIED. Safe to cite.
+% =====================================================================
+
+@article{north2013,
+  author  = {North, Michael J. and Collier, Nicholson T. and Ozik, Jonathan and
+             Tatara, Eric R. and Macal, Charles M. and Bragen, Mark and
+             Sydelko, Pamela},
+  title   = {Complex adaptive systems modeling with {R}epast {S}imphony},
+  journal = {Complex Adaptive Systems Modeling},
+  volume  = {1},
+  number  = {1},
+  pages   = {3},
+  year    = {2013},
+  doi     = {10.1186/2194-3206-1-3}
+}
+% Verified against the Repast project's own citation page (repast.github.io/papers.html)
+% and the Springer record. This is the citation the Repast developers ask you to use.
+
+@article{di2017,
+  author  = {Di, Qian and Wang, Yan and Zanobetti, Antonella and Wang, Yun and
+             Koutrakis, Petros and Choirat, Christine and Dominici, Francesca and
+             Schwartz, Joel D.},
+  title   = {Air pollution and mortality in the {M}edicare population},
+  journal = {New England Journal of Medicine},
+  volume  = {376},
+  number  = {26},
+  pages   = {2513--2522},
+  year    = {2017},
+  doi     = {10.1056/NEJMoa1702747}
+}
+% This one is sound AND supports what you use it for: age-stratified PM2.5
+% effects in a 60-million-person Medicare cohort. It is the strongest citation
+% in your parameter table. Note the population is 65+, so it does not by itself
+% license RR values for the under-18 or 18-44 bins.
+
+@article{boeing2017,
+  author  = {Boeing, Geoff},
+  title   = {{OSMnx}: New methods for acquiring, constructing, analyzing, and
+             visualizing complex street networks},
+  journal = {Computers, Environment and Urban Systems},
+  volume  = {65},
+  pages   = {126--139},
+  year    = {2017},
+  doi     = {10.1016/j.compenvurbsys.2017.05.004}
+}
+% Cite only if you actually used OSMnx for the network in the runs you report.
+% If the street layer came from the City of Portland shapefile instead, cite the
+% shapefile and its retrieval date, not this.
+
+@techreport{henry2023,
+  author      = {Henry, Meghan and Watt, Ryan and Mahathey, Anna and
+                 Ouellette, Jillian and Sitler, Aubrey},
+  title       = {The 2022 Annual Homelessness Assessment Report ({AHAR}) to
+                 {C}ongress, Part 1: Point-in-Time Estimates of Homelessness},
+  institution = {U.S. Department of Housing and Urban Development},
+  year        = {2023}
+}
+% Use for population counts only. NOT for clinical comorbidity prevalence --
+% that is the National Health Care for the Homeless Council, a different
+% organization with different data. Conflating them was error #17 in your own
+% corrections appendix.
+
+
+
+@article{devries2017,
+  author  = {DeVries, Rebecca and Kriebel, David and Sama, Susan},
+  title   = {Outdoor air pollution and {COPD}-related emergency department
+             visits, hospital admissions, and mortality: a meta-analysis},
+  journal = {COPD: Journal of Chronic Obstructive Pulmonary Disease},
+  volume  = {14},
+  number  = {1},
+  pages   = {113--121},
+  year    = {2017},
+  doi     = {10.1080/15412555.2016.1216956}
+}
+% VERIFIED against the journal record and EPA HERO (ref 3409850).
+% 37 studies, ~1,115,000 COPD-related acute events.
+% REPORTS: a 10 ug/m3 increase in PM2.5 is associated with a 2.5%
+% (95% CI 1.6-3.4%) increase in COPD-related ED visits and hospital
+% admissions.  i.e. RR = 1.025 (1.016, 1.034) per 10 ug/m3.
+%
+% READ THIS BEFORE USING IT: 1.025 is the association between PM2.5 and
+% COPD-related events. It is NOT a susceptibility multiplier comparing a
+% person with COPD to a person without. Those are different quantities.
+% See the note on Eq. (1) in chapter.tex.
+
+
+
+@article{murphy2019,
+  author  = {Murphy, Erin R.},
+  title   = {Transportation and homelessness: a systematic review},
+  journal = {Journal of Social Distress and the Homeless},
+  volume  = {28},
+  number  = {2},
+  pages   = {96--105},
+  year    = {2019},
+  doi     = {10.1080/10530789.2019.1582202}
+}
+% VERIFIED against the journal record and multiple citing works.
+% Also hosted by PSU's National Institute for Transportation and Communities.
+% USE FOR: agent mobility. Unhoused people travel 9-14 miles daily; primary
+% mode is PUBLIC TRANSIT, walking second, biking/cars less common.
+% CAUTION: 9-14 mi is total daily travel across all modes and destinations --
+% NOT willingness to walk to one shelter during a smoke event.
+
+@techreport{deq2023trends,
+  author      = {{Oregon Department of Environmental Quality}},
+  title       = {Wildfire Smoke Trends and the Air Quality Index},
+  institution = {Oregon Department of Environmental Quality, Air Quality Monitoring},
+  address     = {Hillsboro, Oregon},
+  year        = {2023},
+  month       = {May},
+  url         = {https://www.oregon.gov/deq/wildfires/Documents/WildfireSmokeTrendsReport.pdf}
+}
+% VERIFIED by direct fetch of the PDF.
+% REPORTS: "In 2020 Portland had its first days over the unhealthy AQI level
+% with three very unhealthy and five hazardous days." Portland had NO unhealthy
+% days or worse from wildfire smoke between 1985 and 2014.
+% Also the source for the EPA PM2.5 AQI breakpoints table used in this project,
+% and for the note that PM2.5 dominates AQI during smoke intrusions.
+
+
+% =====================================================================
+%  SECTION B --- DO NOT USE UNTIL RE-SOURCED
+%  Kept here as a record of what was checked and what was wrong.
+% =====================================================================
+
+% ---------------------------------------------------------------------
+% The record below is CORRECT -- but it is a CARDIOVASCULAR study, and it
+% was being cited for a COPD relative risk of 1.80. It contains no COPD
+% effect-modification estimate. Also note the first author is Atkinson,
+% not Anderson, and the journal is Epidemiology, not Eur Heart J.
+%
+% [ARTICLE ENTRY DISABLED] atkinson2013,
+%   author  = {Atkinson, Richard W. and Carey, Iain M. and Kent, Andrew J. and
+%              van Staa, Tjeerd P. and Anderson, H. Ross and Cook, Derek G.},
+%   title   = {Long-term exposure to outdoor air pollution and incidence of
+%              cardiovascular diseases},
+%   journal = {Epidemiology},
+%   volume  = {24},
+%   number  = {1},
+%   pages   = {44--53},
+%   year    = {2013},
+%   doi     = {10.1097/EDE.0b013e318276ccb8}
+% }
+% TO FIX: find a study reporting PM2.5 effect modification by COPD status.
+% Then set the RR to whatever that study reports.
+
+% ---------------------------------------------------------------------
+% The record below is CORRECT -- but it is a national time-series of all-cause
+% and cause-specific daily MORTALITY. It does not report asthma as an effect
+% modifier, so it cannot support an asthma RR of 1.40. Note also that the
+% implementation guide has the wrong journal, volume, and pages for it.
+%
+% [ARTICLE ENTRY DISABLED] zanobetti2009,
+%   author  = {Zanobetti, Antonella and Schwartz, Joel},
+%   title   = {The effect of fine and coarse particulate air pollution on
+%              mortality: a national analysis},
+%   journal = {Environmental Health Perspectives},
+%   volume  = {117},
+%   number  = {6},
+%   pages   = {898--903},
+%   year    = {2009},
+%   doi     = {10.1289/ehp.0800108}
+% }
+% TO FIX: find a study reporting PM2.5 effect modification by asthma status.
+
+% ---------------------------------------------------------------------
+% Bell, Zanobetti & Dominici 2014, "Who is more affected by ozone pollution?"
+% Am J Epidemiol 180(1):15-28, doi:10.1093/aje/kwu115
+%
+% DELIBERATELY OMITTED. It is a real, well-conducted paper -- about OZONE.
+% It cannot support any PM2.5 parameter. Your corrected implementation guide
+% removed it; your proposal bibliography still lists it as reference [4].
+% Fix the proposal so the two documents agree.
+
+% ---------------------------------------------------------------------
+% Under-18 RR, cited as "GBD MAPS / Kloog et al. 2013"
+% NOT ENTERED. "GBD MAPS" is a report series, not a paper, and "Kloog 2013" is
+% ambiguous. Either pin it to one specific reference with a DOI, or drop the
+% under-18 stratum from the model and say why.
+
+% ---------------------------------------------------------------------
+% Shelter filtration factor 0.35, cited as "MacNaughton et al. 2021" and
+% "Ott et al. 2008"
+% NOT ENTERED -- not yet verified. The filtration factor sits directly on your
+% exposure calculation for every sheltered agent-hour, so verify it before use.
+
+% ---------------------------------------------------------------------
+% Gini methodology, cited in the proposal as Mudway et al. 2019 and
+% Holland et al. 2014
+% NOT ENTERED. Mudway is a London Low Emission Zone children's respiratory
+% study; Holland is an EU cost-benefit analysis. Neither establishes a method
+% for computing a Gini coefficient of exposure. The Gini formula in your code
+% is standard and correct -- cite any standard inequality-measurement reference,
+% or simply state the formula, which is self-explanatory.
+
+% ---------------------------------------------------------------------
+% Disaster-mobility sources (Donner & Rodriguez 2008; Wong et al. 2018)
+% NOT ENTERED -- not yet verified. These support your behavioral parameter
+% ranges, so check them before Section 2 is written.

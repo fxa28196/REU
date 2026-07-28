@@ -1,0 +1,50 @@
+{
+  "title": "Wildfire Smoke Shelter Placement Agent-Based Model",
+  "upload_type": "software",
+  "license": "MIT",
+  "access_right": "open",
+  "version": "1.0.0",
+  "language": "eng",
+  "creators": [
+    {
+      "name": "Asghar, Fatima",
+      "affiliation": "NSF REU, Computational Modeling Serving Portland, Portland State University"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Teuscher, Christof",
+      "type": "Supervisor",
+      "affiliation": "Portland State University"
+    }
+  ],
+  "description": "<p>An agent-based model of clean-air shelter access for unsheltered residents of Multnomah County, Oregon during a wildfire smoke episode.</p><p>6,842 residents &mdash; the 2025 Point-in-Time count for the county &mdash; carry individually sampled age, sex, mobility, asthma and COPD attributes drawn from published sources, start at 2,981 distinct real reported campsite locations, and walk Portland's real street network (89,322 nodes) toward the nearest shelter with room. The hazard is measured hourly PM2.5 from the September 2020 smoke event, which peaked at 562.7 &micro;g/m3 and stayed above the EPA &quot;Unhealthy&quot; threshold for 194 of 312 hours.</p><p>Three scenarios isolate the effect of shelter <em>capacity</em> from the effect of shelter <em>placement</em>. Scenarios B and C hold total system capacity identical at 6,842 spaces, so any difference between them is attributable to placement alone. The experiment comprises 27 runs (three scenarios &times; nine random seeds, 42&ndash;50), each executed from a clean working tree with a manifest recording its git commit, seed, and a SHA-256 checksum for every input file.</p><p>Built on Repast Simphony 2.11 (Java 17), with Python analysis, scenario construction and validation tooling.</p><p><strong>Scope note:</strong> the model measures smoke exposure and inhaled particulate mass. It does not predict illness, hospitalization or death. Susceptibility weighting is deliberately held at 1.0 and equity is reported by stratification instead; see docs/final/TECHNICAL_REFERENCE.md for the citation audit that led to that decision.</p>",
+  "notes": "Not all files in this archive are MIT-licensed. The Portland Metro RLIS street centerline data is redistributed with UNVERIFIED terms and its provenance gap is documented; the Springer svmult class, the Repast Simphony demo data and dependency licenses, and the included public-sector datasets each carry their own terms. See the LICENSE file for the full scope statement.",
+  "keywords": [
+    "agent-based modeling",
+    "wildfire smoke",
+    "PM2.5",
+    "air quality",
+    "homelessness",
+    "emergency shelter",
+    "facility location",
+    "p-median",
+    "environmental justice",
+    "Repast Simphony",
+    "Portland Oregon"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/fxa28196/REU",
+      "relation": "isSupplementTo",
+      "scheme": "url",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "10.1186/2194-3206-1-3",
+      "relation": "requires",
+      "scheme": "doi",
+      "resource_type": "publication-article"
+    }
+  ]
+}

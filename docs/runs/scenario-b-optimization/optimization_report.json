@@ -1,0 +1,399 @@
+{
+  "schema": "reu-wildfire-shelter-abm/scenario-b-optimization/v1",
+  "script": "scripts/optimize_shelters.py",
+  "script_version": "1.1.0",
+  "generated_utc": "2026-07-26T02:48:22Z",
+  "git_commit": "ccad7b70fd659026bf1e9f796cd7ec0c8a1582e0",
+  "input_sha256": {
+    "Geography/data/Streets.shp": "f5e5e311b625f129f94fcf6d3150f8feb521ea5a79039ade43514ebfb35810a8",
+    "Geography/data/Streets.dbf": "636b9ca18b0bf0c2f47474f7810d81634f04cd86439e86d34f4233782d7fab94",
+    "Geography/data/shelters/shelters_2020-09.csv": "892b72500eeaa34005c8ae00f9abb5bdba639e463f505b2794e3231e1801b302",
+    "Geography/data/encampments/irp_campsite_reports_sample.csv": "3e557de5db4668c5d30fd7a6fc13bcc38b5e37bab4b9becaf9b3dc35366285ca",
+    "docs/runs/production-n2037/seed42/agents.csv": "86e032350d3614b8bd5d1a4d9a5ccb6cf0cf2b2e74da0d812a2685a8fcb2b0ee"
+  },
+  "source_run": {
+    "sim_id": "sim-20260725-220449-seed42",
+    "random_seed": 42,
+    "n_agents": 2037
+  },
+  "parameters": {
+    "walking_speed_mps": 1.3,
+    "capacity_per_site": 99,
+    "total_capacity": 198,
+    "event_window_h": 296.0,
+    "event_window_derivation": "simulationHours (312) - common departure offset (tick 960 * 1.0 min/tick = 16 h); identical for every pair, so the A-vs-B ranking is invariant to its exact value"
+  },
+  "graph": {
+    "source": "Geography/data/Streets.shp via scripts/test_routing.build_graphs (validated mirror of geography.routing.StreetNetwork)",
+    "nodes": 89345,
+    "components": 154,
+    "largest_component_nodes": 60444,
+    "demand_component_nodes": 28407,
+    "impossible_edges": 0
+  },
+  "demand": {
+    "residents": 2037,
+    "encampments": 1540,
+    "demand_street_nodes": 1317,
+    "aggregation": "residents sharing a snapped street node form one weighted demand point; snap = planar degree-distance nearest node (mirrors StreetNetwork.nearestNode); no connectivity filter \u2014 a resident is unreachable for a pair iff its network distance to both facilities is infinite"
+  },
+  "candidates": {
+    "count": 790,
+    "grid_spacing_m": 700,
+    "grid_ladder_m": [
+      500,
+      600,
+      700,
+      800,
+      900,
+      1000,
+      1200,
+      1500
+    ],
+    "target_range": [
+      300,
+      800
+    ],
+    "bbox_expand_m": 2000.0,
+    "scenario_a_nodes_force_included": 2,
+    "selection_rule": "street-graph nodes of the demand principal component (the connected component carrying the maximum resident weight: 28407 nodes, 2024 of 2037 residents, contains both Scenario A shelters) inside the demand encampment bounding box expanded 2 km; one node per square grid cell (node nearest the cell centre; ties by squared distance then graph node id); finest ladder spacing yielding <= 800 candidates; Scenario A shelter nodes force-included. NOTE: the demand principal component is deliberately used instead of the largest component by node count (60444 nodes, carrying 3 residents), which is a disconnected regional fragment \u2014 a facility there could serve (almost) no one. Fully deterministic.",
+    "pairs_evaluated": 311655
+  },
+  "assignment_mechanism": "event-ordered capacity-aware greedy mirroring the ABM: simultaneous departure at constant speed => arrival order is network-distance order; each resident heads to the nearer open facility (tie -> first facility of the pair); admitted in arrival order until 99 beds fill; on refusal, re-routes from the refusing facility's node iff the other facility still has beds at that moment (cross-checked against seed-42 door_refusals: 1304 single-refusal give-ups + 520 double refusals = 2344 = 622+1722 door refusals in the manifest); admitted on arrival iff beds remain, else unsheltered; residents with infinite distance to both facilities are unreachable.",
+  "objectives_definitions": {
+    "primary_outdoor_person_hours": "sum over sheltered residents of walked network metres / 1.3 m/s (hours) + unsheltered residents x event window (296 h); under the model's uniform county-level smoke field, exposure is proportional to outdoor time",
+    "mean_walk_sheltered_m": "mean walked network distance of sheltered residents incl. re-route legs",
+    "pmedian_mean_nearest_m": "classic p-median: mean network distance to the nearest facility over residents that can reach at least one facility",
+    "unreachable_residents": "residents with infinite network distance to both facilities of the pair"
+  },
+  "validation": {
+    "baseline_pair_sheltered": 198,
+    "simulation_sheltered": 198,
+    "sheltered_check": "PASS (hard requirement)",
+    "baseline_pair_unreachable": 13,
+    "simulation_unreachable": 15,
+    "unreachable_check": "FAIL",
+    "baseline_door_refusals_occ_cj": [
+      1724,
+      637
+    ],
+    "simulation_door_refusals_occ_cj": [
+      1722,
+      622
+    ],
+    "largest_component_nodes": 60444,
+    "largest_component_matches_manifest": true,
+    "demand_component_nodes": 28407,
+    "demand_component_residents": 2024
+  },
+  "scenario_a_baseline": {
+    "primary_outdoor_person_hours": 544415.82,
+    "sheltered": 198,
+    "mean_walk_sheltered_m": 1697.47,
+    "pmedian_mean_nearest_m": 6500.6,
+    "unreachable_residents": 13,
+    "unsheltered_residents": 1839,
+    "sheltered_travel_person_hours": 71.82,
+    "admitted_per_site": [
+      99,
+      99
+    ],
+    "second_attempt_admits": 0,
+    "door_refusals_per_site": [
+      1724,
+      637
+    ],
+    "node_ids": [
+      48211,
+      32784
+    ],
+    "lon_lat": [
+      [
+        -122.6617,
+        45.52865
+      ],
+      [
+        -122.71133,
+        45.587152
+      ]
+    ]
+  },
+  "chosen_pair": {
+    "primary_outdoor_person_hours": 544366.31,
+    "sheltered": 198,
+    "mean_walk_sheltered_m": 527.26,
+    "pmedian_mean_nearest_m": 6327.45,
+    "unreachable_residents": 13,
+    "unsheltered_residents": 1839,
+    "sheltered_travel_person_hours": 22.31,
+    "admitted_per_site": [
+      99,
+      99
+    ],
+    "second_attempt_admits": 0,
+    "door_refusals_per_site": [
+      556,
+      1271
+    ],
+    "node_ids": [
+      49392,
+      52835
+    ],
+    "lon_lat": [
+      [
+        -122.6735,
+        45.525975
+      ],
+      [
+        -122.655673,
+        45.519355
+      ]
+    ]
+  },
+  "improvement": {
+    "primary_outdoor_person_hours": 49.51,
+    "primary_pct_of_baseline": 0.0091,
+    "sheltered_travel_person_hours_saved": 49.51,
+    "pmedian_mean_nearest_m_saved": 173.2
+  },
+  "top10": [
+    {
+      "rank": 1,
+      "node_ids": [
+        49392,
+        52835
+      ],
+      "lon_lat": [
+        [
+          -122.6735,
+          45.525975
+        ],
+        [
+          -122.655673,
+          45.519355
+        ]
+      ],
+      "primary_outdoor_person_hours": 544366.31,
+      "sheltered": 198,
+      "mean_walk_sheltered_m": 527.3,
+      "pmedian_mean_nearest_m": 6327.4,
+      "unreachable_residents": 13
+    },
+    {
+      "rank": 2,
+      "node_ids": [
+        46304,
+        49392
+      ],
+      "lon_lat": [
+        [
+          -122.690589,
+          45.532083
+        ],
+        [
+          -122.6735,
+          45.525975
+        ]
+      ],
+      "primary_outdoor_person_hours": 544367.96,
+      "sheltered": 198,
+      "mean_walk_sheltered_m": 566.2,
+      "pmedian_mean_nearest_m": 7198.7,
+      "unreachable_residents": 13
+    },
+    {
+      "rank": 3,
+      "node_ids": [
+        49392,
+        55714
+      ],
+      "lon_lat": [
+        [
+          -122.6735,
+          45.525975
+        ],
+        [
+          -122.654701,
+          45.512934
+        ]
+      ],
+      "primary_outdoor_person_hours": 544368.35,
+      "sheltered": 198,
+      "mean_walk_sheltered_m": 575.4,
+      "pmedian_mean_nearest_m": 6221.2,
+      "unreachable_residents": 13
+    },
+    {
+      "rank": 4,
+      "node_ids": [
+        49392,
+        52746
+      ],
+      "lon_lat": [
+        [
+          -122.6735,
+          45.525975
+        ],
+        [
+          -122.663788,
+          45.519382
+        ]
+      ],
+      "primary_outdoor_person_hours": 544368.82,
+      "sheltered": 198,
+      "mean_walk_sheltered_m": 586.6,
+      "pmedian_mean_nearest_m": 6631.8,
+      "unreachable_residents": 13
+    },
+    {
+      "rank": 5,
+      "node_ids": [
+        49392,
+        55603
+      ],
+      "lon_lat": [
+        [
+          -122.6735,
+          45.525975
+        ],
+        [
+          -122.663834,
+          45.512996
+        ]
+      ],
+      "primary_outdoor_person_hours": 544369.23,
+      "sheltered": 198,
+      "mean_walk_sheltered_m": 596.3,
+      "pmedian_mean_nearest_m": 6534.5,
+      "unreachable_residents": 13
+    },
+    {
+      "rank": 6,
+      "node_ids": [
+        49381,
+        52835
+      ],
+      "lon_lat": [
+        [
+          -122.682237,
+          45.525816
+        ],
+        [
+          -122.655673,
+          45.519355
+        ]
+      ],
+      "primary_outdoor_person_hours": 544369.51,
+      "sheltered": 198,
+      "mean_walk_sheltered_m": 603.0,
+      "pmedian_mean_nearest_m": 6300.7,
+      "unreachable_residents": 13
+    },
+    {
+      "rank": 7,
+      "node_ids": [
+        46304,
+        52835
+      ],
+      "lon_lat": [
+        [
+          -122.690589,
+          45.532083
+        ],
+        [
+          -122.655673,
+          45.519355
+        ]
+      ],
+      "primary_outdoor_person_hours": 544369.79,
+      "sheltered": 198,
+      "mean_walk_sheltered_m": 609.6,
+      "pmedian_mean_nearest_m": 6235.7,
+      "unreachable_residents": 13
+    },
+    {
+      "rank": 8,
+      "node_ids": [
+        52488,
+        52835
+      ],
+      "lon_lat": [
+        [
+          -122.672536,
+          45.519742
+        ],
+        [
+          -122.655673,
+          45.519355
+        ]
+      ],
+      "primary_outdoor_person_hours": 544370.69,
+      "sheltered": 198,
+      "mean_walk_sheltered_m": 630.9,
+      "pmedian_mean_nearest_m": 6434.2,
+      "unreachable_residents": 13
+    },
+    {
+      "rank": 9,
+      "node_ids": [
+        49370,
+        49392
+      ],
+      "lon_lat": [
+        [
+          -122.69035,
+          45.525667
+        ],
+        [
+          -122.6735,
+          45.525975
+        ]
+      ],
+      "primary_outdoor_person_hours": 544370.96,
+      "sheltered": 198,
+      "mean_walk_sheltered_m": 637.2,
+      "pmedian_mean_nearest_m": 7277.9,
+      "unreachable_residents": 13
+    },
+    {
+      "rank": 10,
+      "node_ids": [
+        52835,
+        103878
+      ],
+      "lon_lat": [
+        [
+          -122.655673,
+          45.519355
+        ],
+        [
+          -122.682479,
+          45.532224
+        ]
+      ],
+      "primary_outdoor_person_hours": 544371.03,
+      "sheltered": 198,
+      "mean_walk_sheltered_m": 639.0,
+      "pmedian_mean_nearest_m": 6235.4,
+      "unreachable_residents": 13
+    }
+  ],
+  "tie_breaks": [
+    "equal network distance to both facilities -> first facility of the pair",
+    "simultaneous arrivals -> ascending demand-node index (heap key)",
+    "equal primary objective across pairs -> ascending candidate index pair",
+    "grid cell node ties -> squared distance to cell centre, then graph node id"
+  ],
+  "limitations": [
+    "UNCONSTRAINED-SITING THEORETICAL OPTIMUM: ignores building availability, ownership, zoning, ADA access, staffing, transit, and whether any structure capable of housing 99 people exists at the chosen street nodes; an upper bound on what siting alone can achieve, NOT a policy recommendation to build there.",
+    "Total capacity fixed at Scenario A's 198 beds, so the number sheltered is capacity-bound; relocation can only change WHO is sheltered and how far they walk, not (materially) how many.",
+    "Demand geography inherits the 2025-26 encampment proxy limitation (registered assumption A-03).",
+    "The simulation honours real shelter opening dates (OCC admits from 2020-09-10, CJ from 2020-09-11); this optimizer's greedy assignment is a siting objective, not a timing model, and treats both facilities of a pair as open \u2014 a known simplification relative to the ABM. The output CSV copies the real opening dates so the Scenario B simulation itself remains date-faithful.",
+    "Outdoor-exposure proxy is time-based under the model's uniform county-level smoke field; it is not concentration-weighted at sub-county scale.",
+    "Assignment mirror uses continuous arrival times; the ABM uses 1-min ticks and a 200 m shelter-arrival radius, so marginal admission order can differ for near-tied residents.",
+    "Encampment-to-street-node snap gaps are excluded from the objective (identical in Scenarios A and B, so the comparison is unaffected).",
+    "Candidate set is grid-subsampled within the demand principal component; the true optimum may lie at a non-candidate node, so the reported optimum is conservative at the grid-spacing spatial resolution.",
+    "Demand weights are the seed-42 production realization; other seeds redraw resident-to-encampment placement."
+  ],
+  "runtime_s": 207.1
+}
