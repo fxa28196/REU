@@ -8,7 +8,6 @@ import gov.nasa.worldwind.render.WWTexture;
 
 import java.net.URL;
 
-//import geography.agents.RadioTower;
 import geography.agents.Shelter;
 import repast.simphony.visualization.gis3D.style.DefaultMarkStyle;
 
@@ -18,7 +17,6 @@ import repast.simphony.visualization.gis3D.style.DefaultMarkStyle;
  * @author Eric Tatara
  *
  */
-//public class TowerAgentStyle extends DefaultMarkStyle<RadioTower>{
 public class TowerAgentStyle extends DefaultMarkStyle<Shelter>{
 	/**
 	 * The gov.nasa.worldwind.render.Offset is used to position the icon from 
@@ -37,7 +35,6 @@ public class TowerAgentStyle extends DefaultMarkStyle<Shelter>{
 	 * Here we set the appearance of the TowerAgent using a non-changing icon.
 	 */
 	@Override
-//	public WWTexture getTexture(RadioTower agent, WWTexture texture) {
 	public WWTexture getTexture(Shelter agent, WWTexture texture) {
 		
 	
@@ -58,7 +55,6 @@ public class TowerAgentStyle extends DefaultMarkStyle<Shelter>{
 	}
 	
 	@Override
-//	public Offset getIconOffset(RadioTower agent){
 	public Offset getIconOffset(Shelter agent){
 
 		return iconOffset;

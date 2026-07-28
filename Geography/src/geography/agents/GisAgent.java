@@ -395,9 +395,11 @@ public class GisAgent {
 		return false;
 	}
 
-	// --- Vulnerability setters (used by ContextCreator once sourced) ---------
-	public void setAgeRR(double ageRR) { this.ageRR = ageRR; }
-	public void setComorbidityRR(double comorbidityRR) { this.comorbidityRR = comorbidityRR; }
+	// setAgeRR / setComorbidityRR were removed in the v1.0 cleanup: nothing ever
+	// called them. The weights they would have set are pinned at 1.0 by design
+	// (assumption A-09), because the relative risks originally specified could
+	// not be sourced -- see the citation audit in TECHNICAL_REFERENCE.md.
+	// Reintroduce a setter only alongside a sourced coefficient.
 	public void setAttributes(PopulationSampler.Attributes attributes) { this.attributes = attributes; }
 	/** Sampled heterogeneous attributes, or null when heterogeneity is disabled. */
 	public PopulationSampler.Attributes getAttributes() { return attributes; }

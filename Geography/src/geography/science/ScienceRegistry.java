@@ -244,8 +244,9 @@ public final class ScienceRegistry {
 	public String getAssumptionsPath() { return assumptionsPath; }
 	public String getVariablesSha256() { return variablesSha256; }
 	public String getAssumptionsSha256() { return assumptionsSha256; }
-	public List<Variable> getVariables() { return variables; }
-	public List<Assumption> getAssumptions() { return assumptions; }
+	// getVariables() / getAssumptions() removed in the v1.0 cleanup: nothing
+	// consumed the parsed rows. The manifest records the registry by path and
+	// SHA-256 (above) plus the counts, which is what reproducibility needs.
 	public int variableCount() { return variables.size(); }
 	public int assumptionCount() { return assumptions.size(); }
 
