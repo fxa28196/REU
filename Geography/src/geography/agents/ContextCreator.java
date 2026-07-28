@@ -17,7 +17,6 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiLineString;
-import org.locationtech.jts.geom.Point;
 
 import geography.data.CsvLoader;
 import geography.env.SmokeField;
@@ -307,10 +306,12 @@ public class ContextCreator implements ContextBuilder {
 			// Realised marginals printed against the published ones: sampling is
 			// verified at load time, not trusted (01-POPULATION.md §6.3).
 			System.out.printf("[Population] heterogeneity ON - realised: mobility %.3f | "
-					+ "asthma %.3f | COPD %.3f | any respiratory %.3f | age 55+ %.3f | "
+					+ "asthma %.3f | COPD %.3f | any respiratory %.3f | "
+					+ "chronic physical %.3f | age 55+ %.3f | "
 					+ "mean walking speed %.3f m/s%n",
 					sampler.getMobilityLimitedShare(), sampler.getAsthmaShare(),
 					sampler.getCopdShare(), sampler.getAnyRespiratoryShare(),
+					sampler.getChronicPhysicalShare(),
 					sampler.getAge55PlusShare(), sampler.getMeanWalkingSpeedMps());
 			System.out.println("[Population] " + PopulationSampler.publishedTargets());
 		} else {
