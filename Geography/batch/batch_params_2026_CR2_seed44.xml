@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!-- PRESENT-DAY THREE-ARM EXPERIMENT - CONTROL ARM C-random, DRAW r2, SEED 44
+
+     C-random is the control for arm C. C's ten new sites were placed by greedy
+     capacity-aware p-median against the same encampment demand points the run is
+     then scored on, so "C beats B" could be partly definitional. This arm is arm C
+     with the optimiser switched off and NOTHING else changed:
+
+       * the same 36 real facilities at their real coordinates, expanded x1.5
+       * the same ten new sites
+       * the SAME per-site capacity vector, copied facility-for-facility from
+         arm C's own file (shelters_2026_expanded_plus_new_sites.csv)
+       * the same total system capacity, 6,842 - equal to arms B and C
+       * the same population, demographics, PM2.5 field, street network and
+         opening dates, and every parameter below identical to arm C's file
+
+     ONLY DIFFERENCE: the ten new coordinates are drawn UNIFORMLY AT RANDOM from
+     street-graph nodes inside the demand bounding box (largest connected
+     component, existing-facility nodes excluded) instead of by p-median.
+
+     Site selection used python random.Random(2) - a FIXED, STATED site-seed,
+     separate from and unrelated to randomSeed below, which is the model's own RNG
+     seed exactly as in arms A/B/C. Three independent draws (r1/r2/r3) exist so a
+     single lucky or unlucky site set cannot be mistaken for a result.
+
+     Built by scripts/build_scenario_crandom_2026.py ->
+     data/shelters/shelters_2026_random_sites_r2.csv (46 facilities, 6,842 spaces).
+
+     Interpretation: a B -> C-random gap is DISPERSION (ten extra doors anywhere);
+     a C-random -> C gap is OPTIMISATION (choosing where those doors go).
+
+     Population n = 6842 is the 2025 Tri-County Point-in-Time count for
+     Multnomah County (PSU HRAC, published 2025-11-04): 10,526 people
+     experiencing homelessness, of whom more than 65% were unsheltered.
+     The model represents the UNSHELTERED only.
+
+     enableHeterogeneity=1        residents carry sourced age / sex / mobility /
+                                  asthma / COPD attributes and walk at their own speed.
+     respectShelterOpeningDates=1 shelters open on their real dates (A-02).
+
+     walkingSpeedMps is declared but IGNORED when heterogeneity is on. -->
+<sweep runs="1">
+	<parameter name="numAgents" type="constant" constant_type="int" value="6842"/>
+	<parameter name="randomSeed" type="constant" constant_type="int" value="44"/>
+	<parameter name="minutesPerTick" type="constant" constant_type="number" value="1.0"/>
+	<parameter name="walkingSpeedMps" type="constant" constant_type="number" value="1.30"/>
+	<parameter name="shelterArrivalDistanceM" type="constant" constant_type="number" value="200.0"/>
+	<parameter name="evacuationThresholdUgM3" type="constant" constant_type="number" value="55.5"/>
+	<parameter name="simulationHours" type="constant" constant_type="int" value="312"/>
+	<parameter name="scenarioCode" type="constant" constant_type="int" value="5"/>
+	<parameter name="enableHeterogeneity" type="constant" constant_type="int" value="1"/>
+	<parameter name="respectShelterOpeningDates" type="constant" constant_type="int" value="1"/>
+</sweep>

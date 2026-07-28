@@ -47,6 +47,16 @@ public class Shelter {
     /** Dijkstra tree rooted at {@link #graphNodeId}; set once at context build. */
     private StreetNetwork.ShortestPathTree routeTree;
 
+    /** Spaces held back for priority (mobility-limited) arrivals under the
+     *  need-based-admission scenario (arm D). Set by ContextCreator from the
+     *  {@code triageReserveFraction} parameter, clamped to [0, capacity].
+     *
+     *  <p><b>Zero by default, and zero is exactly the old behaviour.</b> With
+     *  {@code reservedForPriority == 0} the priority-aware predicates below are
+     *  arithmetically identical to the first-come-first-served ones they
+     *  replaced, so arms A/B/C reproduce byte-identically. */
+    private int reservedForPriority = 0;
+
     /** Number of residents currently admitted (V12 occupancy). */
     private int occupancy = 0;
     /** Peak occupancy over the run (shelter-level export metric). */
@@ -69,7 +79,17 @@ public class Shelter {
      * a refusal and returns false.
      */
     public boolean admit() {
-        if (capacity != null && occupancy >= capacity) {
+        return admit(false);
+    }
+
+    /**
+     * Attempts to admit one resident under need-based admission (arm D).
+     * A priority arrival may use the whole capacity; a non-priority arrival is
+     * refused once occupancy reaches {@code capacity - reservedForPriority}.
+     * With the reserve at 0 this is identical to {@link #admit()}.
+     */
+    public boolean admit(boolean isPriority) {
+        if (!hasSpaceFor(isPriority)) {
             refusedCount++;
             return false;
         }
@@ -82,8 +102,31 @@ public class Shelter {
 
     /** True if this shelter can currently admit at least one more resident. */
     public boolean hasSpace() {
-        return capacity == null || occupancy < capacity;
+        return hasSpaceFor(false);
     }
+
+    /** True if this shelter can currently admit one more resident of the given
+     *  priority class. Non-priority residents see only the unreserved part of
+     *  the capacity; priority residents see all of it. */
+    public boolean hasSpaceFor(boolean isPriority) {
+        if (capacity == null) {
+            return true;
+        }
+        int usable = isPriority ? capacity : capacity - reservedForPriority;
+        return occupancy < usable;
+    }
+
+    /** Sets the number of spaces held for priority arrivals, clamped into
+     *  [0, capacity]. No-op for capacity-unlimited shelters. */
+    public void setReservedForPriority(int reserved) {
+        if (capacity == null) {
+            this.reservedForPriority = 0;
+            return;
+        }
+        this.reservedForPriority = Math.max(0, Math.min(capacity.intValue(), reserved));
+    }
+
+    public int getReservedForPriority() { return reservedForPriority; }
 
     /** True if this shelter is physically open at the given tick. Always true
      *  when the opening-date gate is disabled (openTick = -inf, closeTick = +inf). */
@@ -94,7 +137,13 @@ public class Shelter {
     /** True if this shelter can be selected and entered right now: operating in
      *  the scenario, open on the calendar, and not yet full. */
     public boolean isAvailableAt(double tick) {
-        return operating && isOpenAt(tick) && hasSpace();
+        return isAvailableAt(tick, false);
+    }
+
+    /** As {@link #isAvailableAt(double)} but for a resident of the given
+     *  priority class (arm D). Identical when the reserve is 0. */
+    public boolean isAvailableAt(double tick, boolean isPriority) {
+        return operating && isOpenAt(tick) && hasSpaceFor(isPriority);
     }
 
     public void setOpenWindowTicks(double openTick, double closeTick) {

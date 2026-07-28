@@ -1,0 +1,282 @@
+{
+  "scenario": "C-random - arm C's design with the optimiser replaced by uniform random draw",
+  "purpose": "control for arm C. C's ten new sites were optimised against the same encampment demand points used to evaluate the run, so C > B may be definitional. C-random separates OPTIMISATION from mere DISPERSION of the same capacity across ten extra doors.",
+  "identical_to_arm_C": [
+    "36 real facilities, real coordinates, capacity x1.5",
+    "10 new sites",
+    "per-site capacity vector for the new sites (copied from arm C's file)",
+    "total system capacity 6,842 (equal to arm B)",
+    "population, demographics, PM2.5 field, street network, opening dates",
+    "every model parameter in the batch params file except scenarioCode"
+  ],
+  "only_difference_from_arm_C": "new-site coordinates drawn uniformly at random from street-graph nodes in the demand bounding box, instead of greedy capacity-aware p-median",
+  "site_selection_rng": "python random.Random(site_seed), site_seed in [1,2,3]",
+  "candidate_pool_rule": "street-graph nodes inside the demand bounding box (demand extent padded 0.02 deg, same as arm C), restricted to the largest connected component, excluding nodes occupied by the 36 real facilities",
+  "candidate_pool_size": 11948,
+  "bounding_box": {
+    "lon": [
+      -122.80570069264014,
+      -122.4570979640866
+    ],
+    "lat": [
+      45.41762260375086,
+      45.66444341734322
+    ]
+  },
+  "existing_capacity_before": 2234,
+  "existing_capacity_after": 3350,
+  "new_site_capacities": [
+    350,
+    350,
+    349,
+    349,
+    349,
+    349,
+    349,
+    349,
+    349,
+    349
+  ],
+  "total_capacity": 6842,
+  "draws": [
+    {
+      "site_seed": 1,
+      "file": "Geography/data/shelters/shelters_2026_random_sites_r1.csv",
+      "facilities": 46,
+      "total_capacity": 6842,
+      "sites": [
+        {
+          "id": "NEW_random_site_01",
+          "node": 16916250,
+          "capacity": 350,
+          "lon": -122.583425,
+          "lat": 45.451824
+        },
+        {
+          "id": "NEW_random_site_02",
+          "node": 16995366,
+          "capacity": 350,
+          "lon": -122.802066,
+          "lat": 45.554181
+        },
+        {
+          "id": "NEW_random_site_03",
+          "node": 16903220,
+          "capacity": 349,
+          "lon": -122.785449,
+          "lat": 45.518748
+        },
+        {
+          "id": "NEW_random_site_04",
+          "node": 16937944,
+          "capacity": 349,
+          "lon": -122.538775,
+          "lat": 45.440817
+        },
+        {
+          "id": "NEW_random_site_05",
+          "node": 16913258,
+          "capacity": 349,
+          "lon": -122.670757,
+          "lat": 45.421418
+        },
+        {
+          "id": "NEW_random_site_06",
+          "node": 16981644,
+          "capacity": 349,
+          "lon": -122.77545,
+          "lat": 45.519208
+        },
+        {
+          "id": "NEW_random_site_07",
+          "node": 16973564,
+          "capacity": 349,
+          "lon": -122.477267,
+          "lat": 45.533677
+        },
+        {
+          "id": "NEW_random_site_08",
+          "node": 16977354,
+          "capacity": 349,
+          "lon": -122.496618,
+          "lat": 45.532535
+        },
+        {
+          "id": "NEW_random_site_09",
+          "node": 17009970,
+          "capacity": 349,
+          "lon": -122.75922,
+          "lat": 45.478401
+        },
+        {
+          "id": "NEW_random_site_10",
+          "node": 16960904,
+          "capacity": 349,
+          "lon": -122.693165,
+          "lat": 45.428067
+        }
+      ]
+    },
+    {
+      "site_seed": 2,
+      "file": "Geography/data/shelters/shelters_2026_random_sites_r2.csv",
+      "facilities": 46,
+      "total_capacity": 6842,
+      "sites": [
+        {
+          "id": "NEW_random_site_01",
+          "node": 16902266,
+          "capacity": 350,
+          "lon": -122.740032,
+          "lat": 45.432729
+        },
+        {
+          "id": "NEW_random_site_02",
+          "node": 16908504,
+          "capacity": 350,
+          "lon": -122.49506,
+          "lat": 45.537867
+        },
+        {
+          "id": "NEW_random_site_03",
+          "node": 16907200,
+          "capacity": 349,
+          "lon": -122.463255,
+          "lat": 45.519143
+        },
+        {
+          "id": "NEW_random_site_04",
+          "node": 16957722,
+          "capacity": 349,
+          "lon": -122.577108,
+          "lat": 45.424259
+        },
+        {
+          "id": "NEW_random_site_05",
+          "node": 16922458,
+          "capacity": 349,
+          "lon": -122.534706,
+          "lat": 45.443618
+        },
+        {
+          "id": "NEW_random_site_06",
+          "node": 17012812,
+          "capacity": 349,
+          "lon": -122.776169,
+          "lat": 45.437838
+        },
+        {
+          "id": "NEW_random_site_07",
+          "node": 16947798,
+          "capacity": 349,
+          "lon": -122.760371,
+          "lat": 45.492285
+        },
+        {
+          "id": "NEW_random_site_08",
+          "node": 16937336,
+          "capacity": 349,
+          "lon": -122.744014,
+          "lat": 45.492177
+        },
+        {
+          "id": "NEW_random_site_09",
+          "node": 17002142,
+          "capacity": 349,
+          "lon": -122.607719,
+          "lat": 45.418198
+        },
+        {
+          "id": "NEW_random_site_10",
+          "node": 16930156,
+          "capacity": 349,
+          "lon": -122.790252,
+          "lat": 45.483714
+        }
+      ]
+    },
+    {
+      "site_seed": 3,
+      "file": "Geography/data/shelters/shelters_2026_random_sites_r3.csv",
+      "facilities": 46,
+      "total_capacity": 6842,
+      "sites": [
+        {
+          "id": "NEW_random_site_01",
+          "node": 16934728,
+          "capacity": 350,
+          "lon": -122.784705,
+          "lat": 45.506385
+        },
+        {
+          "id": "NEW_random_site_02",
+          "node": 16999422,
+          "capacity": 350,
+          "lon": -122.707885,
+          "lat": 45.433015
+        },
+        {
+          "id": "NEW_random_site_03",
+          "node": 16990760,
+          "capacity": 349,
+          "lon": -122.618323,
+          "lat": 45.433815
+        },
+        {
+          "id": "NEW_random_site_04",
+          "node": 16915588,
+          "capacity": 349,
+          "lon": -122.586132,
+          "lat": 45.456645
+        },
+        {
+          "id": "NEW_random_site_05",
+          "node": 16959256,
+          "capacity": 349,
+          "lon": -122.61619,
+          "lat": 45.428344
+        },
+        {
+          "id": "NEW_random_site_06",
+          "node": 17001610,
+          "capacity": 349,
+          "lon": -122.614642,
+          "lat": 45.432848
+        },
+        {
+          "id": "NEW_random_site_07",
+          "node": 16977588,
+          "capacity": 349,
+          "lon": -122.792188,
+          "lat": 45.523536
+        },
+        {
+          "id": "NEW_random_site_08",
+          "node": 17005678,
+          "capacity": 349,
+          "lon": -122.747416,
+          "lat": 45.441888
+        },
+        {
+          "id": "NEW_random_site_09",
+          "node": 16997330,
+          "capacity": 349,
+          "lon": -122.773256,
+          "lat": 45.425841
+        },
+        {
+          "id": "NEW_random_site_10",
+          "node": 16903580,
+          "capacity": 349,
+          "lon": -122.515622,
+          "lat": 45.436207
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "new sites are street-network nodes, not verified venues with filtered indoor air",
+    "uniform over street NODES is not uniform over AREA; street nodes are denser in the inner city where demand is denser, so this control is conservative - it is mildly biased toward demand and therefore under-states how much of arm C's gain is attributable to optimisation",
+    "three draws is enough to rule out a single freak set, not enough for a distribution; treat the spread across r1/r2/r3 as a range, not a CI"
+  ]
+}

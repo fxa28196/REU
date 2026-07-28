@@ -102,4 +102,17 @@
 		isReadOnly="false"
 		converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 	/>
+	<!-- NEED-BASED ADMISSION (arm D). Fraction of EVERY shelter's capacity held
+	     for mobility-limited arrivals; floor()ed per site. Non-priority residents
+	     neither target nor are admitted to a shelter whose free space is entirely
+	     reserved; priority residents may use the whole capacity.
+	     0.0 = first-come, first-served — the admission rule of every A/B/C run,
+	     and arithmetically the identical capacity comparison, so the archived
+	     baselines reproduce byte-identically at this default. Arm D is
+	     scenarioCode 7 (arm B's shelter file, unchanged) with this > 0. -->
+	<parameter name="triageReserveFraction" displayName="Capacity reserved for mobility-limited arrivals (0..1)" type="double"
+		defaultValue="0.0"
+		isReadOnly="false"
+		converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+	/>
 </parameters>
