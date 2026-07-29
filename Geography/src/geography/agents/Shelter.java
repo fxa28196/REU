@@ -63,6 +63,20 @@ public class Shelter {
     private int peakOccupancy = 0;
     /** Count of admission refusals due to capacity (shelter-level export metric). */
     private int refusedCount = 0;
+    /** Of {@link #refusedCount}, how many were POLICY refusals (pet / adults-only
+     *  gates, Phase E) rather than capacity refusals. 0 in every legacy arm. */
+    private int policyRefusedCount = 0;
+
+    /** Pet intake policy (Phase E, V32/A-29). {@code null} = unrecorded in the
+     *  shelter CSV — the record for the 2020 smoke shelters is SILENT — in which
+     *  case the run-wide {@code petPolicyDefault} parameter applies. Set only
+     *  when the optional {@code pet_intake} CSV column is present; absent in
+     *  every archived shelter file, so legacy arms never see a value. */
+    private Boolean petIntake = null;
+    /** Adults-only intake (Phase E, V33). The 2020 record verifies adults-only
+     *  intake at the smoke shelters (Street Roots); present-day files carry no
+     *  column yet, so this defaults false and is inert outside E arms. */
+    private boolean adultsOnly = false;
 
     public Shelter(String id, String name, Integer capacity, boolean operating, double lon, double lat) {
         this.id = id;
@@ -153,6 +167,26 @@ public class Shelter {
 
     public double getOpenTick() { return openTick; }
     public double getCloseTick() { return closeTick; }
+
+    /** Records a POLICY refusal (pet / adults-only gate, Phase E): the resident
+     *  reached the door and was turned away for a reason other than capacity.
+     *  Counted into {@link #refusedCount} so total refusals stay one number,
+     *  and separately so the policy share is auditable. */
+    public void recordPolicyRefusal() {
+        refusedCount++;
+        policyRefusedCount++;
+    }
+
+    public int getPolicyRefusedCount() { return policyRefusedCount; }
+
+    /** Pet intake policy: TRUE admits pets, FALSE refuses, null = unrecorded
+     *  (the run-wide {@code petPolicyDefault} applies — A-29). */
+    public Boolean getPetIntake() { return petIntake; }
+    public void setPetIntake(Boolean petIntake) { this.petIntake = petIntake; }
+
+    /** True if this site admits adults only (dependent children excluded). */
+    public boolean isAdultsOnly() { return adultsOnly; }
+    public void setAdultsOnly(boolean adultsOnly) { this.adultsOnly = adultsOnly; }
 
     public String getId() { return id; }
     public String getName() { return name; }

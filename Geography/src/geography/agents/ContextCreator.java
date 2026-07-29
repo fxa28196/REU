@@ -221,6 +221,41 @@ public class ContextCreator implements ContextBuilder {
 		// capacity comparison in Shelter.hasSpaceFor(), so at 0 the comparison is
 		// the identical expression it always was.
 		double triageReserveFraction = doubleParam(parm, "triageReserveFraction", 0.0);
+
+		// ---- Phase-E decision layer (V29-V44) ------------------------------
+		// Same defensive contract as every switch above: all defaults reproduce
+		// the pre-E behaviour EXACTLY (enableDecisionLayer=0 skips every new
+		// code path), so all archived params files keep running unchanged and
+		// the R3 null holds by construction. The scientific values (aware
+		// 0.356, barriers on, L1, hazard on) are set explicitly by the E-arm
+		// batch files, never sneaked in through defaults.
+		int enableDecisionLayer = intParam(parm, "enableDecisionLayer", 0);
+		double pAwareInit = doubleParam(parm, "pAwareInit", 1.0);
+		double pHeavyBelongings = doubleParam(parm, "pHeavyBelongings", 0.284);
+		double pHasPet = doubleParam(parm, "pHasPet", 0.117);
+		double pHasDependents = doubleParam(parm, "pHasDependents", 0.0044);
+		double groupSpeedDeltaMps = doubleParam(parm, "groupSpeedDeltaMps", 0.06);
+		double lambdaOutreachPerDay = doubleParam(parm, "lambdaOutreachPerDay", 0.0);
+		int informationRegime = intParam(parm, "informationRegime", 0);
+		int enableHazardDeparture = intParam(parm, "enableHazardDeparture", 0);
+		double sigmaTheta = doubleParam(parm, "sigmaTheta", 0.0);
+		// alphaHazard default: provisional (A-30) — chosen so the implied attempt
+		// share over ~240 evaluable hours matches the sourced attempt pipeline
+		// (0.356 aware x 0.385 attempt-given-aware); refit against E9.
+		double alphaHazard = doubleParam(parm, "alphaHazard", -8.0);
+		double bRisk = doubleParam(parm, "bRisk", 0.4);
+		double wOfficial = doubleParam(parm, "wOfficial", 1.1);
+		double gammaVuln = doubleParam(parm, "gammaVuln", 0.0);
+		double riskHalfLifeH = doubleParam(parm, "riskHalfLifeH", 48.0);
+		double barrierBelongings = doubleParam(parm, "barrierBelongings", 0.0);
+		double barrierPet = doubleParam(parm, "barrierPet", 0.0);
+		double barrierDependents = doubleParam(parm, "barrierDependents", 0.0);
+		// petPolicyDefault: 1 = unrecorded sites ADMIT pets (the inert,
+		// behaviour-preserving default); baseline-real E arms set 0 = refuse,
+		// the conservative A-29 reading, and sweep both worlds.
+		int petPolicyDefault = intParam(parm, "petPolicyDefault", 1);
+		double betaTravelTime = doubleParam(parm, "betaTravelTime", 1.0);
+		double betaCapacityPrior = doubleParam(parm, "betaCapacityPrior", 0.0);
 		String scenarioName;
 		String sheltersCsv;
 		if (scenarioCode == 1) {
@@ -395,6 +430,20 @@ public class ContextCreator implements ContextBuilder {
 				shelter.setReservedForPriority(
 						(int) Math.floor(capacity.intValue() * triageReserveFraction));
 			}
+			// Phase-E OPTIONAL policy columns (V32/V33, A-29). Absent from every
+			// archived shelter CSV — those files are never edited (their checksums
+			// feed data_version_tag) — so this reads defensively: no column, no
+			// value, and the run-wide petPolicyDefault applies at the door.
+			String petCol = r.get("pet_intake");
+			if (petCol != null && !petCol.trim().isEmpty()) {
+				shelter.setPetIntake(Boolean.valueOf("admit".equalsIgnoreCase(petCol.trim())));
+			}
+			String adultsCol = r.get("adults_only");
+			if (adultsCol != null && !adultsCol.trim().isEmpty()) {
+				String v = adultsCol.trim();
+				shelter.setAdultsOnly("1".equals(v) || "true".equalsIgnoreCase(v)
+						|| "yes".equalsIgnoreCase(v));
+			}
 			context.add(shelter);
 			Coordinate c = new Coordinate(lon, lat);
 			geography.move(shelter, fac.createPoint(c));
@@ -462,6 +511,12 @@ public class ContextCreator implements ContextBuilder {
 		// whether heterogeneity is on or off.
 		PopulationSampler sampler = (enableHeterogeneity == 1) ? new PopulationSampler(seed) : null;
 
+		// Creation-ordered agent list for the Phase-E second sampling pass:
+		// context.getObjects iteration order is NOT guaranteed to be creation
+		// order, and the E-sampler's draw order defines the E-population, so the
+		// pass iterates this list, never the context.
+		List<GisAgent> createdResidents = new ArrayList<GisAgent>(numAgents);
+
 		for (int i = 0; i < numAgents; i++) {
 			int idx = campCoords.isEmpty() ? -1 : RandomHelper.nextIntFromTo(0, campCoords.size() - 1);
 			Coordinate coord = (idx < 0) ? new Coordinate(0, 0) : campCoords.get(idx);
@@ -477,6 +532,7 @@ public class ContextCreator implements ContextBuilder {
 			}
 			context.add(agent);
 			geography.move(agent, fac.createPoint(coord));
+			createdResidents.add(agent);
 		}
 		System.out.println("[Residents] " + numAgents + " placed at real encampment points");
 		if (sampler != null) {
@@ -496,6 +552,39 @@ public class ContextCreator implements ContextBuilder {
 					+ "run-wide walkingSpeedMps and carries no attributes");
 		}
 
+		// ---- Phase-E second sampling pass (V29-V44) ------------------------
+		// Runs AFTER the placement loop completes, on its own RNG stream, so the
+		// default-stream draws above and PopulationSampler's stream are
+		// positionally untouched and the archived population stays byte-identical
+		// (the three-streams rule; ELayerSampler class doc).
+		ELayerSampler eSampler = null;
+		if (enableDecisionLayer == 1) {
+			eSampler = new ELayerSampler(seed, pAwareInit, pHeavyBelongings,
+					pHasPet, pHasDependents, groupSpeedDeltaMps);
+			GisAgent.DecisionConfig decisionConfig = new GisAgent.DecisionConfig(
+					informationRegime, enableHazardDeparture, alphaHazard, bRisk,
+					wOfficial, gammaVuln, sigmaTheta, riskHalfLifeH,
+					lambdaOutreachPerDay, barrierBelongings, barrierPet,
+					barrierDependents, petPolicyDefault == 1,
+					betaTravelTime, betaCapacityPrior);
+			for (GisAgent resident : createdResidents) {
+				resident.setDecisionLayer(decisionConfig, eSampler.sample());
+			}
+			System.out.printf("[DecisionLayer] ON - regime %s, departure %s - realised: "
+					+ "aware %.3f | belongings %.3f | pet %.3f | dependents %.4f | "
+					+ "any barrier %.3f | compound barrier %.4f%n",
+					informationRegime == 1 ? "L1 (locations only)" : "L0 (omniscient)",
+					enableHazardDeparture == 1 ? "logistic hazard" : "legacy latch",
+					eSampler.getAwareShare(), eSampler.getHeavyBelongingsShare(),
+					eSampler.getPetShare(), eSampler.getDependentsShare(),
+					eSampler.getAnyBarrierShare(), eSampler.getCompoundBarrierShare());
+			System.out.println("[DecisionLayer] " + ELayerSampler.publishedTargets());
+		} else {
+			System.out.println("[DecisionLayer] OFF (enableDecisionLayer=0): legacy latch "
+					+ "departure, omniscient choice, no decision attributes - the pre-E "
+					+ "behaviour, byte-identical.");
+		}
+
 		// ---- Run length + end-of-run export --------------------------------
 		int endHours = Math.min(simulationHours, smokeField.hours());
 		double endTick = endHours * (60.0 / minutesPerTick);
@@ -504,16 +593,30 @@ public class ContextCreator implements ContextBuilder {
 		String[] pNames = { "numAgents", "minutesPerTick", "walkingSpeedMps",
 				"shelterArrivalDistanceM", "simulationHours", "randomSeed",
 				"evacuationThresholdUgM3", "scenarioCode", "enableHeterogeneity",
-				"respectShelterOpeningDates", "triageReserveFraction" };
+				"respectShelterOpeningDates", "triageReserveFraction",
+				// Phase-E decision layer (V29-V44). Every new parameter MUST
+				// appear here or the manifest silently lies about the run config.
+				"enableDecisionLayer", "pAwareInit", "pHeavyBelongings", "pHasPet",
+				"pHasDependents", "groupSpeedDeltaMps", "lambdaOutreachPerDay",
+				"informationRegime", "enableHazardDeparture", "sigmaTheta",
+				"alphaHazard", "bRisk", "wOfficial", "gammaVuln", "riskHalfLifeH",
+				"barrierBelongings", "barrierPet", "barrierDependents",
+				"petPolicyDefault", "betaTravelTime", "betaCapacityPrior" };
 		Object[] pVals = { numAgents, minutesPerTick, parm.getValue("walkingSpeedMps"),
 				parm.getValue("shelterArrivalDistanceM"), simulationHours, seed,
 				paramOrDefault(parm, "evacuationThresholdUgM3", "unset"), scenarioCode,
-				enableHeterogeneity, respectShelterOpeningDates, triageReserveFraction };
+				enableHeterogeneity, respectShelterOpeningDates, triageReserveFraction,
+				enableDecisionLayer, pAwareInit, pHeavyBelongings, pHasPet,
+				pHasDependents, groupSpeedDeltaMps, lambdaOutreachPerDay,
+				informationRegime, enableHazardDeparture, sigmaTheta,
+				alphaHazard, bRisk, wOfficial, gammaVuln, riskHalfLifeH,
+				barrierBelongings, barrierPet, barrierDependents,
+				petPolicyDefault, betaTravelTime, betaCapacityPrior };
 		String[] dataFiles = { STREETS_SHP, SMOKE_CSV, sheltersCsv, ENCAMPMENTS_CSV };
 
 		@SuppressWarnings("unchecked")
 		OutcomeLogger logger = new OutcomeLogger(context, smokeField, seed, pNames, pVals,
-				dataFiles, netReport, registry, scenarioName, sampler);
+				dataFiles, netReport, registry, scenarioName, sampler, eSampler);
 		ISchedule schedule = RunEnvironment.getInstance().getCurrentSchedule();
 		schedule.schedule(ScheduleParameters.createAtEnd(ScheduleParameters.LAST_PRIORITY), logger, "export");
 

@@ -57,13 +57,18 @@ public class OutcomeLogger {
 	private final String scenarioName;
 	/** Null when heterogeneity is disabled; supplies realised-marginal reporting. */
 	private final geography.agents.PopulationSampler sampler;
+	/** Null when the Phase-E decision layer is disabled; supplies the realised
+	 *  E-attribute marginals (incl. the A-28 joint prevalences) for the manifest. */
+	private final geography.agents.ELayerSampler eSampler;
 
 	public OutcomeLogger(Context<Object> context, SmokeField smokeField, long seed,
 			String[] paramNames, Object[] paramValues, String[] inputDataFiles,
 			StreetNetwork.ValidationReport netReport, ScienceRegistry registry,
-			String scenarioName, geography.agents.PopulationSampler sampler) {
+			String scenarioName, geography.agents.PopulationSampler sampler,
+			geography.agents.ELayerSampler eSampler) {
 		this.scenarioName = scenarioName;
 		this.sampler = sampler;
+		this.eSampler = eSampler;
 		this.context = context;
 		this.smokeField = smokeField;
 		this.seed = seed;
@@ -130,7 +135,14 @@ public class OutcomeLogger {
 					// Exposure / dose / risk kept as three separate columns so
 					// physics and biology are never conflated (HEALTH_MODEL_AUDIT).
 					+ "air_volume_breathed_m3,mean_ventilation_m3h,"
-					+ "inhaled_dose_ug,health_risk_multiplier,health_risk_score");
+					+ "inhaled_dose_ug,health_risk_multiplier,health_risk_score,"
+					// Phase-E decision-layer block (V29-V35), appended per the
+					// append-only contract. EMPTY when the layer is disabled -
+					// never a fabricated default. theta_z is the RAW standard-
+					// normal trait draw (population-invariant across sigma sweeps);
+					// the applied trait is sigmaTheta * theta_z.
+					+ "aware_initial,aware_tick,heavy_belongings,has_pet,"
+					+ "has_dependents,theta_z");
 			for (GisAgent a : agents) {
 				boolean reached = a.getState() == GisAgent.State.SHELTERED;
 				String shelter = reached && a.getTargetShelter() != null ? a.getTargetShelter().getId() : "";
@@ -169,8 +181,17 @@ public class OutcomeLogger {
 								(at.asthma || at.copd) ? 1 : 0,
 								at.chronicPhysical ? 1 : 0,
 								isVulnerable(at) ? 1 : 0);
+				geography.agents.ELayerSampler.DecisionAttributes da = a.getDecisionAttributes();
+				String dec = (da == null)
+						? ",,,,,"
+						: String.format(Locale.US, "%d,%s,%d,%d,%d,%.6f",
+								da.awareInitial ? 1 : 0,
+								Double.isNaN(a.getAwareTick()) ? ""
+										: String.valueOf((long) a.getAwareTick()),
+								da.heavyBelongings ? 1 : 0, da.hasPet ? 1 : 0,
+								da.hasDependents ? 1 : 0, da.thetaZ);
 				w.printf(Locale.US,
-						"%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s,%.2f,%.4f,%.4f,%.4f,%.4f,%s,%s,%s,%.3f,%.3f,%s,%.2f,%.2f,%d,%s,%s,%.4f,%.4f,%.4f,%.3f,%.4f%n",
+						"%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s,%.2f,%.4f,%.4f,%.4f,%.4f,%s,%s,%s,%.3f,%.3f,%s,%.2f,%.2f,%d,%s,%s,%.4f,%.4f,%.4f,%.3f,%.4f,%s%n",
 						a.getName(), simId, commit, seed, dataVersionTag,
 						a.getEncampmentId(), startLonS, startLatS,
 						shelter, reached ? "yes" : "no",
@@ -184,7 +205,7 @@ public class OutcomeLogger {
 						csv(scenarioName), het,
 						a.getAirVolumeBreathedM3(), a.getMeanVentilationM3h(),
 						a.getInhaledDoseUg(), a.getHealthRiskMultiplier(),
-						a.getHealthRiskScore());
+						a.getHealthRiskScore(), dec);
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("writeAgents failed", e);
@@ -195,7 +216,10 @@ public class OutcomeLogger {
 		File f = new File(outDir, "shelters.csv");
 		try (PrintWriter w = new PrintWriter(f, "UTF-8")) {
 			w.println("shelter_id,name,lon,lat,capacity,operating,peak_occupancy,"
-					+ "final_occupancy,refused_count,utilization,mean_travel_dist_m_admitted");
+					+ "final_occupancy,refused_count,utilization,mean_travel_dist_m_admitted,"
+					// Phase-E append-only: of refused_count, how many were POLICY
+					// refusals (pet / adults-only gates). 0 in every legacy arm.
+					+ "policy_refused");
 			for (Shelter s : shelters) {
 				double sumTravel = 0; int nAdmitted = 0;
 				for (GisAgent a : agents) {
@@ -209,11 +233,11 @@ public class OutcomeLogger {
 						: String.format(Locale.US, "%.4f", s.getOccupancy() / (double) s.getCapacity());
 				String meanTravel = (nAdmitted == 0) ? ""
 						: String.format(Locale.US, "%.2f", sumTravel / nAdmitted);
-				w.printf(Locale.US, "%s,%s,%.6f,%.6f,%s,%b,%d,%d,%d,%s,%s%n",
+				w.printf(Locale.US, "%s,%s,%.6f,%.6f,%s,%b,%d,%d,%d,%s,%s,%d%n",
 						s.getId(), csv(s.getName()), s.getLon(), s.getLat(),
 						s.getCapacity() == null ? "" : String.valueOf(s.getCapacity()),
 						s.isOperating(), s.getPeakOccupancy(), s.getOccupancy(),
-						s.getRefusedCount(), util, meanTravel);
+						s.getRefusedCount(), util, meanTravel, s.getPolicyRefusedCount());
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("writeShelters failed", e);
@@ -226,6 +250,7 @@ public class OutcomeLogger {
 		double[] vwe = new double[n];
 		double[] travel = new double[n];
 		int sheltered = 0, enRoute = 0, unreachable = 0, refused = 0, preEvac = 0;
+		int unaware = 0;
 		double sumHoursUnhealthy = 0;
 		for (int i = 0; i < n; i++) {
 			GisAgent a = agents.get(i);
@@ -239,6 +264,7 @@ public class OutcomeLogger {
 				case UNREACHABLE: unreachable++; break;
 				case REFUSED_ALL_FULL: refused++; break;
 				case PRE_EVAC: preEvac++; break;
+				case UNAWARE: unaware++; break;
 			}
 		}
 
@@ -292,11 +318,28 @@ public class OutcomeLogger {
 			} else {
 				w.println("  \"population_sampling\": {\"heterogeneity\": false},");
 			}
+			if (eSampler != null) {
+				w.printf(Locale.US, "  \"decision_layer\": {\"enabled\": true, "
+						+ "\"n_sampled\": %d, \"realised_aware\": %.4f, "
+						+ "\"realised_heavy_belongings\": %.4f, \"realised_pet\": %.4f, "
+						+ "\"realised_dependents\": %.4f, \"realised_any_barrier\": %.4f, "
+						+ "\"realised_compound_barrier\": %.4f, \"published_targets\": \"%s\"},%n",
+						eSampler.getSampledCount(), eSampler.getAwareShare(),
+						eSampler.getHeavyBelongingsShare(), eSampler.getPetShare(),
+						eSampler.getDependentsShare(), eSampler.getAnyBarrierShare(),
+						eSampler.getCompoundBarrierShare(),
+						jsonEsc(geography.agents.ELayerSampler.publishedTargets()));
+			} else {
+				w.println("  \"decision_layer\": {\"enabled\": false},");
+			}
 			w.println("  \"population\": {");
 			w.println("    \"n_agents\": " + n + ",");
 			w.println("    \"pre_evac\": " + preEvac + ", \"sheltered\": " + sheltered
 					+ ", \"en_route\": " + enRoute + ", \"unreachable\": " + unreachable
-					+ ", \"refused_all_full\": " + refused + ",");
+					+ ", \"refused_all_full\": " + refused
+					// Appended (never reordered): Phase-E never-aware residents.
+					// 0 in every run with pAwareInit = 1, including the R3 null.
+					+ ", \"unaware\": " + unaware + ",");
 			w.printf(Locale.US, "    \"exposure_ugm3h\": {\"mean\": %.4f, \"median\": %.4f, \"min\": %.4f, "
 					+ "\"p25\": %.4f, \"p75\": %.4f, \"p90\": %.4f, \"max\": %.4f, \"total\": %.4f, \"gini\": %.4f},%n",
 					mean(exposure), pct(exposure, 50), min(exposure), pct(exposure, 25), pct(exposure, 75),
