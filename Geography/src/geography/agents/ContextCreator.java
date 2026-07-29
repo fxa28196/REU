@@ -62,6 +62,18 @@ public class ContextCreator implements ContextBuilder {
 	private static final String ASSUMPTIONS_CSV = "data/registry/assumptions.csv";
 
 	private static final String STREETS_SHP  = "data/Streets.shp";
+
+	/** RLIS TYPE codes excluded from the pedestrian routing graph (U-27,
+	 *  registry V26): 1110 freeway mainline, 1120–1123 freeway ramps and
+	 *  connectors. Pedestrians are prohibited on limited-access freeways —
+	 *  the Marquam (I-5) and Fremont (I-405) bridges carry no pedestrian
+	 *  access — so these features must not supply walking shortcuts.
+	 *  TYPE 1200-series highways are RETAINED (many carry sidewalks);
+	 *  removing them without a per-segment source would be an invention.
+	 *  Every exclusion is counted into
+	 *  {@code simulation.json street_network_validation.freeway_filter}. */
+	private static final java.util.Set<Integer> NON_PEDESTRIAN_TYPES =
+			new java.util.HashSet<Integer>(java.util.Arrays.asList(1110, 1120, 1121, 1122, 1123));
 	private static final String SMOKE_CSV     = "data/airnow/aqs_hourly_pm25_portland_2020-09.csv";
 	private static final String SHELTERS_CSV  = "data/shelters/shelters_2020-09.csv";
 	private static final String ENCAMPMENTS_CSV = "data/encampments/irp_campsite_reports_sample.csv";
@@ -258,6 +270,15 @@ public class ContextCreator implements ContextBuilder {
 			}
 			LineString line = (LineString) ((MultiLineString) geom).getGeometryN(0);
 			Coordinate[] coords = line.getCoordinates();
+			Object typeAttr = feature.getAttribute("TYPE");
+			if (typeAttr instanceof Number
+					&& NON_PEDESTRIAN_TYPES.contains(((Number) typeAttr).intValue())) {
+				// U-27: freeway-class feature — excluded from BOTH the routing
+				// graph and the display layer; counted for the manifest.
+				network.recordExcludedFeature(((Number) typeAttr).intValue(),
+						StreetNetwork.polylineLengthM(coords));
+				continue;
+			}
 			String name = attr(feature, "FULL_NAME");
 			if (name == null) name = attr(feature, "STREETNAME");
 			if (name == null) name = "unnamed street";
@@ -278,6 +299,11 @@ public class ContextCreator implements ContextBuilder {
 		StreetNetwork.ValidationReport netReport = network.getValidationReport();
 		System.out.println("[StreetNetwork] " + network.nodeCount() + " nodes, "
 				+ network.streetEdgeCount() + " street edges");
+		System.out.printf(
+				"[StreetNetwork U-27] %d freeway-class features excluded from the "
+				+ "pedestrian graph (%.1f km), by RLIS TYPE %s%n",
+				netReport.freewayFeaturesExcluded, netReport.freewayKmExcluded,
+				netReport.freewayExcludedByType);
 		System.out.printf(
 				"[StreetNetwork VALIDATION] %d corrupt attribute node ids corrected "
 				+ "(%d sites reattached by geometry, %d split to synthetic nodes); "

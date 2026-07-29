@@ -450,6 +450,14 @@ public class OutcomeLogger {
 				netReport.impossibleEdgesAfterFix, netReport.maxEndpointGapM);
 		w.println("    \"components\": " + netReport.componentCount
 				+ ", \"largest_component_nodes\": " + netReport.largestComponentSize + ",");
+		StringBuilder byType = new StringBuilder();
+		for (java.util.Map.Entry<Integer, Integer> e : netReport.freewayExcludedByType.entrySet()) {
+			if (byType.length() > 0) byType.append(", ");
+			byType.append("\"").append(e.getKey()).append("\": ").append(e.getValue());
+		}
+		w.printf(Locale.US, "    \"freeway_filter\": {\"features_excluded\": %d, "
+				+ "\"km_excluded\": %.1f, \"by_type\": {%s}},%n",
+				netReport.freewayFeaturesExcluded, netReport.freewayKmExcluded, byType);
 		w.println("    \"corrections\": [");
 		for (int i = 0; i < netReport.corrections.size(); i++) {
 			StreetNetwork.Correction c = netReport.corrections.get(i);
