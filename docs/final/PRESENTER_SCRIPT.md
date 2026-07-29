@@ -70,15 +70,15 @@ Three habits will carry the whole talk:
 | Don't say | Say instead | Because |
 |---|---|---|
 | "6,842 beds" and "6,842 people" in the same breath | "one space per person" | Same numeral, two meanings, adjacent slides. Confusing. |
-| "peaked at 563 micrograms" | "peaked at 562.7 — just under 563" | The chart on screen is labelled 562.7. Say what they can read. But **562** is also the number of people turned away in Scenario B, so always attach the unit: "562.7 micrograms," never bare "562." |
-| "578 beds empty and 562 turned away — nearly the same number!" | "B has one bed per person and still fails 562 of them; 578 beds finish the event empty" | The near-equality is forced arithmetic, not a discovery. A methodologist will catch it. |
+| "peaked at 563 micrograms" | "peaked at 562.7 — just under 563" | The chart on screen is labelled 562.7. Say what they can read. Older drafts used 562 as B's turned-away count (now 550 on the corrected street map), so always attach the unit: "562.7 micrograms." |
+| "578 beds empty and 550 turned away — nearly the same number!" | "B has one bed per person and still fails 578 of them — 550 refused plus 28 unreachable; 578 beds finish the event empty" | The near-equality is forced arithmetic, not a discovery. A methodologist will catch it. |
 | "36 clean-air-capable facilities" | "36 existing shelter facilities" | Nobody has established those buildings have filtered air. **The Scenario A card on the slide does say "clean-air-capable." If anyone points at it: that wording on the slide is wrong, limitation 4 flags it, and we should have written "existing shelter facility."** |
 | "no range overlaps between scenarios on any metric" | "on any *headline* metric" — the slide's own word | The "could not reach any shelter" row is identical across scenarios by construction. |
 | "arms" | "scenarios" | Clinical-trial jargon. There is no reason for a second word. |
 | "30 out of 100 reached a shelter" (the old routing test) | "in a 100-person test run, only 30 arrived" | Otherwise it sounds like you just restated the 30.1% headline. Always say "test run." |
 
 **Numbers that collide. Always attach what they count.**
-**194** = hours above the unhealthy line, *and* mobility-limited people still outside in C. · **99** = arrivals in the 100-person routing test, *and* real beds left unused at Charles Jordan. · **30** = the routing test, *and* 30.1% admitted. · **6,842** = beds *and* people.
+**194** = hours above the unhealthy line (about 190 mobility-limited people are still outside in C — similar number, different thing; attach units). · **99** = arrivals in the 100-person routing test, *and* real beds left unused at Charles Jordan. · **30** = the routing test, *and* 30.1% admitted. · **6,842** = beds *and* people.
 
 ---
 
@@ -323,7 +323,7 @@ Both conditions are checked at the same instant. **Is the smoke right now above 
 
 **Rule two: shelters fill up, and being turned away is the normal outcome, not an edge case.**
 
-In Scenario A, **4,766 of 6,842 people are turned away from every shelter they can reach.** So the geography of refusal is not a detail. It is most of the study.
+In Scenario A, **4,754 of 6,842 people are turned away from every shelter they can reach.** So the geography of refusal is not a detail. It is most of the study.
 
 #### Code: where a refused person is standing
 ***[ON SCREEN — this is the block on the slide.]***
@@ -482,13 +482,15 @@ The table is one particular random starting point — number 42. **All three sce
 
 **Read the rest as three sentences.**
 
-**One. Today, seven in ten people living outdoors would still be outdoors.** 2,060 admitted of 6,842. On average they spend **135.8 hours — five and a half days — outdoors in unhealthy air**, and inhale **23,374 micrograms of particulate**. That last figure is mass that actually entered an airway, not a concentration in the air around them. **Across the whole population that is 928,934 person-hours in unhealthy air.**
+**One. Today, seven in ten people living outdoors would still be outdoors.** 2,060 admitted of 6,842. On average they spend **135.8 hours — five and a half days — outdoors in unhealthy air**, and inhale **23,373 micrograms of particulate**. That last figure is mass that actually entered an airway, not a concentration in the air around them. **Across the whole population that is 928,918 person-hours in unhealthy air.**
 
 **Two. Capacity is the first-order fix, and at exactly one bed per person it is not sufficient.** Triple every existing building and admission goes from 30% to 92%. **Hours in unhealthy air fall 87 per cent** — 135.8 down to 17.5. **But look at the last rows of column B: capacity equals population exactly, so the arithmetic is forced — 578 beds finish the event empty, and that is precisely the 550 people turned away plus the 28 who cannot reach any shelter.** **The beds existed. People could not reach them in time. That is the geography failure, quantified — and it lives on a knife edge: our bed sweep shows that at just twenty per cent surplus, admission hits 99.5% and this whole failure mode disappears.**
 
 **Three. More doors, not better doors.** Scenario C has **not one additional bed** compared to B. Every real facility stays exactly where it is; the difference is that some of the capacity opens as ten additional sites instead of growing buildings that were already there. **Admission rises to 96% — and here is the honest part: ten sites drawn at random from the same candidate list produce the same admission count, run for run. The headcount gain is having more doors, not having chosen the right ones.** Where the choosing does earn its keep is distance: **average walking distance falls another 25%. Hours in unhealthy air are cut by a further half — 17.5 down to 8.7. Inhaled particulate too — 3,056 down to 1,536 micrograms.**
 
 **Say "a further half," not "halved again."** A to B was a sevenfold fall, not a halving. Claiming a pattern that isn't there is the kind of thing a methodologist notices.
+
+**And volunteer the window caveat when you talk dose:** these dose contrasts are 312-hour, whole-event numbers. Over just the first 24 hours the B-to-C dose ratio is 1.29, not 1.98 — short windows are dominated by the walking difference, long windows by the headcount difference. Both are in the technical reference.
 
 **Two honest caveats to say out loud on this slide.**
 
@@ -500,7 +502,7 @@ Second: **the real "got inside" numbers are probably lower than these.** The mod
 
 **If they ask why you're showing one run rather than the average of nine:** because the table is a joint picture of one internally consistent world, and averaging nine runs would produce a row of numbers that no single run ever produced. **The check that matters is that all nine agree, and they do — the admissions range across nine starting points is eleven people wide in every scenario, and the ranges are on the slide. I'd rather show you a real run and prove it's typical than show you an average and hide the spread.**
 
-**If they ask how average walk can be 18.3 kilometres when the longest journey after the wormhole fix was 16.5:** different quantities, and I should be clear about it. **The 16.5 is the longest single journey of someone who *arrived*, in the 50-person demonstration run we used to verify the fix. The 18,260 is the *cumulative* distance walked in Scenario A, averaged over everyone — including 4,766 people who are refused at door after door and keep re-planning.** One person in Scenario A walks 34.1 kilometres in total without ever getting inside. **That is what capacity scarcity looks like as distance.**
+**If they ask how average walk can be 18.2 kilometres when the longest journey after the wormhole fix was 16.5:** different quantities, and I should be clear about it. **The 16.5 is the longest single journey of someone who *arrived*, in the 50-person demonstration run we used to verify the fix. The 18,244 is the *cumulative* distance walked in Scenario A, averaged over everyone — including 4,754 people who are refused at door after door and keep re-planning.** One person in Scenario A walks 34.1 kilometres in total without ever getting inside. **That is what capacity scarcity looks like as distance.**
 
 ---
 
@@ -527,13 +529,13 @@ Nothing else penalises them. There is no assumed disadvantage. And yet:
 
 **Splitting that identical capacity across more doors brings the gap back to 12.5 — where Scenario A started — and lifts the slowest group from 72.6% to 86.0%. But the intervention that actually CLOSES the gap is Scenario D: hold ten per cent of each shelter's spaces for mobility-limited arrivals, and the gap goes from 23.7 points to zero — slightly negative, in fact — at identical total admissions. Same beds, same buildings, one intake rule, zero capital cost.**
 
-**And one more result from tonight's sweep, reported against interest because we predicted the opposite: the gap only exists when capacity is scarce. Give the real sites just twenty per cent surplus — 1,368 extra beds — and admissions hit 99.5% and the gap vanishes entirely. So the honest policy sentence is: if you can buy surplus, buy surplus; when you cannot, the triage reserve buys the same equity for free.**
+**And one more result from tonight's sweep, reported against interest because we predicted the opposite: the gap only exists when capacity is scarce. The fine sweep prices it exactly: five per cent surplus — 342 beds — already buys C's entire headcount advantage without closing the gap; ten per cent — 684 beds — admits every reachable person and the gap vanishes. So the honest policy sentence is: if you can buy surplus, buy surplus; when you cannot, the triage reserve buys the same equity for free.**
 
 **Why does that happen? Not because we assumed it.** Nobody in this model is denied a bed for being disabled. **Shelter beds are handed out first-come, first-served. When beds are scarce relative to demand, "first-come" is decided by walking speed. Scarcity gets rationed by how fast you can walk. Nobody programmed that. It falls out of the admission rule.**
 
 **Two things that confirm the mechanism rather than an assumption:**
 
-- **COPD shows an access penalty — 22.6% against 30.1% for everyone. Asthma shows almost none — 29.3%.** That is exactly right. **COPD is the only diagnosis in this model that changes walking speed, because it is the only one with published gait-speed evidence. A diagnosis never affects anything here except through a mechanism we can cite. And we verified this with a regression fitted to the model's own output: across every scenario the asthma coefficient is statistically zero — the model finds no effect we did not build — while in Scenario D the mobility coefficient flips strongly positive, because the reserve is the one channel that privileges it.**
+- **COPD shows an access penalty — 22.6% against 30.1% for everyone. Asthma shows almost none — 29.3%.** That is exactly right. **COPD is the only diagnosis in this model that changes walking speed, because it is the only one with published gait-speed evidence. A diagnosis never affects anything here except through a mechanism we can cite. And we verified this with a regression fitted to the model's own output: across every scenario the asthma coefficient is statistically zero — the model finds no effect we did not build — while in Scenario D the mobility coefficient flips strongly positive — conditional on speed, it is the regression recovering the admission rule we wrote, a sanity check rather than a discovery; the equity result itself is marginal: the gap is zero.**
 - **People aged 65 and over show the same pattern as mobility limitation — 22.4% in Scenario A** — for the same reason.
 
 **Have this ready, because that last row on the slide invites a hard question.** *"Counted as more vulnerable — 71.1% of the population. Counted by whom? Isn't that the weighting you just said you deleted?"* **No, and the distinction is important. That row is a reporting group, not a weight. It is everyone who is 55 or over, or mobility-limited, or has asthma, or has COPD — the union of the categories above it. Nobody's numbers are multiplied by anything. It exists so that a reader who wants a single "vulnerable population" figure gets one that is defined explicitly rather than assembled from a weight nobody can source.**
@@ -745,7 +747,7 @@ Yes. It promised a single vulnerability-weighted number, and it does not deliver
 **5. "Your Scenario B tripled every building. That's not a policy. What's the point?"**
 It isn't a policy and the script that builds it says so about itself. **B is a diagnostic. Its job is to remove capacity as an explanation, so that whatever failure survives can only be geography.** And it survived — 578 empty beds while 550 people are refused and 28 cannot reach anything. **C is the buildable version — no existing facility moves, the difference opens as ten additional sites — and D is the free version: same buildings as B, one intake rule.**
 
-**6. "578 empty and 562 turned away — those are almost the same number. Isn't that just arithmetic?"**
+**6. "578 empty and 550 turned away — those are almost the same number. Isn't that just arithmetic?"**
 Yes, and thank you for pressing — **it is forced, and here is the arithmetic.** **In Scenario B, capacity equals population exactly. So an empty bed means someone who could have used it didn't. 578 empty beds equals 550 people refused plus 28 people who cannot reach any shelter by any route. In Scenario C the same identity holds: 272 equals 244 plus 28.** The near-equality is a consequence of the construction, not a discovery. **The substantive finding is untouched, and it is what I'd stand on: B has one bed for every person and still fails 578 of them, because the spaces they needed were not reachable in time.**
 
 **7. "Your encampment locations come from public complaints. Isn't that badly biased?"**
@@ -775,7 +777,7 @@ Carefully: **this is a modelling study, not a recommendation, and it predicts no
 Yes, and this is worth showing rather than describing. **When a simulation ends, the model writes one row per person — all 6,842 of them — with their inputs and their outcomes joined on the same line: age, sex, mobility status, asthma, COPD, chronic condition, the walking speed they were dealt, where they started; and then what happened — whether they got inside, which shelter, how many minutes it took, how many full doors turned them away first, how far they walked, how many hours they spent in unhealthy air, and how many micrograms they inhaled.** The plain-English version is `1_EVERY_PERSON.csv` — it opens in Excel — and there's a model-ready numeric version, `ML_TRAINING_DATA.csv`, for anyone who wants to fit their own model to it. **"How many stops did they make" has a real answer in there: in today's scenario, people who were refused at least once averaged about 3.4 doors before the outcome settled, and only 6.6% of them eventually found space; give the system more doors and about 80 to 90 per cent of refused people succeed on a retry.**
 
 **15. "You keep saying the model only does what you built. Prove it."**
-**We fit a regression to the model's own output — a logistic regression, because "got inside or not" is a binary outcome and that's the standard model family for evacuation outcomes — with the person's inputs as predictors.** It is an honesty check, and it works in both directions. **It finds exactly the mechanisms we built: distance to the nearest shelter and walking speed dominate, COPD shows up through its published speed effect. It finds nothing we didn't build: the asthma coefficient is statistically zero in every scenario, because no gait-speed evidence exists for asthma and we refused to invent one. And in Scenario D the mobility coefficient flips strongly positive — the algorithm rediscovers the triage reserve from the data alone.** Every decision in this model has that same shape: a rule, a cited source for the rule, and a check that the rule — and nothing else — is what drives the number. The full tables are in `ML_MODEL_SUMMARY.md`.
+**We fit a regression to the model's own output — a logistic regression, because "got inside or not" is a binary outcome and that's the standard model family for evacuation outcomes — with the person's inputs as predictors.** It is an honesty check, and it works in both directions. **It finds exactly the mechanisms we built: distance to the nearest shelter and walking speed dominate, COPD shows up through its published speed effect. It finds nothing we didn't build: the asthma coefficient is statistically zero in every scenario, because no gait-speed evidence exists for asthma and we refused to invent one. And in Scenario D the mobility coefficient flips strongly positive — but say this carefully: conditional on walking speed it recovers the admission rule we wrote — a pipeline sanity check, not a discovery; three speed-band cells sit at exactly 100% (regional quasi-separation), so the coefficient's size is unstable and is not quoted. The equity result is the marginal one: mobility-limited 91.7% vs others 92.0% pooled — marginal odds ratio ≈ 0.95–1.07, i.e. the gap is simply gone.** Every decision in this model has that same shape: a rule, a cited source for the rule, and a check that the rule — and nothing else — is what drives the number. The full tables are in `ML_MODEL_SUMMARY.md`.
 
 ---
 

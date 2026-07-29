@@ -130,5 +130,21 @@ McFadden pseudo-R2 = 0.409; in-sample accuracy = 0.930
 
 Retry behaviour: 8,078 residents were refused at a full door at least once; 79.7% of them still got inside somewhere else (mean stops among the refused: 3.27).
 
+## Model card — the arm-D mobility coefficient, stated carefully
+
+**Outcome:** `final_state == SHELTERED` (binary; UNREACHABLE excluded — no route exists, so no behaviour is being modelled). **Covariates:** age 55+, female, sex-other, mobility, asthma, COPD, chronic condition, walking speed (m/s), distance to the arm's nearest shelter site (km). **Fitted:** IRLS, information-matrix SEs, 9 seeds pooled.
+
+**Marginal (unconditional) result — quote THIS for equity:** P(in|mobility)=0.9166 vs P(in|others)=0.9203; marginal odds ratio = 0.952. The gap is simply gone.
+
+**Conditional coefficient — a sanity check, not a discovery:** conditional on walking speed, the mobility flag flips a slow walker from losing the arrival race to holding a reserved space, so the logit recovers the admission rule we wrote. Its size is NOT quotable: the cross-tab below shows regional quasi-separation (every mobility-limited resident above 1.0 m/s is admitted — cells at exactly 100%), which inflates and destabilises the point estimate. Wald intervals under near-separation are unreliable; treat the coefficient as 'large and positive', nothing more precise.
+
+| speed band (m/s) | others n / access % | mobility n / access % |
+|---|---|---|
+| (0.0, 0.8] | 72 / 40.3% | 1,209 / 72.8% |
+| (0.8, 1.0] | 603 / 56.6% | 1,070 / 98.5% |
+| (1.0, 1.2] | 2,845 / 76.6% | 958 / 100.0% |
+| (1.2, 1.4] | 6,007 / 94.6% | 597 / 100.0% |
+| (1.4, 3.0] | 6,761 / 99.9% | 304 / 100.0% |
+
 ## Negative control (honesty check)
 Asthma and chronic-physical coefficients must be null in arms A-C: no mechanism links them to movement (no gait-speed evidence exists), so a significant coefficient would mean the model invented an effect. Mobility, COPD (via -0.19 m/s), speed, and distance are the built-in mechanisms and should carry the signal. In arm D the mobility coefficient must FLIP toward positive: the triage reserve is the only channel that privileges mobility-limited arrivals.
