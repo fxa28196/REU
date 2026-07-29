@@ -25,7 +25,7 @@
 \titlerunning{Capacity Is Not Access}
 \author{Fatima Asghar}
 \authorrunning{Fatima Asghar}
-\institute{Fatima Asghar \at Harrisburg University of Science and Technology, Harrisburg, PA, \email{fxa28196@hawkmail.hacc.edu}}
+\institute{Fatima Asghar \at Harrisburg Area Community College, Harrisburg, PA, \email{fxa28196@hawkmail.hacc.edu}}
 \maketitle
 
 \abstract{Most planning for emergency clean-air shelters uses static screening
@@ -37,15 +37,25 @@ and refusal at full facilities. It contains 6,842 residents, the 2025
 Point-in-Time unsheltered count for Multnomah County, each starting at a real
 reported campsite and carrying a sampled age, sex, mobility status, and
 respiratory health. The smoke is measured, not modeled: hourly readings from the
-September 2020 event. Three siting scenarios were compared across nine random
-seeds. The present 36-facility system shelters 30.1\% of residents. Raising
-capacity to match the population, without moving any facility, shelters 91.6\%
-and still refuses 562 people, though the system then holds one space per person.
-Spending that identical capacity on ten better-placed sites shelters 96.0\% and
-cuts refusals to 256. Equity depends on how the gap is measured; three measures
-are reported, and residents with mobility limitations remain the worst-served
-group under every scenario. No observational occupancy record could be located,
-so these are model-to-model comparisons.}
+September 2020 event. Four siting and intake scenarios were compared across nine
+random seeds. The present 36-facility system shelters 30.1\% of residents.
+Raising capacity to match the population, without moving any facility, shelters
+91.6\%; because capacity then equals population exactly, the arithmetic is
+forced --- 578 spaces finish the event empty, equal to the 550 residents refused
+everywhere plus 28 who cannot reach any shelter on the pedestrian-legal street
+network. Splitting that identical capacity across ten additional sites --- more
+doors, not better-chosen doors --- shelters 96.0\% and cuts refusals to 244; ten
+sites drawn at random from the same candidate pool reproduce that count
+run-for-run, so the headcount gain is attributable to dispersion, and siting
+optimization earns credit only for shorter walks. In every scenario the residual
+access gap concentrates in residents with mobility limitations, and the one
+tested intervention that closes it is free: reserving 10\% of each facility's
+spaces for mobility-limited arrivals moves the access gap from roughly
+$+24$ to $0$ percentage points at identical total admissions. A capacity sweep
+shows the gap is a knife-edge phenomenon of capacity equal to demand: at 20\%
+surplus, admissions reach 99.5\% and the gap vanishes. Compared against the one
+(approximate) observed occupancy record, the model over-admits by a censored
+bracket of 1.5--15.6$\times$, so all absolute access figures are upper bounds.}
 
 \section{Introduction}
 \label{sec:intro}
@@ -55,7 +65,10 @@ Fine particulate matter, the microscopic soot that makes smoke dangerous to
 breathe, is measured in micrograms per cubic meter and abbreviated PM$_{2.5}$.
 Across the thirteen-day window containing those nine days, it peaked at 562.7
 $\mu$g\,m$^{-3}$ and stayed above the U.S. Environmental Protection Agency's
-``Unhealthy'' threshold for 194 of 312 hours.
+``Unhealthy'' threshold for 194 of 312 hours. Those hours came in two spells:
+a brief spike in the first day (hours 16--22 of the window), then 57 consecutive
+hours of clean air, before the main episode arrived at hour 79 and held for
+days.
 
 Oregon's Department of Environmental Quality reports that this was Portland's
 first experience of air that bad from wildfire. Between 1985 and 2014 the city
@@ -69,11 +82,12 @@ do not have. The county opened clean-air shelters in response to the 2020 event.
 This chapter asks what would happen if the same smoke arrived today, measured
 against the shelter system that exists now.
 
-Two responses are available, and they are not the same. The county could add
-capacity, meaning more spaces inside the buildings it already operates. Or it
-could add capacity in better places. These sound like two versions of one idea.
-They are not, and the difference matters both for how many people get indoors and
-for which people do.
+Three responses are available, and they are not the same. The county could add
+capacity, meaning more spaces inside the buildings it already operates. It
+could split the same capacity across more sites. Or it could change the intake
+rule at the door without touching a single building. These sound like versions
+of one idea. They are not, and the differences matter both for how many people
+get indoors and for which people do.
 
 \textbf{Research question.} For a fixed total shelter capacity, does the
 geographic placement of that capacity change how many unsheltered residents reach
@@ -87,8 +101,9 @@ walk, and how fast they walk depends on their age and their health. None of this
 survives being averaged.
 
 A static screening map reports the burden carried by a neighborhood. It cannot
-report that 562 people were refused shelter during an event in which the system
-held exactly one space per person, which is the central result here.
+report that 550 people were refused shelter during an event in which the system
+held exactly one space per person, or that the refusals concentrated in the
+residents who walk slowest, which are the central results here.
 
 The model is narrow in what it claims. It measures how much smoke each resident
 is exposed to and how much particulate matter each one inhales. It does not
@@ -259,8 +274,9 @@ a clean time series and is not presented as one.
 
 Residents start at real locations. The City of Portland publishes campsite
 reports through its Impact Reduction Program, and 3,400 were retrieved through
-the city's open data service \cite{portlandcampsites}; the runs reported here
-place residents at 2,981 distinct locations. Two limitations matter. The feed
+the city's open data service \cite{portlandcampsites}; they resolve to 3,317
+distinct coordinates in the file, and any single run seeds residents at a
+sampled subset of them (2,981 in the seed-42 arm-A run). Two limitations matter. The feed
 covers only a recent rolling window and retains no records from 2020, so 2025 and
 2026 locations serve as a geographic stand-in for the 2020 distribution, and the
 model prints a warning to this effect at the start of every run. The reports are
@@ -549,9 +565,14 @@ geocoded coordinates with their real capacities: 2,234 spaces.
 \item \textbf{B, capacity meets demand.} Every real facility scaled by
 $6842/2234 = 3.0627$, rounded so the system total is exactly 6,842. Coordinates,
 facility count, and relative facility size unchanged.
-\item \textbf{C, the same capacity, better placed.} Real facilities grow by only
+\item \textbf{C, the same total, more doors.} Real facilities grow by only
 1.5$\times$. The remaining capacity becomes ten new facilities at algorithmically
 chosen street-network nodes. Total capacity is held identical to B at 6,842.
+\item \textbf{D, need-based intake.} Physically identical to B in every respect
+--- the same 36 sites and the same 6,842 spaces --- but a fraction (10\% in the
+headline runs) of each facility's spaces is reserved for mobility-limited
+arrivals instead of being allocated strictly first-come, first-served. At a
+reserve of zero, D reproduces B bit for bit.
 \end{itemize}
 
 Because B and C hold total capacity exactly equal, a difference between them
@@ -621,7 +642,7 @@ Table~\ref{tab:outcomes} gives the headline outcomes and Fig.~\ref{fig:access}(a
 shows the access result.
 
 Today's system shelters 2,060 of 6,842 residents, or 30.1\%. Capacity binds hard:
-4,766 residents are turned away because every facility they can reach is full,
+4,754 residents are turned away because every facility they can reach is full,
 and 33 of the 36 facilities finish the event at capacity. Raising capacity to
 meet demand at the same locations lifts this to 6,264, or 91.6\%, a factor of
 3.04. Total modeled exposure falls 87.3\% and mean walking distance falls 56.5\%.
@@ -638,35 +659,38 @@ because they provide separate evidence.
 \begin{table}[t]
 \caption{Outcomes at seed 42, with the range across all nine seeds in brackets.
 No range overlaps between scenarios on any metric. B and C hold identical total
-capacity, so the B$\rightarrow$C difference is attributable to placement alone.
+capacity, so the B$\rightarrow$C difference is attributable to how the same
+total is split across sites; the random-pool control (see text) shows the
+sheltered count is insensitive to \emph{which} additional sites are chosen.
 The four exposure measures are not independent; see the text.}
 \label{tab:outcomes}
 \begin{tabular}{p{3.6cm}p{2.1cm}p{2.1cm}p{2.1cm}}
 \hline\noalign{\smallskip}
- & A: today & B: more capacity & C: better placed \\
+ & A: today & B: more capacity & C: more doors \\
 \noalign{\smallskip}\svhline\noalign{\smallskip}
 Facilities & 36 & 36 & 46 \\
 Total spaces & 2,234 & 6,842 & 6,842 \\
 Sheltered & 2,060 (30.1\%) & 6,264 (91.6\%) & 6,570 (96.0\%) \\
 range, 9 seeds & [2,053--2,064] & [6,257--6,268] & [6,563--6,574] \\
-Turned away, all full & 4,766 & 562 & 256 \\
+Turned away, all full & 4,754 & 550 & 244 \\
 Spaces left empty & 174 & 578 & 272 \\
-No shelter reachable & 16 & 16 & 16 \\
-Mean distance walked (m) & 18,260 & 7,938 & 5,689 \\
-Mean hours above threshold & 135.8 & 17.5 & 8.6 \\
-Mean inhaled dose ($\mu$g) & 23,374 & 3,056 & 1,534 \\
-Person-hours above threshold & 928,934 & 119,921 & 59,060 \\
+No shelter reachable & 28 & 28 & 28 \\
+Mean distance walked (m) & 18,244 & 7,896 & 5,904 \\
+Mean hours above threshold & 135.8 & 17.5 & 8.7 \\
+Mean inhaled dose ($\mu$g) & 23,373 & 3,056 & 1,536 \\
+Person-hours above threshold & 928,918 & 119,973 & 59,200 \\
 \noalign{\smallskip}\hline
 \end{tabular}
 \end{table}
 
 \begin{figure}[t]
 \includegraphics[width=\textwidth]{fig3_access}
-\caption{Access outcomes for the three scenarios: (a) residents reaching a
-shelter, and (b) spare capacity and unmet need in the same run. Under scenario B
-the system holds exactly one space per person and still refuses 562 people,
-because the spaces are where the buildings are rather than where the people are.
-The equality of empty spaces and unsheltered residents in panel (b) follows from
+\caption{Access outcomes for the three siting scenarios: (a) residents reaching
+a shelter, and (b) spare capacity and unmet need in the same run. Under scenario
+B the system holds exactly one space per person and still strands 578 people
+(550 refused at full facilities, 28 unable to reach any facility), because the
+spaces are where the buildings are rather than where the people are. The
+equality of empty spaces and unsheltered residents in panel (b) follows from
 capacity equaling population; see the text.}
 \label{fig:access}
 \end{figure}
@@ -675,40 +699,51 @@ capacity equaling population; see the text.}
 \label{sec:geography}
 
 Under scenario B the system holds 6,842 spaces for 6,842 residents, exactly one
-space per person. It still refuses 562 people.
+space per person. It still fails 578 of them.
 
-That is the finding, and it needs stating carefully, because a related
-observation is not evidence at all. Scenario B leaves 578 spaces empty and fails
-to shelter 578 people, of whom 562 were refused at a full facility and 16 could
-reach no facility. Those totals are equal by arithmetic, not by discovery: when
-capacity equals population, empty spaces must equal unsheltered people. The
-near-equality proves nothing on its own. What carries weight is that anyone was
-refused. Supply matched demand exactly, and 562 people were still turned away,
-because the added capacity went to buildings that already exist rather than to
-the places where people are. That is a failure of geography, not of supply, and
-the design separates the two cleanly, because capacity is not the binding
-constraint in B.
+That needs stating carefully, because a related observation is not evidence at
+all. Scenario B leaves 578 spaces empty and fails to shelter 578 people, of
+whom 550 were refused at a full facility and 28 could reach no facility. Those
+totals are equal by arithmetic, not by discovery: when capacity equals
+population, empty spaces must equal unsheltered people. The near-equality
+proves nothing on its own. What carries weight is that anyone was refused.
+Supply matched demand exactly, and 550 people were still turned away at door
+after door, because the added capacity went to buildings that already exist
+rather than to the places where people are. That is a failure of geography, not
+of supply, and the design separates the two cleanly, because capacity is not
+the binding constraint in B. It is also a knife-edge failure: a capacity sweep
+at the same 36 sites shows that at $1.2\times$ demand --- 1,368 spaces of
+surplus --- admissions reach 99.5\% and the failure mode disappears
+(Sect.~\ref{sec:equity}).
 
-Scenario C spends the identical 6,842 spaces. Refusals fall from 562 to 256 and
-empty spaces from 578 to 272. Mean walking distance falls a further 28.3\%, total
-modeled exposure a further 50.7\%, and mean inhaled dose from 3,056 to 1,534
-$\mu$g. Fig.~\ref{fig:map} shows the spatial arrangement that produces this.
-Measured against today's system, C shelters 3.19 times as many residents, reduces
-total modeled exposure by 93.8\%, person-hours above threshold by 93.6\%, and
-mean distance walked by 68.8\%.
+Scenario C spends the identical 6,842 spaces, split across ten additional
+sites. Refusals fall from 550 to 244 and empty spaces from 578 to 272. Mean
+walking distance falls a further 25\%, total modeled exposure a further 50.7\%,
+and mean inhaled dose from 3,056 to 1,536 $\mu$g. Fig.~\ref{fig:map} shows the
+spatial arrangement. Measured against today's system, C shelters 3.19 times as
+many residents, reduces total modeled exposure by 93.8\%, and mean distance
+walked by 68\%.
 
-The ranking is therefore unambiguous. Adding capacity is the larger effect and
-placing it well is the smaller one. But the smaller effect costs no additional
-spaces. The claim is specific. A model of individual movement can show that
-identical total capacity produces different access depending on where it sits,
-and a static screening index cannot show that, because none of its inputs change
-when a facility fills. It does not show that these are the refusal counts a real
-expansion would produce.
+The attribution matters, and a control settles it. Ten sites drawn uniformly at
+random from the same 498-node candidate pool the optimizer searched reproduce
+C's sheltered count exactly, in every seed. The headcount gain over B is
+therefore \emph{dispersion} --- the same total split across more doors --- and
+not the optimizer's choice of doors; siting optimization earns its credit on
+walking distance alone, and that credit is conditional on residents knowing
+where every facility is. Capacity remains the first-order effect. What a model
+of individual movement adds is the ability to show that identical total
+capacity produces different access depending on how it is split across doors
+--- a static screening index cannot show that, because none of its inputs
+change when a facility fills. A min-cost-flow bound confirms the admissions
+count in C is already at the coordination optimum for its site set, so the
+remaining lever is not further siting optimization but the intake rule
+(Sect.~\ref{sec:equity}). None of this shows that these are the refusal counts
+a real expansion would produce.
 
 \begin{figure}[t]
 \includegraphics[width=\textwidth]{fig4_map}
 \caption{Resident start points, in gray, against facility locations, sized by
-capacity, in (a) today's system and (b) the better-placed scenario. In (a) the
+capacity, in (a) today's system and (b) the more-doors scenario C. In (a) the
 existing facilities cluster away from much of the demand, while in (b) the ten
 new sites are placed into the demand surface itself. The existing 36 facilities
 are unmoved between panels; only the new capacity is placed.}
@@ -723,19 +758,24 @@ evaluation tracking only overall access would score scenario B as a
 near-complete success. Table~\ref{tab:groups} reports access by group.
 
 \begin{table}[t]
-\caption{Percentage of each group reaching a shelter, seed 42.}
+\caption{Percentage of each group reaching a shelter, seed 42. D is scenario B
+with a 10\% per-facility reserve for mobility-limited arrivals; its total
+admissions equal B's.}
 \label{tab:groups}
-\begin{tabular}{p{3.8cm}p{1.5cm}p{1.4cm}p{1.4cm}p{1.4cm}}
+\begin{tabular}{p{3.4cm}p{1.3cm}p{1.2cm}p{1.2cm}p{1.2cm}p{1.2cm}}
 \hline\noalign{\smallskip}
-Group & Share (\%) & A (\%) & B (\%) & C (\%) \\
+Group & Share (\%) & A (\%) & B (\%) & C (\%) & D (\%) \\
 \noalign{\smallskip}\svhline\noalign{\smallskip}
-Everyone & 100.0 & 30.1 & 91.6 & 96.0 \\
-Walks without difficulty & 80.1 & 32.7 & 96.4 & 98.6 \\
-Mobility limitation & 19.9 & 19.7 & 71.9 & 85.7 \\
-Age 65 and over & 5.2 & 22.4 & 82.4 & 89.8 \\
-COPD & 10.8 & 22.2 & 86.2 & 93.8 \\
-Asthma & 14.8 & 29.2 & 90.6 & 95.7 \\
-Chronic physical condition & 39.6 & 30.2 & 91.1 & 95.8 \\
+Everyone & 100.0 & 30.1 & 91.6 & 96.0 & 91.6 \\
+Walks without difficulty & 80.1 & 32.6 & 96.3 & 98.5 & 91.5 \\
+Mobility limitation & 19.9 & 20.1 & 72.6 & 86.0 & 91.9 \\
+Age 65 and over & 5.2 & 22.4 & 81.6 & 90.1 & 80.7 \\
+COPD & 10.8 & 22.6 & 87.3 & 95.1 & 84.4 \\
+Asthma & 14.8 & 29.3 & 91.1 & 95.8 & 91.2 \\
+Chronic physical condition & 39.6 & 30.1 & 91.0 & 95.7 & 91.6 \\
+Male & 68.6 & 30.1 & 92.0 & 96.0 & 92.5 \\
+Female & 29.2 & 30.1 & 90.5 & 96.1 & 89.4 \\
+Other / not stated & 2.2 & 30.7 & 90.0 & 95.3 & 92.7 \\
 \noalign{\smallskip}\hline
 \end{tabular}
 \end{table}
@@ -744,10 +784,12 @@ The direction of the equity result depends on how the gap is measured, so this
 chapter reports three measures rather than one. Table~\ref{tab:gap} gives all
 three for the comparison between residents who walk without difficulty and
 residents with a mobility limitation. On a percentage-point scale, capacity
-expansion widens the gap from 13.0 to 24.5, and better-placed capacity returns it
-to 12.9. On a ratio scale the gap narrows at every step, from 1.66 to 1.34 to
-1.15. Counting people rather than rates, the number of mobility-limited residents
-left outside falls from 1,094 to 383 to 195.
+expansion widens the gap from 12.5 to 23.7, and dispersion returns it to 12.5.
+On a ratio scale the gap narrows at every step, from 1.62 to 1.33 to 1.15.
+Counting people rather than rates, the number of mobility-limited residents
+left outside falls from 1,087 to 373 to 190. Sex is reported for completeness:
+the male--female access difference is small relative to the mobility gap (at
+most a few percentage points, in scenario B).
 
 \begin{table}[t]
 \caption{The mobility gap on three measures. The last two rows are derived from
@@ -756,14 +798,14 @@ and are rounded to the nearest resident and percentage point.}
 \label{tab:gap}
 \begin{tabular}{p{5.1cm}p{1.6cm}p{1.6cm}p{1.6cm}}
 \hline\noalign{\smallskip}
-Measure & A: today & B: more capacity & C: better placed \\
+Measure & A: today & B: more capacity & C: more doors \\
 \noalign{\smallskip}\svhline\noalign{\smallskip}
-Access, walks without difficulty (\%) & 32.7 & 96.4 & 98.6 \\
-Access, mobility limitation (\%) & 19.7 & 71.9 & 85.7 \\
-Difference in percentage points & 13.0 & 24.5 & 12.9 \\
-Ratio of access rates & 1.66 & 1.34 & 1.15 \\
-Mobility-limited residents left outside & 1,094 & 383 & 195 \\
-Their share of all left outside (\%) & 23 & 66 & 72 \\
+Access, walks without difficulty (\%) & 32.6 & 96.3 & 98.5 \\
+Access, mobility limitation (\%) & 20.1 & 72.6 & 86.0 \\
+Difference in percentage points & 12.5 & 23.7 & 12.5 \\
+Ratio of access rates & 1.62 & 1.33 & 1.15 \\
+Mobility-limited residents left outside & 1,087 & 373 & 190 \\
+Their share of all left outside (\%) & 23 & 65 & 70 \\
 \noalign{\smallskip}\hline
 \end{tabular}
 \end{table}
@@ -779,24 +821,47 @@ applies to my own results.
 
 Three statements survive every measure, and they are the equity findings this
 chapter claims. First, every scenario improves absolute access for residents with
-mobility limitations, from 19.7\% to 71.9\% to 85.7\%. Capacity expansion is not
+mobility limitations, from 20.1\% to 72.6\% to 86.0\%. Capacity expansion is not
 harmful to this group; it helps them substantially. Second, residents with
-mobility limitations remain the worst-served group under every scenario and are
-over-represented among those still outside under every scenario. They are 19.9\%
-of the population but 23\% of the residents left outside today, 66\% under
-capacity expansion, and 72\% under better-placed capacity. As the system improves
+mobility limitations remain the worst-served group under every siting scenario
+and are over-represented among those still outside. They are 19.9\%
+of the population but 23\% of the residents left outside today, 65\% under
+capacity expansion, and 70\% under dispersion. As the system improves
 in aggregate, the people who remain outside are increasingly the people who
-cannot walk fast. This follows directly from first-come-first-served admission,
-discussed in Sect.~\ref{sec:limitations}. Third, better-placed capacity closes
-more of the remaining shortfall for this group than capacity alone: between B and
-C, access for mobility-limited residents rises 13.8 percentage points against 2.2
-for everyone else, and the ratio falls from 1.34 to 1.15. The gap is narrowed,
-not closed; 14.3\% of residents with mobility limitations remain outside in
-scenario C.
+cannot walk fast. This follows directly from first-come-first-served admission.
+Third, the intake rule --- not siting --- is what closes the gap. Scenario D
+reserves 10\% of each facility's spaces for mobility-limited arrivals and moves
+their access from 72.6\% to 91.9\%, above the unimpaired rate of 91.5\%, at
+total admissions identical to B's and zero capital cost. Under D the race
+dynamic that produces the gap is simply switched off for the reserved spaces:
+survival analysis shows that in B roughly 80\% of the final mobility gap
+already exists one hour after departure (Fig.~\ref{fig:race}), so any rule that
+must be won by arrival order will be won by the fast.
+
+Two further results bound the finding, and both contradicted this study's own
+registered predictions, which is reported here deliberately. A capacity sweep
+at B's real sites shows the mobility gap is a property of the scarcity band
+where capacity approximately equals demand: at $1.2\times$ demand, admissions
+reach 99.5\% (above C's 96.0\%) and the gap vanishes entirely. We predicted the
+crossing would require $1.4$--$1.6\times$ and that the gap would persist under
+surplus; both predictions were wrong, and the honest conclusion is stronger ---
+surplus dissolves the failure mode, and the triage reserve matters exactly when
+surplus cannot be bought.
+
+\begin{figure}[t]
+\includegraphics[width=\textwidth]{fig5_race}
+\caption{The mobility gap is a first-hour race, and the intake rule ends it.
+Cumulative share of each group already inside a shelter, by minutes since
+departure (seed 42). Left: under scenario B, the curves separate within the
+first hour and never re-converge. Right: under scenario D's 10\% reserve, the
+mobility-limited curve reaches the unimpaired curve --- same buildings, same
+spaces, different rule.}
+\label{fig:race}
+\end{figure}
 
 The same broad pattern holds for residents aged 65 and over, whose access moves
-from 22.4\% to 82.4\% to 89.8\%, and for residents with COPD, from 22.2\% to
-86.2\% to 93.8\%. Asthma shows almost no access penalty while COPD shows a large
+from 22.4\% to 81.6\% to 90.1\%, and for residents with COPD, from 22.6\% to
+87.3\% to 95.1\%. Asthma shows almost no access penalty while COPD shows a large
 one. This asymmetry follows from the available evidence rather than from an
 oversight. In this model a diagnosis can affect an outcome only by affecting
 walking speed, because a diagnosis is never a dose multiplier, and COPD carries a
@@ -814,18 +879,24 @@ on totals and not on a single gap measure.
 
 Across all 27 runs the largest seed-to-seed spread within a scenario is 11
 residents, while the smallest difference between two scenarios at the same seed
-is 306. The between-scenario signal is therefore roughly 28 times the
-within-scenario noise, and no range overlaps between scenarios on any headline
-metric, so the ordering A $<$ B $<$ C is not an artifact of any particular random
-draw.
+is 306. The two numbers are reported side by side rather than as a ratio: seed
+spread bounds only Monte-Carlo variability, not structural or parametric
+uncertainty. No range overlaps between scenarios on any headline metric, so the
+ordering A $<$ B $<$ C is not an artifact of any particular random draw; the
+B--C gap in particular is reproduced exactly by the random-pool control, so its
+tightness is evidence about dispersion, not the optimizer. A stronger
+robustness result arrived from a correction: after freeway-class street
+segments (2,636 features, 614~km, including two non-pedestrian bridges) were
+removed from the walking graph and every run regenerated, all sheltered counts
+were unchanged to the digit in every scenario and seed.
 
-One detail falls out of the design as a free consistency check. The count of
-residents who can reach no shelter at all is identical across all three scenarios
-within each seed, at 16 at seed 42. These residents sit on street-graph
-components containing no facility, so no amount of capacity and no re-placement
-reaches them, and the number varies only with which residents were sampled. This
-confirms the scenarios differ only in the way intended. It is not a check on
-external accuracy.
+One diagnostic falls out of the design. The count of residents who can reach no
+shelter at all is identical across all three scenarios within each seed --- 28
+at seed 42, verified as the same individuals --- because these residents sit on
+street-graph fragments whose only connection to the network was a freeway.
+No amount of capacity and no re-placement reaches them, and the number varies
+only with which residents were sampled. This confirms the scenarios differ only
+in the way intended. It is not a check on external accuracy.
 
 \subsection{Calibration, and why none was possible}
 \label{sec:calibration}
@@ -873,12 +944,16 @@ direction; the size of each effect would move with different values. The ten new
 sites also average about 349 spaces each, larger than any facility in the real
 inventory.
 
-\textbf{Admission depends on arrival order.} Residents are served in shuffle
-order rather than by need. This matters most in scenario A, where capacity binds
-hardest, and it is the mechanism producing the concentration of mobility-limited
-residents among the excluded that Sect.~\ref{sec:equity} reports. A needs-based
-admission rule would likely change that result, so the equity findings should be
-read as conditional on first-come-first-served admission.
+\textbf{Admission depends on arrival order, and that is now a tested lever
+rather than an untested caveat.} Residents are served in shuffle order rather
+than by need. This matters most in scenario A, where capacity binds hardest,
+and it is the mechanism producing the concentration of mobility-limited
+residents among the excluded that Sect.~\ref{sec:equity} reports. Scenario D
+tests the needs-based alternative directly: a 10\% per-facility reserve for
+mobility-limited arrivals closes the gap at identical total admissions, so the
+equity findings for A--C should be read as conditional on
+first-come-first-served admission, with D quantifying exactly how much of the
+gap that rule creates.
 
 \textbf{Every equity finding is downstream of the movement model,} because
 walking speed is the only attribute permitted to affect an outcome. Those
@@ -897,13 +972,31 @@ about 207 spaces are missing entirely.
 
 \textbf{The inputs carry their own limits.} The PM$_{2.5}$ field is spatially
 uniform, because with two in-county monitors any interpolation would manufacture
-gradients the data cannot support; one consequence is that placement can help
+gradients the data cannot support; one consequence is that siting can help
 only by reducing time outdoors, never by moving people into cleaner air. The
 monitors are non-reference instruments that most likely understate true
 concentrations during fresh wood smoke. Encampment locations are 2025 and 2026
 complaint-driven reports used as a spatial proxy for 2020. Sex and mobility
 distributions are 2019 data, and asthma and COPD prevalences are imported from a
 Minnesota cohort because no local equivalent exists.
+
+\textbf{The behavioral scope is deliberately minimal, and each simplification
+is one-directional.} Every resident knows every shelter and walks to it:
+during the real 2020 event access was partly dispatcher-mediated, with
+transportation arranged through 211, and neither information limits nor rides
+are modeled. Residents have no destination other than a shelter --- no
+self-rescue, no leaving the county. The model is adults-only by construction,
+which happens to match the 2020 emergency sites' adults-only intake, though
+not the general shelter system. The historical 2020 configuration also held
+Mount Scott Community Center in reserve as a standby site; conditional
+activation of standby capacity is not modeled. Scenario B's uniform scale-up
+is physically unrealizable for much of the inventory (motel shelters would
+need to triple their rooms; the largest pod village would grow from 66 to 202
+pods) --- B is a diagnostic bound, not a plan. Finally, an asymmetric
+evidentiary bar is acknowledged: ten real day centers are excluded for lack of
+a published capacity while scenario C's ten hypothetical sites carry invented
+349-space capacities; the two choices are stated together so the asymmetry is
+visible.
 
 The project was also narrower in scope than originally planned. It was proposed
 with five siting scenarios, projected-future smoke conditions, and a second
@@ -921,29 +1014,32 @@ This study asked a direct question: for a fixed total capacity, does placement
 change how many unsheltered residents reach a clean-air shelter, and does it
 change which residents reach one?
 
-The answer to the first is yes. The present system shelters 30.1\% of residents.
-Raising capacity to match the population shelters 91.6\% and still refuses 562
-people while holding exactly one space per person. Spending the identical
-capacity on ten better-placed sites shelters 96.0\% and cuts refusals to 256. The
-ordering held across nine random seeds with no overlap between scenarios on any
-headline metric.
+The answer to the first is yes, with the attribution the controls force. The
+present system shelters 30.1\% of residents. Raising capacity to match the
+population shelters 91.6\% and, holding exactly one space per person, still
+strands 578 of them (550 refused everywhere, 28 unable to reach any facility).
+Splitting the identical capacity across ten additional sites shelters 96.0\%
+and cuts refusals to 244 --- a gain the random-pool control shows is
+dispersion, not optimized siting. The ordering held across nine random seeds
+with no overlap between scenarios on any headline metric, and every sheltered
+count survived a full re-run on the corrected pedestrian-legal street graph
+unchanged.
 
-The answer to the second is yes, with a caveat about measurement that matters as
-much as the result. On a percentage-point scale, capacity expansion widens the
-mobility gap and better-placed capacity closes it; on a ratio scale, both narrow
-it. What holds regardless of scale is that residents with mobility limitations
-remain the worst-served group throughout and make up a growing share of those
-still outside as the system improves, rising from 23\% of the excluded today to
-72\% under the best scenario modeled, against a 19.9\% population share.
+The answer to the second is yes, and it is the finding with no budget attached.
+On a percentage-point scale, capacity expansion widens the mobility gap from
+12.5 to 23.7 points and dispersion returns it to 12.5; on a ratio scale, both
+narrow it. What holds regardless of scale is that residents with mobility
+limitations remain the worst-served group throughout. The intervention that
+closes the gap is the intake rule: reserving 10\% of each facility's spaces for
+mobility-limited arrivals takes the gap to zero at identical total admissions
+and zero capital cost. A capacity sweep sharpens the interpretation --- and
+overturned this study's own registered predictions: at 20\% surplus over
+demand, admissions reach 99.5\% and the mobility gap vanishes entirely, so the
+gap is a phenomenon of the scarcity band where capacity approximately equals
+demand. The policy sentence that survives every control is: buy surplus if you
+can; where you cannot, the triage reserve buys the same equity for free.
 
-If Multnomah County can add clean-air shelter capacity, that dominates every
-other intervention modeled here. But the second finding is the one with no budget
-attached. Once capacity is adequate in aggregate, where the marginal capacity
-sits determines whether it is usable, and the same 6,842 spaces more than halve
-refusals depending only on placement. A capacity expansion evaluated on aggregate
-access would look like a success while the percentage-point gap nearly doubled.
-
-Four extensions would improve the model most. A model of awareness is the most
+Three extensions would improve the model most. A model of awareness is the most
 valuable single addition: the chapter assumes every resident knows the shelters
 exist, and that assumption is what makes each access figure an upper bound.
 Giving each resident a probability of knowing, swept across a range, would turn
@@ -951,10 +1047,7 @@ each figure from a single upper bound into an interval and would give the model 
 parameter that could be fitted if occupancy data ever becomes available. Second,
 an inequality measure computed over the full distribution of exposure, such as a
 Gini coefficient, would give a fourth equity statistic free of the ceiling effect
-described in Sect.~\ref{sec:equity}. Third, an order-independent admission
-procedure would remove the shuffle-order dependence and let a needs-based triage
-rule be compared against first-come-first-served, so the equity result could be
-challenged on policy grounds rather than only on geometry. Fourth, the placement
+described in Sect.~\ref{sec:equity}. Third, the placement
 procedure should be fitted on one set of campsite locations and evaluated on
 another.
 

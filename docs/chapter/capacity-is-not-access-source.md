@@ -1,7 +1,7 @@
 # Capacity Is Not Access: Agent-Based Modeling of Clean-Air Shelter Siting During Wildfire Smoke in Portland
 
 **Fatima Asghar**
-Harrisburg University of Science and Technology, Harrisburg, PA
+Harrisburg Area Community College, Harrisburg, PA
 e-mail: fxa28196@hawkmail.hacc.edu
 
 *Running head: Capacity Is Not Access*
