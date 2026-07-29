@@ -1,0 +1,47 @@
+shelter_id,name,lon,lat,capacity,operating,peak_occupancy,final_occupancy,refused_count,utilization,mean_travel_dist_m_admitted,policy_refused
+Arbor_Lodge_Shelter,Arbor Lodge Shelter,-122.686753,45.576626,132,true,8,8,12,0.0606,2367.00,12
+Bybee_Lakes_Hope_Center,Bybee Lakes Hope Center,-122.757778,45.626297,262,true,2,2,1,0.0076,2529.27,1
+Clark_Center,Clark Center,-122.661942,45.512502,135,true,37,37,26,0.2741,837.00,26
+Gresham_Womens_Shelter,Gresham Women's Shelter,-122.497037,45.522018,135,true,0,0,1,0.0000,,1
+Jeans_Place,Jean's Place,-122.654323,45.523278,90,true,29,29,24,0.3222,669.58,24
+Laurelwood_Center,Laurelwood Center,-122.600281,45.491148,180,true,105,105,0,0.5833,5587.22,0
+River_District_Navigatio,River District Navigation Center,-122.676937,45.530708,150,true,73,73,0,0.4867,7608.57,0
+Walnut_Park_Shelter,Walnut Park Shelter,-122.661833,45.562279,108,true,32,32,0,0.2963,8209.22,0
+Willamette_Center,Willamette Center,-122.649327,45.485729,195,true,49,49,0,0.2513,2021.69,0
+Banfield_Motel_Shelter,Banfield Motel Shelter,-122.625558,45.534537,108,true,39,39,6,0.3611,1148.57,6
+Delta_Park_Motel_Shelter,Delta Park Motel Shelter,-122.679565,45.590053,114,true,2,2,12,0.0175,1163.08,12
+Roseway_Inn_Motel_Shelte,Roseway Inn Motel Shelter,-122.562494,45.558812,225,true,24,24,16,0.1067,1546.33,16
+Rockwood_Bridge_Shelter,Rockwood Bridge Shelter,-122.477620,45.522979,78,true,1,1,1,0.0128,3872.44,1
+Stark_Street_Motel_Shelt,Stark Street Motel Shelter,-122.474369,45.519541,81,true,3,3,1,0.0370,24330.83,1
+Thayer_Family_Foundation,Thayer Family Foundation Veterans Motel Shelter,-122.685370,45.583337,32,true,0,0,12,0.0000,,12
+Arbor_Lodge_Village_Pods,Arbor Lodge Village Pods,-122.686753,45.576626,30,true,0,0,12,0.0000,,12
+Avalon_Village,Avalon Village,-122.647011,45.504545,16,true,1,1,0,0.0625,1180.76,0
+Beacon_Village,Beacon Village,-122.585163,45.527605,16,true,1,1,1,0.0625,331.28,1
+Dignity_Village,Dignity Village,-122.635880,45.590779,99,true,4,4,1,0.0404,1913.07,1
+Harrison_Community_Villa,Harrison Community Village,-122.578184,45.509737,63,true,12,12,9,0.1905,1175.52,9
+Kenton_Womens_Village,Kenton Women's Village,-122.691841,45.586652,32,true,0,0,12,0.0000,,12
+Oak_Street_Village,Oak Street Village,-122.579609,45.520115,48,true,14,14,10,0.2917,802.58,10
+Parkrose_Community_Villa,Parkrose Community Village,-122.533971,45.534177,16,true,2,2,3,0.1250,825.83,3
+St_Andrews_Village,St Andrews Village,-122.721754,45.582464,16,true,0,0,8,0.0000,,8
+St_Johns_Village,St Johns Village,-122.750203,45.590193,32,true,25,25,8,0.7813,1083.81,8
+Lilac_Meadows,Lilac Meadows,-122.583071,45.496970,190,true,53,53,38,0.2789,1022.90,38
+Porch_Light_Youth_Shelte,Porch Light Youth Shelter,-122.688141,45.522468,45,true,0,0,0,0.0000,,0
+Street_Light_Youth_Shelt,Street Light Youth Shelter,-122.688141,45.522468,45,true,0,0,0,0.0000,,0
+Behavioral_Health_Resour,Behavioral Health Resource Center,-122.679643,45.521959,50,true,0,0,0,0.0000,,0
+Sunderland_RV_Safe_Park,Sunderland RV Safe Park,-122.635896,45.595053,92,true,3,3,1,0.0326,2643.49,1
+Peninsula_Crossing_SRV,Peninsula Crossing Trail Safe Rest Village,-122.735946,45.583354,99,true,27,27,9,0.2727,1377.01,9
+BIPOC_SRV,BIPOC Safe Rest Village,-122.665928,45.534443,63,true,11,11,1,0.1746,547.14,1
+Queer_Affinity_Village,Queer Affinity Safe Rest Village,-122.677686,45.506081,57,true,0,0,34,0.0000,,34
+Doreens_Place,Doreen's Place (Transition Projects),-122.677480,45.527488,135,true,2,2,14,0.0148,70.26,14
+Menlo_Park_SRV,Menlo Park Safe Rest Village,-122.537593,45.522410,82,true,63,63,10,0.7683,1942.69,10
+Reedway_SRV,Reedway Safe Rest Village,-122.606664,45.481822,99,true,17,17,4,0.1717,1287.05,4
+NEW_optimized_site_01,Proposed clean-air shelter 1 (optimized location),-122.684239,45.525066,350,true,54,54,51,0.1543,1138.92,51
+NEW_optimized_site_02,Proposed clean-air shelter 2 (optimized location),-122.674314,45.514205,350,true,33,33,51,0.0943,1072.19,51
+NEW_optimized_site_03,Proposed clean-air shelter 3 (optimized location),-122.685357,45.536118,349,true,69,69,44,0.1977,1542.39,44
+NEW_optimized_site_04,Proposed clean-air shelter 4 (optimized location),-122.544555,45.489718,349,true,108,108,24,0.3095,3229.64,24
+NEW_optimized_site_05,Proposed clean-air shelter 5 (optimized location),-122.574416,45.540881,349,true,62,62,16,0.1777,2268.55,16
+NEW_optimized_site_06,Proposed clean-air shelter 6 (optimized location),-122.686929,45.585790,349,true,33,33,12,0.0946,1849.38,12
+NEW_optimized_site_07,Proposed clean-air shelter 7 (optimized location),-122.675258,45.500394,349,true,42,42,38,0.1203,2603.82,38
+NEW_optimized_site_08,Proposed clean-air shelter 8 (optimized location),-122.571918,45.465833,349,true,54,54,6,0.1547,1839.99,6
+NEW_optimized_site_09,Proposed clean-air shelter 9 (optimized location),-122.543241,45.555387,349,true,38,38,16,0.1089,2534.08,16
+NEW_optimized_site_10,Proposed clean-air shelter 10 (optimized location),-122.673484,45.519995,349,true,83,83,51,0.2378,1413.67,51
