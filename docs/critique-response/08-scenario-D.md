@@ -125,6 +125,11 @@ percentage points. Runs archived in `docs/runs/scenario-d-2026/` and
 Per-seed detail at reserve 0.10 — seed 42: 6,264 / 92.1 / 91.4 / −0.6. Seed 43:
 6,259 / 91.6 / 91.5 / −0.1. Seed 44: 6,260 / 90.6 / 91.7 / +1.1.
 
+True three-seed *count* means (quote these, not the seed-42 counts in the
+tables above): B and D-r10 sheltered 6,261 (per-seed 6,264 / 6,259 / 6,260,
+identical in B and D-r10); B ML outside 387.3; D-r10 ML outside 119.0; D-r15
+sheltered 6,096.
+
 **Best value = 0.10.** It is the Pareto point: total sheltered is *unchanged from arm B
 to the person* at all three seeds (6,264 / 6,259 / 6,260 in both), and the final-state
 counts are identical too (seed 42: 6,264 SHELTERED, 562 REFUSED_ALL_FULL, 16

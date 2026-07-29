@@ -26,7 +26,9 @@ scripts/cp.args
 
 # ---- Redundant archive: the extracted, tracked copy lives at Geography/data/Streets.* ----
 /Streets.zip
-scripts/__pycache__/
+# Python bytecode caches anywhere in the tree (supersedes the old scripts/-only rule,
+# which missed scripts/analysis/__pycache__/ -- a .pyc was tracked until Round 5 Phase A).
+__pycache__/
 
 # ---- Overleaf submission staging (regenerable) ----
 # The canonical manuscript lives in docs/chapter/. This folder is assembled for
