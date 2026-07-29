@@ -13,7 +13,7 @@ your decision before you upload, and one of them is in the author line.
 this affiliation):
 
 ```latex
-\institute{Fatima Asghar \at Harrisburg Area Community College, Harrisburg, PA,
+\institute{Fatima Asghar \at Harrisburg University of Science and Technology, Harrisburg, PA,
 \email{fxa28196@hawkmail.hacc.edu}}
 ```
 
