@@ -58,8 +58,20 @@ def main():
     ref = all_df[all_df.seed == 42].copy()          # seed 42 = the reported run
 
     # ---- 1. every person -------------------------------------------------
+    # Arm D (triage reserve, r10) rides along in this sheet only: the mentor
+    # deliverable is "inputs + what each person did", and D is the
+    # intervention that changes WHO gets in, so its rows belong here.
+    d_path = ROOT / "Geography/output/D2026-n6842-seed42-r10/agents.csv"
+    if d_path.exists():
+        d_df = pd.read_csv(d_path)
+        d_df["arm"] = "D"
+        d_df["seed"] = 42
+        ref = pd.concat([ref, d_df], ignore_index=True)
+    arm_labels = dict(ARMS)
+    arm_labels["D"] = ("D - Same beds as B, but 10% of each shelter held "
+                       "for people who walk slowest")
     per = pd.DataFrame({
-        "Scenario": ref["arm"].map(ARMS),
+        "Scenario": ref["arm"].map(arm_labels),
         "Person": ref["agent_id"],
         "Started at encampment": ref["starting_encampment"],
         "Start longitude": ref["start_lon"],
@@ -75,6 +87,8 @@ def main():
         "Walking speed (metres per second)": ref["walking_speed_mps"].round(2),
         "What happened": ref["final_state"].map(plain_state),
         "Shelter they reached": ref["shelter_reached"].fillna("none"),
+        "Minutes to reach shelter": ref["travel_time_min"].round(1),
+        "Times turned away at a full door": ref["door_refusals"],
         "How far they walked (metres)": ref["total_travel_distance_m"].round(0),
         "Hours spent outdoors in smoke": ref["hours_above_unhealthy"].round(1),
         "Smoke breathed in (micrograms)": ref["inhaled_dose_ug"].round(0),

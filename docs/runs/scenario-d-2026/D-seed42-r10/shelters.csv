@@ -1,37 +1,37 @@
 shelter_id,name,lon,lat,capacity,operating,peak_occupancy,final_occupancy,refused_count,utilization,mean_travel_dist_m_admitted
-Arbor_Lodge_Shelter,Arbor Lodge Shelter,-122.686753,45.576626,270,true,270,270,372,1.0000,8437.17
-Bybee_Lakes_Hope_Center,Bybee Lakes Hope Center,-122.757778,45.626297,536,true,536,536,555,1.0000,32424.82
-Clark_Center,Clark Center,-122.661942,45.512502,276,true,276,276,102,1.0000,584.46
+Arbor_Lodge_Shelter,Arbor Lodge Shelter,-122.686753,45.576626,270,true,270,270,359,1.0000,8604.10
+Bybee_Lakes_Hope_Center,Bybee Lakes Hope Center,-122.757778,45.626297,536,true,536,536,544,1.0000,32175.04
+Clark_Center,Clark Center,-122.661942,45.512502,276,true,276,276,108,1.0000,587.64
 Gresham_Womens_Shelter,Gresham Women's Shelter,-122.497037,45.522018,276,true,0,0,0,0.0000,
-Jeans_Place,Jean's Place,-122.654323,45.523278,184,true,184,184,168,1.0000,549.62
-Laurelwood_Center,Laurelwood Center,-122.600281,45.491148,368,true,368,368,291,1.0000,1766.83
-River_District_Navigatio,River District Navigation Center,-122.676937,45.530708,306,true,306,306,167,1.0000,1357.64
-Walnut_Park_Shelter,Walnut Park Shelter,-122.661833,45.562279,220,true,220,220,572,1.0000,3685.38
-Willamette_Center,Willamette Center,-122.649327,45.485729,398,true,398,398,123,1.0000,2630.00
-Banfield_Motel_Shelter,Banfield Motel Shelter,-122.625558,45.534537,220,true,220,220,139,1.0000,1404.96
-Delta_Park_Motel_Shelter,Delta Park Motel Shelter,-122.679565,45.590053,233,true,233,233,257,1.0000,10649.81
-Roseway_Inn_Motel_Shelte,Roseway Inn Motel Shelter,-122.562494,45.558812,459,true,459,459,1140,1.0000,3909.27
+Jeans_Place,Jean's Place,-122.654323,45.523278,184,true,184,184,158,1.0000,550.29
+Laurelwood_Center,Laurelwood Center,-122.600281,45.491148,368,true,368,368,291,1.0000,1767.49
+River_District_Navigatio,River District Navigation Center,-122.676937,45.530708,306,true,306,306,145,1.0000,1397.20
+Walnut_Park_Shelter,Walnut Park Shelter,-122.661833,45.562279,220,true,220,220,537,1.0000,2954.14
+Willamette_Center,Willamette Center,-122.649327,45.485729,398,true,398,398,148,1.0000,2640.71
+Banfield_Motel_Shelter,Banfield Motel Shelter,-122.625558,45.534537,220,true,220,220,118,1.0000,1407.30
+Delta_Park_Motel_Shelter,Delta Park Motel Shelter,-122.679565,45.590053,233,true,233,233,222,1.0000,11412.69
+Roseway_Inn_Motel_Shelte,Roseway Inn Motel Shelter,-122.562494,45.558812,459,true,459,459,1132,1.0000,3993.13
 Rockwood_Bridge_Shelter,Rockwood Bridge Shelter,-122.477620,45.522979,159,true,3,3,0,0.0189,3873.69
-Stark_Street_Motel_Shelt,Stark Street Motel Shelter,-122.474369,45.519541,165,true,19,19,0,0.1152,24776.45
-Thayer_Family_Foundation,Thayer Family Foundation Veterans Motel Shelter,-122.685370,45.583337,64,true,64,64,118,1.0000,6451.68
-Arbor_Lodge_Village_Pods,Arbor Lodge Village Pods,-122.686753,45.576626,61,true,61,61,16,1.0000,12476.60
-Avalon_Village,Avalon Village,-122.647011,45.504545,34,true,34,34,235,1.0000,875.24
-Beacon_Village,Beacon Village,-122.585163,45.527605,34,true,34,34,160,1.0000,720.23
-Dignity_Village,Dignity Village,-122.635880,45.590779,202,true,202,202,937,1.0000,16323.55
-Harrison_Community_Villa,Harrison Community Village,-122.578184,45.509737,129,true,129,129,286,1.0000,1535.74
-Kenton_Womens_Village,Kenton Women's Village,-122.691841,45.586652,64,true,64,64,166,1.0000,6186.38
-Oak_Street_Village,Oak Street Village,-122.579609,45.520115,98,true,98,98,135,1.0000,925.86
-Parkrose_Community_Villa,Parkrose Community Village,-122.533971,45.534177,34,true,34,34,243,1.0000,537.26
+Stark_Street_Motel_Shelt,Stark Street Motel Shelter,-122.474369,45.519541,165,true,19,19,0,0.1152,24794.67
+Thayer_Family_Foundation,Thayer Family Foundation Veterans Motel Shelter,-122.685370,45.583337,64,true,64,64,109,1.0000,5220.98
+Arbor_Lodge_Village_Pods,Arbor Lodge Village Pods,-122.686753,45.576626,61,true,61,61,21,1.0000,12598.77
+Avalon_Village,Avalon Village,-122.647011,45.504545,34,true,34,34,234,1.0000,875.24
+Beacon_Village,Beacon Village,-122.585163,45.527605,34,true,34,34,168,1.0000,720.23
+Dignity_Village,Dignity Village,-122.635880,45.590779,202,true,202,202,936,1.0000,16290.01
+Harrison_Community_Villa,Harrison Community Village,-122.578184,45.509737,129,true,129,129,292,1.0000,1535.25
+Kenton_Womens_Village,Kenton Women's Village,-122.691841,45.586652,64,true,64,64,118,1.0000,6297.07
+Oak_Street_Village,Oak Street Village,-122.579609,45.520115,98,true,98,98,135,1.0000,923.15
+Parkrose_Community_Villa,Parkrose Community Village,-122.533971,45.534177,34,true,34,34,246,1.0000,537.26
 St_Andrews_Village,St Andrews Village,-122.721754,45.582464,34,true,34,34,12,1.0000,1255.05
 St_Johns_Village,St Johns Village,-122.750203,45.590193,64,true,64,64,144,1.0000,570.67
-Lilac_Meadows,Lilac Meadows,-122.583071,45.496970,389,true,389,389,417,1.0000,2423.12
-Porch_Light_Youth_Shelte,Porch Light Youth Shelter,-122.688141,45.522468,92,true,92,92,205,1.0000,549.43
-Street_Light_Youth_Shelt,Street Light Youth Shelter,-122.688141,45.522468,92,true,92,92,97,1.0000,938.53
+Lilac_Meadows,Lilac Meadows,-122.583071,45.496970,389,true,389,389,422,1.0000,2422.49
+Porch_Light_Youth_Shelte,Porch Light Youth Shelter,-122.688141,45.522468,92,true,92,92,234,1.0000,554.51
+Street_Light_Youth_Shelt,Street Light Youth Shelter,-122.688141,45.522468,92,true,92,92,99,1.0000,960.03
 Behavioral_Health_Resour,Behavioral Health Resource Center,-122.679643,45.521959,101,true,101,101,114,1.0000,474.41
-Sunderland_RV_Safe_Park,Sunderland RV Safe Park,-122.635896,45.595053,187,true,187,187,268,1.0000,17692.30
+Sunderland_RV_Safe_Park,Sunderland RV Safe Park,-122.635896,45.595053,187,true,187,187,219,1.0000,17698.62
 Peninsula_Crossing_SRV,Peninsula Crossing Trail Safe Rest Village,-122.735946,45.583354,202,true,202,202,28,1.0000,2194.78
-BIPOC_SRV,BIPOC Safe Rest Village,-122.665928,45.534443,129,true,129,129,197,1.0000,476.06
-Queer_Affinity_Village,Queer Affinity Safe Rest Village,-122.677686,45.506081,116,true,116,116,145,1.0000,690.75
-Doreens_Place,Doreen's Place (Transition Projects),-122.677480,45.527488,276,true,276,276,405,1.0000,1652.93
+BIPOC_SRV,BIPOC Safe Rest Village,-122.665928,45.534443,129,true,129,129,195,1.0000,488.27
+Queer_Affinity_Village,Queer Affinity Safe Rest Village,-122.677686,45.506081,116,true,116,116,146,1.0000,768.94
+Doreens_Place,Doreen's Place (Transition Projects),-122.677480,45.527488,276,true,276,276,383,1.0000,1683.03
 Menlo_Park_SRV,Menlo Park Safe Rest Village,-122.537593,45.522410,168,true,168,168,649,1.0000,1281.51
-Reedway_SRV,Reedway Safe Rest Village,-122.606664,45.481822,202,true,202,202,77,1.0000,1793.05
+Reedway_SRV,Reedway Safe Rest Village,-122.606664,45.481822,202,true,202,202,77,1.0000,1789.97
