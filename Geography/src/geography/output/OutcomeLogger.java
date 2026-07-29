@@ -511,7 +511,10 @@ public class OutcomeLogger {
 
 	/**
 	 * "Vulnerable" for stratified reporting: aged 55+ (the PIT's own older-adult
-	 * boundary), OR mobility-limited, OR living with asthma or COPD.
+	 * boundary), OR mobility-limited, OR living with asthma, COPD, or a
+	 * long-term (chronic) physical health condition (U-07: the published
+	 * definition string previously omitted the chronic-physical term that
+	 * this predicate has always included).
 	 *
 	 * <p>This is a <b>reporting stratum, not a risk score</b>. It is a union of
 	 * measured/imported attributes with no weights attached, precisely because
@@ -568,6 +571,7 @@ public class OutcomeLogger {
 		if ("asthma".equals(stratum)) return at.asthma;
 		if ("copd".equals(stratum)) return at.copd;
 		if ("any_respiratory".equals(stratum)) return at.asthma || at.copd;
+		if ("chronic_physical".equals(stratum)) return at.chronicPhysical;
 		return isVulnerable(at);
 	}
 
@@ -584,10 +588,11 @@ public class OutcomeLogger {
 			return;
 		}
 		String[] strata = { "vulnerable_any", "age55plus", "mobility_limited",
-				"asthma", "copd", "any_respiratory" };
+				"asthma", "copd", "any_respiratory", "chronic_physical" };
 		w.println("  \"stratified_exposure\": {");
 		w.println("    \"definition\": \"vulnerable_any = age 55+ OR mobility-limited OR "
-				+ "asthma OR COPD; a REPORTING STRATUM, not a risk score (decision D-3)\",");
+				+ "asthma OR COPD OR chronic physical condition; a REPORTING STRATUM, "
+				+ "not a risk score (decision D-3)\",");
 		w.println("    \"strata\": [");
 		for (int i = 0; i < strata.length; i++) {
 			String s = strata[i];

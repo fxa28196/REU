@@ -160,6 +160,21 @@ public class ContextCreator implements ContextBuilder {
 	 *  calibration section of the results report, never as a study arm. */
 	private static final String HISTORICAL_REFERENCE_NAME = "HISTORICAL_capacity_reference_not_a_scenario";
 
+	/** Bed-equivalence sweep (round-5 Phase D2). Arm B's REAL locations with
+	 *  system capacity scaled to s × demand, s ∈ {0.8, 1.2, 1.4, 1.6}
+	 *  (B itself is s = 1.0). Same 36 sites, same largest-remainder
+	 *  apportionment as B. Answers: how many extra beds at the real sites
+	 *  buy the same access C obtains by re-placing them? Built by
+	 *  scripts/build_bed_sweep_2026.py. */
+	private static final String SCENARIO_BS080_NAME = "BSWEEP_s080_capacity_0.8x_demand_real_locations";
+	private static final String SHELTERS_BS080_CSV = "data/shelters/shelters_2026_bsweep_s080.csv";
+	private static final String SCENARIO_BS120_NAME = "BSWEEP_s120_capacity_1.2x_demand_real_locations";
+	private static final String SHELTERS_BS120_CSV = "data/shelters/shelters_2026_bsweep_s120.csv";
+	private static final String SCENARIO_BS140_NAME = "BSWEEP_s140_capacity_1.4x_demand_real_locations";
+	private static final String SHELTERS_BS140_CSV = "data/shelters/shelters_2026_bsweep_s140.csv";
+	private static final String SCENARIO_BS160_NAME = "BSWEEP_s160_capacity_1.6x_demand_real_locations";
+	private static final String SHELTERS_BS160_CSV = "data/shelters/shelters_2026_bsweep_s160.csv";
+
 	/** Arm D — NEED-BASED ADMISSION. Identical to B in every physical respect:
 	 *  the same 36 real locations and the same 6,842 spaces, from B's own
 	 *  shelter file. The ONLY difference is the intake rule — a fraction
@@ -231,6 +246,18 @@ public class ContextCreator implements ContextBuilder {
 		} else if (scenarioCode == 10) {
 			scenarioName = SCENARIO_CP6_NAME;
 			sheltersCsv = SHELTERS_CP6_CSV;
+		} else if (scenarioCode == 11) {
+			scenarioName = SCENARIO_BS080_NAME;
+			sheltersCsv = SHELTERS_BS080_CSV;
+		} else if (scenarioCode == 12) {
+			scenarioName = SCENARIO_BS120_NAME;
+			sheltersCsv = SHELTERS_BS120_CSV;
+		} else if (scenarioCode == 13) {
+			scenarioName = SCENARIO_BS140_NAME;
+			sheltersCsv = SHELTERS_BS140_CSV;
+		} else if (scenarioCode == 14) {
+			scenarioName = SCENARIO_BS160_NAME;
+			sheltersCsv = SHELTERS_BS160_CSV;
 		} else {
 			scenarioName = SCENARIO_A_NAME;
 			sheltersCsv = SHELTERS_A_CSV;
