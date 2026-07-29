@@ -17,12 +17,12 @@ Scenario,Seed,People in the simulation,Shelters,Total beds,Got inside,Got inside
 "B - More beds, in the places we already have",48,6842,36,6842,6257,91.4,549,36,585,7946,17.7,3090,33145564,121329
 "B - More beds, in the places we already have",49,6842,36,6842,6268,91.6,548,26,574,8557,17.4,3039,32562858,119224
 "B - More beds, in the places we already have",50,6842,36,6842,6259,91.5,553,30,583,7961,17.7,3081,33039443,120925
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",42,6842,46,6842,6570,96.0,244,28,272,5904,8.7,1536,16168257,59200
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",43,6842,46,6842,6565,96.0,241,36,277,5232,8.7,1553,16408010,59776
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",44,6842,46,6842,6566,96.0,240,36,276,5474,8.8,1553,16377283,59893
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",45,6842,46,6842,6565,96.0,250,27,277,5670,8.8,1560,16437990,60191
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",46,6842,46,6842,6563,95.9,253,26,279,5440,8.8,1566,16526728,60327
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",47,6842,46,6842,6563,95.9,253,26,279,5427,8.8,1564,16520398,60236
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",48,6842,46,6842,6563,95.9,243,36,279,5876,8.8,1569,16542466,60522
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",49,6842,46,6842,6574,96.1,242,26,268,5419,8.5,1513,15939780,58263
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",50,6842,46,6842,6565,96.0,247,30,277,5654,8.8,1559,16434081,60134
+"C - Same total as B, split across 10 additional sites (more doors)",42,6842,46,6842,6570,96.0,244,28,272,5904,8.7,1536,16168257,59200
+"C - Same total as B, split across 10 additional sites (more doors)",43,6842,46,6842,6565,96.0,241,36,277,5232,8.7,1553,16408010,59776
+"C - Same total as B, split across 10 additional sites (more doors)",44,6842,46,6842,6566,96.0,240,36,276,5474,8.8,1553,16377283,59893
+"C - Same total as B, split across 10 additional sites (more doors)",45,6842,46,6842,6565,96.0,250,27,277,5670,8.8,1560,16437990,60191
+"C - Same total as B, split across 10 additional sites (more doors)",46,6842,46,6842,6563,95.9,253,26,279,5440,8.8,1566,16526728,60327
+"C - Same total as B, split across 10 additional sites (more doors)",47,6842,46,6842,6563,95.9,253,26,279,5427,8.8,1564,16520398,60236
+"C - Same total as B, split across 10 additional sites (more doors)",48,6842,46,6842,6563,95.9,243,36,279,5876,8.8,1569,16542466,60522
+"C - Same total as B, split across 10 additional sites (more doors)",49,6842,46,6842,6574,96.1,242,26,268,5419,8.5,1513,15939780,58263
+"C - Same total as B, split across 10 additional sites (more doors)",50,6842,46,6842,6565,96.0,247,30,277,5654,8.8,1559,16434081,60134

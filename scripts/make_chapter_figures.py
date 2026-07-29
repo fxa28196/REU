@@ -34,7 +34,9 @@ COL = {"A": "#c4342c", "B": "#1f6fb2", "C": "#0f7a5a"}
 HATCH = {"A": "", "B": "///", "C": "..."}
 # Wording must match the chapter's tables exactly; a reader looking from a table
 # to a figure must not see two different names for the same scenario.
-LABEL = {"A": "A: today", "B": "B: more capacity", "C": "C: better placed"}
+# "C: better placed" retired with the same-beds-better-placed slogan (POOL
+# control refuted the optimiser attribution); the honest short name is doors.
+LABEL = {"A": "A: today", "B": "B: more capacity", "C": "C: same total, more doors"}
 GREY = "#5b5f66"
 
 plt.rcParams.update({
@@ -70,6 +72,7 @@ CHAPTER_FIGURE_NAMES = {
     "fig6_speed": "fig2_speeds",
     "fig2_outcomes": "fig3_access",
     "fig4_map": "fig4_map",
+    "fig5_race": "fig5_race",
 }
 
 
@@ -329,6 +332,35 @@ def fig_speed():
     save(fig, "fig6_speed")
 
 
+def fig_race():
+    """D4 mechanism figure: the mobility gap is a first-hour race, and the
+    triage reserve (arm D, r=0.10) dissolves it. Cumulative share of each
+    group already inside, by minutes since departure (everyone departs at
+    the same tick when the threshold crosses), seed 42."""
+    b = pd.read_csv(rdir("B", 42) / "agents.csv")
+    d = pd.read_csv(ROOT / "Geography/output/D2026-n6842-seed42-r10/agents.csv")
+    fig, axes = plt.subplots(1, 2, figsize=(5.4, 2.4), sharey=True)
+    t = list(range(0, 241, 2))
+    for ax, df, title in ((axes[0], b, "B: more capacity"),
+                          (axes[1], d, "D: B + 10% triage reserve")):
+        for mob, lab, colour, style in ((0, "walks without difficulty", GREY, "-"),
+                                        (1, "mobility-limited", "#c4342c", "-")):
+            g = df[df.mobility_limited == mob]
+            inside = g[g.final_state == "SHELTERED"].travel_time_min
+            frac = [100 * (inside <= x).sum() / len(g) for x in t]
+            ax.plot(t, frac, style, lw=1.5, color=colour, label=lab)
+        ax.set_xlabel("minutes since departure")
+        ax.set_title(title)
+        ax.set_xlim(0, 240)
+        ax.set_ylim(0, 100)
+        ax.grid(color="#dddad4", lw=0.6)
+        ax.set_axisbelow(True)
+    axes[0].set_ylabel("% of group already inside")
+    axes[0].legend(frameon=False, fontsize=7.2, loc="lower right")
+    fig.tight_layout()
+    save(fig, "fig5_race")
+
+
 if __name__ == "__main__":
     print(f"writing {FIG}")
     # The 15-page chapter carries four figures. The equity figure was cut because
@@ -340,5 +372,6 @@ if __name__ == "__main__":
     fig_speed()      # -> fig2_speeds
     fig_outcomes()   # -> fig3_access
     fig_map()        # -> fig4_map
+    fig_race()       # -> fig5_race (D4: first-hour race + triage reserve)
     total = sum(p.stat().st_size for p in FIG.glob("*")) / 1024
     print(f"total figure payload: {total:.0f} KB")

@@ -27,7 +27,7 @@ SEEDS = list(range(42, 51))   # 42..50 - all three replication batches
 ARMS = {
     "A": "A - Today (real shelters, real number of beds)",
     "B": "B - More beds, in the places we already have",
-    "C": "C - Existing shelters a bit bigger, plus 10 new ones in better places",
+    "C": "C - Same total as B, split across 10 additional sites (more doors)",
 }
 COLOR = {"A": "#c0392b", "B": "#e67e22", "C": "#27ae60"}
 

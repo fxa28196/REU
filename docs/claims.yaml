@@ -127,7 +127,7 @@ claims:
       new sites" (a design description, not an attribution) does not match.
 
   - id: calibration-1-52-overpredict
-    pattern: '1\.52[^.\n]{0,60}over[-\s]?predict|over[-\s]?predict[a-z]*[^.\n]{0,60}1\.5\d?'
+    pattern: '1\.52(?![^\n]{0,100}15\.6)[^.\n]{0,60}over[-\s]?predict|over[-\s]?predict[a-z]*(?![^\n]{0,100}15\.6)[^.\n]{0,60}1\.5\d?'
     regex: true
     case_insensitive: true
     status: corrected-pending
@@ -143,6 +143,12 @@ claims:
       section 2.7, P0 item 4). Precision: context-window regex — a number
       1.5/1.52 flags only within 60 same-sentence characters of
       "over-predict*", so bare 1.52 (coordinates, ratios) never flags.
+      Round-5 guard: a negative lookahead suppresses the match when "15.6"
+      appears within 100 same-line characters, so the SANCTIONED bracket
+      wording ("1.5-15.6x ... 1.52x is the uncensored lower edge") passes
+      the linter while the naked point claim still fails. When writing the
+      replacement, keep "15.6" in the same line as any 1.5/1.52 +
+      over-predict pairing.
 
   - id: registered-sensitivity-test
     pattern: 'registered sensitivity test|we tested for sensitivity'
@@ -289,18 +295,23 @@ claims:
     status: live
     note: >-
       The number itself reproduces from primary run outputs (seed-42 C 6,570 of
-      6,842 = 96.0%; nine-seed mean 6,566). Only the placement-attribution
+      6,842 = 96.0%; nine-seed mean 6,566) — and survived the U-27 freeway
+      filter bit-for-bit (corrected-graph re-run, commit f5eae57: identical
+      sheltered counts in every arm and seed). Only the placement-attribution
       phrasings around it are non-live (attribution-96-placement-phrasing,
       same-beds-better-placed-slogan). Listed live so the linter documents the
       distinction and ignores the bare figure.
 
   - id: b-mismatch-578-562
-    pattern: '578 beds[^.\n]{0,60}562|562[^.\n]{0,60}578 beds'
+    pattern: '578 beds[^.\n]{0,60}5[56]\d|5[56]\d[^.\n]{0,60}578 beds'
     regex: true
     case_insensitive: true
     status: live
     note: >-
-      "578 beds empty while 562 people turned away" reproduces exactly
-      (claims-recompute, 09-SYSTEM-AUDIT.md section 2.9). The numbers are live;
-      only the "this is the finding" crowning of them is retired (see
-      tautology-this-is-the-finding).
+      Corrected-graph values (U-27 re-run, commit f5eae57): B-seed42 leaves
+      578 beds empty = 550 refused + 28 unreachable — the near-equality is an
+      identity forced by capacity == population, and deliverables must state
+      it as such. The pre-U-27 phrasing said "562 turned away" (562 = 550
+      refused + 12 agents whose only route used a freeway fragment, now
+      correctly unreachable). The numbers are live; only the "this is the
+      finding" crowning of them is retired (see tautology-this-is-the-finding).
