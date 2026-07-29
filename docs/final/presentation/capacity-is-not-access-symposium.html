@@ -1,0 +1,278 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Capacity Is Not Access — symposium deck</title>
+<style>
+:root{--bg:#faf8f4;--ink:#1c1e21;--ink2:#585d64;--rule:#ddd8cf;--card:#ffffff;
+--a:#c4342c;--b:#1f6fb2;--c:#0f7a5a;--d:#8a4fbf;--warn:#9a6b00;}
+@media(prefers-color-scheme:dark){:root{--bg:#15171a;--ink:#ecebe7;--ink2:#a5a9af;--rule:#33373d;--card:#1e2126;}}
+:root[data-theme=dark]{--bg:#15171a;--ink:#ecebe7;--ink2:#a5a9af;--rule:#33373d;--card:#1e2126;}
+:root[data-theme=light]{--bg:#faf8f4;--ink:#1c1e21;--ink2:#585d64;--rule:#ddd8cf;--card:#ffffff;}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 Georgia,'Times New Roman',serif}
+section{min-height:100vh;padding:5vh 8vw;display:none;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto}
+section.on{display:flex}
+h1{font-size:2.6rem;line-height:1.15} h2{font-size:1.9rem;margin-bottom:1.2rem}
+.k{font-family:ui-monospace,Consolas,monospace;font-size:.68rem;letter-spacing:.14em;color:var(--ink2);text-transform:uppercase;margin-bottom:.7rem}
+.sub{color:var(--ink2);font-size:1.12rem;max-width:46rem;margin-top:1rem}
+.big{display:flex;gap:2.4rem;flex-wrap:wrap;margin:1.4rem 0}
+.big b{display:block;font-size:2.6rem;line-height:1}
+.big span{font-size:.85rem;color:var(--ink2)}
+.aA{color:var(--a)}.aB{color:var(--b)}.aC{color:var(--c)}.aD{color:var(--d)}
+.chart{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:.8rem;margin:1rem 0}
+.note{font-size:.92rem;color:var(--ink2);border-left:3px solid var(--rule);padding-left:.8rem;margin-top:.9rem;max-width:46rem}
+.flag{color:var(--warn);font-weight:bold}
+table{border-collapse:collapse;margin:.8rem 0;font-size:.95rem}
+td,th{padding:.32rem .7rem;border-bottom:1px solid var(--rule);text-align:left}
+.ctr{position:fixed;bottom:10px;right:14px;font:12px ui-monospace,monospace;color:var(--ink2)}
+.badge{display:inline-block;font:11px ui-monospace,monospace;letter-spacing:.1em;border:1px solid var(--rule);border-radius:4px;padding:2px 7px;color:var(--ink2);margin-left:.6rem;vertical-align:middle}
+svg text{fill:var(--ink2);font:11px ui-monospace,monospace}
+@media print{section{display:flex;page-break-after:always;min-height:95vh}.ctr{display:none}}
+</style></head><body>
+
+<!-- S1 -->
+<section class="on"><div class="k">NSF REU · Computational Modeling Serving Portland</div>
+<h1>Capacity is not access.<br>More beds, or better beds?</h1>
+<p class="sub">What 93 simulations of the September 2020 smoke event say
+about capacity, placement, and fairness for Multnomah County's unsheltered residents.</p>
+<p class="sub" style="margin-top:2.2rem">Fatima Asghar · Harrisburg University of Science and Technology<br>
+NSF REU hosted by Portland State University · mentor Prof. Christof Teuscher</p></section>
+
+<!-- S2 -->
+<section><div class="k">The event, and the people</div>
+<h2>Thirteen days of smoke. 562.7 µg/m³ at the worst hour.</h2>
+<div class="chart"><svg id="pm" viewBox="0 0 960 250"></svg></div>
+<div class="big"><div><b>6,842</b><span>unsheltered residents (2025 count: 10,526 × &gt;65% unsheltered)</span></div>
+<div><b>194/312</b><span>hours above the 55.5 µg/m³ "Unhealthy" line — in two spells</span></div></div>
+<p class="note">Two spells: a spike at hours 16-21, then 57 clean hours,
+then the main episode from hour 79. Every value measured by EPA monitors, not modeled.</p></section>
+
+<!-- S3 -->
+<section><div class="k">How the model works</div>
+<h2>Real streets, real sites, one person at a time</h2>
+<div class="big"><div><b>36</b><span>real facilities · 2,234 spaces</span></div>
+<div><b>88,100</b><span>street intersections, pedestrian-legal only</span></div>
+<div><b>3,400</b><span>real campsite reports seed the start points</span></div></div>
+<table><tr><th>Each simulated person gets</th><th>from</th></tr>
+<tr><td>age, sex, health conditions</td><td>local point-in-time + published prevalence studies</td></tr>
+<tr><td>their own walking speed</td><td>published gait studies by age &amp; sex; slower distributions for impaired walkers; a COPD decrement</td></tr>
+<tr><td>a departure moment</td><td>smoke crosses 55.5 µg/m³ — an EPA reporting line used as a behavioral trigger, a disclosed assumption</td></tr></table>
+<p class="note"><b>Stated up front:</b> in this version everyone knows every shelter and its live occupancy.
+I'll show you what that assumption costs at the end.</p></section>
+
+<!-- S4 -->
+<section><div class="k">Four scenarios</div>
+<h2>Each one exists to answer what the last one measured</h2>
+<table>
+<tr><td><b class="aA">A — today</b></td><td>the real 36 sites, real 2,234 spaces. A measurement, not a plan.</td></tr>
+<tr><td><b class="aB">B — one space per person</b></td><td>same sites, every one scaled ×3.0627. Removes scarcity as an explanation.</td></tr>
+<tr><td><b class="aC">C — same total, more doors</b></td><td>sites grown 1.5×, remainder opens as ten new ~349-space sites. Tests where capacity sits.</td></tr>
+<tr><td><b class="aD">D — B + a fairness rule</b></td><td>10% of each site (667 spaces) reserved for mobility-limited arrivals. Costs nothing.</td></tr></table></section>
+
+<!-- S5 -->
+<section><div class="k">Headline access</div>
+<h2>Who gets inside</h2>
+<div class="chart"><svg id="bars" viewBox="0 0 960 240"></svg></div>
+<p class="note">B's arithmetic is fixed by design: capacity equals demand, so
+<b>578 empty spaces ≡ 550 refused + 28 unreachable</b> —
+the same number counted twice. The finding is <i>who</i> is outside, not that the numbers match.</p></section>
+
+<!-- S6 -->
+<section><div class="k">What C's edge really is <span class="badge">second half = EMERGENCY CUT</span></div>
+<h2>Doors, not door-choosing</h2>
+<div class="big"><div><b class="aC">+306</b><span>admissions, C over B — and ten <i>random</i> sites from the same pool match it exactly</span></div>
+<div><b class="aC">63%</b><span>shorter walks than random sites — the optimizer's real contribution</span></div></div>
+<div class="chart"><svg id="sweep" viewBox="0 0 960 250"></svg></div>
+<p class="note">Surplus at the existing sites: <b>+342 spaces (5%)</b> matches C's admissions;
+<b>+684 (10%)</b> admits every reachable person. C's siting advantage on headcount
+is worth at most about 342 spaces.</p></section>
+
+<!-- S7 -->
+<section><div class="k">The fairness finding</div>
+<h2>Scarcity is rationed by walking speed</h2>
+<div class="chart"><svg id="gaps" viewBox="0 0 960 250"></svg></div>
+<div class="chart"><svg id="race" viewBox="0 0 960 250"></svg></div>
+<p class="note">80% of B's final gap exists one hour after departure.
+The people left outside are increasingly the people who walk slowest — on every scale we measured.</p></section>
+
+<!-- S8 -->
+<section><div class="k">Scenario D</div>
+<h2>A fairer door costs nothing</h2>
+<div class="big"><div><b class="aB">23.7 pts</b><span>mobility access gap in B</span></div>
+<div><b class="aD">-0.4 pts</b><span>gap in D — at identical total admissions (91.6%)</span></div></div>
+<p class="note">The gap only exists where capacity ≈ demand — exactly where a county lives.
+Buy 10% surplus and it dissolves; hold a 10% reserve and it closes for free.</p></section>
+
+<!-- S9 -->
+<section><div class="k">How I know it's right — and where it's wrong</div>
+<h2>The checks that could have embarrassed me</h2>
+<table>
+<tr><td>93 runs, every one fingerprinted &amp; invariant-checked</td><td>manifests + automated suite, exit 0</td></tr>
+<tr><td>asthma negative control</td><td>designed to find nothing; found nothing (p ≥ 0.11)</td></tr>
+<tr><td>freeway defect: 2,636 illegal segments, 614.1 km, two bridges</td><td>found, removed, everything re-run — <b>every headline unchanged to the digit</b></td></tr>
+<tr><td>2 of 13 registered predictions wrong</td><td>reported, and they improved the answer</td></tr>
+<tr><td>vs the real 2020 record</td><td>model over-admits by 1.5–15.6× — the measured size of everything human it omits</td></tr></table>
+<p class="note">Limitations, in one breath: full information · everyone departs on the early spike ·
+dose depends on the window (24-h B:C ratio is 1.29, not 1.98) ·
+the population is an administrative count treated as all-outdoors-at-once.</p></section>
+
+<!-- S10 -->
+<section><div class="k">The answer</div>
+<h2>More beds, if you can afford them.<br>A fairer door, if you can't.</h2>
+<p class="sub">Better-placed beds was the one answer the evidence refused.</p>
+<p class="note">Next: the human decision layer — awareness, belongings, pets, imperfect information —
+specced, registered, and built to close the 1.5–15.6× gap the calibration measured.</p></section>
+
+<!-- E1 -->
+<section><div class="k">OPTIONAL EXTENSION E1 (+1:00)</div>
+<h2>The finding survives every way of measuring it</h2>
+<table><tr><th>Measure</th><th class="aA">A</th><th class="aB">B</th><th class="aC">C</th><th class="aD">D</th></tr>
+<tr><td>gap, percentage points</td><td>12.5</td><td>23.7</td><td>12.5</td><td>-0.4</td></tr>
+<tr><td>ratio of access rates</td><td>1.62</td><td>1.33</td><td>1.15</td><td>~1.00</td></tr>
+<tr><td>mobility-limited people outside</td><td>1,087</td><td>373</td><td>190</td><td>~110</td></tr>
+<tr><td>their share of everyone outside</td><td>23%</td><td>65%</td><td>70%</td><td>~20%</td></tr></table>
+<p class="note">Point-scale says B widens the gap; ratio-scale says B narrows it. Both are reported.
+What survives every scale: the residue concentrates in the slowest walkers — until the rule changes.</p></section>
+
+<!-- E2 -->
+<section><div class="k">OPTIONAL EXTENSION E2 (+1:00)</div>
+<h2>How a student project earns trust</h2>
+<table>
+<tr><td>parameter registry</td><td>no number enters the code without a sourced row first — the model refuses to start otherwise</td></tr>
+<tr><td>run manifests</td><td>every run records its commit, seed, parameters, and the checksum of every input file</td></tr>
+<tr><td>claim linter</td><td>every corrected or retired sentence is a banned string; the build fails if one returns</td></tr>
+<tr><td>negative control</td><td>asthma has no movement mechanism, so it must show no access effect — and doesn't, in every arm</td></tr>
+<tr><td>registered predictions</td><td>written down before running; the misses are published with the hits</td></tr></table></section>
+
+<!-- BACKUPS -->
+<section><div class="k">Backup</div><h2>Backup slides</h2>
+<p class="sub">B1 five-scale equity · B2 survival curves · B3 random-pool control · B4 full bed sweep ·
+B5 2020 calibration · B6 freeway fix · B7 model card · B8 data vintages · B9 agent states ·
+B10 verification pipeline · B11 the identity arithmetic · B12 window-dose table</p></section>
+
+<section><div class="k">B3 · random-pool control</div><h2>Ten random doors = same headcount, triple the walk</h2>
+<table><tr><th></th><th>admitted (seeds 42–44)</th><th>mean walk</th></tr>
+<tr><td class="aC">C (optimized sites)</td><td>6,570 / 6,565 / 6,566</td><td>5,537 m</td></tr>
+<tr><td>random-pool draws (×3)</td><td>identical: 6,565, 6,566, 6,570</td><td>15,011 m</td></tr></table>
+<p class="note">Headcount is pure dispersion. Siting quality earns exactly one thing: the walk.</p></section>
+
+<section><div class="k">B4 · full bed sweep</div><h2>Access &amp; fairness vs surplus at the real sites</h2>
+<table><tr><th>× demand</th><th>total spaces</th><th>admitted %</th><th>mobility gap (pp)</th></tr>
+<tr><td>0.8</td><td>5,474</td><td>73.27</td><td>28.3</td></tr><tr><td>1.0</td><td>6,842</td><td>91.51</td><td>23.5</td></tr><tr><td>1.05</td><td>7,184</td><td>96.07</td><td>15.0</td></tr><tr><td>1.1</td><td>7,526</td><td>99.51</td><td>-0.0</td></tr><tr><td>1.15</td><td>7,868</td><td>99.51</td><td>-0.0</td></tr><tr><td>1.2</td><td>8,210</td><td>99.51</td><td>-0.0</td></tr><tr><td>1.4</td><td>9,579</td><td>99.51</td><td>-0.0</td></tr><tr><td>1.6</td><td>10,947</td><td>99.51</td><td>-0.0</td></tr></table></section>
+
+<section><div class="k">B5 · 2020 calibration</div><h2>The bracket, honestly</h2>
+<p class="sub">Street Roots, Sept 16 2020: ≈90 people at the Convention Center, ≈40 at Charles Jordan — ≈130 of 198 beds.
+The model fills 198 of 198 at both sites. Because the record is approximate, the honest statement is a bracket:
+the model over-admits by 1.5–15.6× (1.52× is only the most favourable edge).</p>
+<p class="note">That bracket is the measured size of awareness, belongings, pets, and trust — everything the
+full-information model omits, and exactly what the next phase models.</p></section>
+
+<section><div class="k">B6 · freeway fix</div><h2>2,636 segments, 614.1 km, removed</h2>
+<p class="sub">RLIS freeway classes (incl. the Marquam and Fremont bridge decks — no pedestrian access) were in the
+walking map. Removed; all 93 runs regenerated. Sheltered counts unchanged to the digit;
+~12 people per run reclassified from refused to unreachable (171 network pieces, largest 59,725).</p></section>
+
+<section><div class="k">B7 · model card</div><h2>The regression is a sanity check, not a discovery</h2>
+<p class="sub">Logistic model: P(got inside) from a person's inputs + distance to the nearest site.
+It re-finds only the mechanisms we built (distance, speed, the COPD decrement) and nothing we didn't
+(asthma null in every arm). In D, conditional on speed, it re-finds the reserve rule we wrote — with
+speed-band cells at exactly 100%, its size is unstable and is not quoted. The equity result is marginal:
+mobility 91.9% vs others 91.5% — the gap is gone.</p></section>
+
+<section><div class="k">B8 · data vintages</div><h2>Owned plainly</h2>
+<table><tr><td>smoke</td><td>2020, measured hourly</td></tr><tr><td>population count</td><td>2025 PIT (methodology-augmented; not a time series with 2019)</td></tr>
+<tr><td>campsite locations</td><td>2025–26 complaint reports, spatial stand-in for 2020</td></tr>
+<tr><td>age / chronic condition</td><td>Pathways 2026, local</td></tr><tr><td>sex / mobility</td><td>2019 PIT (no newer local source)</td></tr>
+<tr><td>asthma / COPD</td><td>2025 EHR study (Minnesota cohort)</td></tr></table></section>
+
+<section><div class="k">B11 · the identity</div><h2>578 = 550 + 28, by construction</h2>
+<p class="sub">Capacity = population ⇒ every empty space is one person outside. Empty spaces (578)
+must equal refused (550) plus unreachable (28). Informative content: zero.
+The informative facts: <i>who</i> is outside (the slowest walkers) and <i>where</i> the empty spaces are (the wrong sites).</p></section>
+
+<section><div class="k">B12 · window-dose</div><h2>Dose depends on the window</h2>
+<table><tr><th>window</th><th>B:C mean-dose ratio</th></tr>
+<tr><td>first 24 h</td><td>1.29</td></tr><tr><td>full 312 h</td><td>1.98</td></tr></table>
+<p class="note">Short windows are dominated by the walking difference, long windows by the headcount difference. Both reported.</p></section>
+
+<div class="ctr" id="ctr"></div>
+<script>
+const DATA = {"pm": [5.5, 5.6, 5.6, 5.8, 6.8, 7.0, 7.2, 6.7, 6.7, 6.8, 6.8, 6.5, 5.7, 5.3, 14.4, 43.2, 82.5, 73.8, 112.1, 63.5, 61.4, 64.7, 24.2, 12.4, 5.2, 3.5, 3.2, 3.5, 3.3, 3.4, 3.5, 4.6, 5.0, 4.9, 4.7, 4.0, 3.8, 4.3, 4.3, 4.7, 4.5, 4.2, 3.8, 3.5, 3.3, 3.5, 4.0, 3.6, 3.6, 4.8, 13.7, 22.7, 24.6, 25.1, 24.6, 23.4, 20.2, 18.9, 18.0, 19.1, 19.4, 15.3, 13.7, 11.3, 11.1, 13.4, 17.4, 21.5, 22.5, 23.6, 22.2, 21.5, 20.5, 20.0, 20.1, 22.6, 25.2, 29.5, 47.0, 59.8, 66.6, 96.9, 96.8, 94.6, 125.5, 189.2, 276.8, 291.1, 262.9, 238.6, 223.7, 264.6, 295.5, 299.6, 298.5, 291.2, 286.4, 282.0, 278.4, 271.4, 258.8, 232.3, 203.3, 194.9, 189.6, 162.2, 171.8, 178.7, 195.8, 186.9, 190.2, 196.8, 205.2, 205.4, 201.8, 198.6, 196.8, 191.1, 186.4, 184.2, 178.6, 174.2, 175.7, 179.0, 176.4, 174.6, 205.4, 219.9, 229.3, 241.2, 255.7, 266.1, 276.4, 296.4, 298.9, 320.9, 345.3, 393.2, 469.6, 548.8, 562.7, 559.5, 552.0, 550.2, 531.8, 474.6, 419.4, 392.6, 384.5, 352.6, 309.7, 313.1, 324.4, 347.5, 370.2, 372.4, 379.4, 383.6, 418.2, 444.1, 441.5, 441.8, 451.4, 490.4, 530.5, 560.9, 558.3, 552.0, 555.9, 552.2, 488.9, 373.4, 370.1, 379.9, 339.6, 268.5, 257.5, 269.5, 275.4, 293.2, 314.4, 349.7, 405.6, 417.9, 427.4, 439.2, 430.4, 426.5, 414.2, 389.8, 395.5, 407.8, 379.9, 361.0, 347.4, 333.6, 312.0, 290.6, 247.8, 254.4, 271.4, 260.1, 233.9, 225.4, 222.3, 211.1, 204.6, 194.6, 189.8, 188.9, 188.5, 173.6, 162.2, 171.4, 172.2, 175.6, 175.6, 173.8, 166.6, 160.5, 155.4, 149.8, 158.1, 177.5, 189.9, 216.2, 221.4, 292.1, 297.0, 312.2, 299.9, 348.8, 361.2, 334.1, 322.9, 318.4, 294.8, 280.9, 285.5, 280.1, 272.0, 278.3, 292.5, 270.1, 225.2, 197.2, 223.4, 237.2, 201.2, 191.8, 178.3, 187.7, 147.2, 129.6, 107.3, 106.3, 115.1, 122.9, 133.7, 136.6, 136.2, 138.4, 130.8, 128.4, 136.5, 117.0, 80.3, 41.8, 46.7, 41.9, 35.6, 32.5, 33.9, 35.9, 40.8, 43.0, 38.6, 33.3, 7.5, 3.5, 4.2, 5.4, 6.3, 6.9, 9.1, 7.6, 8.3, 7.6, 9.1, 7.9, 8.4, 7.7, 8.9, 9.2, 7.3, 6.4, 6.2, 5.8, 5.2, 4.8, 3.5, 2.8, 2.7, 3.0, 3.1, 3.8, 4.5, 5.9, 5.2, 3.9, 3.0, 4.5], "curves": {"B_u": [0.6, 10.3, 24.9, 34.1, 39.8, 45.3, 50.7, 55.1, 58.9, 62.6, 65.9, 67.6, 69.3, 70.5, 71.5, 72.1, 72.7, 73.5, 73.6, 73.6, 73.7, 73.8, 73.9, 74.3, 74.9, 75.1, 75.4, 76.0, 76.3, 76.4, 76.4, 76.5, 76.5, 76.5, 76.6, 76.9, 77.2, 77.6, 78.1, 78.5, 79.0, 79.2, 79.7, 79.9, 80.0, 80.0, 80.0, 80.2, 80.3, 80.3, 80.6, 81.1, 81.5, 81.9, 82.4, 82.8, 83.2, 83.8, 84.1, 84.3, 84.9], "B_m": [0.4, 6.0, 14.9, 21.0, 25.4, 29.7, 33.4, 37.0, 40.5, 43.2, 45.8, 47.4, 49.6, 51.2, 52.5, 53.1, 53.8, 54.6, 54.8, 55.0, 55.2, 55.3, 55.4, 55.7, 55.9, 56.3, 56.3, 56.4, 56.5, 56.5, 56.6, 56.6, 56.7, 56.8, 57.0, 57.1, 57.4, 57.4, 57.6, 57.9, 57.9, 58.2, 58.8, 59.3, 59.3, 59.3, 59.5, 59.6, 59.6, 59.6, 59.7, 59.8, 59.9, 60.1, 60.1, 60.2, 60.4, 60.7, 60.9, 61.2, 61.5], "D_u": [0.6, 10.3, 24.5, 32.9, 38.5, 43.9, 49.1, 53.3, 56.6, 60.7, 62.8, 64.4, 65.9, 67.0, 68.0, 68.6, 68.7, 68.8, 68.8, 68.9, 69.0, 69.2, 69.5, 69.8, 70.1, 70.5, 70.5, 70.6, 70.7, 70.8, 70.9, 70.9, 71.1, 71.3, 71.5, 72.0, 72.5, 73.1, 73.6, 74.1, 74.3, 74.3, 74.3, 74.6, 74.6, 74.8, 74.8, 74.9, 75.1, 75.3, 75.8, 76.5, 77.4, 78.5, 79.5, 79.8, 80.1, 80.5, 80.9, 81.5, 82.0], "D_m": [0.4, 6.0, 14.9, 24.1, 30.2, 34.9, 38.8, 43.1, 47.0, 50.4, 53.6, 56.0, 59.3, 61.3, 63.8, 65.0, 66.1, 67.4, 68.0, 68.5, 69.0, 69.6, 70.2, 71.0, 71.9, 72.5, 72.7, 73.0, 73.5, 74.0, 74.6, 75.5, 75.9, 76.0, 76.2, 76.2, 76.3, 77.0, 77.2, 77.5, 77.9, 77.9, 78.3, 78.9, 79.1, 79.3, 79.5, 79.5, 79.6, 79.6, 79.6, 79.6, 79.7, 79.7, 79.8, 79.8, 79.9, 79.9, 79.9, 79.9, 79.9]}, "sweep": [[0.8, 5474, 73.27, 28.3], [1.0, 6842, 91.51, 23.5], [1.05, 7184, 96.07, 15.0], [1.1, 7526, 99.51, -0.0], [1.15, 7868, 99.51, -0.0], [1.2, 8210, 99.51, -0.0], [1.4, 9579, 99.51, -0.0], [1.6, 10947, 99.51, -0.0]], "bars": [["A", 30.1], ["B", 91.6], ["C", 96.0], ["D", 91.6]], "gaps": [["A", 32.6, 20.1], ["B", 96.3, 72.6], ["C", 98.5, 86.0], ["D", 91.5, 91.9]]};
+const S = [...document.querySelectorAll('section')]; let i = 0;
+function show(k){ S[i].classList.remove('on'); i = Math.max(0, Math.min(S.length-1, k));
+  S[i].classList.add('on'); document.getElementById('ctr').textContent = (i+1) + ' / ' + S.length; draw(); }
+addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') show(i+1);
+  if (e.key === 'ArrowLeft' || e.key === 'PageUp') show(i-1);
+  if (e.key === 'Home') show(0); if (e.key === 'End') show(S.length-1); });
+const cv = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const AC = {A:'--a', B:'--b', C:'--c', D:'--d'};
+function el(t,a){ const x = document.createElementNS('http://www.w3.org/2000/svg',t);
+  for (const k in a) x.setAttribute(k,a[k]); return x; }
+function draw(){
+  let s = document.getElementById('pm');
+  if (s && s.closest('section').classList.contains('on')) { s.innerHTML='';
+    const W=960,H=250,L=46,R=8,T=12,B=30,mx=600;
+    const X=h=>L+(W-L-R)*h/312, Y=v=>T+(H-T-B)*(1-Math.min(v,mx)/mx);
+    s.appendChild(el('line',{x1:L,x2:W-R,y1:Y(55.5),y2:Y(55.5),stroke:cv('--warn'),'stroke-dasharray':'4 4'}));
+    let dstr=''; DATA.pm.forEach((v,h)=>{ if(v===null||isNaN(v))return;
+      dstr += (dstr?'L':'M')+X(h).toFixed(1)+' '+Y(v).toFixed(1); });
+    s.appendChild(el('path',{d:dstr,fill:'none',stroke:cv('--a'),'stroke-width':1.6}));
+    [['spike',18],['57 clean hours',50],['main episode',119]].forEach(([t,h])=>{
+      const tx=el('text',{x:X(h),y:H-8,'text-anchor':'middle'}); tx.textContent=t; s.appendChild(tx); });
+    const t2=el('text',{x:X(140)+6,y:Y(562.7>600?600:562.7)+10}); t2.textContent='562.7 µg/m³'; s.appendChild(t2);
+    [0,150,300,450,600].forEach(v=>{ const t=el('text',{x:L-6,y:Y(v)+4,'text-anchor':'end'});
+      t.textContent=v; s.appendChild(t); });
+  }
+  s = document.getElementById('bars');
+  if (s && s.closest('section').classList.contains('on')) { s.innerHTML='';
+    const W=960,H=240,L=46,T=10,B=28; const X=k=>L+k*(W-L-20)/4;
+    DATA.bars.forEach(([a,v],k)=>{ const h=(H-T-B)*v/100, x=X(k)+30;
+      s.appendChild(el('rect',{x:x,y:H-B-h,width:110,height:h,rx:6,fill:cv(AC[a])}));
+      const t=el('text',{x:x+55,y:H-B-h-8,'text-anchor':'middle','font-size':'20',fill:cv(AC[a]),'font-weight':'bold'});
+      t.textContent=v.toFixed(1)+'%'; s.appendChild(t);
+      const l=el('text',{x:x+55,y:H-8,'text-anchor':'middle'}); l.textContent=a; s.appendChild(l); });
+  }
+  s = document.getElementById('sweep');
+  if (s && s.closest('section').classList.contains('on')) { s.innerHTML='';
+    const W=960,H=250,L=52,R=14,T=14,B=30;
+    const xs=DATA.sweep.map(r=>r[1]); const X=b=>L+(W-L-R)*(b-5400)/(11000-5400);
+    const Y=v=>T+(H-T-B)*(1-(v-70)/30);
+    s.appendChild(el('line',{x1:L,x2:W-R,y1:Y(96.0),y2:Y(96.0),stroke:cv('--c'),'stroke-dasharray':'5 4'}));
+    const tc=el('text',{x:W-R-4,y:Y(96.0)-6,'text-anchor':'end'}); tc.textContent='C: 96.0%'; s.appendChild(tc);
+    let p=''; DATA.sweep.forEach(r=>{ p += (p?'L':'M')+X(r[1]).toFixed(1)+' '+Y(r[2]).toFixed(1); });
+    s.appendChild(el('path',{d:p,fill:'none',stroke:cv('--b'),'stroke-width':2}));
+    DATA.sweep.forEach(r=>{ s.appendChild(el('circle',{cx:X(r[1]),cy:Y(r[2]),r:4,fill:cv('--b')}));
+      const t=el('text',{x:X(r[1]),y:H-8,'text-anchor':'middle'}); t.textContent=r[1].toLocaleString(); s.appendChild(t); });
+    const m=el('text',{x:X(7184),y:Y(96)-12,'text-anchor':'middle',fill:cv('--warn')}); m.textContent='+342: matches C'; s.appendChild(m);
+    const m2=el('text',{x:X(7526),y:Y(99.5)+16,'text-anchor':'middle',fill:cv('--warn')}); m2.textContent='+684: everyone reachable'; s.appendChild(m2);
+  }
+  s = document.getElementById('gaps');
+  if (s && s.closest('section').classList.contains('on')) { s.innerHTML='';
+    const W=960,H=250,L=120,R=90,T=16,B=30;
+    const X=v=>L+(W-L-R)*v/100, Y=k=>T+(H-T-B)/4*(k+0.5);
+    [0,25,50,75,100].forEach(v=>{ const t=el('text',{x:X(v),y:H-8,'text-anchor':'middle'});
+      t.textContent=v+'%'; s.appendChild(t); });
+    DATA.gaps.forEach(([a,u,m],k)=>{ const y=Y(k);
+      s.appendChild(el('line',{x1:X(Math.min(u,m)),x2:X(Math.max(u,m)),y1:y,y2:y,stroke:cv('--rule'),'stroke-width':3}));
+      s.appendChild(el('circle',{cx:X(u),cy:y,r:6,fill:cv('--ink2')}));
+      s.appendChild(el('circle',{cx:X(m),cy:y,r:6,fill:cv(AC[a])}));
+      const l=el('text',{x:L-10,y:y+4,'text-anchor':'end'}); l.textContent=a; s.appendChild(l);
+      const g=el('text',{x:W-R+8,y:y+4}); g.textContent=(u-m).toFixed(1)+' pts'; s.appendChild(g); });
+  }
+  s = document.getElementById('race');
+  if (s && s.closest('section').classList.contains('on')) { s.innerHTML='';
+    const W=960,H=250,L=46,R=10,T=12,B=30;
+    const X=k=>L+(W-L-R)*k/60, Y=v=>T+(H-T-B)*(1-v/100);
+    [['B_u','--ink2','B · walks easily'],['B_m','--b','B · mobility-limited'],
+     ['D_m','--d','D · mobility-limited']].forEach(([key,col,lab],j)=>{
+      let p=''; DATA.curves[key].forEach((v,k)=>{ p+=(p?'L':'M')+X(k).toFixed(1)+' '+Y(v).toFixed(1); });
+      s.appendChild(el('path',{d:p,fill:'none',stroke:cv(col),'stroke-width':2}));
+      const t=el('text',{x:W-R-4,y:T+14+j*15,'text-anchor':'end',fill:cv(col)}); t.textContent=lab; s.appendChild(t); });
+    [0,60,120,180,240].forEach(v=>{ const t=el('text',{x:X(v/4),y:H-8,'text-anchor':'middle'});
+      t.textContent=v+' min'; s.appendChild(t); });
+  }
+}
+show(0);
+new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
+</script></body></html>
