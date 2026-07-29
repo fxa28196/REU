@@ -84,3 +84,11 @@ Boyce 1999 impaired; Buekers 2024 COPD −0.19 m/s); calibration record ≈90+�
 of 99+99 = Street Roots 2020-09-16 (TR §13.6); bracket 1.5–15.6× =
 claims.yaml calibration entry; C new-site size ~349 = shelter CSV;
 +306 = C_in − B_in per 6_SEED_ROBUSTNESS.csv.
+
+## Hand-added rows (final-polish v1)
+
+| value | slide(s) | source |
+|---|---|---|
+| `graph_nodes_pedestrian` = 88,100 | S3 | street_network_validation manifest, final_graph_nodes (post-freeway-filter) |
+| `predictions_registered` = 13 (2 missed, 1 partial) | S9 | 12-PHASE-D-PREDICTIONS.md (P-1a–g, P-2a–b, P-3a–d) + 11-ROUND5-REPORT.md prediction-outcomes table; the partial (P-1f, travel medians) is disclosed there |
+| monitor under-read note | Q&A root 12 | non-FRM heated-inlet nephelometers under-read fresh wood smoke — method column of the AQS file + TECHNICAL_REFERENCE monitor limitation |

@@ -200,7 +200,7 @@ Departure triggers when PM2.5 crosses 55.5 while a shelter is open; on this
 event that's hour sixteen, in the first-evening spike. [PROV: first_cross_hour]
 → *Why 55.5?* It's EPA's published "Unhealthy" breakpoint — a reporting
 boundary I use as a behavioral trigger because it's the only citable line;
-that's an assumption, labeled as one in the registry. [B10]
+that's an assumption, labeled as one in the registry. [PROV: fixed statements / registry]
 → *What if the trigger were lower or higher?* Lower thresholds start the race earlier in the spike, higher ones later — the race itself, and who wins it, is set by the admission rule, not the start gun. [B12]
 → *So the whole race runs before the main smoke?* Yes — the race resolves in
 hours, 2.5 days before the main episode; that's why I disclose the two-spell
@@ -244,17 +244,19 @@ the empty spaces sit: the wrong sites. [B11]
 failure survives can only be geography. [S4]
 → *And the knife edge?* The whole failure mode lives at capacity ≈ demand:
 five percent slack matches C, ten percent admits everyone reachable. [B4]
+→ *Why does the sweep table say 99.51 when 6,842 − 28 is 99.59?* Because the table is the three-seed mean and the unreachable count varies by seed — 28 at seed 42, 36 at seeds 43 and 44. In every seed, refusals are zero and sheltered plus unreachable equals 6,842 exactly, so "every reachable person gets in" holds seed by seed. [B4; sweep manifests]
 
 **6. Why nine seeds — is that enough?**
 Seeds vary who gets which attributes; across nine, admissions move by at most
 eleven people while the smallest between-scenario gap is 306. I report those
 side by side, not as a ratio, because seed spread only measures random-draw
-noise. [PROV: *_in_range]
+noise. [PROV: A/B/C_in_range]
 → *What don't seeds cover?* Structural and parameter uncertainty — that's
 what the sweeps and controls are for (capacity sweep, random-site draws,
 window arms). [B4, B3, B12]
+→ *Your backup table says the gap is 23.5; you said 23.7.* 23.7 is seed 42 — the single run every slide quotes for internal consistency; 23.5 is the sweep family's three-seed aggregate at 1.0×. Both sit inside the nine-seed spread. [B4; PROV]
 → *Why 42–50?* Arbitrary consecutive integers, fixed before running and
-recorded in every manifest — chosen once, never reselected. [B10]
+recorded in every manifest — chosen once, never reselected. [E2 (extension slide)]
 → *Could more seeds change a conclusion?* Only if a gap of hundreds hid inside a spread of eleven — the margins are two orders apart; more seeds buy precision, not direction. [PROV]
 
 **7. Who are the 28 unreachable?**
@@ -272,7 +274,7 @@ to unreachable, and no headline moved. [B6]
 **8. How do you know the simulation isn't just wrong?**
 I can't prove it right; I can make it checkable — manifests, an invariant
 suite, independent recomputation of routing and exposure, and controls
-designed to embarrass me. [B10]
+designed to embarrass me. [E2 (extension slide)]
 → *Example?* The asthma negative control: no mechanism links asthma to
 movement, so it must show nothing — and does show nothing, in every arm, with
 the regression p-values to match. [B7]
@@ -280,7 +282,7 @@ the regression p-values to match. [B7]
 audit, fixed, everything re-run, headlines unchanged to the digit. That
 survival is the strongest robustness evidence I have. [B6]
 → *What about the code itself?* Every run's manifest pins the exact commit;
-a fresh clone rebuilds the deliverables and passes the same checks. [B10]
+a fresh clone rebuilds the deliverables and passes the same checks. [E2 (extension slide)]
 → *Who reviewed it?* Three external critique rounds plus a 52-agent audit are in the repo with every verdict — including the ones that refuted my own claims. [11-ROUND5-REPORT]
 
 **9. What did you get wrong?**
@@ -327,7 +329,7 @@ difference between scenarios; long windows by who's still outside. [B12]
 → *Is the smoke field realistic?* It's uniform county-wide — two monitors
 can't support a spatial surface; that means every scenario effect is a
 travel-time effect, stated plainly. [B12]
-→ *Do monitors understate wildfire smoke?* Likely yes — these are heated-inlet instruments known to under-read fresh wood smoke, so reality was probably worse; that pushes every conclusion in the same direction. [B8]
+→ *Do monitors understate wildfire smoke?* Some monitor types are documented to under-read fresh wood smoke, so reality was likely no better than the chart shows — the direction favors caution. A source note for this sits in the provenance file rather than on a slide. [B8]
 
 **13. The 2020 smoke with the 2025 population — isn't that mixing eras?**
 Deliberately: the question is "if that smoke returned *today*" — the largest
@@ -351,11 +353,25 @@ as a limitation, not silently dropped. [B8]
 → *Why not estimate day-center capacity?* Ten invented numbers would have been fabrications — the same standard that kept me from inventing an asthma speed effect. [B8]
 → *Does the unit conversion drive results?* The conversion band is small against the threefold scarcity ratio in A; capacity binds regardless. [PROV: spaces]
 
+**15. "Capacity is not access"? Your own B arm shows capacity buying 61 points.**
+It does — capacity buys the first sixty-one points, and that's said in the
+same breath on slide 5. What capacity alone can't buy is the last stretch: at
+capacity-equals-demand, 578 spaces sit empty while 578 people stand outside,
+and the ones outside are the slowest walkers. [S5, B11]
+→ *So the title overclaims?* The full title is a question and its answer:
+capacity is necessary and, right at the margin a county actually lives on,
+not sufficient — access there is set by doors and admission rules. [S8]
+→ *Then why not "capacity is most of access"?* Because the marginal decision
+the county faces is exactly the regime where the equivalence breaks — the
+title names the decision-relevant finding, and slide 5 shows the 61 points in
+the same breath. [S5]
+
 ---
 
 ## BACKUP SLIDE KEY
-B1 five-scale equity table (E1's numbers) · B2 survival curves · B3 random-
-pool control · B4 full bed sweep · B5 2020 two-site calibration + bracket ·
-B6 freeway fix · B7 model card (regression sanity check) · B8 data vintages &
-population construct · B9 agent states · B10 verification pipeline ·
-B11 identity arithmetic · B12 window-dose table.
+B1 = extension E1 (five-scale equity) · B2 = S7 lower chart (survival) ·
+B3 random-pool control · B4 full bed sweep · B5 2020 two-site calibration +
+bracket · B6 freeway fix · B7 model card (regression sanity check) ·
+B8 data vintages & population construct · B10 = extension E2 (verification
+pipeline) · B11 identity arithmetic · B12 window-dose table. Agent states:
+answer verbally from S3 (no dedicated slide).
