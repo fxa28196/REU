@@ -174,6 +174,15 @@ public class ContextCreator implements ContextBuilder {
 	private static final String SHELTERS_BS140_CSV = "data/shelters/shelters_2026_bsweep_s140.csv";
 	private static final String SCENARIO_BS160_NAME = "BSWEEP_s160_capacity_1.6x_demand_real_locations";
 	private static final String SHELTERS_BS160_CSV = "data/shelters/shelters_2026_bsweep_s160.csv";
+	/** Fine sweep between 1.0x and 1.2x to locate where surplus capacity at
+	 *  the REAL sites crosses arm C's access — the "exchange rate" of siting
+	 *  vs surplus (round-5 critique follow-up). */
+	private static final String SCENARIO_BS105_NAME = "BSWEEP_s105_capacity_1.05x_demand_real_locations";
+	private static final String SHELTERS_BS105_CSV = "data/shelters/shelters_2026_bsweep_s105.csv";
+	private static final String SCENARIO_BS110_NAME = "BSWEEP_s110_capacity_1.1x_demand_real_locations";
+	private static final String SHELTERS_BS110_CSV = "data/shelters/shelters_2026_bsweep_s110.csv";
+	private static final String SCENARIO_BS115_NAME = "BSWEEP_s115_capacity_1.15x_demand_real_locations";
+	private static final String SHELTERS_BS115_CSV = "data/shelters/shelters_2026_bsweep_s115.csv";
 
 	/** Arm D — NEED-BASED ADMISSION. Identical to B in every physical respect:
 	 *  the same 36 real locations and the same 6,842 spaces, from B's own
@@ -258,6 +267,15 @@ public class ContextCreator implements ContextBuilder {
 		} else if (scenarioCode == 14) {
 			scenarioName = SCENARIO_BS160_NAME;
 			sheltersCsv = SHELTERS_BS160_CSV;
+		} else if (scenarioCode == 15) {
+			scenarioName = SCENARIO_BS105_NAME;
+			sheltersCsv = SHELTERS_BS105_CSV;
+		} else if (scenarioCode == 16) {
+			scenarioName = SCENARIO_BS110_NAME;
+			sheltersCsv = SHELTERS_BS110_CSV;
+		} else if (scenarioCode == 17) {
+			scenarioName = SCENARIO_BS115_NAME;
+			sheltersCsv = SHELTERS_BS115_CSV;
 		} else {
 			scenarioName = SCENARIO_A_NAME;
 			sheltersCsv = SHELTERS_A_CSV;
