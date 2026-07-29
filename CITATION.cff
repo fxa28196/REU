@@ -18,12 +18,15 @@ abstract: >-
   with individually sampled age, sex, mobility, asthma and COPD attributes
   start at real reported campsite locations and walk Portland's real street
   network toward the nearest shelter with room, driven by measured hourly
-  PM2.5 from the September 2020 smoke event. Three scenarios isolate the
-  effect of shelter capacity from the effect of shelter placement.
+  PM2.5 from the September 2020 smoke event. Three scenarios separate the
+  effect of total shelter capacity from the effect of how that capacity is
+  split across sites, with a triage arm testing bed reserves for
+  mobility-limited residents.
 
 authors:
   - family-names: Asghar
     given-names: Fatima
+    affiliation: "Harrisburg Area Community College, Harrisburg, PA"
     # orcid: "https://orcid.org/0000-0000-0000-0000"
 
 version: "1.0.0"
