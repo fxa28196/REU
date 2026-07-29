@@ -87,13 +87,73 @@ public class GisAgent {
 	 *  24-hour-average AQI category. */
 	public static final double UNHEALTHY_UGM3 = 55.5;
 
-	/** Outcome state (docs/science/DESIGN_SPEC.md Decision 3). */
+	/** Outcome state (docs/science/DESIGN_SPEC.md Decision 3; Phase E states in
+	 *  E-LAYER-SPEC.md §5).
+	 *
+	 *  <p><b>Phase-E mapping (deliberate):</b> the spec's AWARE_IDLE state is
+	 *  represented by {@code PRE_EVAC} — an aware resident waiting at its
+	 *  encampment is exactly what PRE_EVAC always meant, and reusing it keeps the
+	 *  exported {@code final_state} vocabulary byte-identical in the R3 null run
+	 *  (where everyone is aware). Only {@code UNAWARE} is new, and it appears in
+	 *  output only when {@code pAwareInit < 1}. The spec's ARRIVED_FULL maps onto
+	 *  the existing refusal-at-door mechanic rather than a new enum value. */
 	public enum State {
-		PRE_EVAC,          // sheltering in place at the encampment, awaiting the smoke trigger
+		PRE_EVAC,          // aware, sheltering in place at the encampment (spec: AWARE_IDLE)
 		EN_ROUTE,          // walking toward a shelter
 		SHELTERED,         // admitted; remains for the rest of the run
 		UNREACHABLE,       // no shelter reachable on the street graph
-		REFUSED_ALL_FULL   // every reachable operating shelter was at capacity
+		REFUSED_ALL_FULL,  // every reachable operating shelter was at capacity
+		UNAWARE            // Phase E: does not know shelters exist (V29); in place, accruing
+	}
+
+	/** Phase-E decision-layer configuration (V35–V44), shared by every agent in
+	 *  a run. {@code null} on every agent unless {@code enableDecisionLayer=1},
+	 *  in which case ContextCreator builds one instance from the batch params and
+	 *  hands it to each agent alongside its sampled
+	 *  {@link ELayerSampler.DecisionAttributes}. All fields are read-only. */
+	public static final class DecisionConfig {
+		/** 0 = L0 omniscient (legacy choice incl. live-occupancy pre-filter);
+		 *  1 = L1 locations-only (fullness discovered at the door). V42. */
+		public final int informationRegime;
+		/** 1 = logistic hazard departure (V36–V40); 0 = legacy 55.5 latch. */
+		public final int enableHazardDeparture;
+		public final double alphaHazard;        // V38
+		public final double bRisk;              // V36
+		public final double wOfficial;          // V37
+		public final double gammaVuln;          // V39
+		public final double sigmaTheta;         // V35
+		public final double riskHalfLifeH;      // V36
+		public final double lambdaOutreachPerDay; // V41
+		public final double barrierBelongings;  // V40
+		public final double barrierPet;         // V40
+		public final double barrierDependents;  // V40
+		/** TRUE = sites with unrecorded pet policy admit pets; FALSE = refuse
+		 *  (the conservative A-29 default for baseline-real arms). */
+		public final boolean petPolicyAdmitDefault;
+		public final double betaTravelTime;     // V43
+		public final double betaCapacityPrior;  // V43
+
+		public DecisionConfig(int informationRegime, int enableHazardDeparture,
+				double alphaHazard, double bRisk, double wOfficial, double gammaVuln,
+				double sigmaTheta, double riskHalfLifeH, double lambdaOutreachPerDay,
+				double barrierBelongings, double barrierPet, double barrierDependents,
+				boolean petPolicyAdmitDefault, double betaTravelTime, double betaCapacityPrior) {
+			this.informationRegime = informationRegime;
+			this.enableHazardDeparture = enableHazardDeparture;
+			this.alphaHazard = alphaHazard;
+			this.bRisk = bRisk;
+			this.wOfficial = wOfficial;
+			this.gammaVuln = gammaVuln;
+			this.sigmaTheta = sigmaTheta;
+			this.riskHalfLifeH = riskHalfLifeH;
+			this.lambdaOutreachPerDay = lambdaOutreachPerDay;
+			this.barrierBelongings = barrierBelongings;
+			this.barrierPet = barrierPet;
+			this.barrierDependents = barrierDependents;
+			this.petPolicyAdmitDefault = petPolicyAdmitDefault;
+			this.betaTravelTime = betaTravelTime;
+			this.betaCapacityPrior = betaCapacityPrior;
+		}
 	}
 
 	private final String name;
@@ -132,6 +192,36 @@ public class GisAgent {
 	 *  in which case this resident walks at the run-wide {@code walkingSpeedMps}
 	 *  parameter and exports empty attribute columns, exactly as before. */
 	private PopulationSampler.Attributes attributes = null;
+
+	// ---- Phase-E decision layer (V29–V44). ALL null/inert unless -----------
+	// enableDecisionLayer=1; every use below is gated on decisionConfig != null
+	// so legacy arms execute the pre-E code verbatim (R3 byte-identity).
+	private DecisionConfig decisionConfig = null;
+	private ELayerSampler.DecisionAttributes decisionAttributes = null;
+	/** Per-agent private stream for in-run decisions (hazard Bernoulli, outreach
+	 *  conversion, Scenario-E stuck draws). Never Repast's default stream, never
+	 *  a sampler stream — seeded from DecisionAttributes.decisionSeed so an
+	 *  agent's decision sequence is invariant to the per-tick shuffle. */
+	private java.util.Random decisionRng = null;
+	/** sigmaTheta * thetaZ, precomputed (V35). */
+	private double thetaScaled = 0.0;
+	/** Departure barrier cost c_i (V40), precomputed from attributes + config. */
+	private double barrierCost = 0.0;
+	/** Accumulated risk cue z_R (V36): cumulative unhealthy-exposure DAYS with
+	 *  exponential decay — the sourced form (Castillo: response is to cumulative
+	 *  exposure days, not instantaneous PM2.5). Updated once per simulated hour. */
+	private double zR = 0.0;
+	/** Hour index of the last decision update, so hazard/conversion evaluate
+	 *  hourly (PM2.5 is hourly; 60x fewer draws, no rate-conversion bugs). */
+	private int lastDecisionHour = -1;
+	/** Tick this resident became aware (0.0 = aware at start; NaN = never). */
+	private double awareTick = Double.NaN;
+	/** L1 belief set: shelter ids discovered full-or-refusing at the door.
+	 *  Never cleared, and never wrong: occupancy is monotone (no departures are
+	 *  modelled) and policy is fixed, so a site once refused stays refused for
+	 *  this resident. New capacity only ever appears as a NEWLY OPENED site,
+	 *  which by construction is not yet in the set. Null under L0. */
+	private java.util.Set<String> believedFull = null;
 
 	// Exported scientific quantities -----------------------------------------
 	private double networkDistToShelterM = Double.NaN;  // V11
@@ -183,6 +273,14 @@ public class GisAgent {
 		double walkingSpeedMps = (attributes != null)
 				? attributes.walkingSpeedMps
 				: (Double) params.getValue("walkingSpeedMps");
+		// V34 group pace: residents travelling with dependent children walk at
+		// the group's speed (Moussaid 2010), applied as a derived reduction —
+		// the sampled individual speed is never mutated. 0.40 = the V27 floor.
+		if (decisionConfig != null && decisionAttributes != null
+				&& decisionAttributes.groupSpeedDeltaMps > 0.0) {
+			walkingSpeedMps = Math.max(0.40,
+					walkingSpeedMps - decisionAttributes.groupSpeedDeltaMps);
+		}
 		double tick = RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
 		double dtHours = minutesPerTick / 60.0;
 
@@ -214,26 +312,92 @@ public class GisAgent {
 			outdoorHours += dtHours;
 		}
 
-		// PRE_EVAC: shelter in place at the encampment, accruing outdoor
-		// exposure, until local PM2.5 crosses the evacuation threshold (default
-		// the EPA "Unhealthy" AQI breakpoint 55.5 µg/m³ — a sourced value,
-		// DATA_SOURCES D9), then begin evacuating. This ties evacuation to the
-		// smoke event rather than assuming everyone leaves at t0 (AUDIT.md #1).
-		if (state == State.PRE_EVAC) {
-			double evacThreshold = (Double) params.getValue("evacuationThresholdUgM3");
+		// UNAWARE / PRE_EVAC: in place at the encampment, accruing outdoor
+		// exposure. Departure is decided here — by the Phase-E decision layer
+		// when it is enabled, otherwise by the legacy bright-line latch, which
+		// runs VERBATIM so every archived arm reproduces byte-identically.
+		if (state == State.UNAWARE || state == State.PRE_EVAC) {
 			double cNow = (smokeField == null) ? 0.0
 					: smokeField.concentrationForTick(tick, minutesPerTick);
-			// Departure requires BOTH the smoke trigger and somewhere open to walk
-			// to. With the opening-date gate enabled this is the A-02 mitigation:
-			// the real shelters opened on Sept 10-11, days after the first
-			// threshold crossing, so residents cannot arrive before a door exists
-			// to arrive at. With the gate disabled every shelter is open from tick
-			// 0 and this reduces to the previous smoke-only trigger.
-			if (cNow >= evacThreshold && anyShelterOpen(context, tick)) {
-				state = State.EN_ROUTE;
-				evacuationTick = tick;
+
+			if (decisionConfig != null && decisionAttributes != null) {
+				// ---- Phase-E decision layer (hourly; V29/V36–V41) -----------
+				int hour = (int) Math.floor(tick * minutesPerTick / 60.0);
+				boolean newHour = hour > lastDecisionHour;
+				if (newHour) {
+					lastDecisionHour = hour;
+					// z_R (V36): cumulative unhealthy-exposure DAYS, decayed —
+					// the sourced Castillo form. Deterministic: no RNG consumed,
+					// so the E0 null run stays byte-identical.
+					double decay = Math.pow(2.0, -1.0 / decisionConfig.riskHalfLifeH);
+					zR = zR * decay + (cNow >= UNHEALTHY_UGM3 ? 1.0 / 24.0 : 0.0);
+				}
+
+				// UNAWARE -> PRE_EVAC by outreach contact (V41), evaluated hourly
+				// on this agent's private stream.
+				if (state == State.UNAWARE) {
+					if (newHour && decisionConfig.lambdaOutreachPerDay > 0.0
+							&& decisionRng.nextDouble() < decisionConfig.lambdaOutreachPerDay / 24.0) {
+						state = State.PRE_EVAC;   // now aware (spec: AWARE_IDLE)
+						awareTick = tick;
+					}
+					if (state == State.UNAWARE) {
+						return; // still unaware; exposure already accrued above
+					}
+				}
+
+				if (decisionConfig.enableHazardDeparture == 1) {
+					// Logistic hazard departure (V36–V40), replacing the latch.
+					// u_i = alpha + bRisk_i*z_R + w*officialCue + theta_i - c_i.
+					// Departure additionally REQUIRES an open shelter — the same
+					// A-02 gate the latch enforces: nobody walks to a door that
+					// does not exist. Before opening, officialCue = 0 lowers the
+					// odds; the Wachinger constraint (high-barrier residents may
+					// never depart even at peak PM2.5) is carried by -c_i.
+					if (newHour) {
+						boolean open = anyShelterOpen(context, tick);
+						boolean vulnerable = attributes != null
+								&& (attributes.copd || attributes.asthma
+										|| attributes.ageYears >= 65 || attributes.mobilityLimited);
+						double bRiskEff = decisionConfig.bRisk
+								* (1.0 + (vulnerable ? decisionConfig.gammaVuln : 0.0));
+						double u = decisionConfig.alphaHazard + bRiskEff * zR
+								+ decisionConfig.wOfficial * (open ? 1.0 : 0.0)
+								+ thetaScaled - barrierCost;
+						double p = 1.0 / (1.0 + Math.exp(-u));
+						if (open && decisionRng.nextDouble() < p) {
+							state = State.EN_ROUTE;
+							evacuationTick = tick;
+						}
+					}
+					if (state != State.EN_ROUTE) {
+						return; // waiting; exposure already accrued above
+					}
+				} else {
+					// Decision layer on but hazard OFF (the R3 null): the legacy
+					// latch below runs identically, every tick.
+					double evacThreshold = (Double) params.getValue("evacuationThresholdUgM3");
+					if (cNow >= evacThreshold && anyShelterOpen(context, tick)) {
+						state = State.EN_ROUTE;
+						evacuationTick = tick;
+					} else {
+						return;
+					}
+				}
 			} else {
-				return; // still waiting outdoors; exposure already accrued above
+				// ---- Legacy bright-line latch (decision layer off) ----------
+				// PRE_EVAC until local PM2.5 crosses the evacuation threshold
+				// (default the EPA "Unhealthy" breakpoint 55.5 µg/m³, DATA_SOURCES
+				// D9) AND somewhere is open to walk to (A-02 mitigation: the real
+				// shelters opened Sept 10-11, days after the first threshold
+				// crossing). UNAWARE cannot occur here.
+				double evacThreshold = (Double) params.getValue("evacuationThresholdUgM3");
+				if (cNow >= evacThreshold && anyShelterOpen(context, tick)) {
+					state = State.EN_ROUTE;
+					evacuationTick = tick;
+				} else {
+					return; // still waiting outdoors; exposure already accrued above
+				}
 			}
 		}
 
@@ -247,7 +411,16 @@ public class GisAgent {
 		// modelled) and each shelter opens once, so re-entry is bounded by the
 		// number of opening events.
 		if (state == State.REFUSED_ALL_FULL) {
-			if (!anyShelterAvailable(context, tick)) {
+			// Under L1 the resident cannot see occupancy, so "worth setting out"
+			// means an operating, open, reachable site it has NOT yet been turned
+			// away from (believedFull covers both capacity and policy refusals;
+			// beliefs never expire — see the field doc). A newly opened site is
+			// by construction untried. Under L0/legacy the omniscient
+			// availability check runs verbatim.
+			boolean somewhereToTry = useL1()
+					? anyUntriedReachableShelter(context, tick)
+					: anyShelterAvailable(context, tick);
+			if (!somewhereToTry) {
 				return; // still nowhere to go; keeps accruing exposure outdoors
 			}
 			state = State.EN_ROUTE;
@@ -261,9 +434,13 @@ public class GisAgent {
 			return; // terminal states persist in place (still accruing if outside)
 		}
 
-		// --- Routing (capacity-aware) ---------------------------------------
+		// --- Routing (capacity-aware under L0; belief-aware under L1) --------
 		if (routePath == null) {
-			chooseNetworkNearestShelter(context, tick);
+			if (useL1()) {
+				chooseShelterByUtility(context, tick, walkingSpeedMps);
+			} else {
+				chooseNetworkNearestShelter(context, tick);
+			}
 			if (routePath == null) {
 				// state was set by chooseNetworkNearestShelter (UNREACHABLE or
 				// REFUSED_ALL_FULL); the agent persists and keeps accruing.
@@ -298,22 +475,42 @@ public class GisAgent {
 
 		if (pathIndex >= routePath.size()) {
 			// Reached the shelter's street node: request admission (V12).
-			if (targetShelter.isOpenAt(tick) && targetShelter.admit(isPriorityForAdmission())) {
+			// Phase-E policy gates are evaluated AT THE DOOR, not at selection
+			// time: under L1 the resident knows locations, not intake policies,
+			// and the sourced datum is exactly "ever been TURNED AWAY over pet
+			// policy" (48.1%, Henwood 2020) — people went and were refused.
+			boolean policyRefused = decisionConfig != null && decisionAttributes != null
+					&& ((decisionAttributes.hasPet && !petAdmittedAt(targetShelter))
+							|| (decisionAttributes.hasDependents && targetShelter.isAdultsOnly()));
+			if (!policyRefused && targetShelter.isOpenAt(tick)
+					&& targetShelter.admit(isPriorityForAdmission())) {
 				state = State.SHELTERED;
 				arrivalTick = tick;
 			} else {
-				// Filled since selection: the resident REMAINS at this
-				// shelter's street node and re-plans from there next tick,
-				// excluding full shelters (A-17 / Finding A: never re-plan
-				// from the immutable start node — that walked refused agents
-				// back to their encampment, inflating distance and dose).
-				// Bounded to avoid livelock.
+				// Refused (capacity, closed, or policy): the resident REMAINS at
+				// this shelter's street node and re-plans from there next tick
+				// (A-17 / Finding A: never re-plan from the immutable start node
+				// — that walked refused agents back to their encampment,
+				// inflating distance and dose).
+				if (policyRefused) {
+					targetShelter.recordPolicyRefusal();
+				}
+				if (useL1()) {
+					// The discovery IS the information: this door will never
+					// admit this resident (occupancy is monotone, policy fixed).
+					believedFull.add(targetShelter.getId());
+				}
 				currentNodeId = targetShelter.getGraphNodeId();
 				targetShelter = null;
 				routePath = null;
 				pathIndex = 0;
 				retargetCount++;
-				if (retargetCount > MAX_RETARGETS) {
+				// Under L0/legacy the retry cap guards against livelock. Under
+				// L1 the believedFull set is the bound (each refusal permanently
+				// removes one site; REFUSED_ALL_FULL follows when none remain),
+				// so retries are belief-driven decisions, never counter-capped
+				// (U-16: closed-at-selection sites never burned retries either).
+				if (!useL1() && retargetCount > MAX_RETARGETS) {
 					state = State.REFUSED_ALL_FULL;
 				}
 			}
@@ -370,6 +567,102 @@ public class GisAgent {
 		}
 	}
 
+	/** True when the Phase-E L1 information regime governs this agent's choice:
+	 *  locations known, occupancy and intake policy discovered at the door. */
+	private boolean useL1() {
+		return decisionConfig != null && decisionAttributes != null
+				&& decisionConfig.informationRegime == 1;
+	}
+
+	/** Whether this site admits pets: its own recorded policy when the CSV has
+	 *  one, otherwise the run-wide default (A-29: the 2020 record is silent). */
+	private boolean petAdmittedAt(Shelter shelter) {
+		Boolean policy = shelter.getPetIntake();
+		return policy != null ? policy.booleanValue()
+				: decisionConfig.petPolicyAdmitDefault;
+	}
+
+	/** Documented ln-cap for capacity-unlimited standby sites in the V43 size
+	 *  prior: ln(capacity) needs a finite argument, and an uncapped site is
+	 *  believed at least as large as any real one. */
+	private static final double UNCAPPED_CAPACITY_PRIOR = 10000.0;
+
+	/**
+	 * Phase-E L1 destination choice (V43, E-LAYER-SPEC.md §4):
+	 * {@code V_j = -betaT * walkTime_j(ownSpeed) + betaS * ln(capacity_j)}
+	 * over operating, open, reachable sites NOT yet discovered-refusing
+	 * (believedFull). <b>Deliberately no {@code hasSpaceFor} pre-filter</b> —
+	 * that live-occupancy knowledge is exactly the omniscience L1 removes;
+	 * fullness is discovered at the door and recorded as belief. With
+	 * betaS = 0 this reduces to nearest-reachable, the legacy geometry.
+	 * Ties break on shelter id so the choice is independent of iteration order.
+	 * Terminal classification mirrors the legacy chooser: reachable-but-all-
+	 * believed-refusing → REFUSED_ALL_FULL; nothing reachable → UNREACHABLE.
+	 */
+	private void chooseShelterByUtility(Context context, double tick, double ownSpeedMps) {
+		double bestV = Double.NEGATIVE_INFINITY;
+		Shelter best = null;
+		double bestDistM = Double.NaN;
+		boolean anyReachable = false;
+
+		for (Object obj : context.getObjects(Shelter.class)) {
+			Shelter shelter = (Shelter) obj;
+			if (!shelter.isOperating() || !shelter.isOpenAt(tick)
+					|| shelter.getRouteTree() == null) {
+				continue;
+			}
+			double dM = shelter.getRouteTree().distanceTo(currentNodeId);
+			if (Double.isInfinite(dM)) {
+				continue;
+			}
+			anyReachable = true;
+			if (believedFull.contains(shelter.getId())) {
+				continue;
+			}
+			double cap = (shelter.getCapacity() == null)
+					? UNCAPPED_CAPACITY_PRIOR : shelter.getCapacity().doubleValue();
+			double walkTimeH = dM / (ownSpeedMps * 3600.0);
+			double v = -decisionConfig.betaTravelTime * walkTimeH
+					+ decisionConfig.betaCapacityPrior * Math.log(Math.max(1.0, cap));
+			if (v > bestV || (v == bestV && best != null
+					&& shelter.getId().compareTo(best.getId()) < 0)) {
+				bestV = v;
+				best = shelter;
+				bestDistM = dM;
+			}
+		}
+
+		if (best != null) {
+			targetShelter = best;
+			if (Double.isNaN(networkDistToShelterM)) {
+				networkDistToShelterM = bestDistM;   // V11, first selection only
+			}
+			plannedRouteM += bestDistM;
+			routePath = network.pathToSource(best.getRouteTree(), currentNodeId);
+			pathIndex = 0;
+		} else if (anyReachable) {
+			state = State.REFUSED_ALL_FULL;
+		} else {
+			state = State.UNREACHABLE;
+		}
+	}
+
+	/** L1 counterpart of {@link #anyShelterAvailable}: an operating, open,
+	 *  reachable site this resident has not yet been turned away from. No
+	 *  occupancy consultation — the resident cannot see it. */
+	private boolean anyUntriedReachableShelter(Context context, double tick) {
+		for (Object obj : context.getObjects(Shelter.class)) {
+			Shelter shelter = (Shelter) obj;
+			if (shelter.isOperating() && shelter.isOpenAt(tick)
+					&& shelter.getRouteTree() != null
+					&& !Double.isInfinite(shelter.getRouteTree().distanceTo(currentNodeId))
+					&& !believedFull.contains(shelter.getId())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * Whether this resident is a PRIORITY arrival under need-based admission
 	 * (arm D): the reserved fraction of each shelter's capacity is available
@@ -423,6 +716,49 @@ public class GisAgent {
 	public void setAttributes(PopulationSampler.Attributes attributes) { this.attributes = attributes; }
 	/** Sampled heterogeneous attributes, or null when heterogeneity is disabled. */
 	public PopulationSampler.Attributes getAttributes() { return attributes; }
+
+	/**
+	 * Arms the Phase-E decision layer on this resident. Called once per agent by
+	 * ContextCreator's second sampling pass when {@code enableDecisionLayer=1};
+	 * never called otherwise, which is what keeps every legacy arm byte-identical.
+	 *
+	 * <p>Precomputes the scaled trait (sigmaTheta * thetaZ — the raw draw is
+	 * consumed even at sigma 0, per the unconditional-draw rule) and the
+	 * departure barrier cost c_i (V40). The pet term enters c_i only when the
+	 * world's default policy refuses pets: per-site policies are discovered at
+	 * the door, but the departure-suppressing burden is anticipating refusal
+	 * (A-29). An initially-unaware resident starts in {@link State#UNAWARE};
+	 * an aware one stays in PRE_EVAC exactly as legacy residents do.
+	 */
+	public void setDecisionLayer(DecisionConfig config, ELayerSampler.DecisionAttributes da) {
+		this.decisionConfig = config;
+		this.decisionAttributes = da;
+		this.decisionRng = new java.util.Random(da.decisionSeed);
+		this.thetaScaled = config.sigmaTheta * da.thetaZ;
+		double c = 0.0;
+		if (da.heavyBelongings) c += config.barrierBelongings;
+		if (da.hasPet && !config.petPolicyAdmitDefault) c += config.barrierPet;
+		if (da.hasDependents) c += config.barrierDependents;
+		this.barrierCost = c;
+		if (config.informationRegime == 1) {
+			this.believedFull = new java.util.HashSet<String>();
+		}
+		if (da.awareInitial) {
+			this.awareTick = 0.0;      // aware from the start; state stays PRE_EVAC
+		} else {
+			this.state = State.UNAWARE;
+			this.awareTick = Double.NaN;
+		}
+	}
+
+	/** Sampled decision attributes, or null when the decision layer is off. */
+	public ELayerSampler.DecisionAttributes getDecisionAttributes() { return decisionAttributes; }
+	/** Tick this resident became aware: 0 = from the start, NaN = never. */
+	public double getAwareTick() { return awareTick; }
+	/** Scaled persistent trait sigmaTheta * thetaZ (0 when the layer is off). */
+	public double getThetaScaled() { return thetaScaled; }
+	/** Departure barrier cost c_i (V40); 0 when the layer is off. */
+	public double getBarrierCost() { return barrierCost; }
 	/** Speed this resident actually walks at (m/s): its own when heterogeneity is
 	 *  enabled, otherwise NaN meaning "the run-wide parameter applies". */
 	public double getPersonalWalkingSpeedMps() {
