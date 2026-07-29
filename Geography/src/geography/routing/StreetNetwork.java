@@ -189,6 +189,12 @@ public class StreetNetwork {
 		public double maxEndpointGapM;
 		public int componentCount;
 		public int largestComponentSize;
+		/** U-27 pedestrian-legality filter: freeway-class features excluded
+		 *  from the graph before any edge was added (registry V26). */
+		public int freewayFeaturesExcluded;
+		public double freewayKmExcluded;
+		public final Map<Integer, Integer> freewayExcludedByType =
+				new LinkedHashMap<Integer, Integer>();
 	}
 
 	private final List<RawStreet> rawStreets = new ArrayList<RawStreet>();
@@ -201,6 +207,13 @@ public class StreetNetwork {
 	private boolean indexBuilt = false;
 	private long nextSyntheticId = -1000;
 	private ValidationReport report;
+
+	// U-27 exclusion accumulators, copied into the ValidationReport at
+	// finaliseGraph() (the report object does not exist earlier).
+	private int excludedFreewayFeatures = 0;
+	private double excludedFreewayLengthM = 0;
+	private final Map<Integer, Integer> excludedFreewayByType =
+			new LinkedHashMap<Integer, Integer>();
 
 	/** Planar centre-to-centre distance used only to rank spatial-index candidates. */
 	private static final ItemDistance CENTRE_DISTANCE = new ItemDistance() {
@@ -243,6 +256,17 @@ public class StreetNetwork {
 		return lengthM;
 	}
 
+	/** U-27 provenance: records one street feature excluded from the
+	 *  pedestrian graph by its RLIS TYPE class (freeway mainline or ramp,
+	 *  registry V26). The feature never reaches {@link #addStreet}; this
+	 *  only keeps the removal count for the manifest. */
+	public void recordExcludedFeature(int rlisType, double lengthM) {
+		excludedFreewayFeatures++;
+		excludedFreewayLengthM += lengthM;
+		Integer prev = excludedFreewayByType.get(rlisType);
+		excludedFreewayByType.put(rlisType, prev == null ? 1 : prev + 1);
+	}
+
 	private void registerClaim(long attrId, Coordinate endpoint, String label) {
 		List<NodeSite> sites = sitesByAttrId.get(attrId);
 		if (sites == null) {
@@ -273,6 +297,9 @@ public class StreetNetwork {
 		report = new ValidationReport();
 		report.featureCount = rawStreets.size();
 		report.attrNodeIds = sitesByAttrId.size();
+		report.freewayFeaturesExcluded = excludedFreewayFeatures;
+		report.freewayKmExcluded = excludedFreewayLengthM / 1000.0;
+		report.freewayExcludedByType.putAll(excludedFreewayByType);
 
 		// Pass 1 -- primary sites keep the attribute ID as graph node id.
 		STRtree primaryIndex = new STRtree();
