@@ -276,7 +276,12 @@ visibility bias.
 Second limitation: the reports are **complaint-driven**, so they are biased toward
 visible, complained-about camps. This is not a census.
 
-In the reported runs, residents occupy **2,981 distinct real campsite locations**.
+The source file's 3,400 reports resolve to **3,317 distinct coordinates**; a
+single run seeds residents at a sampled subset of them (2,981 in the seed-42
+arm-A run, `A2026-n6842-seed42/agents.csv`). No de-duplication step exists in
+`ContextCreator` — duplicate coordinates account for only 83 of the 419
+report-to-coordinate shortfall; the realised per-run count is a sampling
+outcome, not a property of the feed.
 
 ### 3.4 D10 — Population count (class M)
 
@@ -311,7 +316,7 @@ this project corrected everywhere else.
 | Age bands 18-44 / 45-64 / 65+ | 0.527 / 0.423 / 0.050 | M | **Pathways Study 2026**, N=541, Multnomah County (PSU HRAC / OHSU), Table 2.1. Local and contemporaneous. |
 | Sex male / female / other | 0.68432 / 0.29271 / 0.02297 | M | 2019 Multnomah PIT unsheltered; corroborated by HUD 2023 AHAR national unsheltered (68.2/30.1/0.9) |
 | Mobility limitation (marginal) | 0.192 | M | 2019 Multnomah PIT: 391/2,037. **A LOWER BOUND** — asked only of survey completers, divided by the full population |
-| Mobility age gradient | ×2.286 at 55+ (0.1522 / 0.3478) | A (donor-imputed) | **CASPEH 2023** (UCSF Benioff, n=3,198): 22% overall vs 32% at 50+. The *ratio* is borrowed; the local *marginal* is held exactly |
+| Mobility age gradient | ×2.286 at 55+ (0.1522 / 0.3478) | A (donor-imputed) | **CASPEH 2023** (UCSF Benioff, n=3,198): 22% overall vs 32% at 50+. The *ratio* is borrowed. The conditionals were solved against the 2019-PIT 55+ share, but the sampler now draws ages from Pathways-2026 weights, so the coded expectation is **0.2033, not the 0.192 target** — the pooled nine-seed realised rate (~20.4%) excludes 0.192. The ~1.1 pp upward drift is stated openly rather than re-derived, because re-solving the constants would change every population |
 | Asthma | 0.15 | L | **Zellmer et al. 2025**, *J Gen Intern Med*, DOI `10.1007/s11606-025-09814-x` — EHR-diagnosed, n=20,139 adults with recent homelessness: 14.9% vs 7.1% housed |
 | COPD | 0.105 | L | Same source: 10.5% vs 3.0% housed |
 | Chronic physical condition | 0.391 | M | Pathways 2026 (local) |
@@ -2098,50 +2103,112 @@ falls out of the design.
 | Total exposure | 0.23% of the mean | 1.8% | 3.6% |
 
 The **smallest** between-arm gap on "got inside" is B→C at 306 people. The
-**largest** within-arm spread is 11. The between-arm signal is roughly **28×** the
-within-arm noise on that metric.
+**largest** within-arm spread is 11. The two numbers are reported side by side,
+deliberately not as a ratio: seed spread bounds only Monte-Carlo variability
+(pooling nine seeds understates CI widths by up to 46%) and says nothing about
+structural uncertainty. The B→C gap in particular is reproduced exactly by the
+POOL control (6,570/6,565/6,566 across three independent random site draws), so
+its tightness is evidence about dispersion, not the optimiser.
 
-### 13.4 The finding that matters most
+### 13.4 The capacity/geography separation — and why the near-equality is forced
 
-> **Scenario B leaves 578 beds empty while turning 562 people away.**
+In B, capacity equals population exactly, so the arithmetic is an identity:
+**578 empty beds = 550 people refused everywhere + 28 who can reach no shelter**
+(corrected-graph values; the identity, not the near-equality, is the point).
+B has no shortage. It has exactly enough beds for exactly the population — and
+it still fails 578 people, because the beds are where the *buildings* are, not
+where the *people* are. **This is a geography failure, cleanly separated from a
+capacity failure.** It is also a knife-edge failure: the bed-equivalence sweep
+(§13.7) shows 20% surplus dissolves it entirely.
 
-Those two numbers are nearly equal. B has no shortage. It has exactly enough beds
-for exactly the population — and it still fails 562 people, because the beds are
-where the *buildings* are, not where the *people* are. **This is a geography
-failure, cleanly separated from a capacity failure**, and it is what C exists to fix.
-
-C spends the **identical 6,842 beds**. Instead of tripling the size of buildings
-already in the wrong places, it grows them 1.5× and puts the difference into ten new
-shelters where people actually are. Result: **refusals halve (562 → 256), empty beds
-halve (578 → 272), walking drops 28%, and inhaled dose halves again.**
+C spends the **same total as B, split differently — more doors**. It grows the
+36 real sites 1.5× and opens the difference as ten additional sites. Result:
+**refusals halve (550 → 244), empty beds halve (578 → 272), walking drops 25%,
+and inhaled dose halves again.** The POOL control shows random sites from the
+same candidate pool reproduce the headcount exactly — dispersion, not the
+optimiser; siting quality earns credit on walking distance only.
 
 ### 13.5 Intervention ranking
 
 | Rank | Intervention | Effect |
 |---|---|---|
-| **1** | Add capacity to meet demand | Exposure **−87.3%** — this dominates everything |
-| **2** | Place the marginal capacity well | A further **−50.7%** on top of #1, at **zero additional beds** |
-| 3 | Earlier opening | Not isolated in this experiment; large in the 2020-timing runs |
-| 4 | Transport assistance | Not modelled; implied by the mobility gap |
+| **1** | Add capacity to meet demand | Exposure **−87.3%** — this dominates everything; and 20% surplus (+1,368 beds) lifts admissions to 99.5% and erases the equity gap |
+| **2** | Triage reserve (scenario D, r=0.10) | Mobility access gap **~+23.7pp → ~−0.5pp** at identical total admissions and **zero capital cost** — the only tested intervention that closes the gap |
+| 3 | Split the same total across more doors (C) | +306 admitted vs B and **−50.7%** exposure on top of #1 at zero additional beds; headcount gain is dispersion (POOL null), siting credit is walking distance only |
+| 4 | Earlier opening | Not isolated in this experiment; large in the 2020-timing runs |
+| 5 | Transport assistance | Not modelled; implied by the mobility gap |
 
-The honest summary is that **capacity is the first-order effect and placement is the
-second-order effect — but the second-order effect is free.**
+The honest summary: **capacity is first-order; at the capacity==demand knife
+edge the intake rule closes the equity gap for free; dispersion buys headcount
+without optimisation; and surplus makes all of it moot.**
 
-### 13.6 Calibration: the model over-predicts, and says so
+### 13.6 Calibration: the model over-admits, and says so
 
 Against the one observed occupancy record — Street Roots, 2020-09-16: approximately
 **90 occupants at the Oregon Convention Center and 40 at Charles Jordan, ≈130 of 198
-beds** — the historical reference configuration fills **198 of 198**.
+beds** — the historical reference configuration fills **198 of 198 at both sites**
+(per-site: OCC ~1.1× observed, right-censored; Charles Jordan ~2.5×).
 
-**That is a 1.52× over-prediction**, and it is attributed to assumption A-12
-(universal shelter awareness), against local survey evidence that 65% of unsheltered
-residents had never heard of the shelters.
+Because the record is approximate, the honest statement is the censored bracket:
+**the model over-admits by 1.5–15.6×, where 1.52× is only the uncensored lower
+edge**; a final point value awaits the U-12 population recalibration. The
+direction is attributed to assumption A-12 (universal shelter awareness),
+against local survey evidence that 65% of unsheltered residents had never heard
+of the shelters.
 
 Consequently the required wording is fixed, and used everywhere:
 
-> *"Optimized shelter placement improves outcomes under the modelled assumptions"*
+> *"Splitting the same capacity across more sites improves outcomes under the
+> modelled assumptions"*
 
 **never** *"recreates what actually happened"*.
+
+### 13.7 Round-5 additions: corrected graph, bed sweep, windows, and the regression check
+
+**Corrected street graph (U-27).** The RLIS centreline file includes freeway
+mainlines and ramps that pedestrians may not use — 2,636 features, 614 km,
+including the Marquam and Fremont bridge decks. They are now excluded before
+graph build (`ContextCreator` TYPE filter, registry V26); every run records the
+removal in `simulation.json → street_network_validation.freeway_filter`. The
+corrected graph has 109,434 edges, 88,100 nodes, 171 components (largest
+59,725). Every sheltered count in every arm and seed was unchanged by the
+correction; ~12 residents per run reclassified from refused to unreachable
+(their fragments connected only via freeway), and travel medians moved 0.1–2%
+(a few C runs up to ~3%).
+
+**Bed-equivalence sweep (registered predictions P-3, both MISSES — reported).**
+Arm B's 36 real sites, capacity scaled to s × demand, seeds 42–44:
+
+| s × demand | beds | admitted % (range) | mobility gap (pp) |
+|---|---|---|---|
+| 0.8 | 5,474 | 73.3 | 28.3 |
+| 1.0 (=B) | 6,842 | 91.5 | 23.5 |
+| 1.2 | 8,210 | **99.5** | **−0.0** |
+| 1.4 | 9,579 | 99.5 | −0.0 |
+| 1.6 | 10,947 | 99.5 | −0.0 |
+
+We predicted B would not reach C's 96.0% before 1.4–1.6× and that the gap
+would persist under surplus. Both were wrong: **20% surplus beats C's access
+and erases the gap** — the equity result is a property of the scarcity band
+where capacity ≈ demand, which is exactly where the triage reserve earns its
+keep.
+
+**Window arms (D1).** From-start windows at 24/72/312 h (seeds 42–44): B/C
+mean-dose ratio 1.29 → 1.33 → 1.98, and walking's share of C's dose benefit
+100% → 83% → 4.5%. Short windows are dominated by the walking-dose difference;
+long windows by the headcount difference. (The audit's episode-aligned
+trajectory truncation is a different construction and gives 62%/51%/2.7%.)
+
+**The regression check (learning component).** A logistic model of
+P(got inside) on agent inputs plus distance to the nearest site, fitted to the
+pooled 9-seed output per arm (`scripts/fit_outcome_models.py`, results in
+`docs/final/results-2026/ML_MODEL_SUMMARY.md`; per-agent training table in
+`ML_TRAINING_DATA.csv`): distance and walking speed dominate everywhere;
+**asthma is null in every arm** (the negative control — the model invents no
+effect it cannot cite); and in arm D the mobility coefficient flips to an odds
+ratio of ~123 — the reserve, learned back from the data. Retry behaviour:
+refused residents averaged ~3.1–3.4 door attempts; 6.6% of ever-refused
+residents eventually got inside under scarcity (A) vs 79–91% in B/C/D.
 
 ---
 
@@ -2261,7 +2328,8 @@ were designed so a reader can verify them without running anything:
 - **No health outcome.** No case, hospitalisation or death is predicted, so no
   health prediction can be validated.
 - **No absolute occupancy claim.** The one observed occupancy record is
-  over-predicted 1.52× (§13.6).
+  over-admitted by a censored bracket of 1.5–15.6× (§13.6); the point value
+  awaits the U-12 recalibration.
 - **No spatial exposure validation.** With two in-county monitors, a spatial field
   cannot be validated at all — which is why it is uniform.
 - **No behavioural validation.** Awareness, willingness to travel, queueing and
