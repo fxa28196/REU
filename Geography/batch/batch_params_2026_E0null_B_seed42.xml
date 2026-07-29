@@ -32,4 +32,5 @@
 	<parameter name="petPolicyDefault" type="constant" constant_type="int" value="1"/>
 	<parameter name="betaTravelTime" type="constant" constant_type="number" value="1.0"/>
 	<parameter name="betaCapacityPrior" type="constant" constant_type="number" value="0.0"/>
+	<parameter name="shelterPolicyVariant" type="constant" constant_type="int" value="0"/>
 </sweep>

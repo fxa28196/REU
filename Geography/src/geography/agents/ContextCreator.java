@@ -234,7 +234,12 @@ public class ContextCreator implements ContextBuilder {
 		double pHeavyBelongings = doubleParam(parm, "pHeavyBelongings", 0.284);
 		double pHasPet = doubleParam(parm, "pHasPet", 0.117);
 		double pHasDependents = doubleParam(parm, "pHasDependents", 0.0044);
-		double groupSpeedDeltaMps = doubleParam(parm, "groupSpeedDeltaMps", 0.06);
+		// 0.0, NOT the sourced 0.06: this is the one E parameter whose non-zero
+		// value would change behaviour the moment the layer is switched on, so a
+		// sourced default here would make the "every default is
+		// behaviour-preserving" guarantee false. The E arms set 0.06 explicitly
+		// (V34, Moussaid 2010); the degenerate null sets 0.0.
+		double groupSpeedDeltaMps = doubleParam(parm, "groupSpeedDeltaMps", 0.0);
 		double lambdaOutreachPerDay = doubleParam(parm, "lambdaOutreachPerDay", 0.0);
 		int informationRegime = intParam(parm, "informationRegime", 0);
 		int enableHazardDeparture = intParam(parm, "enableHazardDeparture", 0);
@@ -256,6 +261,13 @@ public class ContextCreator implements ContextBuilder {
 		int petPolicyDefault = intParam(parm, "petPolicyDefault", 1);
 		double betaTravelTime = doubleParam(parm, "betaTravelTime", 1.0);
 		double betaCapacityPrior = doubleParam(parm, "betaCapacityPrior", 0.0);
+		// 1 = read the "_elayer" variant of this arm's shelter file, which carries
+		// the RECORDED pet_intake policy joined from the upstream 2026 inventory
+		// (4 of 48 facilities record pets_allowed=1, 422 beds). Default 0 reads
+		// the archived file untouched, so data_version_tag and the archived
+		// three-arm chain are unaffected. See A-29 and
+		// scripts/build_shelter_policy_elayer.py.
+		int shelterPolicyVariant = intParam(parm, "shelterPolicyVariant", 0);
 		String scenarioName;
 		String sheltersCsv;
 		if (scenarioCode == 1) {
@@ -314,6 +326,21 @@ public class ContextCreator implements ContextBuilder {
 		} else {
 			scenarioName = SCENARIO_A_NAME;
 			sheltersCsv = SHELTERS_A_CSV;
+		}
+
+		// Swap in the recorded-pet-policy variant of whichever arm file the
+		// scenario chain selected. Fail loudly rather than silently falling back:
+		// a run that asked for recorded policy and quietly got the blanket
+		// default would misattribute every pet-owner outcome.
+		if (shelterPolicyVariant == 1) {
+			String variant = sheltersCsv.substring(0, sheltersCsv.length() - 4) + "_elayer.csv";
+			if (!new File(variant).exists()) {
+				throw new IllegalStateException("shelterPolicyVariant=1 but " + variant
+						+ " does not exist; run scripts/build_shelter_policy_elayer.py");
+			}
+			sheltersCsv = variant;
+			System.out.println("[Shelters] policy variant ON: reading recorded pet_intake from "
+					+ variant);
 		}
 
 		// Scientific governance: validate the variable and assumption registries
@@ -601,7 +628,8 @@ public class ContextCreator implements ContextBuilder {
 				"informationRegime", "enableHazardDeparture", "sigmaTheta",
 				"alphaHazard", "bRisk", "wOfficial", "gammaVuln", "riskHalfLifeH",
 				"barrierBelongings", "barrierPet", "barrierDependents",
-				"petPolicyDefault", "betaTravelTime", "betaCapacityPrior" };
+				"petPolicyDefault", "betaTravelTime", "betaCapacityPrior",
+				"shelterPolicyVariant" };
 		Object[] pVals = { numAgents, minutesPerTick, parm.getValue("walkingSpeedMps"),
 				parm.getValue("shelterArrivalDistanceM"), simulationHours, seed,
 				paramOrDefault(parm, "evacuationThresholdUgM3", "unset"), scenarioCode,
@@ -611,7 +639,8 @@ public class ContextCreator implements ContextBuilder {
 				informationRegime, enableHazardDeparture, sigmaTheta,
 				alphaHazard, bRisk, wOfficial, gammaVuln, riskHalfLifeH,
 				barrierBelongings, barrierPet, barrierDependents,
-				petPolicyDefault, betaTravelTime, betaCapacityPrior };
+				petPolicyDefault, betaTravelTime, betaCapacityPrior,
+				shelterPolicyVariant };
 		String[] dataFiles = { STREETS_SHP, SMOKE_CSV, sheltersCsv, ENCAMPMENTS_CSV };
 
 		@SuppressWarnings("unchecked")

@@ -499,6 +499,11 @@ public class GisAgent {
 					// The discovery IS the information: this door will never
 					// admit this resident (occupancy is monotone, policy fixed).
 					believedFull.add(targetShelter.getId());
+				} else if (policyRefused) {
+					// L0 sees occupancy but not intake policy, so a policy
+					// refusal must still be remembered or the omniscient chooser
+					// picks the same door again next tick, forever.
+					believedFull.add(targetShelter.getId());
 				}
 				currentNodeId = targetShelter.getGraphNodeId();
 				targetShelter = null;
@@ -542,6 +547,9 @@ public class GisAgent {
 				continue;
 			}
 			anyReachable = true;
+			if (excludedByBelief(shelter)) {
+				continue;   // already turned this resident away on policy (L0)
+			}
 			if (shelter.hasSpaceFor(isPriorityForAdmission()) && dM < bestDistM) {
 				bestDistM = dM;
 				best = shelter;
@@ -565,6 +573,13 @@ public class GisAgent {
 		} else {
 			state = State.UNREACHABLE;
 		}
+	}
+
+	/** True if this resident has already been turned away from this site and
+	 *  should not select it again. Always false when the decision layer is off
+	 *  (the set is null), which is what keeps the legacy choosers unchanged. */
+	private boolean excludedByBelief(Shelter shelter) {
+		return believedFull != null && believedFull.contains(shelter.getId());
 	}
 
 	/** True when the Phase-E L1 information regime governs this agent's choice:
@@ -701,7 +716,8 @@ public class GisAgent {
 		for (Object obj : context.getObjects(Shelter.class)) {
 			Shelter shelter = (Shelter) obj;
 			if (shelter.isAvailableAt(tick, isPriorityForAdmission()) && shelter.getRouteTree() != null
-					&& !Double.isInfinite(shelter.getRouteTree().distanceTo(currentNodeId))) {
+					&& !Double.isInfinite(shelter.getRouteTree().distanceTo(currentNodeId))
+					&& !excludedByBelief(shelter)) {
 				return true;
 			}
 		}
@@ -740,9 +756,15 @@ public class GisAgent {
 		if (da.hasPet && !config.petPolicyAdmitDefault) c += config.barrierPet;
 		if (da.hasDependents) c += config.barrierDependents;
 		this.barrierCost = c;
-		if (config.informationRegime == 1) {
-			this.believedFull = new java.util.HashSet<String>();
-		}
+		// Allocated in BOTH regimes. Under L1 it records every door that turned
+		// this resident away. Under L0 it records only POLICY refusals: the
+		// omniscient chooser already filters on live capacity, but nothing filters
+		// on intake policy, so without this a pet owner would re-select the same
+		// refusing shelter every tick forever (EN_ROUTE -> refused ->
+		// REFUSED_ALL_FULL -> re-entry resets the retarget counter -> repeat).
+		// R3 is unaffected: the degenerate null admits pets and has no adults-only
+		// site, so the set stays empty and the legacy chooser sees no change.
+		this.believedFull = new java.util.HashSet<String>();
 		if (da.awareInitial) {
 			this.awareTick = 0.0;      // aware from the start; state stays PRE_EVAC
 		} else {
