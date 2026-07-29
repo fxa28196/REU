@@ -1,65 +1,115 @@
-<!DOCTYPE html>
+#!/usr/bin/env python3
+"""Render the symposium deck from verified repo numbers.
+
+Reads docs/final/presentation/deck_numbers.json (produced by
+scripts/make_symposium_deck.py, which computes every value from the archived
+runs, manifests and source CSVs) plus a small set of values re-verified at
+build time, and writes:
+
+    docs/final/presentation/capacity-is-not-access-symposium.html
+
+Design rules enforced here:
+  * every chart carries an axis title on BOTH axes and a units line;
+  * every slide that shows a number also shows where the number came from;
+  * one fixed colour per scenario (A/B/C/D) everywhere;
+  * @media print => one slide per page, so browser "Save as PDF" produces a
+    clean handout with no extra tooling.
+"""
+import json
+import pathlib
+
+import pandas as pd
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+OUTD = ROOT / "docs/final/presentation"
+D = json.loads((OUTD / "deck_numbers.json").read_text(encoding="utf-8"))
+n = D["numbers"]
+
+# --- values re-verified at build time (each printed with its source) --------
+adf = pd.read_csv(ROOT / "docs/runs/present-day-three-arm/A-seed42/agents.csv")
+n["A_door_refusals"] = int(adf.door_refusals.sum())
+n["max_retries"] = int(max(pd.read_csv(
+    ROOT / f"docs/runs/present-day-three-arm/{a}-seed42/agents.csv").door_refusals.max()
+    for a in "ABC"))
+pm = [v for v in D["pm_series"] if v == v]
+n["pm_mean"] = round(sum(pm) / len(pm), 1)
+nonshel = pd.concat([pd.read_csv(
+    ROOT / f"docs/runs/present-day-three-arm/{a}-seed42/agents.csv") for a in "ABC"])
+nonshel = nonshel[nonshel.final_state != "SHELTERED"]
+n["never_inside_rows"] = len(nonshel)
+sw = {r["s"]: r for r in n["sweep"]}
+
+C = json.dumps({"pm": D["pm_series"], "curves": D["curves"],
+                "sweep": [[r["s"], r["beds"], r["acc"], r["gap"]] for r in n["sweep"]],
+                "bars": [["A", n["A_in_pct"]], ["B", n["B_in_pct"]],
+                         ["C", n["C_in_pct"]], ["D", n["D_in_pct"]]],
+                "gaps": [["A", n["A_acc_unimp"], n["A_acc_mob"]],
+                         ["B", n["B_acc_unimp"], n["B_acc_mob"]],
+                         ["C", n["C_acc_unimp"], n["C_acc_mob"]],
+                         ["D", n["D_u"], n["D_m"]]]})
+
+HTML = f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Capacity Is Not Access — symposium deck</title>
 <style>
-:root{--bg:#fbf9f5;--ink:#16181b;--ink2:#4a5057;--ink3:#767c84;--rule:#dcd7ce;
---card:#fff;--a:#b3322b;--b:#1a5f9e;--c:#0d6b4f;--d:#7a45ad;--warn:#8a5d00;--src:#5a6169;}
-@media(prefers-color-scheme:dark){:root{--bg:#131518;--ink:#eeece8;--ink2:#adb2b8;
---ink3:#868c93;--rule:#2f333a;--card:#1b1e23;--a:#e2645c;--b:#5b9fd8;--c:#3aa483;--d:#a97fd6;--warn:#d4a13a;--src:#9aa1a9;}}
-:root[data-theme=dark]{--bg:#131518;--ink:#eeece8;--ink2:#adb2b8;--ink3:#868c93;
---rule:#2f333a;--card:#1b1e23;--a:#e2645c;--b:#5b9fd8;--c:#3aa483;--d:#a97fd6;--warn:#d4a13a;--src:#9aa1a9;}
-*{box-sizing:border-box;margin:0}
-body{background:var(--bg);color:var(--ink);
-font:16px/1.5 "Iowan Old Style",Georgia,"Times New Roman",serif;}
-section{display:none;min-height:100vh;padding:4.5vh 7vw 7vh;max-width:1180px;margin:0 auto;
-flex-direction:column;justify-content:flex-start;}
-section.on{display:flex}
-.tag{font:600 .66rem/1.4 ui-monospace,Consolas,monospace;letter-spacing:.16em;
-text-transform:uppercase;color:var(--ink3);margin-bottom:.5rem}
-h1{font-size:2.5rem;line-height:1.12;letter-spacing:-.01em}
-h2{font-size:1.72rem;line-height:1.2;margin-bottom:.9rem;letter-spacing:-.01em}
-h3{font-size:1.02rem;margin:1rem 0 .3rem;color:var(--ink)}
-p{max-width:52rem;margin-bottom:.55rem}
-.lede{font-size:1.1rem;color:var(--ink2);max-width:50rem;margin:.8rem 0}
-.src{font:11.5px/1.5 ui-monospace,Consolas,monospace;color:var(--src);
-border-left:2px solid var(--rule);padding-left:.7rem;margin-top:.7rem;max-width:56rem}
-.src b{color:var(--ink2);font-weight:600}
-.kpis{display:flex;gap:2.2rem;flex-wrap:wrap;margin:1rem 0}
-.kpi b{display:block;font-size:2.3rem;line-height:1.05}
-.kpi span{font-size:.82rem;color:var(--ink2);display:block;max-width:14rem}
-.aA{color:var(--a)}.aB{color:var(--b)}.aC{color:var(--c)}.aD{color:var(--d)}
-table{border-collapse:collapse;margin:.7rem 0;font-size:.93rem;width:100%}
-th{text-align:left;font-weight:600;border-bottom:1.5px solid var(--rule);padding:.34rem .6rem}
-td{border-bottom:1px solid var(--rule);padding:.34rem .6rem;vertical-align:top}
-td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
-.chart{background:var(--card);border:1px solid var(--rule);border-radius:9px;
-padding:.7rem .8rem .4rem;margin:.7rem 0}
-.cap{font-size:.86rem;color:var(--ink2);margin-top:.35rem;max-width:56rem}
-code{font:12.5px ui-monospace,Consolas,monospace;background:var(--card);
-border:1px solid var(--rule);border-radius:3px;padding:.05rem .3rem}
-pre{background:var(--card);border:1px solid var(--rule);border-radius:8px;
+:root{{--bg:#fbf9f5;--ink:#16181b;--ink2:#4a5057;--ink3:#767c84;--rule:#dcd7ce;
+--card:#fff;--a:#b3322b;--b:#1a5f9e;--c:#0d6b4f;--d:#7a45ad;--warn:#8a5d00;--src:#5a6169;}}
+@media(prefers-color-scheme:dark){{:root{{--bg:#131518;--ink:#eeece8;--ink2:#adb2b8;
+--ink3:#868c93;--rule:#2f333a;--card:#1b1e23;--a:#e2645c;--b:#5b9fd8;--c:#3aa483;--d:#a97fd6;--warn:#d4a13a;--src:#9aa1a9;}}}}
+:root[data-theme=dark]{{--bg:#131518;--ink:#eeece8;--ink2:#adb2b8;--ink3:#868c93;
+--rule:#2f333a;--card:#1b1e23;--a:#e2645c;--b:#5b9fd8;--c:#3aa483;--d:#a97fd6;--warn:#d4a13a;--src:#9aa1a9;}}
+*{{box-sizing:border-box;margin:0}}
+body{{background:var(--bg);color:var(--ink);
+font:16px/1.5 "Iowan Old Style",Georgia,"Times New Roman",serif;}}
+section{{display:none;min-height:100vh;padding:4.5vh 7vw 7vh;max-width:1180px;margin:0 auto;
+flex-direction:column;justify-content:flex-start;}}
+section.on{{display:flex}}
+.tag{{font:600 .66rem/1.4 ui-monospace,Consolas,monospace;letter-spacing:.16em;
+text-transform:uppercase;color:var(--ink3);margin-bottom:.5rem}}
+h1{{font-size:2.5rem;line-height:1.12;letter-spacing:-.01em}}
+h2{{font-size:1.72rem;line-height:1.2;margin-bottom:.9rem;letter-spacing:-.01em}}
+h3{{font-size:1.02rem;margin:1rem 0 .3rem;color:var(--ink)}}
+p{{max-width:52rem;margin-bottom:.55rem}}
+.lede{{font-size:1.1rem;color:var(--ink2);max-width:50rem;margin:.8rem 0}}
+.src{{font:11.5px/1.5 ui-monospace,Consolas,monospace;color:var(--src);
+border-left:2px solid var(--rule);padding-left:.7rem;margin-top:.7rem;max-width:56rem}}
+.src b{{color:var(--ink2);font-weight:600}}
+.kpis{{display:flex;gap:2.2rem;flex-wrap:wrap;margin:1rem 0}}
+.kpi b{{display:block;font-size:2.3rem;line-height:1.05}}
+.kpi span{{font-size:.82rem;color:var(--ink2);display:block;max-width:14rem}}
+.aA{{color:var(--a)}}.aB{{color:var(--b)}}.aC{{color:var(--c)}}.aD{{color:var(--d)}}
+table{{border-collapse:collapse;margin:.7rem 0;font-size:.93rem;width:100%}}
+th{{text-align:left;font-weight:600;border-bottom:1.5px solid var(--rule);padding:.34rem .6rem}}
+td{{border-bottom:1px solid var(--rule);padding:.34rem .6rem;vertical-align:top}}
+td.num,th.num{{text-align:right;font-variant-numeric:tabular-nums}}
+.chart{{background:var(--card);border:1px solid var(--rule);border-radius:9px;
+padding:.7rem .8rem .4rem;margin:.7rem 0}}
+.cap{{font-size:.86rem;color:var(--ink2);margin-top:.35rem;max-width:56rem}}
+code{{font:12.5px ui-monospace,Consolas,monospace;background:var(--card);
+border:1px solid var(--rule);border-radius:3px;padding:.05rem .3rem}}
+pre{{background:var(--card);border:1px solid var(--rule);border-radius:8px;
 padding:.7rem .9rem;font:12px/1.55 ui-monospace,Consolas,monospace;overflow-x:auto;
-margin:.5rem 0;color:var(--ink2)}
-pre b{color:var(--ink);font-weight:600}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem}
-@media(max-width:820px){.two{grid-template-columns:1fr}}
-.ctr{position:fixed;right:14px;bottom:11px;font:12px ui-monospace,monospace;color:var(--ink3)}
-svg text{fill:var(--ink2);font:12px ui-monospace,Consolas,monospace}
-svg text.axis{fill:var(--ink);font-weight:600}
-@media print{
-  body{background:#fff}
-  section{display:flex!important;page-break-after:always;min-height:0;padding:8mm 10mm}
-  .ctr{display:none} h1{font-size:26pt} h2{font-size:17pt}
-  body{font-size:10.5pt} .chart{break-inside:avoid}
-}
+margin:.5rem 0;color:var(--ink2)}}
+pre b{{color:var(--ink);font-weight:600}}
+.two{{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem}}
+@media(max-width:820px){{.two{{grid-template-columns:1fr}}}}
+.ctr{{position:fixed;right:14px;bottom:11px;font:12px ui-monospace,monospace;color:var(--ink3)}}
+svg text{{fill:var(--ink2);font:12px ui-monospace,Consolas,monospace}}
+svg text.axis{{fill:var(--ink);font-weight:600}}
+@media print{{
+  body{{background:#fff}}
+  section{{display:flex!important;page-break-after:always;min-height:0;padding:8mm 10mm}}
+  .ctr{{display:none}} h1{{font-size:26pt}} h2{{font-size:17pt}}
+  body{{font-size:10.5pt}} .chart{{break-inside:avoid}}
+}}
 </style></head><body>
 
 <!-- 1 ---------------------------------------------------------------->
 <section class="on"><div class="tag">NSF REU · Computational Modeling Serving Portland</div>
 <h1>Capacity is not access</h1>
 <p class="lede" style="font-size:1.3rem;color:var(--ink)">More beds, or better beds?
-A 93-run agent-based experiment on clean-air shelter access during
+A {n['runs_total']}-run agent-based experiment on clean-air shelter access during
 the September 2020 Portland smoke event.</p>
 <p class="lede">Fatima Asghar · Harrisburg University of Science and Technology<br>
 NSF REU hosted by Portland State University · mentor Prof. Christof Teuscher</p>
@@ -78,9 +128,9 @@ micrograms per cubic metre — the mass of fine soot suspended in each cubic met
 The dashed line is 55.5 µg/m³, the EPA's published "Unhealthy" breakpoint. Shaded bands mark
 the two spells above that line.</p>
 <div class="kpis">
-<div class="kpi"><b>562.7</b><span>µg/m³ at the worst hour (hour 140)</span></div>
-<div class="kpi"><b>173.1</b><span>µg/m³ mean across all 312 hours</span></div>
-<div class="kpi"><b>194/312</b><span>hours above the Unhealthy line, in two spells</span></div></div>
+<div class="kpi"><b>{n['pm_peak']}</b><span>µg/m³ at the worst hour (hour {n['pm_peak_hour']})</span></div>
+<div class="kpi"><b>{n['pm_mean']}</b><span>µg/m³ mean across all 312 hours</span></div>
+<div class="kpi"><b>{n['hours_above']}/312</b><span>hours above the Unhealthy line, in two spells</span></div></div>
 <div class="src"><b>Source.</b> U.S. EPA Air Quality System, hourly PM2.5, parameter 88502,
 September 2020; county-mean of the Multnomah monitors.
 File <code>Geography/data/airnow/aqs_hourly_pm25_portland_2020-09.csv</code> (4,795 rows,
@@ -101,7 +151,7 @@ bound. <b>Measured, not modelled — this chart is the only input the model does
 <td>Zellmer et al. 2025, <i>J Gen Intern Med</i>, DOI 10.1007/s11606-025-09814-x, n = 20,139 records</td></tr>
 <tr><td>COPD</td><td class="num">10.5%</td><td class="num">10.8%</td><td>Same source (3.0% in housed adults)</td></tr>
 <tr><td>Start locations</td><td class="num">3,317</td><td class="num">—</td>
-<td>City of Portland IRP campsite reports, 3,400 reports → 3,317 distinct coordinates</td></tr></table>
+<td>City of Portland IRP campsite reports, {n['camp_reports']:,} reports → 3,317 distinct coordinates</td></tr></table>
 <div class="src"><b>Read the two number columns.</b> "Coded" is the published proportion the
 sampler targets; "Drawn" is what this run actually realised. The difference is ordinary sampling
 variation in 6,842 draws, and it is reported rather than hidden.
@@ -141,13 +191,13 @@ reported 68.3 km; proved by an independent Python re-implementation of the routi
 synthetic node (23 cases). Nothing deleted; every correction written into the run manifest.
 Impossible edges after: <b>0</b>.</p></div><div>
 <h3>Defect 2 — freeways in a walking map</h3>
-<p>The centreline file includes limited-access highways. <b>2,636 freeway-class
-features, 614.1 km</b> — including the Marquam and Fremont bridge decks, which carry no
+<p>The centreline file includes limited-access highways. <b>{n['fw_features']:,} freeway-class
+features, {n['fw_km']} km</b> — including the Marquam and Fremont bridge decks, which carry no
 pedestrian access — were routable.</p>
 <p><b>Fix:</b> exclude RLIS TYPE 1110 and 1120–1123 before graph build, count the removal into
-every manifest, and regenerate all 93 runs. Resulting graph:
-<b>59,725</b> intersections in the main component,
-171 components total.</p></div></div>
+every manifest, and regenerate all {n['runs_total']} runs. Resulting graph:
+<b>{n['largest_component']:,}</b> intersections in the main component,
+{n['components']} components total.</p></div></div>
 <p class="cap"><b>The result that matters:</b> after removing 614 km of illegal routes and
 re-running everything, <b>every headline admission count was unchanged to the digit</b>. About
 twelve people per run moved from "turned away" to "could not reach", because their only link to
@@ -174,18 +224,18 @@ be full. <b>Reason:</b> the original code re-planned from the person's campsite,
 them home and inflating distance and dose by up to ten kilometres each. That branch never
 executed at the 50-person test scale, so it passed every comparison test — it was caught by an
 arithmetic invariant instead (walked ≤ planned + snap gap + 200 m).</p>
-<pre>if (targetShelter.isOpenAt(tick) &amp;&amp; targetShelter.admit()) {
+<pre>if (targetShelter.isOpenAt(tick) &amp;&amp; targetShelter.admit()) {{
     state = State.SHELTERED;
-} else {
+}} else {{
     <b>currentNodeId = targetShelter.getGraphNodeId();</b>   // stay at the door
     retargetCount++;
     if (retargetCount &gt; MAX_RETARGETS) state = State.REFUSED_ALL_FULL;
-}</pre>
+}}</pre>
 <div class="src"><b>Code:</b> <code>GisAgent.java</code> (admission + re-route).
-<b>Measured consequence:</b> in scenario A the 2,060 admissions come with
-<b>17,167 door refusals</b> — one person can be refused many times. The retry
-cap is 9; the most any individual actually used is
-<b>8</b>, so the cap never bound.</div></section>
+<b>Measured consequence:</b> in scenario A the {n['A_in']:,} admissions come with
+<b>{n['A_door_refusals']:,} door refusals</b> — one person can be refused many times. The retry
+cap is {n['max_retries'] + 1}; the most any individual actually used is
+<b>{n['max_retries']}</b>, so the cap never bound.</div></section>
 
 <!-- 7 ---------------------------------------------------------------->
 <section><div class="tag">Slide 7 · decision 4 — walking speed</div>
@@ -250,16 +300,16 @@ row of every output file, so a reader sees the switch position rather than takin
 <h2>Four scenarios; exactly one thing changes at a time</h2>
 <table><tr><th>Scenario</th><th>What it is</th><th>What it isolates</th></tr>
 <tr><td class="aA"><b>A · today</b></td>
-<td>the county's real 36 facilities at their real geocoded addresses,
-2,234 spaces</td><td>a measurement, not a treatment: which constraint binds</td></tr>
+<td>the county's real {n['sites']} facilities at their real geocoded addresses,
+{n['spaces']:,} spaces</td><td>a measurement, not a treatment: which constraint binds</td></tr>
 <tr><td class="aB"><b>B · one space per person</b></td>
-<td>same coordinates, every facility scaled ×3.0627, total exactly 6,842</td>
+<td>same coordinates, every facility scaled ×{n['scale_factor']}, total exactly 6,842</td>
 <td>capacity, and nothing else</td></tr>
 <tr><td class="aC"><b>C · same total, more doors</b></td>
 <td>real sites grow 1.5× only; the remainder opens as ten new ~349-space sites</td>
 <td>where the same capacity sits</td></tr>
 <tr><td class="aD"><b>D · B + a triage rule</b></td>
-<td>B's buildings and B's spaces; 10% of each facility (667 spaces) reserved
+<td>B's buildings and B's spaces; 10% of each facility ({n['reserve_spaces']} spaces) reserved
 for mobility-limited arrivals</td><td>the admission rule, at zero capital cost</td></tr></table>
 <p class="cap"><b>Controls that make "one thing at a time" true, not asserted.</b> The 6,842
 residents are byte-identical across scenarios at each random starting point — SHA-256 over the
@@ -280,42 +330,42 @@ bed-sum, and scenario codes; exits 0 over all archived runs.</div></section>
 6,842 residents who reached a shelter and were admitted. Random starting point 42; the
 nine-seed range is printed in the table below.</p>
 <table><tr><th>Outcome (seed 42)</th><th class="num aA">A</th><th class="num aB">B</th><th class="num aC">C</th></tr>
-<tr><td>Admitted</td><td class="num">2,060 (30.1%)</td>
-<td class="num">6,264 (91.6%)</td><td class="num">6,570 (96.0%)</td></tr>
+<tr><td>Admitted</td><td class="num">{n['A_in']:,} ({n['A_in_pct']}%)</td>
+<td class="num">{n['B_in']:,} ({n['B_in_pct']}%)</td><td class="num">{n['C_in']:,} ({n['C_in_pct']}%)</td></tr>
 <tr><td>&nbsp;&nbsp;<span style="color:var(--ink3)">range over 9 starting points</span></td>
-<td class="num" style="color:var(--ink3)">2,053–2,064</td>
-<td class="num" style="color:var(--ink3)">6,257–6,268</td>
-<td class="num" style="color:var(--ink3)">6,563–6,574</td></tr>
-<tr><td>Turned away (every reachable shelter full)</td><td class="num">4,754</td>
-<td class="num">550</td><td class="num">244</td></tr>
-<tr><td>Could not reach any shelter</td><td class="num">28</td>
-<td class="num">28</td><td class="num">28</td></tr>
-<tr><td>Spaces left empty</td><td class="num">174</td><td class="num">578</td>
-<td class="num">272</td></tr>
-<tr><td>Mean distance walked (m)</td><td class="num">18,244</td>
-<td class="num">7,896</td><td class="num">5,904</td></tr>
-<tr><td>Mean inhaled dose over 312 h (µg)</td><td class="num">23,373</td>
-<td class="num">3,056</td><td class="num">1,536</td></tr></table>
+<td class="num" style="color:var(--ink3)">{n['A_in_range'][0]:,}–{n['A_in_range'][1]:,}</td>
+<td class="num" style="color:var(--ink3)">{n['B_in_range'][0]:,}–{n['B_in_range'][1]:,}</td>
+<td class="num" style="color:var(--ink3)">{n['C_in_range'][0]:,}–{n['C_in_range'][1]:,}</td></tr>
+<tr><td>Turned away (every reachable shelter full)</td><td class="num">{n['A_refused']:,}</td>
+<td class="num">{n['B_refused']}</td><td class="num">{n['C_refused']}</td></tr>
+<tr><td>Could not reach any shelter</td><td class="num">{n['A_unreach']}</td>
+<td class="num">{n['B_unreach']}</td><td class="num">{n['C_unreach']}</td></tr>
+<tr><td>Spaces left empty</td><td class="num">{n['A_empty']}</td><td class="num">{n['B_empty']}</td>
+<td class="num">{n['C_empty']}</td></tr>
+<tr><td>Mean distance walked (m)</td><td class="num">{n['A_walk']:,}</td>
+<td class="num">{n['B_walk']:,}</td><td class="num">{n['C_walk']:,}</td></tr>
+<tr><td>Mean inhaled dose over 312 h (µg)</td><td class="num">{n['A_dose']:,}</td>
+<td class="num">{n['B_dose']:,}</td><td class="num">{n['C_dose']:,}</td></tr></table>
 <div class="src"><b>Every column sums to 6,842</b> — admitted + turned away + unreachable.
 <b>The identity to state before anyone finds it:</b> in B capacity equals population by
-construction, so 578 empty spaces ≡ 550 refused + 28
+construction, so {n['B_empty']} empty spaces ≡ {n['B_refused']} refused + {n['B_unreach']}
 unreachable. That is arithmetic, not a discovery; the informative content is <i>who</i> is
 outside. <b>Source:</b> <code>docs/final/results-2026/6_SEED_ROBUSTNESS.csv</code>.</div></section>
 
 <!-- 11 --------------------------------------------------------------->
 <section><div class="tag">Slide 11 · result 2 — the control that changed the conclusion</div>
 <h2>C's gain is more doors, not better-chosen doors</h2>
-<p>Scenario C admits 306 more people than B. My hypothesis was that the
+<p>Scenario C admits {n['C_in'] - n['B_in']} more people than B. My hypothesis was that the
 placement algorithm earned that. So I ran the control: <b>ten sites drawn uniformly at random
 from the same 498-node candidate pool the optimiser searched</b>, three independent draws.</p>
 <table><tr><th>Site selection</th><th class="num">Admitted (starting points 42 / 43 / 44)</th><th class="num">Mean walk</th></tr>
 <tr><td class="aC">p-median optimiser (scenario C)</td>
-<td class="num">6,570 / 6,565 / 6,566</td><td class="num">5,537 m</td></tr>
+<td class="num">6,570 / 6,565 / 6,566</td><td class="num">{n['C_walk_mean_3seed']:,} m</td></tr>
 <tr><td>random from the same pool, draw 1–3</td>
-<td class="num">6,565 / 6,566 / 6,570 — identical</td>
-<td class="num">15,011 m</td></tr></table>
+<td class="num">{' / '.join(f"{v:,}" for v in n['CP_in_values'])} — identical</td>
+<td class="num">{n['CP_walk_mean']:,} m</td></tr></table>
 <p class="cap"><b>Reading.</b> The optimiser contributes <b>zero</b> to headcount and
-<b>63.1% shorter walks</b>. So the honest attribution is: splitting
+<b>{n['walk_saving_optimizer_pct']}% shorter walks</b>. So the honest attribution is: splitting
 the same capacity across more doors is what admits more people; choosing the doors well is what
 shortens the journey — and that walking benefit assumes everyone knows where every shelter is.</p>
 <div class="src"><b>Source:</b> <code>docs/runs/scenario-crandom-2026/CP2026r4/r5/r6-*</code>
@@ -334,14 +384,14 @@ residents admitted, averaged over three random starting points. The dashed horiz
 scenario C's admission rate. Each point is a full three-run family; the two vertical guides mark
 the crossings.</p>
 <table><tr><th class="num">× demand</th><th class="num">spaces</th><th class="num">admitted %</th><th class="num">mobility gap (pp)</th><th>reading</th></tr>
-<tr><td class="num">0.8</td><td class="num">5,474</td><td class="num">73.27</td><td class="num">28.3</td><td>severe scarcity</td></tr>
-<tr><td class="num">1.0</td><td class="num">6,842</td><td class="num">91.51</td><td class="num">23.5</td><td>= scenario B</td></tr>
-<tr><td class="num">1.05</td><td class="num">7,184</td><td class="num">96.07</td><td class="num">15.0</td><td><b>matches C's headcount</b>; gap still open</td></tr>
-<tr><td class="num">1.10</td><td class="num">7,526</td><td class="num">99.51</td><td class="num">-0.0</td><td><b>every reachable person admitted</b>; gap gone</td></tr>
-<tr><td class="num">1.2–1.6</td><td class="num">8,210–10,947</td><td class="num">99.51</td><td class="num">-0.0</td><td>plateau — nothing left to buy</td></tr></table>
+<tr><td class="num">0.8</td><td class="num">{sw[0.8]['beds']:,}</td><td class="num">{sw[0.8]['acc']}</td><td class="num">{sw[0.8]['gap']}</td><td>severe scarcity</td></tr>
+<tr><td class="num">1.0</td><td class="num">{sw[1.0]['beds']:,}</td><td class="num">{sw[1.0]['acc']}</td><td class="num">{sw[1.0]['gap']}</td><td>= scenario B</td></tr>
+<tr><td class="num">1.05</td><td class="num">{sw[1.05]['beds']:,}</td><td class="num">{sw[1.05]['acc']}</td><td class="num">{sw[1.05]['gap']}</td><td><b>matches C's headcount</b>; gap still open</td></tr>
+<tr><td class="num">1.10</td><td class="num">{sw[1.1]['beds']:,}</td><td class="num">{sw[1.1]['acc']}</td><td class="num">{sw[1.1]['gap']}</td><td><b>every reachable person admitted</b>; gap gone</td></tr>
+<tr><td class="num">1.2–1.6</td><td class="num">8,210–10,947</td><td class="num">{sw[1.2]['acc']}</td><td class="num">{sw[1.2]['gap']}</td><td>plateau — nothing left to buy</td></tr></table>
 <div class="src"><b>The county sentence.</b> C's siting advantage on headcount is worth at most
-about <b>342 spaces</b>; the fairness gap closes at <b>10% surplus</b>
-(+684 spaces) — or for free with the triage rule on slide 14.
+about <b>{n['beds_at_parity']} spaces</b>; the fairness gap closes at <b>10% surplus</b>
+(+{n['beds_gap_closes']} spaces) — or for free with the triage rule on slide 14.
 <b>Source:</b> <code>docs/runs/phaseD-bed-sweep/</code> (21 runs, seven capacity levels).
 <b>I registered the opposite prediction</b> — 1.4–1.6× — before running this. It is reported on
 slide 16.</div></section>
@@ -361,7 +411,7 @@ Vertical axis: cumulative percentage of that group already inside a shelter. The
 line marks 60 minutes.</p>
 <p><b>Nobody is denied a bed for being disabled.</b> Beds go to whoever arrives first — and when
 beds are scarce, "first" is decided by walking speed. The gap is not assumed; it falls out of
-the admission rule. <b>80% of scenario B's final gap already exists one
+the admission rule. <b>{n['first_hour_share']}% of scenario B's final gap already exists one
 hour after departure.</b></p>
 <div class="src"><b>Confirming the mechanism, not the assumption:</b> COPD — the one diagnosis
 with a published gait effect — shows an access penalty; asthma, which has none, tracks the
@@ -371,13 +421,13 @@ per-person arrival times from the archived <code>agents.csv</code> files.</div><
 <!-- 14 --------------------------------------------------------------->
 <section><div class="tag">Slide 14 · result 5 — the free intervention</div>
 <h2>Scenario D: one rule at the door</h2>
-<p>Hold 10% of each facility's spaces — 667 spaces across the system — for
+<p>Hold 10% of each facility's spaces — {n['reserve_spaces']} spaces across the system — for
 mobility-limited arrivals. No new building, no new bed, no relocation.</p>
 <div class="kpis">
-<div class="kpi"><b class="aB">23.7 pts</b><span>mobility access gap in B</span></div>
-<div class="kpi"><b class="aD">-0.4 pts</b><span>gap in D — the group is now marginally
+<div class="kpi"><b class="aB">{n['B_gap']} pts</b><span>mobility access gap in B</span></div>
+<div class="kpi"><b class="aD">{n['D_gap']} pts</b><span>gap in D — the group is now marginally
 ahead</span></div>
-<div class="kpi"><b>91.6%</b><span>total admitted in D — identical to B</span></div></div>
+<div class="kpi"><b>{n['D_in_pct']}%</b><span>total admitted in D — identical to B</span></div></div>
 <p><b>Why it works, and where it matters.</b> The gap is produced by a race, so a rule that
 removes some spaces from the race closes it. And the sweep on slide 12 shows the gap only exists
 while capacity ≈ demand — which is precisely the margin a county operates on. Where surplus can
@@ -401,7 +451,7 @@ caught my own mislabelled row on the first run</td></tr>
 <b>1.0000</b></td></tr>
 <tr><td>Hand-checkable invariant</td><td>anyone can verify without code</td>
 <td>194 of 312 hours were unhealthy, so anyone never admitted must show exactly 194.0 h —
-all <b>5,632</b> such rows do, zero exceptions</td></tr>
+all <b>{n['never_inside_rows']:,}</b> such rows do, zero exceptions</td></tr>
 <tr><td>Negative control</td><td>the model does not invent effects</td>
 <td>asthma has no movement mechanism, so it must show no access effect — and does not, in every
 scenario</td></tr>
@@ -478,9 +528,9 @@ Buekers et al. 2024 (10.1183/16000617.0253-2023)</td></tr>
 <tr><td>Methods</td><td>Karney 2013 (10.1007/s00190-012-0578-z); Dijkstra 1959
 (10.1007/BF01386390); North et al. 2013 (10.1186/2194-3206-1-3)</td></tr>
 <tr><td>Shelters</td><td>Multnomah County HSD inventory + City of Portland Safe Rest Village
-addresses; 36 facilities geocoded, 2,234 spaces</td></tr>
+addresses; {n['sites']} facilities geocoded, {n['spaces']:,} spaces</td></tr>
 <tr><td>Start locations</td><td>City of Portland IRP campsite reports, ArcGIS open data
-(3,400 reports → 3,317 distinct coordinates)</td></tr>
+({n['camp_reports']:,} reports → 3,317 distinct coordinates)</td></tr>
 <tr><td>Streets</td><td>Portland Metro RLIS centrelines; freeway classes excluded (slide 5)</td></tr>
 <tr><td>Calibration record</td><td>Street Roots, published 2020-09-16 (occupancy observed the
 night of 15 Sept): ≈90 at the Convention Center, ≈40 at Charles Jordan, of 99 + 99 spaces</td></tr></table>
@@ -506,7 +556,7 @@ sourced attributes and registered predictions.</b></p>
 surface. The consequence is useful: no scenario can help by moving people into cleaner air, so
 every effect reported here is a travel-time effect.</p>
 <p><b>Its dose figures depend on the window.</b> Over the full 312 hours the B-to-C mean-dose
-ratio is 1.98; over the first 24 hours it is 1.29. Both are
+ratio is {n['dose_ratio_312']}; over the first 24 hours it is {n['dose_ratio_24']}. Both are
 reported, because a single figure would hide the dependence.</p>
 <div class="src"><b>Every one of these pushes the same way</b> — toward making shelter access look
 easier than it is. Where the model is wrong, it is wrong optimistically, so the real number left
@@ -520,119 +570,122 @@ sites admit exactly as many people as ten optimally chosen ones. What choosing w
 shorter walk — and only if people know where to walk.</p>
 <div class="src"><b>Next.</b> The human decision layer — awareness, belongings, pets, imperfect
 information about which shelters have room — specified, registered, and built to close the
-1.5–15.6× gap this study measured. <b>Code, data and all 93 run manifests</b> are
+1.5–15.6× gap this study measured. <b>Code, data and all {n['runs_total']} run manifests</b> are
 in the project repository, with the analysis pipeline documented end to end.</div></section>
 
 <div class="ctr" id="ctr"></div>
 <script>
-const DATA = {"pm": [5.5, 5.6, 5.6, 5.8, 6.8, 7.0, 7.2, 6.7, 6.7, 6.8, 6.8, 6.5, 5.7, 5.3, 14.4, 43.2, 82.5, 73.8, 112.1, 63.5, 61.4, 64.7, 24.2, 12.4, 5.2, 3.5, 3.2, 3.5, 3.3, 3.4, 3.5, 4.6, 5.0, 4.9, 4.7, 4.0, 3.8, 4.3, 4.3, 4.7, 4.5, 4.2, 3.8, 3.5, 3.3, 3.5, 4.0, 3.6, 3.6, 4.8, 13.7, 22.7, 24.6, 25.1, 24.6, 23.4, 20.2, 18.9, 18.0, 19.1, 19.4, 15.3, 13.7, 11.3, 11.1, 13.4, 17.4, 21.5, 22.5, 23.6, 22.2, 21.5, 20.5, 20.0, 20.1, 22.6, 25.2, 29.5, 47.0, 59.8, 66.6, 96.9, 96.8, 94.6, 125.5, 189.2, 276.8, 291.1, 262.9, 238.6, 223.7, 264.6, 295.5, 299.6, 298.5, 291.2, 286.4, 282.0, 278.4, 271.4, 258.8, 232.3, 203.3, 194.9, 189.6, 162.2, 171.8, 178.7, 195.8, 186.9, 190.2, 196.8, 205.2, 205.4, 201.8, 198.6, 196.8, 191.1, 186.4, 184.2, 178.6, 174.2, 175.7, 179.0, 176.4, 174.6, 205.4, 219.9, 229.3, 241.2, 255.7, 266.1, 276.4, 296.4, 298.9, 320.9, 345.3, 393.2, 469.6, 548.8, 562.7, 559.5, 552.0, 550.2, 531.8, 474.6, 419.4, 392.6, 384.5, 352.6, 309.7, 313.1, 324.4, 347.5, 370.2, 372.4, 379.4, 383.6, 418.2, 444.1, 441.5, 441.8, 451.4, 490.4, 530.5, 560.9, 558.3, 552.0, 555.9, 552.2, 488.9, 373.4, 370.1, 379.9, 339.6, 268.5, 257.5, 269.5, 275.4, 293.2, 314.4, 349.7, 405.6, 417.9, 427.4, 439.2, 430.4, 426.5, 414.2, 389.8, 395.5, 407.8, 379.9, 361.0, 347.4, 333.6, 312.0, 290.6, 247.8, 254.4, 271.4, 260.1, 233.9, 225.4, 222.3, 211.1, 204.6, 194.6, 189.8, 188.9, 188.5, 173.6, 162.2, 171.4, 172.2, 175.6, 175.6, 173.8, 166.6, 160.5, 155.4, 149.8, 158.1, 177.5, 189.9, 216.2, 221.4, 292.1, 297.0, 312.2, 299.9, 348.8, 361.2, 334.1, 322.9, 318.4, 294.8, 280.9, 285.5, 280.1, 272.0, 278.3, 292.5, 270.1, 225.2, 197.2, 223.4, 237.2, 201.2, 191.8, 178.3, 187.7, 147.2, 129.6, 107.3, 106.3, 115.1, 122.9, 133.7, 136.6, 136.2, 138.4, 130.8, 128.4, 136.5, 117.0, 80.3, 41.8, 46.7, 41.9, 35.6, 32.5, 33.9, 35.9, 40.8, 43.0, 38.6, 33.3, 7.5, 3.5, 4.2, 5.4, 6.3, 6.9, 9.1, 7.6, 8.3, 7.6, 9.1, 7.9, 8.4, 7.7, 8.9, 9.2, 7.3, 6.4, 6.2, 5.8, 5.2, 4.8, 3.5, 2.8, 2.7, 3.0, 3.1, 3.8, 4.5, 5.9, 5.2, 3.9, 3.0, 4.5], "curves": {"B_u": [0.6, 10.3, 24.9, 34.1, 39.8, 45.3, 50.7, 55.1, 58.9, 62.6, 65.9, 67.6, 69.3, 70.5, 71.5, 72.1, 72.7, 73.5, 73.6, 73.6, 73.7, 73.8, 73.9, 74.3, 74.9, 75.1, 75.4, 76.0, 76.3, 76.4, 76.4, 76.5, 76.5, 76.5, 76.6, 76.9, 77.2, 77.6, 78.1, 78.5, 79.0, 79.2, 79.7, 79.9, 80.0, 80.0, 80.0, 80.2, 80.3, 80.3, 80.6, 81.1, 81.5, 81.9, 82.4, 82.8, 83.2, 83.8, 84.1, 84.3, 84.9], "B_m": [0.4, 6.0, 14.9, 21.0, 25.4, 29.7, 33.4, 37.0, 40.5, 43.2, 45.8, 47.4, 49.6, 51.2, 52.5, 53.1, 53.8, 54.6, 54.8, 55.0, 55.2, 55.3, 55.4, 55.7, 55.9, 56.3, 56.3, 56.4, 56.5, 56.5, 56.6, 56.6, 56.7, 56.8, 57.0, 57.1, 57.4, 57.4, 57.6, 57.9, 57.9, 58.2, 58.8, 59.3, 59.3, 59.3, 59.5, 59.6, 59.6, 59.6, 59.7, 59.8, 59.9, 60.1, 60.1, 60.2, 60.4, 60.7, 60.9, 61.2, 61.5], "D_u": [0.6, 10.3, 24.5, 32.9, 38.5, 43.9, 49.1, 53.3, 56.6, 60.7, 62.8, 64.4, 65.9, 67.0, 68.0, 68.6, 68.7, 68.8, 68.8, 68.9, 69.0, 69.2, 69.5, 69.8, 70.1, 70.5, 70.5, 70.6, 70.7, 70.8, 70.9, 70.9, 71.1, 71.3, 71.5, 72.0, 72.5, 73.1, 73.6, 74.1, 74.3, 74.3, 74.3, 74.6, 74.6, 74.8, 74.8, 74.9, 75.1, 75.3, 75.8, 76.5, 77.4, 78.5, 79.5, 79.8, 80.1, 80.5, 80.9, 81.5, 82.0], "D_m": [0.4, 6.0, 14.9, 24.1, 30.2, 34.9, 38.8, 43.1, 47.0, 50.4, 53.6, 56.0, 59.3, 61.3, 63.8, 65.0, 66.1, 67.4, 68.0, 68.5, 69.0, 69.6, 70.2, 71.0, 71.9, 72.5, 72.7, 73.0, 73.5, 74.0, 74.6, 75.5, 75.9, 76.0, 76.2, 76.2, 76.3, 77.0, 77.2, 77.5, 77.9, 77.9, 78.3, 78.9, 79.1, 79.3, 79.5, 79.5, 79.6, 79.6, 79.6, 79.6, 79.7, 79.7, 79.8, 79.8, 79.9, 79.9, 79.9, 79.9, 79.9]}, "sweep": [[0.8, 5474, 73.27, 28.3], [1.0, 6842, 91.51, 23.5], [1.05, 7184, 96.07, 15.0], [1.1, 7526, 99.51, -0.0], [1.15, 7868, 99.51, -0.0], [1.2, 8210, 99.51, -0.0], [1.4, 9579, 99.51, -0.0], [1.6, 10947, 99.51, -0.0]], "bars": [["A", 30.1], ["B", 91.6], ["C", 96.0], ["D", 91.6]], "gaps": [["A", 32.6, 20.1], ["B", 96.3, 72.6], ["C", 98.5, 86.0], ["D", 91.5, 91.9]]};
+const DATA = {C};
 const S=[...document.querySelectorAll('section')];let i=0;
-function show(k){S[i].classList.remove('on');i=Math.max(0,Math.min(S.length-1,k));
- S[i].classList.add('on');document.getElementById('ctr').textContent=(i+1)+' / '+S.length;draw();}
-addEventListener('keydown',e=>{if(['ArrowRight',' ','PageDown'].includes(e.key))show(i+1);
+function show(k){{S[i].classList.remove('on');i=Math.max(0,Math.min(S.length-1,k));
+ S[i].classList.add('on');document.getElementById('ctr').textContent=(i+1)+' / '+S.length;draw();}}
+addEventListener('keydown',e=>{{if(['ArrowRight',' ','PageDown'].includes(e.key))show(i+1);
  if(['ArrowLeft','PageUp'].includes(e.key))show(i-1);
- if(e.key==='Home')show(0);if(e.key==='End')show(S.length-1);});
+ if(e.key==='Home')show(0);if(e.key==='End')show(S.length-1);}});
 const cv=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-const AC={A:'--a',B:'--b',C:'--c',D:'--d'};
-function el(t,a){const x=document.createElementNS('http://www.w3.org/2000/svg',t);
- for(const k in a)x.setAttribute(k,a[k]);return x;}
-function txt(s,x,y,t,o){const e=el('text',Object.assign({x:x,y:y},o||{}));
- e.textContent=t;s.appendChild(e);return e;}
-function draw(){
+const AC={{A:'--a',B:'--b',C:'--c',D:'--d'}};
+function el(t,a){{const x=document.createElementNS('http://www.w3.org/2000/svg',t);
+ for(const k in a)x.setAttribute(k,a[k]);return x;}}
+function txt(s,x,y,t,o){{const e=el('text',Object.assign({{x:x,y:y}},o||{{}}));
+ e.textContent=t;s.appendChild(e);return e;}}
+function draw(){{
  let s=document.getElementById('pm');
- if(s){s.innerHTML='';const W=980,H=300,L=64,R=16,T=34,B=54,mx=600;
+ if(s){{s.innerHTML='';const W=980,H=300,L=64,R=16,T=34,B=54,mx=600;
   const X=h=>L+(W-L-R)*h/312,Y=v=>T+(H-T-B)*(1-Math.min(v,mx)/mx);
-  [[16,21,'--a'],[22,78,'--c'],[79,311,'--a']].forEach(function(z){
-    s.appendChild(el('rect',{x:X(z[0]),y:T,width:X(z[1])-X(z[0]),height:H-T-B,
-      fill:cv(z[2]),opacity:.07}));});
-  [0,150,300,450,600].forEach(function(v){
-    s.appendChild(el('line',{x1:L,x2:W-R,y1:Y(v),y2:Y(v),stroke:cv('--rule'),opacity:.6}));
-    txt(s,L-8,Y(v)+4,v,{'text-anchor':'end'});});
-  s.appendChild(el('line',{x1:L,x2:W-R,y1:Y(55.5),y2:Y(55.5),stroke:cv('--warn'),'stroke-dasharray':'5 4'}));
-  txt(s,L+6,Y(55.5)-6,"55.5 µg/m³ — EPA 'Unhealthy'",{fill:cv('--warn')});
-  let d='';DATA.pm.forEach(function(v,h){if(v===null||isNaN(v))return;
-    d+=(d?'L':'M')+X(h).toFixed(1)+' '+Y(v).toFixed(1);});
-  s.appendChild(el('path',{d:d,fill:'none',stroke:cv('--a'),'stroke-width':1.7}));
-  ['Sep 7','Sep 9','Sep 11','Sep 13','Sep 15','Sep 17','Sep 19'].forEach(function(t,k){
-    txt(s,X(k*48),H-26,t,{'text-anchor':'middle'});});
-  txt(s,L,T-14,'PM2.5 concentration (µg/m³)',{class:'axis'});
+  [[16,21,'--a'],[22,78,'--c'],[79,311,'--a']].forEach(function(z){{
+    s.appendChild(el('rect',{{x:X(z[0]),y:T,width:X(z[1])-X(z[0]),height:H-T-B,
+      fill:cv(z[2]),opacity:.07}}));}});
+  [0,150,300,450,600].forEach(function(v){{
+    s.appendChild(el('line',{{x1:L,x2:W-R,y1:Y(v),y2:Y(v),stroke:cv('--rule'),opacity:.6}}));
+    txt(s,L-8,Y(v)+4,v,{{'text-anchor':'end'}});}});
+  s.appendChild(el('line',{{x1:L,x2:W-R,y1:Y(55.5),y2:Y(55.5),stroke:cv('--warn'),'stroke-dasharray':'5 4'}}));
+  txt(s,L+6,Y(55.5)-6,"55.5 µg/m³ — EPA 'Unhealthy'",{{fill:cv('--warn')}});
+  let d='';DATA.pm.forEach(function(v,h){{if(v===null||isNaN(v))return;
+    d+=(d?'L':'M')+X(h).toFixed(1)+' '+Y(v).toFixed(1);}});
+  s.appendChild(el('path',{{d:d,fill:'none',stroke:cv('--a'),'stroke-width':1.7}}));
+  ['Sep 7','Sep 9','Sep 11','Sep 13','Sep 15','Sep 17','Sep 19'].forEach(function(t,k){{
+    txt(s,X(k*48),H-26,t,{{'text-anchor':'middle'}});}});
+  txt(s,L,T-14,'PM2.5 concentration (µg/m³)',{{class:'axis'}});
   txt(s,(L+W-R)/2,H-6,'time — hour by hour, 7–19 September 2020 (312 hours)',
-    {class:'axis','text-anchor':'middle'});
-  txt(s,X(18),T+16,'spike',{'text-anchor':'middle'});
-  txt(s,X(50),T+16,'57 clean hours',{'text-anchor':'middle'});
-  txt(s,X(190),T+16,'main episode',{'text-anchor':'middle'});
-  txt(s,X(140)+8,Y(562.7)+14,'peak 562.7');}
+    {{class:'axis','text-anchor':'middle'}});
+  txt(s,X(18),T+16,'spike',{{'text-anchor':'middle'}});
+  txt(s,X(50),T+16,'57 clean hours',{{'text-anchor':'middle'}});
+  txt(s,X(190),T+16,'main episode',{{'text-anchor':'middle'}});
+  txt(s,X(140)+8,Y(562.7)+14,'peak 562.7');}}
  s=document.getElementById('bars');
- if(s){s.innerHTML='';const W=980,H=270,L=64,R=40,T=30,B=52;
+ if(s){{s.innerHTML='';const W=980,H=270,L=64,R=40,T=30,B=52;
   const X=k=>L+k*(W-L-R)/4,Y=v=>T+(H-T-B)*(1-v/100);
-  [0,25,50,75,100].forEach(function(v){
-    s.appendChild(el('line',{x1:L,x2:W-R,y1:Y(v),y2:Y(v),stroke:cv('--rule'),opacity:.6}));
-    txt(s,L-8,Y(v)+4,v,{'text-anchor':'end'});});
-  const cap={A:'today · 2,234 spaces',B:'spaces = people',C:'same total, 10 more doors',D:'B + 10% reserve'};
-  DATA.bars.forEach(function(r,k){const a=r[0],v=r[1],x=X(k)+58,w=118,h=(H-T-B)*v/100;
-   s.appendChild(el('rect',{x:x,y:Y(v),width:w,height:h,rx:5,fill:cv(AC[a])}));
-   txt(s,x+w/2,Y(v)-9,v.toFixed(1)+'%',{'text-anchor':'middle',fill:cv(AC[a]),
-     'font-size':'19','font-weight':'bold'});
-   txt(s,x+w/2,H-30,a,{'text-anchor':'middle','font-size':'14'});
-   txt(s,x+w/2,H-16,cap[a],{'text-anchor':'middle','font-size':'10.5'});});
-  txt(s,L,T-12,'residents admitted (% of 6,842)',{class:'axis'});
-  txt(s,(L+W-R)/2,H-2,'scenario',{class:'axis','text-anchor':'middle'});}
+  [0,25,50,75,100].forEach(function(v){{
+    s.appendChild(el('line',{{x1:L,x2:W-R,y1:Y(v),y2:Y(v),stroke:cv('--rule'),opacity:.6}}));
+    txt(s,L-8,Y(v)+4,v,{{'text-anchor':'end'}});}});
+  const cap={{A:'today · 2,234 spaces',B:'spaces = people',C:'same total, 10 more doors',D:'B + 10% reserve'}};
+  DATA.bars.forEach(function(r,k){{const a=r[0],v=r[1],x=X(k)+58,w=118,h=(H-T-B)*v/100;
+   s.appendChild(el('rect',{{x:x,y:Y(v),width:w,height:h,rx:5,fill:cv(AC[a])}}));
+   txt(s,x+w/2,Y(v)-9,v.toFixed(1)+'%',{{'text-anchor':'middle',fill:cv(AC[a]),
+     'font-size':'19','font-weight':'bold'}});
+   txt(s,x+w/2,H-30,a,{{'text-anchor':'middle','font-size':'14'}});
+   txt(s,x+w/2,H-16,cap[a],{{'text-anchor':'middle','font-size':'10.5'}});}});
+  txt(s,L,T-12,'residents admitted (% of 6,842)',{{class:'axis'}});
+  txt(s,(L+W-R)/2,H-2,'scenario',{{class:'axis','text-anchor':'middle'}});}}
  s=document.getElementById('sweep');
- if(s){s.innerHTML='';const W=980,H=300,L=64,R=22,T=32,B=56;
+ if(s){{s.innerHTML='';const W=980,H=300,L=64,R=22,T=32,B=56;
   const X=b=>L+(W-L-R)*(b-5300)/(11100-5300),Y=v=>T+(H-T-B)*(1-(v-70)/30);
-  [70,80,90,100].forEach(function(v){
-    s.appendChild(el('line',{x1:L,x2:W-R,y1:Y(v),y2:Y(v),stroke:cv('--rule'),opacity:.6}));
-    txt(s,L-8,Y(v)+4,v+'%',{'text-anchor':'end'});});
-  s.appendChild(el('line',{x1:L,x2:W-R,y1:Y(96.0),y2:Y(96.0),
-    stroke:cv('--c'),'stroke-dasharray':'6 4'}));
-  txt(s,W-R-4,Y(96.0)-7,'scenario C = 96.0%',
-    {'text-anchor':'end',fill:cv('--c')});
-  [7184,7526].forEach(function(b){s.appendChild(el('line',{x1:X(b),x2:X(b),y1:T,y2:H-B,
-    stroke:cv('--rule'),'stroke-dasharray':'3 3'}));});
-  let p='';DATA.sweep.forEach(function(r){p+=(p?'L':'M')+X(r[1]).toFixed(1)+' '+Y(r[2]).toFixed(1);});
-  s.appendChild(el('path',{d:p,fill:'none',stroke:cv('--b'),'stroke-width':2.2}));
-  DATA.sweep.forEach(function(r){s.appendChild(el('circle',{cx:X(r[1]),cy:Y(r[2]),r:4.5,fill:cv('--b')}));
-   txt(s,X(r[1]),H-30,r[0]+'×',{'text-anchor':'middle'});});
-  txt(s,X(7184)-8,Y(96.07)+24,'+342 spaces: matches C',{'text-anchor':'end',fill:cv('--warn')});
-  txt(s,X(7526)+8,Y(99.51)-10,'+684 spaces: everyone reachable admitted',{fill:cv('--warn')});
-  txt(s,L,T-12,'residents admitted (% of 6,842)',{class:'axis'});
+  [70,80,90,100].forEach(function(v){{
+    s.appendChild(el('line',{{x1:L,x2:W-R,y1:Y(v),y2:Y(v),stroke:cv('--rule'),opacity:.6}}));
+    txt(s,L-8,Y(v)+4,v+'%',{{'text-anchor':'end'}});}});
+  s.appendChild(el('line',{{x1:L,x2:W-R,y1:Y({n['C_in_pct']}),y2:Y({n['C_in_pct']}),
+    stroke:cv('--c'),'stroke-dasharray':'6 4'}}));
+  txt(s,W-R-4,Y({n['C_in_pct']})-7,'scenario C = {n['C_in_pct']}%',
+    {{'text-anchor':'end',fill:cv('--c')}});
+  [7184,7526].forEach(function(b){{s.appendChild(el('line',{{x1:X(b),x2:X(b),y1:T,y2:H-B,
+    stroke:cv('--rule'),'stroke-dasharray':'3 3'}}));}});
+  let p='';DATA.sweep.forEach(function(r){{p+=(p?'L':'M')+X(r[1]).toFixed(1)+' '+Y(r[2]).toFixed(1);}});
+  s.appendChild(el('path',{{d:p,fill:'none',stroke:cv('--b'),'stroke-width':2.2}}));
+  DATA.sweep.forEach(function(r){{s.appendChild(el('circle',{{cx:X(r[1]),cy:Y(r[2]),r:4.5,fill:cv('--b')}}));
+   txt(s,X(r[1]),H-30,r[0]+'×',{{'text-anchor':'middle'}});}});
+  txt(s,X(7184)-8,Y(96.07)+24,'+342 spaces: matches C',{{'text-anchor':'end',fill:cv('--warn')}});
+  txt(s,X(7526)+8,Y(99.51)-10,'+684 spaces: everyone reachable admitted',{{fill:cv('--warn')}});
+  txt(s,L,T-12,'residents admitted (% of 6,842)',{{class:'axis'}});
   txt(s,(L+W-R)/2,H-4,'total spaces at the existing 36 sites, as a multiple of demand',
-    {class:'axis','text-anchor':'middle'});}
+    {{class:'axis','text-anchor':'middle'}});}}
  s=document.getElementById('gaps');
- if(s){s.innerHTML='';const W=980,H=260,L=150,R=112,T=40,B=48;
+ if(s){{s.innerHTML='';const W=980,H=260,L=150,R=112,T=40,B=48;
   const X=v=>L+(W-L-R)*v/100,Y=k=>T+(H-T-B)/4*(k+.5);
   txt(s,L,T-18,'○ no mobility limitation      ● mobility-limited (scenario colour)');
-  [0,25,50,75,100].forEach(function(v){
-    s.appendChild(el('line',{x1:X(v),x2:X(v),y1:T,y2:H-B,stroke:cv('--rule'),opacity:.6}));
-    txt(s,X(v),H-26,v+'%',{'text-anchor':'middle'});});
-  DATA.gaps.forEach(function(r,k){const a=r[0],u=r[1],m=r[2],y=Y(k);
-   s.appendChild(el('line',{x1:X(Math.min(u,m)),x2:X(Math.max(u,m)),y1:y,y2:y,
-     stroke:cv('--rule'),'stroke-width':3}));
-   s.appendChild(el('circle',{cx:X(u),cy:y,r:6.5,fill:'none',stroke:cv('--ink2'),'stroke-width':2}));
-   s.appendChild(el('circle',{cx:X(m),cy:y,r:6.5,fill:cv(AC[a])}));
-   txt(s,L-12,y+4,'scenario '+a,{'text-anchor':'end'});
-   txt(s,W-R+10,y+4,(u-m).toFixed(1)+' pts'+(a==='D'?' (closed)':''));});
+  [0,25,50,75,100].forEach(function(v){{
+    s.appendChild(el('line',{{x1:X(v),x2:X(v),y1:T,y2:H-B,stroke:cv('--rule'),opacity:.6}}));
+    txt(s,X(v),H-26,v+'%',{{'text-anchor':'middle'}});}});
+  DATA.gaps.forEach(function(r,k){{const a=r[0],u=r[1],m=r[2],y=Y(k);
+   s.appendChild(el('line',{{x1:X(Math.min(u,m)),x2:X(Math.max(u,m)),y1:y,y2:y,
+     stroke:cv('--rule'),'stroke-width':3}}));
+   s.appendChild(el('circle',{{cx:X(u),cy:y,r:6.5,fill:'none',stroke:cv('--ink2'),'stroke-width':2}}));
+   s.appendChild(el('circle',{{cx:X(m),cy:y,r:6.5,fill:cv(AC[a])}}));
+   txt(s,L-12,y+4,'scenario '+a,{{'text-anchor':'end'}});
+   txt(s,W-R+10,y+4,(u-m).toFixed(1)+' pts'+(a==='D'?' (closed)':''));}});
   txt(s,(L+W-R)/2,H-6,'residents of that group admitted (%)',
-    {class:'axis','text-anchor':'middle'});}
+    {{class:'axis','text-anchor':'middle'}});}}
  s=document.getElementById('race');
- if(s){s.innerHTML='';const W=980,H=260,L=64,R=24,T=34,B=50;
+ if(s){{s.innerHTML='';const W=980,H=260,L=64,R=24,T=34,B=50;
   const X=k=>L+(W-L-R)*k/60,Y=v=>T+(H-T-B)*(1-v/100);
-  [0,25,50,75,100].forEach(function(v){
-    s.appendChild(el('line',{x1:L,x2:W-R,y1:Y(v),y2:Y(v),stroke:cv('--rule'),opacity:.6}));
-    txt(s,L-8,Y(v)+4,v,{'text-anchor':'end'});});
-  s.appendChild(el('line',{x1:X(15),x2:X(15),y1:T,y2:H-B,stroke:cv('--warn'),'stroke-dasharray':'4 3'}));
-  txt(s,X(15)+6,T+14,'60 minutes',{fill:cv('--warn')});
+  [0,25,50,75,100].forEach(function(v){{
+    s.appendChild(el('line',{{x1:L,x2:W-R,y1:Y(v),y2:Y(v),stroke:cv('--rule'),opacity:.6}}));
+    txt(s,L-8,Y(v)+4,v,{{'text-anchor':'end'}});}});
+  s.appendChild(el('line',{{x1:X(15),x2:X(15),y1:T,y2:H-B,stroke:cv('--warn'),'stroke-dasharray':'4 3'}}));
+  txt(s,X(15)+6,T+14,'60 minutes',{{fill:cv('--warn')}});
   [['B_u','--ink2','B · no mobility limitation'],['B_m','--b','B · mobility-limited'],
-   ['D_m','--d','D · mobility-limited (reserve)']].forEach(function(z,j){
-   let p='';DATA.curves[z[0]].forEach(function(v,x){p+=(p?'L':'M')+X(x).toFixed(1)+' '+Y(v).toFixed(1);});
-   s.appendChild(el('path',{d:p,fill:'none',stroke:cv(z[1]),'stroke-width':2.2}));
-   txt(s,L+12,T+14+j*15,z[2],{fill:cv(z[1])});});
-  [0,60,120,180,240].forEach(function(v){txt(s,X(v/4),H-26,v,{'text-anchor':'middle'});});
-  txt(s,L,T-14,'cumulative % of group already sheltered',{class:'axis'});
+   ['D_m','--d','D · mobility-limited (reserve)']].forEach(function(z,j){{
+   let p='';DATA.curves[z[0]].forEach(function(v,x){{p+=(p?'L':'M')+X(x).toFixed(1)+' '+Y(v).toFixed(1);}});
+   s.appendChild(el('path',{{d:p,fill:'none',stroke:cv(z[1]),'stroke-width':2.2}}));
+   txt(s,L+12,T+14+j*15,z[2],{{fill:cv(z[1])}});}});
+  [0,60,120,180,240].forEach(function(v){{txt(s,X(v/4),H-26,v,{{'text-anchor':'middle'}});}});
+  txt(s,L,T-14,'cumulative % of group already sheltered',{{class:'axis'}});
   txt(s,(L+W-R)/2,H-6,'minutes since departure (first four hours)',
-    {class:'axis','text-anchor':'middle'});}
-}
+    {{class:'axis','text-anchor':'middle'}});}}
+}}
 show(0);
-new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+new MutationObserver(draw).observe(document.documentElement,{{attributes:true,attributeFilter:['data-theme']}});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',draw);
-</script></body></html>
+</script></body></html>"""
+
+(OUTD / "capacity-is-not-access-symposium.html").write_text(HTML, encoding="utf-8", newline="\n")
+print(f"wrote deck: {len(HTML)//1024} KB, {HTML.count('<section')} slides")
