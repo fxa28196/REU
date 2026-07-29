@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<!DOCTYPE html><!-- hand-patched post-generation: final-polish v1 --><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Capacity Is Not Access — symposium deck</title>
 <style>
@@ -25,7 +25,7 @@ table{border-collapse:collapse;margin:.8rem 0;font-size:.95rem}
 td,th{padding:.32rem .7rem;border-bottom:1px solid var(--rule);text-align:left}
 .ctr{position:fixed;bottom:10px;right:14px;font:12px ui-monospace,monospace;color:var(--ink2)}
 .badge{display:inline-block;font:11px ui-monospace,monospace;letter-spacing:.1em;border:1px solid var(--rule);border-radius:4px;padding:2px 7px;color:var(--ink2);margin-left:.6rem;vertical-align:middle}
-svg text{fill:var(--ink2);font:11px ui-monospace,monospace}
+svg text{fill:var(--ink2);font:12.5px ui-monospace,monospace}
 @media print{section{display:flex;page-break-after:always;min-height:95vh}.ctr{display:none}}
 </style></head><body>
 
@@ -145,9 +145,9 @@ What survives every scale: the residue concentrates in the slowest walkers — u
 
 <!-- BACKUPS -->
 <section><div class="k">Backup</div><h2>Backup slides</h2>
-<p class="sub">B1 five-scale equity · B2 survival curves · B3 random-pool control · B4 full bed sweep ·
-B5 2020 calibration · B6 freeway fix · B7 model card · B8 data vintages · B9 agent states ·
-B10 verification pipeline · B11 the identity arithmetic · B12 window-dose table</p></section>
+<p class="sub">B1 = extension E1 (five-scale equity) · B2 = S7 lower chart (survival) · B3 random-pool control ·
+B4 full bed sweep · B5 2020 calibration · B6 freeway fix · B7 model card · B8 data vintages ·
+B10 = extension E2 (verification) · B11 identity arithmetic · B12 window-dose table</p></section>
 
 <section><div class="k">B3 · random-pool control</div><h2>Ten random doors = same headcount, triple the walk</h2>
 <table><tr><th></th><th>admitted (seeds 42–44)</th><th>mean walk</th></tr>
@@ -160,7 +160,7 @@ B10 verification pipeline · B11 the identity arithmetic · B12 window-dose tabl
 <tr><td>0.8</td><td>5,474</td><td>73.27</td><td>28.3</td></tr><tr><td>1.0</td><td>6,842</td><td>91.51</td><td>23.5</td></tr><tr><td>1.05</td><td>7,184</td><td>96.07</td><td>15.0</td></tr><tr><td>1.1</td><td>7,526</td><td>99.51</td><td>-0.0</td></tr><tr><td>1.15</td><td>7,868</td><td>99.51</td><td>-0.0</td></tr><tr><td>1.2</td><td>8,210</td><td>99.51</td><td>-0.0</td></tr><tr><td>1.4</td><td>9,579</td><td>99.51</td><td>-0.0</td></tr><tr><td>1.6</td><td>10,947</td><td>99.51</td><td>-0.0</td></tr></table></section>
 
 <section><div class="k">B5 · 2020 calibration</div><h2>The bracket, honestly</h2>
-<p class="sub">Street Roots, Sept 16 2020: ≈90 people at the Convention Center, ≈40 at Charles Jordan — ≈130 of 198 beds.
+<p class="sub">Street Roots (published Sept 16 2020; occupancy observed the night of Sept 15): ≈90 people at the Convention Center, ≈40 at Charles Jordan — ≈130 of 198 beds.
 The model fills 198 of 198 at both sites. Because the record is approximate, the honest statement is a bracket:
 the model over-admits by 1.5–15.6× (1.52× is only the most favourable edge).</p>
 <p class="note">That bracket is the measured size of awareness, belongings, pets, and trust — everything the
@@ -210,64 +210,83 @@ function el(t,a){ const x = document.createElementNS('http://www.w3.org/2000/svg
   for (const k in a) x.setAttribute(k,a[k]); return x; }
 function draw(){
   let s = document.getElementById('pm');
-  if (s && s.closest('section').classList.contains('on')) { s.innerHTML='';
+  if (s) { s.innerHTML='';
     const W=960,H=250,L=46,R=8,T=12,B=30,mx=600;
     const X=h=>L+(W-L-R)*h/312, Y=v=>T+(H-T-B)*(1-Math.min(v,mx)/mx);
     s.appendChild(el('line',{x1:L,x2:W-R,y1:Y(55.5),y2:Y(55.5),stroke:cv('--warn'),'stroke-dasharray':'4 4'}));
     let dstr=''; DATA.pm.forEach((v,h)=>{ if(v===null||isNaN(v))return;
       dstr += (dstr?'L':'M')+X(h).toFixed(1)+' '+Y(v).toFixed(1); });
     s.appendChild(el('path',{d:dstr,fill:'none',stroke:cv('--a'),'stroke-width':1.6}));
-    [['spike',18],['57 clean hours',50],['main episode',119]].forEach(([t,h])=>{
-      const tx=el('text',{x:X(h),y:H-8,'text-anchor':'middle'}); tx.textContent=t; s.appendChild(tx); });
+    [[16,21,'--a'],[22,78,'--c'],[79,311,'--a']].forEach(([a,b,c])=>{ s.appendChild(el('rect',{x:X(a),y:T,width:X(b)-X(a),height:H-T-B,fill:cv(c),opacity:.07})); });
+    ['Sep 7','Sep 9','Sep 11','Sep 13','Sep 15','Sep 17','Sep 19'].forEach((d,i)=>{ const tx=el('text',{x:X(i*48),y:H-8,'text-anchor':'middle'}); tx.textContent=d; s.appendChild(tx); });
+    const th=el('text',{x:L+6,y:Y(55.5)-5,fill:cv('--warn')}); th.textContent="55.5 \u2014 'Unhealthy'"; s.appendChild(th);
+    const yt=el('text',{x:L,y:T-2}); yt.textContent='PM2.5, \u00b5g/m\u00b3'; s.appendChild(yt);
+    const xt=el('text',{x:W-R,y:T+14,'text-anchor':'end'}); xt.textContent='hour-by-hour, Sep 7\u201319 2020'; s.appendChild(xt);
+    [['spike',18],['57 clean hours',50],['main episode',190]].forEach(([t,h])=>{
+      const tx=el('text',{x:X(h),y:T+14,'text-anchor':'middle'}); tx.textContent=t; s.appendChild(tx); });
     const t2=el('text',{x:X(140)+6,y:Y(562.7>600?600:562.7)+10}); t2.textContent='562.7 µg/m³'; s.appendChild(t2);
     [0,150,300,450,600].forEach(v=>{ const t=el('text',{x:L-6,y:Y(v)+4,'text-anchor':'end'});
       t.textContent=v; s.appendChild(t); });
   }
   s = document.getElementById('bars');
-  if (s && s.closest('section').classList.contains('on')) { s.innerHTML='';
-    const W=960,H=240,L=46,T=10,B=28; const X=k=>L+k*(W-L-20)/4;
-    DATA.bars.forEach(([a,v],k)=>{ const h=(H-T-B)*v/100, x=X(k)+30;
+  if (s) { s.innerHTML='';
+    const W=960,H=240,L=46,T=10,B=28,R2=46; const X=k=>L+k*(W-L-R2)/4;
+    [0,25,50,75,100].forEach(v=>{const yy=T+(H-T-B)*(1-v/100);s.appendChild(el('line',{x1:L,x2:W-R2,y1:yy,y2:yy,stroke:cv('--rule'),opacity:.5}));const ty=el('text',{x:L-6,y:yy+4,'text-anchor':'end'});ty.textContent=v;s.appendChild(ty);});
+    const yt3=el('text',{x:L+4,y:T+12}); yt3.textContent='% of 6,842 admitted'; s.appendChild(yt3);
+    DATA.bars.forEach(([a,v],k)=>{ const h=(H-T-B)*v/100, x=X(k)+54;
       s.appendChild(el('rect',{x:x,y:H-B-h,width:110,height:h,rx:6,fill:cv(AC[a])}));
       const t=el('text',{x:x+55,y:H-B-h-8,'text-anchor':'middle','font-size':'20',fill:cv(AC[a]),'font-weight':'bold'});
       t.textContent=v.toFixed(1)+'%'; s.appendChild(t);
-      const l=el('text',{x:x+55,y:H-8,'text-anchor':'middle'}); l.textContent=a; s.appendChild(l); });
+      const l=el('text',{x:x+55,y:H-16,'text-anchor':'middle'}); l.textContent=a; s.appendChild(l);
+      const c2=el('text',{x:x+55,y:H-4,'text-anchor':'middle','font-size':'10'});c2.textContent={A:'today',B:'beds = demand',C:'more doors',D:'B + reserve'}[a]; s.appendChild(c2); });
   }
   s = document.getElementById('sweep');
-  if (s && s.closest('section').classList.contains('on')) { s.innerHTML='';
+  if (s) { s.innerHTML='';
     const W=960,H=250,L=52,R=14,T=14,B=30;
     const xs=DATA.sweep.map(r=>r[1]); const X=b=>L+(W-L-R)*(b-5400)/(11000-5400);
     const Y=v=>T+(H-T-B)*(1-(v-70)/30);
+    [70,80,90,100].forEach(v=>{s.appendChild(el('line',{x1:L,x2:W-R,y1:Y(v),y2:Y(v),stroke:cv('--rule'),opacity:.5}));const ty=el('text',{x:L-6,y:Y(v)+4,'text-anchor':'end'});ty.textContent=v+(v===100?'%':'');s.appendChild(ty);});
+    const cap=el('text',{x:L+4,y:T+12}); cap.textContent='% of 6,842 admitted \u00b7 x-axis: capacity as multiple of demand'; s.appendChild(cap);
     s.appendChild(el('line',{x1:L,x2:W-R,y1:Y(96.0),y2:Y(96.0),stroke:cv('--c'),'stroke-dasharray':'5 4'}));
     const tc=el('text',{x:W-R-4,y:Y(96.0)-6,'text-anchor':'end'}); tc.textContent='C: 96.0%'; s.appendChild(tc);
     let p=''; DATA.sweep.forEach(r=>{ p += (p?'L':'M')+X(r[1]).toFixed(1)+' '+Y(r[2]).toFixed(1); });
     s.appendChild(el('path',{d:p,fill:'none',stroke:cv('--b'),'stroke-width':2}));
     DATA.sweep.forEach(r=>{ s.appendChild(el('circle',{cx:X(r[1]),cy:Y(r[2]),r:4,fill:cv('--b')}));
-      const t=el('text',{x:X(r[1]),y:H-8,'text-anchor':'middle'}); t.textContent=r[1].toLocaleString(); s.appendChild(t); });
-    const m=el('text',{x:X(7184),y:Y(96)-12,'text-anchor':'middle',fill:cv('--warn')}); m.textContent='+342: matches C'; s.appendChild(m);
-    const m2=el('text',{x:X(7526),y:Y(99.5)+16,'text-anchor':'middle',fill:cv('--warn')}); m2.textContent='+684: everyone reachable'; s.appendChild(m2);
+      const t=el('text',{x:X(r[1]),y:H-8,'text-anchor':'middle'}); t.textContent=r[0]+'\u00d7'; s.appendChild(t); });
+    s.appendChild(el('line',{x1:X(7184),x2:X(7184),y1:Y(96.07),y2:H-B,stroke:cv('--rule'),'stroke-dasharray':'3 3'}));
+    s.appendChild(el('line',{x1:X(7526),x2:X(7526),y1:Y(99.51),y2:H-B,stroke:cv('--rule'),'stroke-dasharray':'3 3'}));
+    const m=el('text',{x:X(7184)-8,y:Y(96.07)+22,'text-anchor':'end',fill:cv('--warn')}); m.textContent='+342: matches C'; s.appendChild(m);
+    const m2=el('text',{x:X(7526)+8,y:Y(99.51)-8,'text-anchor':'start',fill:cv('--warn')}); m2.textContent='+684: everyone reachable'; s.appendChild(m2);
   }
   s = document.getElementById('gaps');
-  if (s && s.closest('section').classList.contains('on')) { s.innerHTML='';
+  if (s) { s.innerHTML='';
     const W=960,H=250,L=120,R=90,T=16,B=30;
     const X=v=>L+(W-L-R)*v/100, Y=k=>T+(H-T-B)/4*(k+0.5);
     [0,25,50,75,100].forEach(v=>{ const t=el('text',{x:X(v),y:H-8,'text-anchor':'middle'});
       t.textContent=v+'%'; s.appendChild(t); });
+    const lg=el('text',{x:L,y:T-2}); lg.textContent='\u25cb no mobility limitation   \u25cf mobility-limited (arm color)'; s.appendChild(lg);
     DATA.gaps.forEach(([a,u,m],k)=>{ const y=Y(k);
       s.appendChild(el('line',{x1:X(Math.min(u,m)),x2:X(Math.max(u,m)),y1:y,y2:y,stroke:cv('--rule'),'stroke-width':3}));
-      s.appendChild(el('circle',{cx:X(u),cy:y,r:6,fill:cv('--ink2')}));
+      s.appendChild(el('circle',{cx:X(u),cy:y,r:6,fill:'none',stroke:cv('--ink2'),'stroke-width':2}));
       s.appendChild(el('circle',{cx:X(m),cy:y,r:6,fill:cv(AC[a])}));
       const l=el('text',{x:L-10,y:y+4,'text-anchor':'end'}); l.textContent=a; s.appendChild(l);
-      const g=el('text',{x:W-R+8,y:y+4}); g.textContent=(u-m).toFixed(1)+' pts'; s.appendChild(g); });
+      const g=el('text',{x:W-R+8,y:y+4}); g.textContent=(u-m).toFixed(1)+' pts'+(a==='D'?' (closed)':''); s.appendChild(g); });
   }
   s = document.getElementById('race');
-  if (s && s.closest('section').classList.contains('on')) { s.innerHTML='';
+  if (s) { s.innerHTML='';
     const W=960,H=250,L=46,R=10,T=12,B=30;
     const X=k=>L+(W-L-R)*k/60, Y=v=>T+(H-T-B)*(1-v/100);
+    [0,25,50,75,100].forEach(v=>{const ty=el('text',{x:L-6,y:Y(v)+4,'text-anchor':'end'});ty.textContent=v;s.appendChild(ty);});
+    const yt2=el('text',{x:L,y:T-2}); yt2.textContent='% of group sheltered'; s.appendChild(yt2);
+    s.appendChild(el('line',{x1:X(15),x2:X(15),y1:T,y2:H-B,stroke:cv('--warn'),'stroke-dasharray':'4 3'}));
+    const w1=el('text',{x:X(15)+6,y:H-B-10}); w1.textContent="80% of B's final gap already open"; s.appendChild(w1);
+    const xt2=el('text',{x:W-R,y:H-22,'text-anchor':'end'}); xt2.textContent='minutes after departure \u2014 first four hours'; s.appendChild(xt2);
+    const fn=el('text',{x:L+10,y:H-B-26,'font-size':'10'}); fn.textContent='D unimpaired \u2248 D mobility-limited; omitted for legibility.'; s.appendChild(fn);
     [['B_u','--ink2','B · walks easily'],['B_m','--b','B · mobility-limited'],
      ['D_m','--d','D · mobility-limited']].forEach(([key,col,lab],j)=>{
       let p=''; DATA.curves[key].forEach((v,k)=>{ p+=(p?'L':'M')+X(k).toFixed(1)+' '+Y(v).toFixed(1); });
       s.appendChild(el('path',{d:p,fill:'none',stroke:cv(col),'stroke-width':2}));
-      const t=el('text',{x:W-R-4,y:T+14+j*15,'text-anchor':'end',fill:cv(col)}); t.textContent=lab; s.appendChild(t); });
+      const t=el('text',{x:L+10,y:T+14+j*15,'text-anchor':'start',fill:cv(col)}); t.textContent=lab; s.appendChild(t); });
     [0,60,120,180,240].forEach(v=>{ const t=el('text',{x:X(v/4),y:H-8,'text-anchor':'middle'});
       t.textContent=v+' min'; s.appendChild(t); });
   }
