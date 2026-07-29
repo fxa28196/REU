@@ -1,40 +1,40 @@
 Scenario,Group,People in this group,Share of everyone (%),Got inside,Got inside (%),Turned away,Average walk (metres),Average hours in bad smoke,Average smoke breathed (micrograms),Average walking speed (m/s)
-"A - Today (real shelters, real number of beds)",Everyone,6842,100.0,2060,30.1,4766,18260,135.8,23374,1.28
-"A - Today (real shelters, real number of beds)",Age 18-44,3612,52.8,1107,30.6,2497,18417,134.7,23194,1.3
-"A - Today (real shelters, real number of beds)",Age 45-64,2877,42.0,874,30.4,1996,18158,135.3,23285,1.28
-"A - Today (real shelters, real number of beds)",Age 65+,353,5.2,79,22.4,273,17495,150.7,25944,1.06
-"A - Today (real shelters, real number of beds)",Male,4691,68.6,1417,30.2,3259,18448,135.6,23342,1.3
-"A - Today (real shelters, real number of beds)",Female,2001,29.2,595,29.7,1405,17846,136.5,23496,1.24
-"A - Today (real shelters, real number of beds)",Other / not stated,150,2.2,48,32.0,102,17923,132.1,22752,1.27
-"A - Today (real shelters, real number of beds)",Has trouble walking,1360,19.9,268,19.7,1089,17231,155.9,26842,0.98
-"A - Today (real shelters, real number of beds)",Walks without difficulty,5482,80.1,1792,32.7,3677,18516,130.8,22514,1.36
-"A - Today (real shelters, real number of beds)",Has asthma,1011,14.8,295,29.2,713,18516,137.6,23684,1.29
-"A - Today (real shelters, real number of beds)",Has COPD,738,10.8,164,22.2,572,18770,151.0,25995,1.15
-"A - Today (real shelters, real number of beds)",Long-term physical condition,2712,39.6,819,30.2,1889,18124,135.6,23341,1.28
-"A - Today (real shelters, real number of beds)",Counted as more vulnerable,4866,71.1,1371,28.2,3485,18210,139.5,24017,1.24
-"B - More beds, in the places we already have",Everyone,6842,100.0,6264,91.6,562,7938,17.5,3056,1.28
-"B - More beds, in the places we already have",Age 18-44,3612,52.8,3362,93.1,242,7593,14.6,2547,1.3
-"B - More beds, in the places we already have",Age 45-64,2877,42.0,2611,90.8,259,8064,19.1,3321,1.28
-"B - More beds, in the places we already have",Age 65+,353,5.2,291,82.4,61,10434,35.3,6104,1.06
-"B - More beds, in the places we already have",Male,4691,68.6,4319,92.1,357,7659,16.5,2879,1.3
-"B - More beds, in the places we already have",Female,2001,29.2,1812,90.6,188,8527,19.5,3398,1.24
-"B - More beds, in the places we already have",Other / not stated,150,2.2,133,88.7,17,8783,23.1,4014,1.27
-"B - More beds, in the places we already have",Has trouble walking,1360,19.9,978,71.9,379,11481,55.5,9585,0.98
-"B - More beds, in the places we already have",Walks without difficulty,5482,80.1,5286,96.4,183,7059,8.1,1436,1.36
-"B - More beds, in the places we already have",Has asthma,1011,14.8,916,90.6,92,8617,19.4,3379,1.29
-"B - More beds, in the places we already have",Has COPD,738,10.8,636,86.2,100,9758,28.0,4859,1.15
-"B - More beds, in the places we already have",Long-term physical condition,2712,39.6,2470,91.1,238,8008,18.4,3213,1.28
-"B - More beds, in the places we already have",Counted as more vulnerable,4866,71.1,4320,88.8,536,8565,22.9,3980,1.24
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",Everyone,6842,100.0,6570,96.0,256,5689,8.6,1534,1.28
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",Age 18-44,3612,52.8,3496,96.8,108,5350,7.1,1275,1.3
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",Age 45-64,2877,42.0,2757,95.8,113,5896,9.0,1603,1.28
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",Age 65+,353,5.2,317,89.8,35,7463,20.7,3614,1.06
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",Male,4691,68.6,4509,96.1,167,5628,8.4,1500,1.3
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",Female,2001,29.2,1919,95.9,81,5754,8.9,1578,1.24
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",Other / not stated,150,2.2,142,94.7,8,6713,11.3,1995,1.27
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",Has trouble walking,1360,19.9,1166,85.7,191,8189,28.7,4981,0.98
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",Walks without difficulty,5482,80.1,5404,98.6,65,5068,3.7,679,1.36
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",Has asthma,1011,14.8,968,95.7,40,6306,9.2,1636,1.29
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",Has COPD,738,10.8,692,93.8,44,6496,13.1,2296,1.15
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",Long-term physical condition,2712,39.6,2598,95.8,110,5793,9.1,1611,1.28
-"C - Existing shelters a bit bigger, plus 10 new ones in better places",Counted as more vulnerable,4866,71.1,4606,94.7,250,6175,11.3,1995,1.24
+"A - Today (real shelters, real number of beds)",Everyone,6842,100.0,2060,30.1,4754,18244,135.8,23373,1.28
+"A - Today (real shelters, real number of beds)",Age 18-44,3612,52.8,1104,30.6,2493,18417,134.9,23221,1.3
+"A - Today (real shelters, real number of beds)",Age 45-64,2877,42.0,877,30.5,1989,18110,135.0,23249,1.28
+"A - Today (real shelters, real number of beds)",Age 65+,353,5.2,79,22.4,272,17577,150.7,25944,1.06
+"A - Today (real shelters, real number of beds)",Male,4691,68.6,1412,30.1,3255,18445,135.8,23376,1.3
+"A - Today (real shelters, real number of beds)",Female,2001,29.2,602,30.1,1395,17796,135.8,23381,1.24
+"A - Today (real shelters, real number of beds)",Other / not stated,150,2.2,46,30.7,104,17947,134.7,23188,1.27
+"A - Today (real shelters, real number of beds)",Has trouble walking,1360,19.9,273,20.1,1082,17119,155.2,26719,0.98
+"A - Today (real shelters, real number of beds)",Walks without difficulty,5482,80.1,1787,32.6,3672,18524,130.9,22543,1.36
+"A - Today (real shelters, real number of beds)",Has asthma,1011,14.8,296,29.3,710,18482,137.4,23650,1.29
+"A - Today (real shelters, real number of beds)",Has COPD,738,10.8,167,22.6,569,18702,150.2,25862,1.15
+"A - Today (real shelters, real number of beds)",Long-term physical condition,2712,39.6,816,30.1,1884,18046,135.8,23376,1.28
+"A - Today (real shelters, real number of beds)",Counted as more vulnerable,4866,71.1,1373,28.2,3473,18164,139.4,24003,1.24
+"B - More beds, in the places we already have",Everyone,6842,100.0,6264,91.6,550,7896,17.5,3056,1.28
+"B - More beds, in the places we already have",Age 18-44,3612,52.8,3365,93.2,232,7546,14.4,2520,1.3
+"B - More beds, in the places we already have",Age 45-64,2877,42.0,2611,90.8,255,8015,19.1,3320,1.28
+"B - More beds, in the places we already have",Age 65+,353,5.2,288,81.6,63,10505,36.9,6385,1.06
+"B - More beds, in the places we already have",Male,4691,68.6,4318,92.0,349,7635,16.5,2887,1.3
+"B - More beds, in the places we already have",Female,2001,29.2,1811,90.5,186,8470,19.6,3415,1.24
+"B - More beds, in the places we already have",Other / not stated,150,2.2,135,90.0,15,8392,20.5,3573,1.27
+"B - More beds, in the places we already have",Has trouble walking,1360,19.9,987,72.6,368,11300,54.2,9367,0.98
+"B - More beds, in the places we already have",Walks without difficulty,5482,80.1,5277,96.3,182,7051,8.4,1490,1.36
+"B - More beds, in the places we already have",Has asthma,1011,14.8,921,91.1,85,8441,18.5,3215,1.29
+"B - More beds, in the places we already have",Has COPD,738,10.8,644,87.3,92,9436,26.0,4501,1.15
+"B - More beds, in the places we already have",Long-term physical condition,2712,39.6,2468,91.0,232,7952,18.6,3236,1.28
+"B - More beds, in the places we already have",Counted as more vulnerable,4866,71.1,4325,88.9,521,8448,22.7,3945,1.24
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Everyone,6842,100.0,6570,96.0,244,5904,8.7,1536,1.28
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Age 18-44,3612,52.8,3501,96.9,96,5578,6.9,1233,1.3
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Age 45-64,2877,42.0,2751,95.6,115,6087,9.4,1673,1.28
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Age 65+,353,5.2,318,90.1,33,7752,20.2,3525,1.06
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Male,4691,68.6,4505,96.0,162,5825,8.6,1529,1.3
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Female,2001,29.2,1922,96.1,75,5989,8.6,1533,1.24
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Other / not stated,150,2.2,143,95.3,7,7219,10.1,1785,1.27
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Has trouble walking,1360,19.9,1170,86.0,185,8643,28.2,4889,0.98
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Walks without difficulty,5482,80.1,5400,98.5,59,5224,3.8,704,1.36
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Has asthma,1011,14.8,969,95.8,37,6453,9.1,1606,1.29
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Has COPD,738,10.8,702,95.1,34,6575,10.5,1854,1.15
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Long-term physical condition,2712,39.6,2596,95.7,104,6092,9.3,1638,1.28
+"C - Existing shelters a bit bigger, plus 10 new ones in better places",Counted as more vulnerable,4866,71.1,4614,94.8,232,6396,11.0,1943,1.24

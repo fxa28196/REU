@@ -197,8 +197,15 @@ if MANIFEST_DIR and os.path.isdir(MANIFEST_DIR):
         try:
             with open(os.path.join(MANIFEST_DIR, fn)) as fh:
                 m = json.load(fh)
-            v = m.get("git_working_tree_dirty", m.get("working_tree_dirty"))
-            if not isinstance(v, str) or v not in ("true", "false", "unknown"):
+            # U-21 fix (round-5): the flag is NESTED at
+            # reproducibility.source_integrity.git_working_tree_dirty, not at
+            # the top level; post-Phase-A typing is JSON boolean on success
+            # and the quoted string "unknown" on failure.
+            v = (m.get("reproducibility", {})
+                  .get("source_integrity", {})
+                  .get("git_working_tree_dirty",
+                       m.get("git_working_tree_dirty")))
+            if not (isinstance(v, bool) or v == "unknown"):
                 bad.append((fn, repr(v)))
         except Exception as e:  # malformed JSON is itself a failure
             bad.append((fn, f"unparseable: {e}"))

@@ -1,47 +1,47 @@
 shelter_id,name,lon,lat,capacity,operating,peak_occupancy,final_occupancy,refused_count,utilization,mean_travel_dist_m_admitted
 Arbor_Lodge_Shelter,Arbor Lodge Shelter,-122.686753,45.576626,132,true,132,132,100,1.0000,4197.37
-Bybee_Lakes_Hope_Center,Bybee Lakes Hope Center,-122.757778,45.626297,262,true,262,262,1169,1.0000,32770.70
-Clark_Center,Clark Center,-122.661942,45.512502,135,true,135,135,269,1.0000,457.50
+Bybee_Lakes_Hope_Center,Bybee Lakes Hope Center,-122.757778,45.626297,262,true,262,262,1062,1.0000,32367.41
+Clark_Center,Clark Center,-122.661942,45.512502,135,true,135,135,267,1.0000,456.59
 Gresham_Womens_Shelter,Gresham Women's Shelter,-122.497037,45.522018,135,true,0,0,0,0.0000,
-Jeans_Place,Jean's Place,-122.654323,45.523278,90,true,90,90,273,1.0000,413.45
+Jeans_Place,Jean's Place,-122.654323,45.523278,90,true,90,90,270,1.0000,413.45
 Laurelwood_Center,Laurelwood Center,-122.600281,45.491148,180,true,180,180,487,1.0000,884.59
-River_District_Navigatio,River District Navigation Center,-122.676937,45.530708,150,true,150,150,210,1.0000,872.61
-Walnut_Park_Shelter,Walnut Park Shelter,-122.661833,45.562279,108,true,108,108,11,1.0000,1291.79
+River_District_Navigatio,River District Navigation Center,-122.676937,45.530708,150,true,150,150,217,1.0000,899.89
+Walnut_Park_Shelter,Walnut Park Shelter,-122.661833,45.562279,108,true,108,108,12,1.0000,1291.79
 Willamette_Center,Willamette Center,-122.649327,45.485729,195,true,195,195,313,1.0000,1156.97
-Banfield_Motel_Shelter,Banfield Motel Shelter,-122.625558,45.534537,108,true,108,108,147,1.0000,617.28
-Delta_Park_Motel_Shelter,Delta Park Motel Shelter,-122.679565,45.590053,114,true,114,114,1129,1.0000,2700.79
-Roseway_Inn_Motel_Shelte,Roseway Inn Motel Shelter,-122.562494,45.558812,225,true,225,225,104,1.0000,1674.89
+Banfield_Motel_Shelter,Banfield Motel Shelter,-122.625558,45.534537,108,true,108,108,143,1.0000,597.20
+Delta_Park_Motel_Shelter,Delta Park Motel Shelter,-122.679565,45.590053,114,true,114,114,1102,1.0000,5010.87
+Roseway_Inn_Motel_Shelte,Roseway Inn Motel Shelter,-122.562494,45.558812,225,true,225,225,103,1.0000,1723.43
 Rockwood_Bridge_Shelter,Rockwood Bridge Shelter,-122.477620,45.522979,78,true,3,3,0,0.0385,3876.19
-Stark_Street_Motel_Shelt,Stark Street Motel Shelter,-122.474369,45.519541,81,true,15,15,0,0.1852,24238.11
-Thayer_Family_Foundation,Thayer Family Foundation Veterans Motel Shelter,-122.685370,45.583337,32,true,32,32,0,1.0000,548.20
+Stark_Street_Motel_Shelt,Stark Street Motel Shelter,-122.474369,45.519541,81,true,15,15,0,0.1852,24266.96
+Thayer_Family_Foundation,Thayer Family Foundation Veterans Motel Shelter,-122.685370,45.583337,32,true,32,32,3,1.0000,559.64
 Arbor_Lodge_Village_Pods,Arbor Lodge Village Pods,-122.686753,45.576626,30,true,30,30,1,1.0000,7296.79
 Avalon_Village,Avalon Village,-122.647011,45.504545,16,true,16,16,315,1.0000,759.60
-Beacon_Village,Beacon Village,-122.585163,45.527605,16,true,16,16,152,1.0000,321.53
-Dignity_Village,Dignity Village,-122.635880,45.590779,99,true,99,99,736,1.0000,18499.36
+Beacon_Village,Beacon Village,-122.585163,45.527605,16,true,16,16,157,1.0000,321.53
+Dignity_Village,Dignity Village,-122.635880,45.590779,99,true,99,99,604,1.0000,17604.11
 Harrison_Community_Villa,Harrison Community Village,-122.578184,45.509737,63,true,63,63,123,1.0000,1208.81
-Kenton_Womens_Village,Kenton Women's Village,-122.691841,45.586652,32,true,32,32,230,1.0000,1578.44
-Oak_Street_Village,Oak Street Village,-122.579609,45.520115,48,true,48,48,152,1.0000,555.38
-Parkrose_Community_Villa,Parkrose Community Village,-122.533971,45.534177,16,true,16,16,240,1.0000,403.54
+Kenton_Womens_Village,Kenton Women's Village,-122.691841,45.586652,32,true,32,32,300,1.0000,1647.16
+Oak_Street_Village,Oak Street Village,-122.579609,45.520115,48,true,48,48,152,1.0000,553.56
+Parkrose_Community_Villa,Parkrose Community Village,-122.533971,45.534177,16,true,16,16,241,1.0000,403.54
 St_Andrews_Village,St Andrews Village,-122.721754,45.582464,16,true,16,16,26,1.0000,716.12
 St_Johns_Village,St Johns Village,-122.750203,45.590193,32,true,32,32,162,1.0000,491.01
-Lilac_Meadows,Lilac Meadows,-122.583071,45.496970,190,true,190,190,249,1.0000,1368.41
-Porch_Light_Youth_Shelte,Porch Light Youth Shelter,-122.688141,45.522468,45,true,45,45,218,1.0000,356.36
-Street_Light_Youth_Shelt,Street Light Youth Shelter,-122.688141,45.522468,45,true,45,45,42,1.0000,580.30
+Lilac_Meadows,Lilac Meadows,-122.583071,45.496970,190,true,190,190,249,1.0000,1368.10
+Porch_Light_Youth_Shelte,Porch Light Youth Shelter,-122.688141,45.522468,45,true,45,45,234,1.0000,359.88
+Street_Light_Youth_Shelt,Street Light Youth Shelter,-122.688141,45.522468,45,true,45,45,41,1.0000,567.98
 Behavioral_Health_Resour,Behavioral Health Resource Center,-122.679643,45.521959,50,true,50,50,152,1.0000,300.05
-Sunderland_RV_Safe_Park,Sunderland RV Safe Park,-122.635896,45.595053,92,true,92,92,224,1.0000,17395.66
+Sunderland_RV_Safe_Park,Sunderland RV Safe Park,-122.635896,45.595053,92,true,92,92,189,1.0000,16823.42
 Peninsula_Crossing_SRV,Peninsula Crossing Trail Safe Rest Village,-122.735946,45.583354,99,true,99,99,164,1.0000,1210.33
-BIPOC_SRV,BIPOC Safe Rest Village,-122.665928,45.534443,63,true,63,63,205,1.0000,396.31
-Queer_Affinity_Village,Queer Affinity Safe Rest Village,-122.677686,45.506081,57,true,57,57,139,1.0000,570.43
-Doreens_Place,Doreen's Place (Transition Projects),-122.677480,45.527488,135,true,135,135,483,1.0000,603.28
+BIPOC_SRV,BIPOC Safe Rest Village,-122.665928,45.534443,63,true,63,63,204,1.0000,414.19
+Queer_Affinity_Village,Queer Affinity Safe Rest Village,-122.677686,45.506081,57,true,57,57,165,1.0000,652.12
+Doreens_Place,Doreen's Place (Transition Projects),-122.677480,45.527488,135,true,135,135,492,1.0000,603.28
 Menlo_Park_SRV,Menlo Park Safe Rest Village,-122.537593,45.522410,82,true,82,82,653,1.0000,552.07
 Reedway_SRV,Reedway Safe Rest Village,-122.606664,45.481822,99,true,99,99,113,1.0000,1050.35
-NEW_random_site_01,Control clean-air shelter 1 (RANDOM from arm-C candidate set  site-seed 6),-122.681516,45.573921,350,true,350,350,783,1.0000,12856.49
-NEW_random_site_02,Control clean-air shelter 2 (RANDOM from arm-C candidate set  site-seed 6),-122.780156,45.619508,350,true,350,350,894,1.0000,32454.14
-NEW_random_site_03,Control clean-air shelter 3 (RANDOM from arm-C candidate set  site-seed 6),-122.620414,45.575824,349,true,349,349,1346,1.0000,13019.62
-NEW_random_site_04,Control clean-air shelter 4 (RANDOM from arm-C candidate set  site-seed 6),-122.771224,45.546993,349,true,349,349,457,1.0000,53627.62
-NEW_random_site_05,Control clean-air shelter 5 (RANDOM from arm-C candidate set  site-seed 6),-122.738045,45.454835,349,true,349,349,242,1.0000,54329.46
-NEW_random_site_06,Control clean-air shelter 6 (RANDOM from arm-C candidate set  site-seed 6),-122.684751,45.578834,349,true,349,349,185,1.0000,15401.58
-NEW_random_site_07,Control clean-air shelter 7 (RANDOM from arm-C candidate set  site-seed 6),-122.681624,45.509202,349,true,349,349,1039,1.0000,2875.10
-NEW_random_site_08,Control clean-air shelter 8 (RANDOM from arm-C candidate set  site-seed 6),-122.786359,45.600967,349,true,349,349,750,1.0000,43582.21
-NEW_random_site_09,Control clean-air shelter 9 (RANDOM from arm-C candidate set  site-seed 6),-122.574416,45.540881,349,true,349,349,1484,1.0000,4496.85
-NEW_random_site_10,Control clean-air shelter 10 (RANDOM from arm-C candidate set  site-seed 6),-122.706861,45.536076,349,true,349,349,998,1.0000,5226.44
+NEW_random_site_01,Control clean-air shelter 1 (RANDOM from arm-C candidate set  site-seed 6),-122.681516,45.573921,350,true,350,350,1038,1.0000,14465.33
+NEW_random_site_02,Control clean-air shelter 2 (RANDOM from arm-C candidate set  site-seed 6),-122.780156,45.619508,350,true,350,350,886,1.0000,31787.35
+NEW_random_site_03,Control clean-air shelter 3 (RANDOM from arm-C candidate set  site-seed 6),-122.620414,45.575824,349,true,349,349,1101,1.0000,12946.04
+NEW_random_site_04,Control clean-air shelter 4 (RANDOM from arm-C candidate set  site-seed 6),-122.771224,45.546993,349,true,349,349,450,1.0000,52610.28
+NEW_random_site_05,Control clean-air shelter 5 (RANDOM from arm-C candidate set  site-seed 6),-122.738045,45.454835,349,true,349,349,228,1.0000,54704.90
+NEW_random_site_06,Control clean-air shelter 6 (RANDOM from arm-C candidate set  site-seed 6),-122.684751,45.578834,349,true,349,349,247,1.0000,16915.59
+NEW_random_site_07,Control clean-air shelter 7 (RANDOM from arm-C candidate set  site-seed 6),-122.681624,45.509202,349,true,349,349,1279,1.0000,3086.02
+NEW_random_site_08,Control clean-air shelter 8 (RANDOM from arm-C candidate set  site-seed 6),-122.786359,45.600967,349,true,349,349,727,1.0000,43487.79
+NEW_random_site_09,Control clean-air shelter 9 (RANDOM from arm-C candidate set  site-seed 6),-122.574416,45.540881,349,true,349,349,1238,1.0000,4477.98
+NEW_random_site_10,Control clean-air shelter 10 (RANDOM from arm-C candidate set  site-seed 6),-122.706861,45.536076,349,true,349,349,1019,1.0000,5296.06

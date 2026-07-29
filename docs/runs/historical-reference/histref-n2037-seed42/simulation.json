@@ -1,0 +1,122 @@
+{
+  "schema": "reu-wildfire-shelter-abm/simulation/v1",
+  "generated_utc": "2026-07-28T21:31:46.665088700",
+  "reproducibility": {
+    "random_seed": 42,
+    "sim_id": "sim-20260728-213138-seed42",
+    "data_version_tag": "0bc943324ae6",
+    "git_commit": "deddfcad568321490c5bfe254a783d448cb3e1a8",
+    "java_version": "17.0.19",
+    "repast_version": "2.11.0",
+    "parameters": {"numAgents": 2037, "minutesPerTick": 1.0, "walkingSpeedMps": 1.3, "shelterArrivalDistanceM": 200.0, "simulationHours": 312, "randomSeed": 42, "evacuationThresholdUgM3": 55.5, "scenarioCode": 3, "enableHeterogeneity": 1, "respectShelterOpeningDates": 1, "triageReserveFraction": 0.0},
+    "input_datasets": [
+      {"file": "data/Streets.shp", "sha256": "f5e5e311b625f129f94fcf6d3150f8feb521ea5a79039ade43514ebfb35810a8"},
+      {"file": "data/airnow/aqs_hourly_pm25_portland_2020-09.csv", "sha256": "d908556c347ecdf68342ce859b1c56813cc606f695804c0ba71992604486ca08"},
+      {"file": "data/shelters/shelters_2020-09.csv", "sha256": "892b72500eeaa34005c8ae00f9abb5bdba639e463f505b2794e3231e1801b302"},
+      {"file": "data/encampments/irp_campsite_reports_sample.csv", "sha256": "3e557de5db4668c5d30fd7a6fc13bcc38b5e37bab4b9becaf9b3dc35366285ca"}
+    ],
+    "source_integrity": {
+      "note": "Full checksum census including shapefile sidecars and the governance registries. data_version_tag intentionally covers only the four model inputs, to stay comparable with earlier archived runs.",
+      "git_working_tree_dirty": false,
+      "files": [
+        {"file": "data/Streets.shp", "sha256": "f5e5e311b625f129f94fcf6d3150f8feb521ea5a79039ade43514ebfb35810a8"},
+        {"file": "data/Streets.dbf", "sha256": "636b9ca18b0bf0c2f47474f7810d81634f04cd86439e86d34f4233782d7fab94"},
+        {"file": "data/Streets.shx", "sha256": "0c5cecb995dd3af50bf2b0c2fa976202f283e7c08aa56ed4aab6ed01cd48a651"},
+        {"file": "data/Streets.prj", "sha256": "f2e7fb14d55bdd8d6a3bc2c272a48729d8f9d0ad72936e20eae6a9a81c2fccd0"},
+        {"file": "data/Streets.cpg", "sha256": "3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824"},
+        {"file": "data/airnow/aqs_hourly_pm25_portland_2020-09.csv", "sha256": "d908556c347ecdf68342ce859b1c56813cc606f695804c0ba71992604486ca08"},
+        {"file": "data/shelters/shelters_2020-09.csv", "sha256": "892b72500eeaa34005c8ae00f9abb5bdba639e463f505b2794e3231e1801b302"},
+        {"file": "data/shelters/shelters_2026_current_placement.csv", "sha256": "d00fdc33fb3e0cb4851e24a3bb0bd6d000984da54aac253b5416546e0a8fab5c"},
+        {"file": "data/shelters/shelters_2026_expanded_capacity.csv", "sha256": "19ab32a29a89e0ca70c7a6130060300ec78bb3b9cba5757f2b1d8e5e0289ebcf"},
+        {"file": "data/shelters/shelters_2026_expanded_plus_new_sites.csv", "sha256": "af6ee97cef863c7b512d8a5e065383f1c129b98f7f83d0cd4927091e753a2add"},
+        {"file": "data/encampments/irp_campsite_reports_sample.csv", "sha256": "3e557de5db4668c5d30fd7a6fc13bcc38b5e37bab4b9becaf9b3dc35366285ca"},
+        {"file": "data/registry/variables.csv", "sha256": "a460273be5f9e71d84a120be393064e3bcf3bf20787cdc1951ba6bf96b27b0df"},
+        {"file": "data/registry/assumptions.csv", "sha256": "0006704cda736b32e5e7a57dc71bb00e4fe3efc1163485d7cda9e572d7681de5"}
+      ]
+    }
+  },
+  "smoke_field": {
+    "county": "Multnomah",
+    "start": "2020-09-07T00:00",
+    "hours": 576,
+    "peak_hourly_ugm3": 562.7,
+    "out_of_range_lookups": 0
+  },
+  "street_network_validation": {
+    "node_site_tolerance_m": 100.0, "reattach_tolerance_m": 10.0,
+    "features": 109434, "attr_node_ids": 88078, "final_graph_nodes": 88100,
+    "affected_attr_node_ids": 25, "sites_reattached": 3, "sites_split_synthetic": 22,
+    "impossible_edges_after_fix": 0, "max_endpoint_gap_m": 11.9,
+    "components": 171, "largest_component_nodes": 59725,
+    "freeway_filter": {"features_excluded": 2636, "km_excluded": 614.1, "by_type": {"1110": 1372, "1120": 279, "1121": 466, "1122": 447, "1123": 72}},
+    "corrections": [
+      {"kind": "SPLIT", "attr_node_id": 107665, "graph_node_id": -1000, "dist_from_primary_m": 8520.9, "lon": -122.781836, "lat": 45.536632, "first_feature": "NW UNNAMED RD", "claims": 1},
+      {"kind": "SPLIT", "attr_node_id": 107668, "graph_node_id": -1001, "dist_from_primary_m": 9293.3, "lon": -122.548095, "lat": 45.473256, "first_feature": "SE 112TH AVE", "claims": 3},
+      {"kind": "SPLIT", "attr_node_id": 107673, "graph_node_id": -1002, "dist_from_primary_m": 12220.0, "lon": -122.757688, "lat": 45.533733, "first_feature": "NW SKYLINE BLVD", "claims": 3},
+      {"kind": "SPLIT", "attr_node_id": 107674, "graph_node_id": -1003, "dist_from_primary_m": 10493.1, "lon": -122.755777, "lat": 45.533851, "first_feature": "NW UNNAMED RD", "claims": 1},
+      {"kind": "SPLIT", "attr_node_id": 107677, "graph_node_id": -1004, "dist_from_primary_m": 4273.2, "lon": -122.736811, "lat": 45.497955, "first_feature": "SW PATTON RD", "claims": 2},
+      {"kind": "SPLIT", "attr_node_id": 107681, "graph_node_id": -1005, "dist_from_primary_m": 18554.8, "lon": -122.578222, "lat": 45.463299, "first_feature": "SE UNNAMED RD", "claims": 3},
+      {"kind": "SPLIT", "attr_node_id": 107682, "graph_node_id": -1006, "dist_from_primary_m": 18562.3, "lon": -122.577925, "lat": 45.464029, "first_feature": "SE UNNAMED RD", "claims": 1},
+      {"kind": "SPLIT", "attr_node_id": 107684, "graph_node_id": -1007, "dist_from_primary_m": 17971.1, "lon": -122.573647, "lat": 45.466774, "first_feature": "SE LAMBERT ST", "claims": 2},
+      {"kind": "SPLIT", "attr_node_id": 107696, "graph_node_id": -1008, "dist_from_primary_m": 7918.5, "lon": -122.577410, "lat": 45.466855, "first_feature": "SE LAMBERT ST", "claims": 3},
+      {"kind": "SPLIT", "attr_node_id": 107699, "graph_node_id": -1009, "dist_from_primary_m": 8002.8, "lon": -122.576602, "lat": 45.468620, "first_feature": "SE FLAVEL ST", "claims": 3},
+      {"kind": "SPLIT", "attr_node_id": 107697, "graph_node_id": -1010, "dist_from_primary_m": 7944.8, "lon": -122.577620, "lat": 45.468644, "first_feature": "SE FLAVEL ST", "claims": 3},
+      {"kind": "SPLIT", "attr_node_id": 107695, "graph_node_id": -1011, "dist_from_primary_m": 7993.0, "lon": -122.576805, "lat": 45.466841, "first_feature": "SE LAMBERT ST", "claims": 3},
+      {"kind": "SPLIT", "attr_node_id": 107705, "graph_node_id": -1012, "dist_from_primary_m": 9229.3, "lon": -122.576390, "lat": 45.467500, "first_feature": "SE UNNAMED RD", "claims": 3},
+      {"kind": "SPLIT", "attr_node_id": 107708, "graph_node_id": -1013, "dist_from_primary_m": 15281.5, "lon": -122.576600, "lat": 45.468052, "first_feature": "SE UNNAMED RD", "claims": 3},
+      {"kind": "SPLIT", "attr_node_id": 107714, "graph_node_id": -1014, "dist_from_primary_m": 16587.1, "lon": -122.549385, "lat": 45.491568, "first_feature": "SE UNNAMED RD", "claims": 3},
+      {"kind": "SPLIT", "attr_node_id": 107719, "graph_node_id": -1015, "dist_from_primary_m": 1654.7, "lon": -122.667509, "lat": 45.513695, "first_feature": "SE MAIN ST", "claims": 1},
+      {"kind": "SPLIT", "attr_node_id": 107722, "graph_node_id": -1016, "dist_from_primary_m": 17221.6, "lon": -122.579067, "lat": 45.469549, "first_feature": "SE 82ND AVE", "claims": 3},
+      {"kind": "SPLIT", "attr_node_id": 107657, "graph_node_id": -1017, "dist_from_primary_m": 11026.0, "lon": -122.678876, "lat": 45.562672, "first_feature": "N KILLINGSWORTH ST", "claims": 2},
+      {"kind": "SPLIT", "attr_node_id": 107680, "graph_node_id": -1018, "dist_from_primary_m": 7002.1, "lon": -122.661342, "lat": 45.443469, "first_feature": "S AVENTINE CT", "claims": 1},
+      {"kind": "REATTACHED", "attr_node_id": 107679, "graph_node_id": 77406, "dist_from_primary_m": 7146.9, "lon": -122.664406, "lat": 45.443211, "first_feature": "S AVENTINE CT", "claims": 1},
+      {"kind": "REATTACHED", "attr_node_id": 107671, "graph_node_id": 17022100, "dist_from_primary_m": 16801.2, "lon": -122.766114, "lat": 45.532807, "first_feature": "NW RYAN ST", "claims": 1},
+      {"kind": "SPLIT", "attr_node_id": 107700, "graph_node_id": -1019, "dist_from_primary_m": 7983.1, "lon": -122.675734, "lat": 45.452968, "first_feature": "S PALATER RD", "claims": 3},
+      {"kind": "SPLIT", "attr_node_id": 107701, "graph_node_id": -1020, "dist_from_primary_m": 7915.0, "lon": -122.676233, "lat": 45.452422, "first_feature": "S TERWILLIGER BLVD", "claims": 3},
+      {"kind": "REATTACHED", "attr_node_id": 107718, "graph_node_id": 17015842, "dist_from_primary_m": 14327.7, "lon": -122.746632, "lat": 45.476476, "first_feature": "SW VERMONT ST", "claims": 1},
+      {"kind": "SPLIT", "attr_node_id": 107660, "graph_node_id": -1021, "dist_from_primary_m": 11077.6, "lon": -122.804942, "lat": 45.607776, "first_feature": "NW BPA RD", "claims": 1}
+    ]
+  },
+  "governance": {
+    "variables_file": "data/registry/variables.csv", "variables_sha256": "a460273be5f9e71d84a120be393064e3bcf3bf20787cdc1951ba6bf96b27b0df",
+    "assumptions_file": "data/registry/assumptions.csv", "assumptions_sha256": "0006704cda736b32e5e7a57dc71bb00e4fe3efc1163485d7cda9e572d7681de5",
+    "variable_count": 30, "assumption_count": 26,
+    "evidence_class_census": {"M": 14, "L": 6, "C": 0, "A": 10, "F": 0},
+    "placeholder_variables": ["V7", "V2", "V4"],
+    "blocking_assumptions": ["A-04", "A-09", "A-12", "A-16"]
+  },
+  "stratified_exposure": {
+    "definition": "vulnerable_any = age 55+ OR mobility-limited OR asthma OR COPD OR chronic physical condition; a REPORTING STRATUM, not a risk score (decision D-3)",
+    "strata": [
+      {"stratum": "vulnerable_any", "member": true, "n": 1443, "sheltered_share": 0.0811, "mean_exposure_ugm3h": 49893.00, "mean_travel_m": 15473.24, "mean_travel_time_min": 562.70, "mean_walking_speed_mps": 1.2430},
+      {"stratum": "vulnerable_any", "member": false, "n": 594, "sheltered_share": 0.1364, "mean_exposure_ugm3h": 47085.36, "mean_travel_m": 15153.98, "mean_travel_time_min": 551.16, "mean_walking_speed_mps": 1.3906},
+      {"stratum": "age55plus", "member": true, "n": 576, "sheltered_share": 0.0694, "mean_exposure_ugm3h": 50475.11, "mean_travel_m": 15486.71, "mean_travel_time_min": 531.40, "mean_walking_speed_mps": 1.1958},
+      {"stratum": "age55plus", "member": false, "n": 1461, "sheltered_share": 0.1081, "mean_exposure_ugm3h": 48522.00, "mean_travel_m": 15338.13, "mean_travel_time_min": 564.71, "mean_walking_speed_mps": 1.3216},
+      {"stratum": "mobility_limited", "member": true, "n": 391, "sheltered_share": 0.0230, "mean_exposure_ugm3h": 52820.83, "mean_travel_m": 15405.24, "mean_travel_time_min": 374.22, "mean_walking_speed_mps": 0.9709},
+      {"stratum": "mobility_limited", "member": false, "n": 1646, "sheltered_share": 0.1148, "mean_exposure_ugm3h": 48184.30, "mean_travel_m": 15374.18, "mean_travel_time_min": 566.73, "mean_walking_speed_mps": 1.3609},
+      {"stratum": "asthma", "member": true, "n": 296, "sheltered_share": 0.1149, "mean_exposure_ugm3h": 48178.48, "mean_travel_m": 15482.07, "mean_travel_time_min": 557.38, "mean_walking_speed_mps": 1.2785},
+      {"stratum": "asthma", "member": false, "n": 1741, "sheltered_share": 0.0942, "mean_exposure_ugm3h": 49226.58, "mean_travel_m": 15362.81, "mean_travel_time_min": 558.10, "mean_walking_speed_mps": 1.2873},
+      {"stratum": "copd", "member": true, "n": 224, "sheltered_share": 0.0446, "mean_exposure_ugm3h": 51687.31, "mean_travel_m": 15442.88, "mean_travel_time_min": 228.80, "mean_walking_speed_mps": 1.1626},
+      {"stratum": "copd", "member": false, "n": 1813, "sheltered_share": 0.1037, "mean_exposure_ugm3h": 48751.43, "mean_travel_m": 15372.39, "mean_travel_time_min": 575.49, "mean_walking_speed_mps": 1.3013},
+      {"stratum": "any_respiratory", "member": true, "n": 480, "sheltered_share": 0.0875, "mean_exposure_ugm3h": 49549.89, "mean_travel_m": 15532.35, "mean_travel_time_min": 505.14, "mean_walking_speed_mps": 1.2351},
+      {"stratum": "any_respiratory", "member": false, "n": 1557, "sheltered_share": 0.1002, "mean_exposure_ugm3h": 48927.65, "mean_travel_m": 15333.22, "mean_travel_time_min": 572.21, "mean_walking_speed_mps": 1.3017},
+      {"stratum": "chronic_physical", "member": true, "n": 786, "sheltered_share": 0.0992, "mean_exposure_ugm3h": 48976.05, "mean_travel_m": 15365.82, "mean_travel_time_min": 572.33, "mean_walking_speed_mps": 1.2908},
+      {"stratum": "chronic_physical", "member": false, "n": 1251, "sheltered_share": 0.0959, "mean_exposure_ugm3h": 49135.99, "mean_travel_m": 15389.14, "mean_travel_time_min": 548.65, "mean_walking_speed_mps": 1.2831}
+    ]
+  },
+  "scenario": "HISTORICAL_capacity_reference_not_a_scenario",
+  "population_sampling": {"heterogeneity": true, "n_sampled": 2037, "realised_mobility_limited": 0.1919, "realised_asthma": 0.1453, "realised_copd": 0.1100, "realised_any_respiratory": 0.2356, "realised_age_55plus": 0.2828, "mean_walking_speed_mps": 1.2860, "published_targets": "targets: mobility 0.192 (PIT 2019, lower bound) | asthma 0.150 (Zellmer 2025) | COPD 0.105 (Zellmer 2025) | any respiratory 0.239 (independent draws) | chronic physical 0.391 (Pathways 2026, local) | age bands 0.527/0.423/0.050 (Pathways 2026)"},
+  "population": {
+    "n_agents": 2037,
+    "pre_evac": 0, "sheltered": 198, "en_route": 0, "unreachable": 17, "refused_all_full": 1822,
+    "exposure_ugm3h": {"mean": 49074.2765, "median": 54002.8192, "min": 1357.0917, "p25": 54002.8192, "p75": 54002.8192, "p90": 54002.8192, "max": 54002.8192, "total": 99964301.1342, "gini": 0.0909},
+    "vwe_ugm3h": {"mean": 49074.2765, "median": 54002.8192, "total": 99964301.1342, "gini": 0.0909},
+    "total_person_hours_above_unhealthy": 359798.63,
+    "travel_m": {"mean": 15380.14, "median": 16069.69, "max": 26951.92}
+  },
+  "shelters": [
+    {"id": "CJ", "capacity": 99, "operating": true, "peak_occupancy": 99, "final_occupancy": 99, "refused": 1822},
+    {"id": "OCC", "capacity": 99, "operating": true, "peak_occupancy": 99, "final_occupancy": 99, "refused": 1921},
+    {"id": "MSCC", "capacity": null, "operating": false, "peak_occupancy": 0, "final_occupancy": 0, "refused": 0}
+  ]
+}

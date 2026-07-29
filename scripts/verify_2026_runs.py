@@ -36,6 +36,9 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs/final/results-2026"
 SEEDS = [int(s) for s in sys.argv[1:]] or list(range(42, 51))
 ARM_CODE = {"A": 0, "B": 1, "C": 2}
+# U-03 bed-sum invariant: every arm's shelters.csv must sum to the designed
+# system capacity, exactly (largest-remainder apportionment guarantees it).
+EXPECTED_CAP = {"A": 2234, "B": 6842, "C": 6842}
 
 # The attribute columns that define "the same population" across arms.
 POP_COLS = ["agent_id", "starting_encampment", "start_lon", "start_lat",
@@ -53,6 +56,8 @@ def main():
     tags = {}              # arm -> set of tags seen
     integrity_sets, commits = set(), {}
     pop_hash = {}          # (seed) -> {arm: sha}
+    unreach_hash = {}      # (seed) -> {arm: sha of sorted unreachable ids}
+    negctl = {}            # (arm, col) -> [(n_sub, shel_sub, n_all, shel_all)]
 
     for arm in "ABC":
         for seed in SEEDS:
@@ -91,8 +96,40 @@ def main():
             pop_hash.setdefault(seed, {})[arm] = h
 
             srows = list(csv.DictReader(open(d / "shelters.csv")))
-            cap = sum(int(x["capacity"]) for x in srows)
-            occ = sum(int(x["final_occupancy"]) for x in srows)
+            cap = sum(int(x["capacity"]) for x in srows if x["capacity"])
+            occ = sum(int(x["final_occupancy"]) for x in srows if x["final_occupancy"])
+            if cap != EXPECTED_CAP[arm]:
+                problems.append(f"{d.name}: shelter capacity sum {cap} != "
+                                f"{EXPECTED_CAP[arm]} (U-03 bed-sum invariant)")
+
+            # U-19 negative controls: no mechanism links asthma or a chronic
+            # physical condition to movement, so each stratum's access rate
+            # must match the overall rate. Levels: 3 SE per run (54
+            # simultaneous tests across 27 runs x 2 strata — at 2 SE ~2.5
+            # false alarms are EXPECTED under the null; measured 2026-07-28:
+            # exactly 2 marginal 2-SE exceedances, pooled z <= 0.87), plus a
+            # pooled 9-seed test per arm at 2 SE below, which is the
+            # correctly-powered version.
+            p_all = (df.final_state == "SHELTERED").mean()
+            for col, label in (("asthma_flag", "asthma"),
+                               ("chronic_physical", "chronic_physical")):
+                sub = df[df[col] == 1]
+                if len(sub):
+                    se = (p_all * (1 - p_all) / len(sub)) ** 0.5
+                    diff = abs((sub.final_state == "SHELTERED").mean() - p_all)
+                    if diff > 3 * se:
+                        problems.append(
+                            f"{d.name}: {label} negative control violated "
+                            f"(|delta|={diff:.4f} > 3SE={3 * se:.4f}) (U-19)")
+                    negctl.setdefault((arm, col), []).append(
+                        (len(sub), int((sub.final_state == "SHELTERED").sum()),
+                         len(df), int((df.final_state == "SHELTERED").sum())))
+
+            # U-27 follow-through: the unreachable id set must be identical
+            # across arms within a seed (same encampments, same graph).
+            un_ids = hashlib.sha256(",".join(map(str, sorted(
+                df[df.final_state == "UNREACHABLE"].agent_id))).encode()).hexdigest()
+            unreach_hash.setdefault(seed, {})[arm] = un_ids
             sh = json.loads((d / "shelters.csv").with_name("simulation.json")
                             .read_text())["population"]
             rows.append({
@@ -119,6 +156,64 @@ def main():
     for seed, arms in pop_hash.items():
         if len(set(arms.values())) != 1:
             problems.append(f"seed {seed}: population NOT identical across arms")
+    for seed, arms in unreach_hash.items():
+        if len(set(arms.values())) != 1:
+            problems.append(f"seed {seed}: UNREACHABLE id set differs across arms (U-27)")
+    # Pooled 9-seed negative controls (correct level; see per-run note above).
+    for (arm, col), recs in negctl.items():
+        n_sub = sum(r[0] for r in recs)
+        shel_sub = sum(r[1] for r in recs)
+        n_all = sum(r[2] for r in recs)
+        shel_all = sum(r[3] for r in recs)
+        p_all = shel_all / n_all
+        se = (p_all * (1 - p_all) / n_sub) ** 0.5
+        diff = abs(shel_sub / n_sub - p_all)
+        if diff > 2 * se:
+            problems.append(f"arm {arm} pooled {col}: negative control violated "
+                            f"(|delta|={diff:.5f} > 2SE={2 * se:.5f}) (U-19)")
+
+    # ---- Extended families (U-26): D, CR, CP, bed sweep, windows, histref --
+    extra = []
+    extra.append(("histref-n2037-seed42", 3, 198, 2037))
+    for seed, rs in ((42, ("00", "10", "15", "25")), (43, ("10", "15")), (44, ("10", "15"))):
+        for r in rs:
+            extra.append((f"D2026-n6842-seed{seed}-r{r}", 7, 6842, 6842))
+    for r, code in ((1, 4), (2, 5), (3, 6)):
+        for seed in (42, 43, 44):
+            extra.append((f"CR2026r{r}-n6842-seed{seed}", code, 6842, 6842))
+    for r, code in ((4, 8), (5, 9), (6, 10)):
+        for seed in (42, 43, 44):
+            extra.append((f"CP2026r{r}-n6842-seed{seed}", code, 6842, 6842))
+    for suf, code, cap in (("080", 11, 5474), ("120", 12, 8210),
+                           ("140", 13, 9579), ("160", 14, 10947)):
+        for seed in (42, 43, 44):
+            extra.append((f"BS{suf}-n6842-seed{seed}", code, cap, 6842))
+    for wh in (24, 72):
+        for arm in "ABC":
+            for seed in (42, 43, 44):
+                extra.append((f"W{wh}{arm}-n6842-seed{seed}", ARM_CODE[arm],
+                              EXPECTED_CAP[arm], 6842))
+    n_extra = 0
+    for name, code, cap_expect, n_expect in extra:
+        d = ROOT / f"Geography/output/{name}"
+        if not (d / "simulation.json").exists():
+            problems.append(f"MISSING extended run {name}")
+            continue
+        m = json.loads((d / "simulation.json").read_text())
+        r = m["reproducibility"]
+        p = r["parameters"]
+        if int(p.get("scenarioCode", -1)) != code:
+            problems.append(f"{name}: scenarioCode {p.get('scenarioCode')} != {code}")
+        if int(p.get("numAgents", -1)) != n_expect:
+            problems.append(f"{name}: numAgents {p.get('numAgents')} != {n_expect}")
+        if r["source_integrity"].get("git_working_tree_dirty") is not False:
+            problems.append(f"{name}: git_working_tree_dirty is not False")
+        srows = list(csv.DictReader(open(d / "shelters.csv")))
+        cap = sum(int(x["capacity"]) for x in srows if x["capacity"])
+        if cap != cap_expect:
+            problems.append(f"{name}: shelter capacity sum {cap} != {cap_expect} (U-03)")
+        n_extra += 1
+    print(f"extended-family runs verified: {n_extra}/{len(extra)}")
 
     tbl = pd.DataFrame(rows).sort_values(["Scenario", "Seed"])
     summary = []
