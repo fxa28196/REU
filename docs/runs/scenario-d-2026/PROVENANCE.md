@@ -44,3 +44,28 @@ Four directories lack `agents.csv`: `D-seed43-r10`, `D-seed43-r15`,
 `D-seed44-r10`, `D-seed44-r15` (seed-42 runs have it). Regeneration of the
 seed-43/44 per-agent outputs is scheduled as a separate Phase-B item; the
 `simulation.json` aggregates for those runs are complete and unaffected.
+
+## Regeneration completed (2026-07-28, Round-5)
+
+All four missing `agents.csv` files were regenerated on the **same (pre-U-27)
+street graph** and are archived alongside the record manifests:
+
+| Run | Regenerated at | Tree | Outcome check vs archived manifest |
+|---|---|---|---|
+| D-seed43-r10 | `8ee9c9d`, clean | clean | sheltered 6,259 / refused 558 / unreachable 25 / total exposure 33,049,550.1925 — **exact match** |
+| D-seed43-r15 | `8ee9c9d`, clean | clean | sheltered 6,087 / refused 730 / unreachable 25 / total exposure 42,265,024.7483 — **exact match** |
+| D-seed44-r10 | `db44dc0` | docs-only dirty* | sheltered 6,260 / refused 558 / unreachable 24 / total exposure 32,999,444.5558 — **exact match** |
+| D-seed44-r15 | `db44dc0` | docs-only dirty* | sheltered 6,113 / refused 705 / unreachable 24 / total exposure 40,875,201.3817 — **exact match** |
+
+\* The regen manifests for seed 44 carry `git_working_tree_dirty = true`
+because the tree contained the in-flight archive copies of the *earlier*
+regen outputs (porcelain diff was `docs/runs/scenario-d-2026/*` only — zero
+source, data, or parameter files). The now-real porcelain-based flag is
+working as intended; the dirtiness is this archiving process itself.
+
+Each archived `agents.csv` was verified before copying: 6,842 rows and a
+final-state census identical to the record manifest's `population` block.
+The record manifests (stamped `696472a`, see above) remain the citation;
+the regen proves the aggregates reproduce bit-for-bit from `ec9b208`-lineage
+code and supplies the per-agent rows. Regen manifests retained in
+`Geography/output/D2026regen-*` (gitignored, local only).
