@@ -85,6 +85,53 @@ coordination package, E9 historical calibration (spec timeline Aug 6–8),
 9-seed extension, L3 word-of-mouth (descope ladder position 1), logit choice
 noise, petPolicyDefault=admit counter-world.
 
+## Prediction outcomes (runs 2026-07-29, commit 7224cef, archived `docs/runs/phase-e/`)
+
+Nine baseline-real runs, {A,C,D} × seeds {42,43,44}, all clean-tree, 99/99
+invariants in `scripts/verify_E_runs.py`. Sheltered counts:
+
+| seed | A | C | D | capacity refusals (A / C / D) |
+|---|---|---|---|---|
+| 42 | 1215 | 1215 | 1215 | 295 / 0 / 0 |
+| 43 | 1168 | 1168 | 1168 | — |
+| 44 | 1205 | 1206 | 1206 | — |
+
+Between-arm difference ≤ 1 resident; between-seed spread 47.
+
+- **P-E1 — MISS on magnitude, CONFIRMED on mechanism.** Predicted 10–15%
+  sheltered; observed 15.9% pre-pet-correction and 17.8% after it. The
+  mechanism claim is right and is the headline: arm A ceases to be
+  capacity-bound and finishes with 1,019 empty beds.
+- **P-E2 — CONFIRMED, and more strongly than stated.** The A→C gap does not
+  merely compress, it disappears (0–1 residents against 47 of seed noise).
+- **P-E3 — CONFIRMED.** 22.1% of departures occur before hour 79; the mass
+  aligns with the main episode.
+- **P-E4 — CONFIRMED via its disconfirmation clause, and sharpened.** The
+  mobility gap does not just shrink, it inverts (limited 17.0% vs unimpaired
+  15.7%). Arm D's reserve effect does not merely shrink either: **arm D
+  records ZERO capacity refusals, so the 667 reserved beds arbitrate nothing
+  and ER-D is not a test of triage at all** — it is an arm-B-capacity run with
+  an inert intake rule. This must be stated wherever ER-D is reported. The
+  clause registered in advance ("if D's effect vanishes entirely, that is a
+  reportable disconfirmation") is what happened.
+- **P-E5 — CONFIRMED.** Pre-correction sheltered share: 19.1% with no
+  barriers, 11.5% with one, 0.0% with two or more. Wachinger holds in every
+  run (~87% of high-barrier residents never depart even at peak PM2.5), so the
+  model is not a monotone risk-only trigger.
+- **P-E6 — CONFIRMED.** Asthma shows no gait-speed or dose difference
+  (|Δspeed| = 0.004 m/s, dose z = 0.70); any asthma signal is confined to
+  departure timing, exactly as V39 permits.
+
+**Caveat that outranks all of the above.** These arms are not a placement or
+triage experiment any more. Because only ~1,220 of 6,842 residents ever
+depart, system capacity never binds and no supply-side intervention *can*
+register. Arm A still shows 295 door-level capacity refusals — individual
+sites fill while 1,019 beds stand empty elsewhere, the same geography failure
+the earlier arms measured — but every refused resident re-routes and is
+admitted. The correct reading is that under measured awareness the binding
+constraint moves from architecture to behaviour; it is NOT that placement and
+triage were shown to be ineffective.
+
 ## Scenario-E (severe-event) predictions
 
 To be appended in this file BEFORE any Scenario-E run (codes 18–20).
