@@ -247,6 +247,16 @@ def dist_m(a, b):
     return math.hypot(dx, dy)
 
 
+def rel_to_root(path):
+    """Repo-relative posix path when possible, absolute otherwise. --out may
+    legitimately point outside the repo, and a provenance field is not worth
+    crashing over after the CSV has already been written."""
+    try:
+        return str(pathlib.Path(path).resolve().relative_to(ROOT)).replace("\\", "/")
+    except ValueError:
+        return str(pathlib.Path(path).resolve()).replace("\\", "/")
+
+
 class Checks:
     """Same registration idiom as scripts/analyze_run.py."""
 
@@ -955,7 +965,7 @@ def main():
         "site_selection_rng": f"python random.Random({args.site_seed})",
         "waves": [{"wave": w_, "activation_hour": wave_hours[w_], "bridges": b, "arterials": a}
                   for w_, b, a in plan],
-        "output_csv": str(out.relative_to(ROOT)).replace("\\", "/"),
+        "output_csv": rel_to_root(out),
         "csv_columns": CSV_COLUMNS,
         "graph": {
             "source_attributes": "Geography/data/Streets.dbf",
