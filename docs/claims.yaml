@@ -1,0 +1,306 @@
+# =============================================================================
+# docs/claims.yaml — claim-status registry for the wildfire-shelter ABM
+# Round-5 Phase A, task A4. Consumed by scripts/lint_claims.py.
+#
+# Format decision: YAML (python -c "import yaml" succeeds; PyYAML 6.0.3).
+#
+# Each entry under `claims`:
+#   id:               stable slug for the claim
+#   pattern:          literal string or Python regex, applied to whole-file text
+#   regex:            true  -> pattern is a Python regex
+#                     false/absent -> pattern is a literal substring
+#   case_insensitive: optional, default false
+#   status:           live | corrected | corrected-pending | refuted | retired
+#   replacement:      what to say instead (required for corrected / corrected-pending)
+#   note:             why the claim has this status AND the pattern's precision
+#                     rationale (how false positives are avoided)
+#
+# Status semantics (the linter flags every status except `live`):
+#   live              claim verified against primary run outputs — linter ignores
+#   corrected         claim wrong as phrased; a verified replacement exists
+#   corrected-pending correction direction known; final number awaits a re-run
+#   refuted           claim disproved; must be removed/rewritten, no drop-in value
+#   retired           framing/slogan withdrawn or belongs to a superseded experiment
+#
+# Evidence trail: docs/critique-response/09-SYSTEM-AUDIT.md (sections cited per
+# entry), 00-RESPONSE.md, 03-data.md. Registry created 2026-07-28 at HEAD 3cd3760.
+# =============================================================================
+
+deliverables:
+  - docs/chapter/*.tex
+  - docs/chapter/SUBMIT.md
+  - README.md
+  - docs/final/presentation/index.html
+  - docs/final/PRESENTER_SCRIPT.md
+  - docs/final/PRESENTER_SCRIPT_REFORMAT.html
+  - docs/final/TECHNICAL_REFERENCE.md
+  - docs/final/PRESENT_DAY_THREE_ARM_RESULTS.md
+  - docs/final/README_RESULTS.md
+  - docs/final/readable/RESULTS_EXPLAINED.md
+
+claims:
+
+  # --------------------------------------------------------------- non-live ---
+
+  - id: attribution-96-placement-phrasing
+    pattern: 'better[-\s]placed sites shelters 96\.0|(?:put|spend)[a-z ]{0,30}(?:it|them|the same beds)\s+in better places?,? and you get 96%|ten new well-placed shelters'
+    regex: true
+    case_insensitive: true
+    status: refuted
+    note: >-
+      The POOL control (D1, ec9b208) disproved the attribution: ten random
+      sites drawn from the same 498-node candidate pool reproduce C's sheltered
+      count run-for-run (6,570/6,565/6,566); the +306 vs B is 100% dispersion
+      ("more doors"), not optimised placement. Placement credit survives only
+      for walking (-28.3%, conditional on perfect information). See
+      09-SYSTEM-AUDIT.md section 1 and section 2.9. Precision: flags only the
+      three attribution phrasings (chapter tex:43/926 "better-placed sites
+      shelters 96.0"; presenter "put it in better places, and you get 96%";
+      RESULTS_EXPLAINED "ten new well-placed shelters"), never the bare number
+      96.0 — see the `live` entry headline-96-0-number.
+
+  - id: ranking-unambiguous
+    pattern: 'ranking[^.\n]{0,80}unambiguous|unambiguous[^.\n]{0,80}ranking'
+    regex: true
+    case_insensitive: true
+    status: refuted
+    note: >-
+      Capacity_Is_Not_Access.tex:699 calls the intervention ranking
+      "unambiguous" — the exact claim the POOL control refuted (placement's
+      headcount contribution is indistinguishable from random dispersion over
+      the same pool). 09-SYSTEM-AUDIT.md section 1. Precision: context-window
+      regex — "unambiguous" only within 80 same-sentence characters of
+      "ranking", so ordinary uses of "unambiguous" elsewhere never flag.
+
+  - id: mobility-19-2-held-exactly
+    pattern: 'marginal[^.\n]{0,40}held exactly|held exactly[^.\n]{0,60}(?:marginal|0\.192|19\.2)|(?:0\.192|19\.2%?)[^.\n]{0,40}held exactly'
+    regex: true
+    case_insensitive: true
+    status: refuted
+    note: >-
+      "The local marginal is held exactly" (TECHNICAL_REFERENCE.md:313; also
+      PopulationSampler.java:82-83, variables.csv) is analytically unreachable:
+      the 0.152163/0.347802 constants were solved against the 2019 PIT 55+
+      share (0.2036) but the sampler now uses Pathways age weights, giving a
+      coded expectation of 0.2033, not 0.192; the pooled nine-seed 20.4%
+      excludes 0.192 (z ~ 7.6). Needs re-derivation then re-run or reword
+      (09-SYSTEM-AUDIT.md section 2.5, P1 item 11). Precision: "held exactly"
+      flags only near "marginal"/"0.192"/"19.2" — tex:90 "held exactly one
+      space per person" (a live capacity statement) is deliberately excluded.
+
+  - id: checks-37-of-37
+    pattern: '(?<![\d/])37/37(?![\d/])'
+    regex: true
+    status: refuted
+    note: >-
+      "37/37 checks pass ... across all 27 runs" (index.html:830, TR:2233) is
+      false: the true per-run check counts are 32+2n = 104 (A/B) / 124 (C), no
+      analysis report exists for any of the 27 production runs, and 37/37
+      belongs to the retired 2-shelter baseline (09-SYSTEM-AUDIT.md section 2.6).
+      Precision: literal 37/37 guarded by lookarounds so longer digit/date
+      strings (e.g. 137/370, 2026/07/28) never flag.
+
+  - id: second-best-intervention-free
+    pattern: 'second[-\s]best intervention is free'
+    regex: true
+    case_insensitive: true
+    status: refuted
+    note: >-
+      presentation/index.html:188 "finds that the second-best intervention is
+      free" rides on the refuted placement attribution: the headcount gain of
+      re-spending the same beds is reproduced by random dispersion from the
+      same pool (D1). "Free" also ignores the ten new sites' siting/operating
+      reality. Precision: exact phrase, hyphen or space.
+
+  - id: same-beds-better-placed-slogan
+    pattern: 'same beds,? better place[sd]'
+    regex: true
+    case_insensitive: true
+    status: retired
+    note: >-
+      The slogan ("SAME BEDS, BETTER PLACED" / "same beds, better places")
+      encodes the refuted placement attribution as the explanation for C's
+      96.0% (index.html:209 kpi label, PRESENT_DAY:93, presenter script
+      tables). Rewrite direction: "same beds, more doors" for access;
+      placement credit only for walking distance. 09-SYSTEM-AUDIT.md P0 item 1.
+      Precision: catches both "placed" and "places" variants; "same beds, 10
+      new sites" (a design description, not an attribution) does not match.
+
+  - id: calibration-1-52-overpredict
+    pattern: '1\.52[^.\n]{0,60}over[-\s]?predict|over[-\s]?predict[a-z]*[^.\n]{0,60}1\.5\d?'
+    regex: true
+    case_insensitive: true
+    status: corrected-pending
+    replacement: >-
+      Report the D7-censored bracket: the model over-predicts the one observed
+      occupancy record by 1.5-15.6x (point value 1.52x is the uncensored lower
+      edge). Final single number pending the U-12 recalibration.
+    note: >-
+      Status corrected-pending (U-12 recalibration). The 1.52x point estimate
+      (README.md:64, SUBMIT.md:227, index.html:726, TR:2130/2258,
+      README_RESULTS:170, presenter "about 1.5 times") hides that the record
+      is censored: the true bracket is 1.5-15.6x (09-SYSTEM-AUDIT.md
+      section 2.7, P0 item 4). Precision: context-window regex — a number
+      1.5/1.52 flags only within 60 same-sentence characters of
+      "over-predict*", so bare 1.52 (coordinates, ratios) never flags.
+
+  - id: registered-sensitivity-test
+    pattern: 'registered sensitivity test|we tested for sensitivity'
+    regex: true
+    case_insensitive: true
+    status: refuted
+    note: >-
+      The "registered sensitivity test" of the 100 m node-site tolerance
+      (index.html:423; PRESENTER_SCRIPT.md:294-296 "we tested for
+      sensitivity") was never executed: NODE_SITE_TOLERANCE_M=100.0 is a
+      hard-coded static final, no batch file exposes it, and all 101 manifests
+      record the identical value (09-SYSTEM-AUDIT.md section 2.6). Precision:
+      requires the full "registered ... test" phrase or the presenter's exact
+      "we tested for sensitivity" — the word "sensitivity" alone never flags.
+
+  - id: tautology-this-is-the-finding
+    pattern: 'This is the finding|The finding that matters most|The three sentences that matter'
+    regex: true
+    case_insensitive: true
+    status: retired
+    note: >-
+      Tautology framing: B's "578 beds empty while 562 turned away" is a
+      design consequence (B relieves capacity and nothing else), not a
+      discovery, and must not be crowned "the finding" (index.html "This is
+      the finding.", TR "The finding that matters most", RESULTS_EXPLAINED
+      "The three sentences that matter" header over the pull-quotes; audit P0
+      item 2 also lists TR:68, which uses the numbers without a crowning
+      phrase and needs manual rewrite). Precision: three literal phrases
+      only. Known edge: PRESENTER_SCRIPT.md "This is the finding I'd most
+      want..." crowns the equity finding — same framing family, flagged for
+      manual review rather than auto-exempted.
+
+  - id: signal-28x-within-noise
+    pattern: '28\s*(?:times|[×x])[\s\S]{0,15}the\s+within'
+    regex: true
+    case_insensitive: true
+    status: retired
+    note: >-
+      "The between-arm signal is roughly 28x the within-arm noise" (TR:2095,
+      index.html:652) is withdrawn as a framing: seed-to-seed spread is not a
+      noise model for structural/parametric uncertainty, and the pooled
+      nine-seed treatment understates CI widths by up to 46%
+      (09-SYSTEM-AUDIT.md section 2.9). Report between-arm gaps alongside
+      within-arm ranges without the ratio. Precision: requires the "the
+      within..." continuation (across markdown bold or HTML tags and line
+      wraps), so stray "28x" strings never flag.
+
+  - id: gate-resolvable-doi
+    pattern: 'resolvable DOI'
+    regex: false
+    status: corrected
+    replacement: >-
+      The pre-run gate checks that the source field is non-empty; it does not
+      test DOI resolvability ('D99'/'TODO' pass). A real resolvability check
+      is action item 30.
+    note: >-
+      index.html:841-842 and TECHNICAL_REFERENCE.md:25-28 claim the model
+      "refuses to start" if a literature-derived variable "lacks a resolvable
+      DOI" — the gate tests non-emptiness only (09-SYSTEM-AUDIT.md
+      section 2.6). Precision: exact literal; the phrase does not occur in any
+      live sense in the deliverables.
+
+  - id: campsite-deduplicate-claim
+    pattern: 'de-duplicate to distinct places'
+    regex: false
+    status: refuted
+    note: >-
+      "we de-duplicate to distinct places" (PRESENTER_SCRIPT.md:177,
+      PRESENTER_SCRIPT_REFORMAT.html:145) is false: no de-duplication exists
+      anywhere in ContextCreator; the campsite file contains 3,317 distinct
+      coordinates from 3,400 reports, duplicates explain only 83 of the 419
+      shortfall, and 2,981 is a per-run sampling outcome
+      (00-RESPONSE.md:476-491; 03-data.md section 4). Precision: exact literal
+      phrase.
+
+  - id: campsite-2981-distinct
+    pattern: '2,981 distinct'
+    regex: false
+    status: corrected
+    replacement: >-
+      2,981 is the count of distinct start locations realised in one run
+      (A2026-seed42 agents.csv); the source file has 3,317 distinct
+      coordinates from 3,400 reports. State it as a sampling outcome, not a
+      property of the data.
+    note: >-
+      "2,981 distinct real locations / distinct campsite points" is stated as
+      a property of the data file but is a seed-42 sampling outcome
+      (00-RESPONSE.md:483-491, action item 17; 03-data.md:185-204). Precision:
+      literal "2,981 distinct" — bare occurrences of 2,981 as a count of
+      realised start locations are acceptable when labelled per-run.
+
+  - id: network-small-fragments
+    pattern: 'rest are small fragments'
+    regex: true
+    case_insensitive: true
+    status: refuted
+    note: >-
+      "The main piece holds 60,444 of the 89,322 intersections; the rest are
+      small fragments" (PRESENTER_SCRIPT.md:300, REFORMAT:222) is false: the
+      second component alone holds 28,407 of the 28,901 off-giant nodes —
+      31.8% of the graph — and is where 33 of 36 arm-A shelters and 3,382 of
+      3,400 campsites actually sit (03-data.md:91-93,293; 00-RESPONSE.md:35,131).
+      Precision: anchored phrase; legitimate uses of "fragment" never flag.
+
+  - id: last-arrival-tick-1539-global
+    pattern: 'tick 1,539|hour 25\.7|\bh25\.7|last arrival in any run'
+    regex: true
+    case_insensitive: true
+    status: corrected
+    replacement: >-
+      The last arrival across all 27 production runs is tick 1,973 (h32.9,
+      seed 46). Tick 1,539 (h25.7) is the seed-42 arm-C value and must be
+      labelled per-seed. (Conclusion survives: still ~107 h before the peak.)
+    note: >-
+      "Last arrival in any run is tick 1,539 (h25.7)" (06-equity-scales.md:262,
+      00-RESPONSE.md:729 — critique-response docs, outside this linter's
+      deliverable set) is seed-42-only (09-SYSTEM-AUDIT.md section 2.6).
+      Registered so the number cannot re-enter a deliverable as a global claim;
+      zero hits expected at baseline. Precision: "tick " prefix required so
+      digit runs like 258,641,539 (TR:2047) never flag.
+
+  - id: retired-two-shelter-experiment
+    pattern: '2,037[\s*]{0,4}(?:simulated residents|rows|spaces|run)|n=2,037'
+    regex: true
+    case_insensitive: true
+    status: retired
+    note: >-
+      README_RESULTS.md still describes the superseded two-shelter,
+      2,037-resident experiment in the present tense ("the model creates
+      2,037 simulated residents"; "A — current placement / B — optimized")
+      — fully replaced by the 36-shelter, 6,842-resident three-arm study;
+      the whole document must be retired or rewritten (09-SYSTEM-AUDIT.md
+      section 4 item 1, P0 item 1). Precision: flags only present-tense
+      experiment descriptions (2,037 followed by "simulated residents"/
+      "rows"/"spaces"/"run", or "n=2,037"); historical mentions of the 2019
+      figure ("was using 2,037", "replaced the 2019 figure of 2,037",
+      "391/2,037") deliberately do not match.
+
+  # ------------------------------------------------------------------- live ---
+
+  - id: headline-96-0-number
+    pattern: '96\.0'
+    regex: true
+    status: live
+    note: >-
+      The number itself reproduces from primary run outputs (seed-42 C 6,570 of
+      6,842 = 96.0%; nine-seed mean 6,566). Only the placement-attribution
+      phrasings around it are non-live (attribution-96-placement-phrasing,
+      same-beds-better-placed-slogan). Listed live so the linter documents the
+      distinction and ignores the bare figure.
+
+  - id: b-mismatch-578-562
+    pattern: '578 beds[^.\n]{0,60}562|562[^.\n]{0,60}578 beds'
+    regex: true
+    case_insensitive: true
+    status: live
+    note: >-
+      "578 beds empty while 562 people turned away" reproduces exactly
+      (claims-recompute, 09-SYSTEM-AUDIT.md section 2.9). The numbers are live;
+      only the "this is the finding" crowning of them is retired (see
+      tautology-this-is-the-finding).

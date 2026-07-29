@@ -23,9 +23,10 @@ without one of three labels:
 | **A** — assumption | Nobody measured it and no paper reports it. It is named, its direction of bias is stated, and it is registered in `Geography/data/registry/assumptions.csv`. |
 
 The project enforces this mechanically. `ScienceRegistry.java` refuses to start a
-run if any variable claiming class **M** or **L** lacks a resolvable DOI or dataset
-id, or if any **L**/**C** variable lacks a sweepable uncertainty range. A citation
-defect stops the simulation; it cannot silently become a result.
+run if any variable claiming class **M** or **L** has an empty `doi_or_dataset`
+field, or if any **L**/**C** variable lacks a sweepable uncertainty range. The
+gate tests presence, not resolvability — a wrong or dead identifier passes. A
+missing citation stops the simulation; it cannot silently become a result.
 
 **Companion documents.** The polished narrative version of this material is
 `docs/final/PRESENTATION.md`. The plain-language summary is
@@ -1961,6 +1962,11 @@ reproducibility block.
 			}
 ```
 
+Note the comment's "must name a resolvable source" overstates what the code
+below it enforces: rule 4 tests only that `doi_or_dataset` is non-empty and not
+`"none"`. It never attempts to resolve the identifier — a wrong or dead DOI
+passes the gate. "Resolvable" describes the intent, not the check.
+
 Called **first** in `ContextCreator.build()` (line 154), before any model object is
 constructed:
 
@@ -2226,12 +2232,12 @@ not a solution.
 | Check | Method | Result |
 |---|---|---|
 | **Exposure integration** | Recompute Σ C·dt from the raw EPA AQS CSV in Python, independently of the model | **Ratio 1.0000** (54,002.7 vs 54,002.8 µg·m⁻³·h) |
-| **Routing correctness** | `scripts/test_routing.py` — Python Dijkstra reimplementation, tests T1–T5 | Reproduces Java distances **exactly**; all pass |
+| **Routing correctness** | `scripts/test_routing.py` — Python Dijkstra reimplementation, tests T1–T5 | **Fails on current output by design**: V11 (`network_dist_to_shelter_m`) is stale for retargeted agents since fix D-6, so recorded distances no longer match a fresh Dijkstra for them (consistent with `FINAL_SYSTEM_AUDIT.md:144`) |
 | **Realised walking speeds** | Distance ÷ time from exported rows, checked against Bohannon bounds | 1.300–1.376 m/s, inside published range |
 | **Determinism** | Re-run at seed 42 | **Bit-for-bit identical** |
 | **Baseline invariance** | Add the entire heterogeneity layer, re-run baseline, compare all 25 shared columns | **Byte-identical**; `shelters.csv` byte-identical |
-| **Run-file consistency** | `scripts/analyze_run.py` — 37 cross-checks between `agents.csv`, `shelters.csv`, `simulation.json` | **37/37 pass** |
-| **Walked ≤ planned** (check #38) | `walked ≤ planned_route_m + snap_gap_m + 200 m`, per agent | Max unexplained 8.9 m in the capacity-binding reference |
+| **Run-file consistency** | `scripts/analyze_run.py` — 32 + 2n cross-checks between `agents.csv`, `shelters.csv`, `simulation.json` (n = shelter sites) | **104 checks** per A/B run (36 sites), **124** per C run (46 sites); the 37-check count quoted in earlier versions belonged to the retired 2-shelter baseline |
+| **Walked ≤ planned** (a derived computation reported alongside the checks, not a registered check) | `walked ≤ planned_route_m + snap_gap_m + 200 m`, per agent | Max unexplained 8.9 m in the capacity-binding reference |
 | **Population identity across arms** | SHA-256 over the joined attribute vector | Identical for A/B/C in **all nine seeds** |
 | **Cross-run invariants** | `scripts/verify_2026_runs.py`, six invariants | **All hold for 27 runs** |
 | **Street-graph integrity** | Impossible-edge count after correction | 50 → **0**; components unchanged |
@@ -2542,7 +2548,7 @@ inhaled_dose_ug,health_risk_multiplier,health_risk_score
 | `hours_above_unhealthy` | Hours outdoors with C > 55.5 µg/m³ (V8). |
 | `age`, `asthma`, `copd`, `age_rr`, `comorbidity_rr` | Legacy columns, retained for schema stability. `age_rr` and `comorbidity_rr` are **always 1.0**. |
 | `final_state` | SHELTERED / REFUSED_ALL_FULL / UNREACHABLE / EN_ROUTE / PRE_EVAC. |
-| `planned_route_m`, `snap_gap_m`, `door_refusals` | QC columns for check #38. `door_refusals` **under-reports** (resets on waiting-state re-entry). |
+| `planned_route_m`, `snap_gap_m`, `door_refusals` | QC columns for the walked-≤-planned computation (derived, not a registered check). `door_refusals` **under-reports** (resets on waiting-state re-entry). |
 | `scenario` | Arm label. |
 | `walking_speed_mps` | This resident's comfortable gait speed (V10). |
 | `age_years`, `age_band`, `sex` | V18, V19. |
@@ -2618,7 +2624,8 @@ python scripts\verify_2026_runs.py
 python scripts\make_2026_results.py
 python scripts\make_readable_results.py
 
-# Per-run consistency (37 checks + check #38):
+# Per-run consistency (32 + 2n checks: 104 for A/B, 124 for C, plus the
+# derived walked-vs-planned computation):
 python scripts\analyze_run.py Geography\output\A2026-n6842-seed42
 
 # Independent routing validation:

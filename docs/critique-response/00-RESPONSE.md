@@ -215,8 +215,8 @@ population draws" in the table header. Effort: 1 hour.
 
 **Evidence.** `hours_above_unhealthy` is exactly 194.000 for every unsheltered
 agent in all 27 runs — zero variance. Sheltered mean is 0.55–1.26 h. Per-agent
-`R²(cumulative_dose ~ hours) = 0.99921–0.99998` with slope 278.16–278.30 =
-54002.8192 / 194, a fixed constant. `R²(hours ~ binary got-inside) =
+`R²(cumulative_dose ~ hours) = 0.99921–0.99998` with slope 278.16–278.69
+across the 27 runs, bracketing 54002.8192 / 194 = 278.365, a fixed constant. `R²(hours ~ binary got-inside) =
 0.9984–0.99996`. `inhaled_dose / hours` = 172.2 / 174.4 / 177.7 — this is the
 critique's "~175". `vwe_ugm3h` is byte-identical to `cumulative_dose`, a third
 copy of the same column. Person-hours = 6,842 × mean hours exactly
@@ -585,12 +585,19 @@ cap. The critique's supporting arithmetic (`8 × mean inter-shelter distance`) i
 also off by 3.8×: the true figure is 8 × 8,655 m = 69,240 m.
 
 **R5. "`retargetCount` resets on re-entry, so refusals are under-reported."**
-The reset is real (`GisAgent.java:254`) but the path is unreachable: all
-shelters have `opened=2020-09-07` and occupancy is monotone (D10), so no agent
-ever re-enters. Proof: `Σ agents.door_refusals == Σ shelters.refused_count`
-exactly, in every arm (A 17,373; B 8,292; C 6,775). Our own documentation claims
-this caveat under-reports refusals; that claim is inoperative for these runs and
-should be withdrawn.
+**Confirmed — and the first version of this paragraph was wrong.** The reset is
+real (`GisAgent.java:254`) and the refused-then-retry path **does execute** in
+reported runs. The earlier claim that it is unreachable rested on seed 42 alone
+— the same seed-42-as-global error this response criticises elsewhere. At
+seed 42 the identity `Σ agents.door_refusals == Σ shelters.refused_count` holds
+exactly (A 17,373; B 8,292; C 6,775), but in C-seed44 and C-seed49 it breaks by
+exactly 18 each: two retarget-cap re-entries per run, and both re-entrant agents
+later shelter at Bybee Lakes with `door_refusals` reset to 0. Every arm-D
+r10/r15 run shows a deficit of 9–63. No published C headline metric changes —
+the re-entrants are already counted in the published sheltered totals. The
+documented caveat that `door_refusals` under-reports refusals is therefore
+correct and is restored; the earlier version of this paragraph withdrew it in
+error.
 
 **R6. "`CENTRE_DISTANCE` contradicts the surrounding prose about tolerances."**
 Refuted. `StreetNetwork.java:206` `CENTRE_DISTANCE` is not a distance at all —
@@ -663,15 +670,22 @@ archived `A-seed42/agents.csv` over 6,842 rows, and arm D at reserve 0.00 is
 identical to archived `B-seed42` with 0 differing rows. Arm D is arm B plus the
 rule and nothing else.
 
-Three-seed means (mobility-limited = 1,360 of 6,842; gap = unimpaired − ML, pp):
+Three-seed means (mobility-limited = 1,360 of 6,842; gap = unimpaired − ML, pp).
+Percentage columns are three-seed means; the count columns print seed-42
+values:
 
-| Arm | Sheltered | Total % | ML % | Gap | ML outside |
+| Arm | Sheltered (seed 42) | Total % | ML % | Gap | ML outside (seed 42) |
 |---|---|---|---|---|---|
 | B | 6,264 | 91.5 | 72.0 | 24.4 | 382 |
 | C | 6,570 | 96.0 | 85.7 | 12.9 | 194 |
 | **D, r = 0.10** | **6,264** | **91.5** | **91.4** | **0.1** | **108** |
 | D, r = 0.15 | 6,088 | 89.1 | 99.7 | −13.3 | 3–5 |
 | D, r = 0.25 | 5,523 | 80.7 | 99.8 | −23.8 | 3 |
+
+True three-seed count means: B and D-r10 sheltered 6,261 (per-seed
+6,264 / 6,259 / 6,260, identical in B and D-r10); B ML outside 387.3; D-r10 ML
+outside 119.0; D-r15 sheltered 6,096. The r = 0.25 row is seed-42 only (that
+reserve level was run at seed 42 only).
 
 **Meaning for the central claim.** At reserve 0.10 total sheltered is unchanged
 from B to the person at all three seeds (6,264 / 6,259 / 6,260, identical
@@ -726,12 +740,15 @@ residual is 74% mobility-limited, which implies paratransit and in-place
 filtration rather than more cots. The pp / RR / OR scales are inference tools
 and cannot size a purchase order.
 
-**Temporal.** Every agent departs at tick 960 (h16) and the last arrival is
-h25.7, so C helps throughout the episode, not at the peak: 99.3% of the 242M
+**Temporal.** Every agent departs at tick 960 (h16) and the last arrival across
+all 27 runs is tick 1,973 = h32.9 (seed 46, and seeds 48/49 reach h31–33; at
+seed 42 it is tick 1,539 = h25.7), so C helps throughout the episode, not at
+the peak: 99.3% of the 242M
 person-µg·m⁻³·h it avoids relative to A accrues after evacuation ends, and the
 ±12 h peak window (h128–152, 8.4% of the episode) carries 18.0% of it — 2.1× its
 time share. C works by permanently removing 4,510 people (vs A) and 306 people
-(vs B) from a standing outdoor population for 286 hours. Person-hours outdoors:
+(vs B) from a standing outdoor population for the remaining 279–286 hours
+(seed-dependent; 286 at seed 42). Person-hours outdoors:
 1,417,876 → 180,762 → 88,445, with mobility-limited absorbing 23% → 64% → 70%.
 
 Mobility-limited p90 time-to-shelter in C is 4.13 h vs 2.03 h unimpaired (2.0×)

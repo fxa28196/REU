@@ -259,13 +259,15 @@ appears nowhere in `PRESENT_DAY_THREE_ARM_RESULTS.md` or the chapter.
 
 Every agent in all 27 runs departs at **tick 960 = hour 16** (the county-uniform
 PM2.5 field crosses the 55.5 µg/m³ evacuation threshold once, so departures are
-not staggered — a real model limitation, see §6.4). The last arrival in any run
-is tick 1,539 = **hour 25.7**. The smoke-field peak is **hour 140 at
-562.7 µg/m³**, reproduced from
+not staggered — a real model limitation, see §6.4). The last arrival at seed 42
+is tick 1,539 = **hour 25.7**; the last arrival in any of the 27 runs is tick
+1,973 = **hour 32.9** (seed 46, and seeds 48/49 reach h31–33). The smoke-field
+peak is **hour 140 at 562.7 µg/m³**, reproduced from
 `Geography/src/geography/env/SmokeField.java:52-92`.
 
-**So the entire evacuation is over by hour 26 of a 312-hour episode.** After that
-the outdoor headcount is frozen for 286 hours:
+**So the entire evacuation is over by hour 26 at seed 42 — and by hour 33 in
+every one of the 27 runs — of a 312-hour episode.** After that the outdoor
+headcount is frozen for the remaining 279–286 hours:
 
 | arm | outdoors at h20 | at h30 | at h140 (peak) | at h311 |
 |---|---|---|---|---|

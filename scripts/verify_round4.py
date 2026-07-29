@@ -18,9 +18,28 @@ from math import erf, sqrt
 # ----------------------------------------------------------------------
 # CONFIG — set these when the repo is available (Section B)
 # ----------------------------------------------------------------------
-REPO = os.environ.get("REU_REPO", "")            # repo root
-AGENT_CSV = os.environ.get("REU_AGENT_CSV", "")  # per-agent output CSV, seed 42
-MANIFEST_DIR = os.environ.get("REU_MANIFESTS", "")
+# Wired 2026-07-28 to the real repo layout:
+#   REPO       — repo root.
+#   AGENT_CSV  — arm A (present-day reality), seed 42 per-agent output.
+#   MANIFEST_DIR — the repo has no flat manifest directory; manifests live as
+#       docs/runs/<scenario>/<run>/simulation.json. They are staged 1:1
+#       (renamed <scenario>__<run>.json) into a flat directory so the U-21B
+#       listdir-based check runs unmodified on the real files. Rebuild with:
+#       find docs/runs -name simulation.json | while read f; do
+#         cp "$f" "$STAGE/$(echo ${f#docs/runs/} | sed 's|/simulation.json||;s|/|__|g').json"; done
+#   GRAPH_EDGES — no edge-list export with RLIS TYPE exists in the repo
+#       (only the raw shapefile Geography/data/Streets.shp); left empty.
+REPO = os.environ.get(
+    "REU_REPO", r"C:\Users\Chick\OneDrive\Desktop\reu")  # repo root
+AGENT_CSV = os.environ.get(
+    "REU_AGENT_CSV",
+    os.path.join(REPO, "docs", "runs", "present-day-three-arm",
+                 "A-seed42", "agents.csv"))  # per-agent output CSV, seed 42
+MANIFEST_DIR = os.environ.get(
+    "REU_MANIFESTS",
+    r"C:\Users\Chick\AppData\Local\Temp\claude"
+    r"\C--Users-Chick-OneDrive-Desktop-reu"
+    r"\2e9bcfaf-1df6-44c3-a9bf-a52def769b76\scratchpad\manifests_flat")
 GRAPH_EDGES = os.environ.get("REU_EDGES", "")    # exported edge list w/ RLIS TYPE
 
 POP = 6842

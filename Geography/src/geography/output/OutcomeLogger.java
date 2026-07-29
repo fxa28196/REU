@@ -1,6 +1,8 @@
 package geography.output;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -10,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import geography.agents.GisAgent;
 import geography.agents.Shelter;
@@ -356,7 +359,13 @@ public class OutcomeLogger {
 		w.println("      \"note\": \"Full checksum census including shapefile sidecars and the "
 				+ "governance registries. data_version_tag intentionally covers only the four "
 				+ "model inputs, to stay comparable with earlier archived runs.\",");
-		w.println("      \"git_working_tree_dirty\": " + gitWorkingTreeDirty() + ",");
+		// U-21 (docs/critique-response/10-ROUND4-DELTA.md): typing is decided
+		// once, here at the writer — true/false as real JSON booleans,
+		// "unknown" as a JSON string. Field name and position are part of the
+		// append-only manifest contract; do not reorder or rename.
+		String dirty = gitWorkingTreeDirty();
+		w.println("      \"git_working_tree_dirty\": "
+				+ ("unknown".equals(dirty) ? "\"unknown\"" : dirty) + ",");
 		w.println("      \"files\": [");
 		for (int i = 0; i < files.length; i++) {
 			w.println("        {\"file\": \"" + jsonEsc(files[i]) + "\", \"sha256\": \""
@@ -367,42 +376,58 @@ public class OutcomeLogger {
 	}
 
 	/**
-	 * True when tracked model sources are newer than the recorded git HEAD, i.e.
-	 * the run may have executed uncommitted code. An audit found nine archived
-	 * runs stamped a commit that could not reproduce them; this flag makes that
-	 * condition visible in the manifest instead of silent. Heuristic and
-	 * deliberately conservative: it compares file modification times against the
-	 * HEAD ref's own timestamp, so it errs toward reporting "true".
+	 * Whether the git working tree contained uncommitted changes when this run
+	 * executed, i.e. whether the recorded HEAD commit can actually reproduce
+	 * it. An audit found nine archived runs stamped a commit that could not
+	 * reproduce them; this flag makes that condition visible in the manifest
+	 * instead of silent. Asks git itself — {@code git status --porcelain} run
+	 * at the repository root with a 5-second timeout — rather than the earlier
+	 * mtime-vs-HEAD heuristic: any porcelain output means dirty, none means
+	 * clean. Returns the three-state token {@code "true"} / {@code "false"} /
+	 * {@code "unknown"} ("unknown" when git is missing, exits non-zero, times
+	 * out, or anything else fails); the manifest writer decides JSON typing
+	 * (U-21).
 	 */
 	private static String gitWorkingTreeDirty() {
 		try {
-			File head = new File(".git/HEAD");
-			if (!head.exists()) head = new File("../.git/HEAD");
-			if (!head.exists()) return "\"unknown\"";
-			String h = new String(Files.readAllBytes(head.toPath()), StandardCharsets.UTF_8).trim();
-			File ref = head;
-			if (h.startsWith("ref:")) {
-				File candidate = new File(head.getParentFile(), h.substring(4).trim());
-				if (candidate.exists()) ref = candidate;
-			}
-			long headTime = ref.lastModified();
-			File src = new File("src/geography");
-			if (!src.exists()) src = new File("Geography/src/geography");
-			return String.valueOf(newestFileTime(src) > headTime);
-		} catch (Exception e) {
-			return "\"unknown\"";
-		}
-	}
+			// Runs launch with cwd = Geography/ (see build.gradle runModel),
+			// so the repo root is either "." or its parent.
+			File root = new File(".").getCanonicalFile();
+			if (!new File(root, ".git").exists()) root = root.getParentFile();
+			if (root == null || !new File(root, ".git").exists()) return "unknown";
 
-	private static long newestFileTime(File dir) {
-		long newest = 0;
-		File[] kids = dir.listFiles();
-		if (kids == null) return newest;
-		for (File f : kids) {
-			long t = f.isDirectory() ? newestFileTime(f) : f.lastModified();
-			if (t > newest) newest = t;
+			ProcessBuilder pb = new ProcessBuilder("git", "status", "--porcelain");
+			pb.directory(root);
+			pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+			Process p = pb.start();
+			p.getOutputStream().close();
+
+			// Drain stdout concurrently so a large status list cannot fill the
+			// pipe buffer and deadlock the child against waitFor().
+			ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+			final boolean[] drained = { false };
+			Thread drain = new Thread(() -> {
+				try (InputStream in = p.getInputStream()) {
+					byte[] buf = new byte[8192];
+					for (int n; (n = in.read(buf)) != -1;) stdout.write(buf, 0, n);
+					drained[0] = true;
+				} catch (Exception ignored) {
+					// drained[0] stays false; reported as "unknown" below.
+				}
+			});
+			drain.setDaemon(true);
+			drain.start();
+
+			if (!p.waitFor(5, TimeUnit.SECONDS)) {
+				p.destroyForcibly();
+				return "unknown";
+			}
+			drain.join(1000);
+			if (!drained[0] || p.exitValue() != 0) return "unknown";
+			return stdout.toString(StandardCharsets.UTF_8).trim().isEmpty() ? "false" : "true";
+		} catch (Exception e) {
+			return "unknown";
 		}
-		return newest;
 	}
 
 	/** Street-graph validation provenance (docs/validation/STREET_NETWORK_VALIDATION.md):

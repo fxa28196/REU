@@ -419,8 +419,10 @@ footer{border-top:1px solid var(--rule);margin-top:4rem;padding:2.2rem 0 3.5rem;
           is deleted, and no geometry is edited.</li>
         <li><b>The 100 m threshold sits in an empty band.</b> Legitimate endpoint scatter
           in this data is sub-metre; the smallest corrupt displacement is ~1.65 km. Any
-          threshold between those two regimes produces the identical graph — which is
-          exactly the registered sensitivity test.</li>
+          threshold between roughly 10 m and 1 km must therefore produce the identical
+          graph. This is an argument from the empty band, not an executed sweep:
+          <code>NODE_SITE_TOLERANCE_M</code> is hard-coded at 100.0 and all 101 run
+          manifests record that same value.</li>
         <li><b>Every correction is written to the run manifest</b> under
           <code>street_network_validation</code>, so a reader can see precisely which nodes
           were touched and why.</li>
@@ -489,7 +491,8 @@ footer{border-top:1px solid var(--rule);margin-top:4rem;padding:2.2rem 0 3.5rem;
           scale.</li>
         <li><b>The highlighted line is the fix</b> — the routing origin moves to where the
           resident actually is.</li>
-        <li><b>It is now guarded arithmetically.</b> Analysis check #38 asserts
+        <li><b>It is now guarded arithmetically.</b> A derived analysis computation
+          (reported alongside the registered checks, not itself one) asserts
           <code>walked ≤ planned_route_m + snap_gap_m + 200 m</code> for every agent. In the
           capacity-binding reference run — 250 of 400 agents refused at least once — the
           maximum unexplained distance was <b>8.9 m</b>.</li>
@@ -827,7 +830,7 @@ footer{border-top:1px solid var(--rule);margin-top:4rem;padding:2.2rem 0 3.5rem;
         <tr><td>Routing — independent Python Dijkstra, tests T1–T5</td><td class="lt">distances match exactly</td></tr>
         <tr><td>Determinism — re-run at seed 42</td><td class="lt">bit-for-bit identical</td></tr>
         <tr><td>Baseline invariance after adding the heterogeneity layer</td><td class="lt">byte-identical</td></tr>
-        <tr><td>Per-run internal consistency (<code>analyze_run.py</code>)</td><td class="lt">37/37 checks pass</td></tr>
+        <tr><td>Per-run internal consistency (<code>analyze_run.py</code>)</td><td class="lt">32 + 2n checks: 104 per A/B run, 124 per C run (the old 37-check count was the retired 2-shelter baseline)</td></tr>
         <tr><td>Walked ≤ planned + snap + 200 m, per agent</td><td class="lt">max unexplained 8.9 m</td></tr>
       </tbody></table></div>
   </div>
@@ -839,10 +842,11 @@ footer{border-top:1px solid var(--rule);margin-top:4rem;padding:2.2rem 0 3.5rem;
     <h2>Provenance</h2>
     <div class="measure">
       <p>The model refuses to start if any variable claiming to be measured or
-        literature-derived lacks a resolvable DOI, or if any literature value lacks a sweep
-        range. A citation defect stops the simulation; it cannot quietly become a result.
-        The registry holds <strong>28 variables and 26 assumptions</strong>, four of which
-        are marked blocking.</p>
+        literature-derived lacks a DOI or dataset id — the gate tests that the field is
+        non-empty, not that the identifier resolves — or if any literature value lacks a
+        sweep range. A missing citation stops the simulation; it cannot quietly become a
+        result. The registry holds <strong>29 variables and 26 assumptions</strong>, four
+        of which are marked blocking.</p>
     </div>
 
     <h3>Data</h3>
