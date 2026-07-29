@@ -183,12 +183,15 @@ footer{border-top:1px solid var(--rule);margin-top:4rem;padding:2.2rem 0 3.5rem;
 <header class="hero">
   <p class="eyebrow">NSF REU · Computational Modeling Serving Portland · Portland State University<br>
     Agent-based model · 6,842 residents · 27 simulation runs · <span>PM2.5 peak 562.7 µg/m³</span></p>
-  <h1>More beds,<br>or better beds?</h1>
+  <h1>Capacity is not access</h1>
   <p class="deck">If the September 2020 wildfire smoke returned today, Multnomah County's
     shelter system would reach fewer than one unsheltered person in three. This model asks
-    which fix actually works — and finds that the second-best intervention is free.</p>
+    which fix actually works — and finds that the shortfall always lands on the people who
+    walk slowest, and that the one tested intervention that closes that gap costs nothing:
+    holding 10% of each shelter's spaces for mobility-limited arrivals takes the access gap
+    from ~24 points to zero at identical total admissions.</p>
   <p class="byline">Fatima Asghar · mentor Prof. Christof Teuscher<br>
-    Repast Simphony 2.11 · Java 17 · commit <code>c0cd113</code></p>
+    Repast Simphony 2.11 · Java 17 · corrected-graph runs at commit <code>deddfca</code></p>
 </header>
 
 <figure>
@@ -207,7 +210,7 @@ footer{border-top:1px solid var(--rule);margin-top:4rem;padding:2.2rem 0 3.5rem;
 <div class="kpis">
   <div class="kpi"><span class="n a-ink">30.1%</span><span class="l">reach a shelter today</span></div>
   <div class="kpi"><span class="n b-ink">91.6%</span><span class="l">with capacity raised to demand</span></div>
-  <div class="kpi"><span class="n c-ink">96.0%</span><span class="l">same beds, better placed</span></div>
+  <div class="kpi"><span class="n c-ink">96.0%</span><span class="l">same total as B, more doors</span></div>
   <div class="kpi"><span class="n">27</span><span class="l">runs · 9 seeds × 3 arms</span></div>
 </div>
 
@@ -252,8 +255,10 @@ footer{border-top:1px solid var(--rule);margin-top:4rem;padding:2.2rem 0 3.5rem;
       <p>The population count is the 2025 Tri-County Point-in-Time count: 10,526 people
         experiencing homelessness in Multnomah County, more than 65% of them unsheltered
         — about 6,842. Only the unsheltered are modelled, because only they are outdoors.</p>
-      <p>Each one is placed at one of <strong>2,981 distinct real campsite-report
-        locations</strong> and given an age, a sex, a mobility status, an asthma and COPD
+      <p>Each one is placed at a real campsite-report location — the City feed's
+        <strong>3,400 reports resolve to 3,317 distinct coordinates</strong>, and any one
+        run seeds residents at a sampled subset of them (2,981 places in the seed-42 run
+        shown here) — and given an age, a sex, a mobility status, an asthma and COPD
         status, and their own walking speed, each drawn from a published source.</p>
     </div>
 
@@ -368,7 +373,7 @@ footer{border-top:1px solid var(--rule);margin-top:4rem;padding:2.2rem 0 3.5rem;
 </section>
 
 <section class="stage">
-  <div class="stage-tag"><b>Stage 2</b>The city<br>89,322 nodes</div>
+  <div class="stage-tag"><b>Stage 2</b>The city<br>88,100 nodes</div>
   <div>
     <h2>Real streets, and a real bug in them</h2>
     <div class="measure">
@@ -435,7 +440,9 @@ footer{border-top:1px solid var(--rule);margin-top:4rem;padding:2.2rem 0 3.5rem;
       <tbody>
         <tr><td>Impossible edges</td><td>50</td><td class="hi">0</td></tr>
         <tr><td>Maximum endpoint gap</td><td>18.5 km</td><td class="hi">11.9 m</td></tr>
-        <tr><td>Graph components</td><td>154 / 60,444</td><td>unchanged</td></tr>
+        <tr><td>Graph components</td><td>154 / 60,444</td><td>unchanged by this fix; the later
+          pedestrian-legality filter (2,636 freeway features removed) re-based them to
+          <b>171 / 59,725</b></td></tr>
         <tr><td>Longest journey, seed 42</td><td>875 min / 68.3 km</td><td class="hi">212 min / 16.5 km</td></tr>
       </tbody></table></div>
 
@@ -609,56 +616,66 @@ footer{border-top:1px solid var(--rule);margin-top:4rem;padding:2.2rem 0 3.5rem;
         aria-label="Bar chart: scenario A shelters 2,060 people (30.1%), scenario B 6,264 (91.6%), scenario C 6,570 (96.0%)."></svg></div>
       <div class="legend"><span><i style="background:var(--arm-a)"></i>A · today</span>
         <span><i style="background:var(--arm-b)"></i>B · more beds</span>
-        <span><i style="background:var(--arm-c)"></i>C · better-placed beds</span>
+        <span><i style="background:var(--arm-c)"></i>C · same total, more doors</span>
         <span><i style="background:var(--rule)"></i>left outside</span></div>
       <figcaption>Raising capacity to meet demand is the dominant intervention. But B still
-        fails 562 people — and it does so while holding beds it cannot fill.</figcaption>
+        fails 578 people — and it does so while holding beds it cannot fill.</figcaption>
     </figure>
 
     <figure>
       <div class="fig-head">Empty beds and turned-away people, at the same moment</div>
       <div class="fig-sub">Seed 42 · when both bars are tall, the beds exist in the wrong places</div>
       <div class="chart"><svg id="c-geo" viewBox="0 0 900 290" role="img"
-        aria-label="Paired bars per scenario. A: 174 beds empty, 4,766 turned away. B: 578 empty, 562 turned away — nearly equal. C: 272 empty, 256 turned away."></svg></div>
+        aria-label="Paired bars per scenario. A: 174 beds empty, 4,754 turned away. B: 578 empty, 550 turned away plus 28 unreachable. C: 272 empty, 244 turned away."></svg></div>
       <div class="legend"><span><i style="background:var(--ink-3)"></i>beds left empty</span>
         <span><i style="background:var(--arm-a)"></i>people turned away</span></div>
-      <figcaption><b>This is the finding.</b> Scenario B leaves <b>578 beds empty while
-        turning 562 people away.</b> Those numbers are nearly equal. B has no shortage — it
-        has exactly one bed per person — and it still fails, because the beds went where the
+      <figcaption><b>The capacity/geography separation — and why the near-equality is
+        forced.</b> In B, capacity equals population exactly, so the arithmetic is an
+        identity: <b>578 empty beds = 550 people refused + 28 who cannot reach any shelter
+        by any route.</b> The identity is a consequence of the design; the substance is
+        that one bed per person still strands 578 people, because the spaces sit where the
         <em>buildings</em> are rather than where the <em>people</em> are. That is a
-        geography failure, cleanly separated from a capacity failure.</figcaption>
+        geography failure, cleanly separated from a capacity failure — and it is a
+        knife-edge failure: give the same sites 20% surplus and admissions reach 99.5%.</figcaption>
     </figure>
 
-    <div class="pull c">C spends the identical 6,842 beds. Refusals halve, empty beds halve,
-      walking drops 28%, and inhaled dose halves again.</div>
+    <div class="pull c">C spends the same total as B, split differently — more doors:
+      refusals halve, empty beds halve, walking drops 25%, and inhaled dose halves again.
+      Ten random sites from the same candidate pool match C's headcount exactly — the gain
+      is dispersion, not the optimiser; siting quality earns its credit on walking
+      distance only.</div>
 
     <div class="tbl-wrap"><table>
       <thead><tr><th>Seed 42 · range across nine seeds</th>
-        <th>A — today</th><th>B — more beds</th><th>C — better placed</th></tr></thead>
+        <th>A — today</th><th>B — more beds</th><th>C — same total, more doors</th></tr></thead>
       <tbody>
         <tr><td>Facilities</td><td>36</td><td>36</td><td>46</td></tr>
         <tr><td>Total spaces</td><td>2,234</td><td>6,842</td><td>6,842</td></tr>
         <tr><td>Got inside</td><td class="hi">2,060 (30.1%)</td><td class="hi">6,264 (91.6%)</td><td class="hi">6,570 (96.0%)</td></tr>
         <tr><td>&nbsp;&nbsp;<span style="color:var(--ink-3);font-family:var(--mono);font-size:.85em">range over 9 seeds</span></td>
           <td style="color:var(--ink-3)">2,053–2,064</td><td style="color:var(--ink-3)">6,257–6,268</td><td style="color:var(--ink-3)">6,563–6,574</td></tr>
-        <tr><td>Turned away</td><td>4,766</td><td>562</td><td class="hi">256</td></tr>
+        <tr><td>Turned away</td><td>4,754</td><td>550</td><td class="hi">244</td></tr>
         <tr><td>Beds left empty</td><td>174</td><td class="hi">578</td><td>272</td></tr>
-        <tr><td>Could not reach any shelter</td><td>16</td><td>16</td><td>16</td></tr>
-        <tr><td>Average walk</td><td>18,260 m</td><td>7,938 m</td><td class="hi">5,689 m</td></tr>
-        <tr><td>Average hours in unhealthy air</td><td>135.8</td><td>17.5</td><td class="hi">8.6</td></tr>
-        <tr><td>Average smoke inhaled</td><td>23,374 µg</td><td>3,056 µg</td><td class="hi">1,534 µg</td></tr>
-        <tr class="tot"><td>Person-hours in unhealthy air</td><td>928,934</td><td>119,921</td><td>59,060</td></tr>
+        <tr><td>Could not reach any shelter</td><td>28</td><td>28</td><td>28</td></tr>
+        <tr><td>Average walk</td><td>18,244 m</td><td>7,896 m</td><td class="hi">5,904 m</td></tr>
+        <tr><td>Average hours in unhealthy air</td><td>135.8</td><td>17.5</td><td class="hi">8.7</td></tr>
+        <tr><td>Average smoke inhaled</td><td>23,373 µg</td><td>3,056 µg</td><td class="hi">1,536 µg</td></tr>
+        <tr class="tot"><td>Person-hours in unhealthy air</td><td>928,918</td><td>119,973</td><td>59,200</td></tr>
       </tbody></table></div>
 
-    <div class="note"><h4>Signal against noise</h4>
+    <div class="note"><h4>Spread across seeds, gap between scenarios</h4>
       Every arm was run with nine random seeds — 27 runs in total. The largest
       seed-to-seed spread on "got inside" is <b>11 people</b>; the smallest gap between two
-      arms is <b>306</b>. The between-arm signal is roughly <b>28×</b> the within-arm noise,
-      and <b>no range overlaps between arms on any headline metric</b>.
-      <br><br>One detail falls out of the design as a free consistency check: <em>could not
-      reach any shelter</em> is identical across all three arms within each seed (16, 16,
-      16 in seed 42). Those residents sit on street-graph components containing no shelter
-      at all — no amount of capacity or re-placement reaches them, and the number varies
+      arms is <b>306</b>. The two are reported side by side, not as a ratio — seed spread
+      bounds only random-draw variability, not structural uncertainty — and
+      <b>no range overlaps between arms on any headline metric</b>. The B→C gap of 306 is
+      reproduced exactly by random site draws from the same candidate pool, so its
+      tightness is evidence about dispersion, not the optimiser.
+      <br><br>One diagnostic falls out of the design: <em>could not reach any shelter</em>
+      is identical across all three arms within each seed (28, 28, 28 in seed 42 — verified
+      as the same individuals, not just the same count). Those residents sit on street-graph
+      fragments whose only link to the rest of the map was a freeway, which pedestrians may
+      not use — no amount of capacity or re-placement reaches them, and the number varies
       only with which residents were sampled.</div>
   </div>
 </section>
@@ -677,26 +694,29 @@ footer{border-top:1px solid var(--rule);margin-top:4rem;padding:2.2rem 0 3.5rem;
       <div class="fig-head">The mobility gap</div>
       <div class="fig-sub">Percentage reaching a shelter · residents who walk without difficulty vs residents who do not</div>
       <div class="chart"><svg id="c-gap" viewBox="0 0 900 260" role="img"
-        aria-label="Dumbbell chart. Scenario A: 32.7 percent versus 19.7 percent, a 13.0 point gap. Scenario B: 96.4 versus 71.9, a 24.5 point gap. Scenario C: 98.6 versus 85.7, a 12.9 point gap."></svg></div>
+        aria-label="Dumbbell chart. Scenario A: 32.6 percent versus 20.1 percent, a 12.5 point gap. Scenario B: 96.3 versus 72.6, a 23.7 point gap. Scenario C: 98.5 versus 86.0, a 12.5 point gap. Scenario D: 91.5 versus 91.9, the gap closed."></svg></div>
       <div class="legend"><span><i style="background:var(--ink-3);border-radius:50%"></i>walks without difficulty</span>
         <span><i style="background:var(--hazard);border-radius:50%"></i>has trouble walking</span></div>
       <figcaption>Pouring 4,608 extra beds into the <em>same</em> buildings widens the
-        mobility gap from <b>13.0 to 24.5 percentage points</b> — extra capacity at an
-        existing site is captured first by whoever can walk there fastest. Spending that
-        identical capacity on well-placed new sites returns the gap to <b>12.9</b> while
-        lifting the slowest group from 71.9% to 85.7%.</figcaption>
+        mobility gap from <b>12.5 to 23.7 percentage points</b> — extra capacity at an
+        existing site is captured first by whoever can walk there fastest. More doors bring
+        the gap back to <b>12.5</b>. What <em>closes</em> it is scenario D's intake rule:
+        hold 10% of each shelter's spaces for mobility-limited arrivals and the gap goes to
+        <b>−0.4 points at identical total admissions</b> — zero capital cost. And the gap is
+        a knife-edge phenomenon: at 20% capacity surplus it vanishes entirely (a
+        pre-registered prediction we got wrong, reported in the round-5 report).</figcaption>
     </figure>
 
     <div class="tbl-wrap"><table>
-      <thead><tr><th>Group</th><th>Share</th><th>A</th><th>B</th><th>C</th></tr></thead>
+      <thead><tr><th>Group</th><th>Share</th><th>A</th><th>B</th><th>C</th><th>D = B + reserve</th></tr></thead>
       <tbody>
-        <tr><td>Everyone</td><td>100%</td><td>30.1</td><td>91.6</td><td class="hi">96.0</td></tr>
-        <tr><td>Walks without difficulty</td><td>80.1%</td><td>32.7</td><td>96.4</td><td>98.6</td></tr>
-        <tr><td>Has trouble walking</td><td>19.9%</td><td class="hi">19.7</td><td class="hi">71.9</td><td class="hi">85.7</td></tr>
-        <tr><td>Age 65+</td><td>5.2%</td><td>22.4</td><td>82.4</td><td>89.8</td></tr>
-        <tr><td>Has COPD</td><td>10.8%</td><td>22.2</td><td>86.2</td><td>93.8</td></tr>
-        <tr><td>Has asthma</td><td>14.8%</td><td>29.2</td><td>90.6</td><td>95.7</td></tr>
-        <tr><td>Counted as more vulnerable</td><td>71.1%</td><td>28.2</td><td>88.8</td><td>94.7</td></tr>
+        <tr><td>Everyone</td><td>100%</td><td>30.1</td><td>91.6</td><td class="hi">96.0</td><td>91.6</td></tr>
+        <tr><td>Walks without difficulty</td><td>80.1%</td><td>32.6</td><td>96.3</td><td>98.5</td><td>91.5</td></tr>
+        <tr><td>Has trouble walking</td><td>19.9%</td><td class="hi">20.1</td><td class="hi">72.6</td><td class="hi">86.0</td><td class="hi">91.9</td></tr>
+        <tr><td>Age 65+</td><td>5.2%</td><td>22.4</td><td>81.6</td><td>90.1</td><td></td></tr>
+        <tr><td>Has COPD</td><td>10.8%</td><td>22.6</td><td>87.3</td><td>95.1</td><td></td></tr>
+        <tr><td>Has asthma</td><td>14.8%</td><td>29.3</td><td>91.1</td><td>95.8</td><td></td></tr>
+        <tr><td>Counted as more vulnerable</td><td>71.1%</td><td>28.2</td><td>88.9</td><td>94.8</td><td></td></tr>
       </tbody></table></div>
 
     <div class="pull">Asthma shows almost no access penalty. COPD shows a large one. That
@@ -707,9 +727,10 @@ footer{border-top:1px solid var(--rule);margin-top:4rem;padding:2.2rem 0 3.5rem;
         diagnosis is never a dose multiplier. COPD carries a published gait-speed decrement;
         asthma does not. So COPD tracks the mobility pattern and asthma tracks the
         population average — which is exactly what an honest model should produce.</p>
-      <p><strong>And the gap is narrowed, not closed.</strong> 14.3% of residents with
-        mobility limitations are still outside in scenario C. Ten well-placed shelters are a
-        large improvement, not a solution.</p>
+      <p><strong>More doors narrow the gap; the intake rule closes it.</strong> 14.0% of
+        residents with mobility limitations — about 190 people — are still outside in
+        scenario C. Ten additional shelters are a large improvement, not a solution; the
+        solution the model found costs nothing.</p>
     </div>
   </div>
 </section>
@@ -720,15 +741,20 @@ footer{border-top:1px solid var(--rule);margin-top:4rem;padding:2.2rem 0 3.5rem;
     <h2>What this does not claim</h2>
     <div class="measure">
       <p>The claim is narrow and deliberate: <em class="q">for a fixed total capacity,
-        placing new capacity at optimized locations outperforms enlarging existing
-        facilities — under the modelled assumptions.</em></p>
+        splitting the capacity across more sites admits more people than enlarging existing
+        facilities — under the modelled assumptions — and the admissions gain does not
+        depend on choosing the sites well: random sites from the same candidate pool
+        reproduce it exactly.</em></p>
     </div>
 
     <div class="note warn"><h4>The calibration result, reported against interest</h4>
       Against the one observed occupancy record — Street Roots, 16 September 2020:
-      approximately 130 of 198 beds occupied — the historical reference configuration fills
-      <b>198 of 198</b>. That is a <b>1.52× over-prediction</b>, attributed to the
-      assumption that everyone knows the shelters exist. A local survey found <b>65% of
+      approximately 90 people at the Convention Center and 40 at Charles Jordan, ≈130 of
+      198 beds — the historical reference configuration fills <b>198 of 198 at both
+      sites</b>. Because the record is approximate, the honest statement is a bracket: the
+      model over-admits by <b>1.5–15.6×</b> (1.52× is only the most favourable edge; a
+      final value awaits the planned population recalibration). Attributed to the
+      assumption that everyone knows the shelters exist — a local survey found <b>65% of
       unsheltered residents had never heard of them.</b> Every "got inside" figure in this
       study is therefore an <b>upper bound</b>.</div>
 
@@ -838,6 +864,70 @@ footer{border-top:1px solid var(--rule);margin-top:4rem;padding:2.2rem 0 3.5rem;
 </section>
 
 <section class="stage">
+  <div class="stage-tag"><b>Stage 9</b>Raw data<br>&amp; every "why"</div>
+  <div>
+    <h2>One row per person — and a model that checks our honesty</h2>
+    <div class="measure">
+      <p>When a simulation ends, the model writes one row for each of the 6,842 residents,
+        with their <em>inputs</em> (age, sex, mobility, asthma, COPD, chronic condition,
+        the walking speed they were dealt, where they started) joined to their
+        <em>outcomes</em> (whether they got inside, which shelter, how many minutes it
+        took, how many full doors turned them away first, metres walked, hours in
+        unhealthy air, micrograms inhaled). Four real rows from
+        <code>docs/final/results-2026/1_EVERY_PERSON.csv</code>:</p>
+    </div>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Scenario</th><th>Age</th><th>Walks OK?</th><th>Speed m/s</th>
+        <th>What happened</th><th>Minutes</th><th>Doors full</th><th>Walked</th><th>Inhaled</th></tr></thead>
+      <tbody>
+        <tr><td>B</td><td>61</td><td>yes</td><td>1.45</td><td>got inside (Doreen's Place)</td><td class="hi">10</td><td>0</td><td>936 m</td><td>112 µg</td></tr>
+        <tr><td>B</td><td>74</td><td>yes</td><td>1.08</td><td>got inside (Arbor Lodge pods)</td><td>171</td><td class="hi">4</td><td>11.0 km</td><td>498 µg</td></tr>
+        <tr><td>B</td><td>49</td><td class="hi">no</td><td>0.62</td><td class="hi">turned away everywhere</td><td>—</td><td>4</td><td>20.2 km</td><td class="hi">33,446 µg</td></tr>
+        <tr><td>D</td><td>60</td><td class="hi">no</td><td>1.10</td><td>got inside (Banfield Motel — reserved space)</td><td class="hi">19</td><td>0</td><td>1.3 km</td><td>132 µg</td></tr>
+      </tbody></table></div>
+
+    <div class="measure">
+      <p>Those four rows are the whole study in miniature: a fast walker wins the race in
+        ten minutes; a slower walker succeeds only after four full doors; the man who walks
+        at 0.62 m/s is turned away everywhere and inhales three hundred times more smoke;
+        and under scenario D's reserve, a mobility-limited resident is inside in nineteen
+        minutes. Refused residents averaged <b>3.1–3.4 door attempts</b>; under scarcity
+        (A) only <b>6.6%</b> of ever-refused residents eventually found space, versus
+        <b>79–91%</b> once capacity or doors were added.</p>
+      <p><b>The learning-algorithm check.</b> We fit a logistic regression — the standard
+        model family for a binary evacuation outcome — to the model's own output:
+        P(got&nbsp;inside) from the person's inputs plus distance to the nearest shelter.
+        It is an honesty test, and it passes in both directions: it learns back exactly the
+        mechanisms we built, and finds nothing we didn't.</p>
+    </div>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Logit odds ratio (9 seeds pooled)</th><th>B</th><th>D (reserve)</th><th>reading</th></tr></thead>
+      <tbody>
+        <tr><td>distance to nearest shelter (per km)</td><td>0.42</td><td>0.39</td><td>geography dominates</td></tr>
+        <tr><td>walking speed (per +0.1 m/s)</td><td>2.2×</td><td>2.9×</td><td>the race, quantified</td></tr>
+        <tr><td>asthma</td><td class="hi">1.09 (p=0.11)</td><td class="hi">1.12 (p=0.21)</td><td class="hi">null — the negative control holds</td></tr>
+        <tr><td>mobility limitation</td><td>1.07 (p=0.23)</td><td class="hi">122.9 (p&lt;10⁻¹⁵)</td><td class="hi">the reserve, rediscovered from data</td></tr>
+      </tbody></table></div>
+
+    <div class="note"><h4>Every decision has a stated why</h4>
+      <b>Why these shelter locations?</b> They are the county's real facilities at real
+      addresses; only scenario C adds sites, and its headcount gain is dispersion (the
+      random-pool control proves it). <b>Why do agents leave when they leave?</b> PM2.5
+      crosses EPA's Unhealthy line (55.5 µg/m³) while a shelter is open. <b>Why that
+      route?</b> Shortest walking path on the pedestrian-legal street graph to the nearest
+      shelter with room; a full door means re-route to the next nearest — that is the
+      "doors full" column. <b>Why different speeds?</b> Published age-and-sex gait norms;
+      an evidence-backed COPD decrement; no asthma effect because no gait evidence exists
+      and we refuse to invent one. <b>Why doesn't diagnosis change dose?</b> No validated
+      coefficient exists; biology enters through movement only. The full training table is
+      <code>ML_TRAINING_DATA.csv</code>; the fitted models are
+      <code>ML_MODEL_SUMMARY.md</code>.</div>
+  </div>
+</section>
+
+<section class="stage">
   <div class="stage-tag"><b>Sources</b>where every<br>number came from</div>
   <div>
     <h2>Provenance</h2>
@@ -861,9 +951,12 @@ footer{border-top:1px solid var(--rule);margin-top:4rem;padding:2.2rem 0 3.5rem;
         chronic-condition distributions.</li>
       <li><b>Multnomah County HSD shelter inventory</b>, July 2026, plus City of Portland
         Safe Rest Village addresses. 36 facilities geocoded, 2,234 spaces.</li>
-      <li><b>City of Portland IRP Campsite Reports</b>, ArcGIS open data. 2,981 distinct
-        real start locations.</li>
-      <li><b>Portland Metro RLIS street centrelines</b> — 112,070 features.</li>
+      <li><b>City of Portland IRP Campsite Reports</b>, ArcGIS open data. 3,400 reports
+        resolving to 3,317 distinct coordinates; each run seeds residents at a sampled
+        subset.</li>
+      <li><b>Portland Metro RLIS street centrelines</b> — 112,070 features; 2,636
+        freeway-class features (TYPE 1110/112x, 614 km, incl. the non-pedestrian Marquam
+        and Fremont bridges) excluded from the walking graph.</li>
     </ol>
 
     <h3>Literature</h3>
@@ -900,7 +993,7 @@ footer{border-top:1px solid var(--rule);margin-top:4rem;padding:2.2rem 0 3.5rem;
 
 <footer>
   Fatima Asghar · NSF REU <em>Computational Modeling Serving Portland</em> · Portland State University · mentor Prof. Christof Teuscher<br>
-  Code, data and all 27 run manifests: github.com/fxa28196/REU · branch phase2/human-agent-modeling · commit c0cd113<br><br>
+  Code, data and all run manifests: github.com/fxa28196/REU · branch main · corrected-graph runs at commit deddfca<br><br>
   I directed this research, made all research decisions, and wrote the manuscript.
   Claude (Anthropic) assisted with coding, verification tooling and documentation drafting.
   I reviewed, revised and approved all outputs and take full responsibility for the final text.
@@ -1028,9 +1121,9 @@ function drawGeo(){
   const s=document.getElementById("c-geo");if(!s)return;s.innerHTML="";
   const W=900,H=290,L=58,R=18,T=26,B=54;
   const pw=W-L-R,ph=H-T-B,maxV=5000;
-  const data=[{k:"A",empty:174,ref:4766,c:"--arm-a",lab:"A · today"},
-              {k:"B",empty:578,ref:562,c:"--arm-b",lab:"B · more beds"},
-              {k:"C",empty:272,ref:256,c:"--arm-c",lab:"C · better-placed"}];
+  const data=[{k:"A",empty:174,ref:4754,c:"--arm-a",lab:"A · today"},
+              {k:"B",empty:578,ref:550,c:"--arm-b",lab:"B · more beds"},
+              {k:"C",empty:272,ref:244,c:"--arm-c",lab:"C · more doors"}];
   const gap=pw/3,bw=gap*0.2;
   const Y=v=>T+ph-(v/maxV)*ph;
   [0,1000,2000,3000,4000,5000].forEach(v=>{
@@ -1055,17 +1148,18 @@ function drawGeo(){
   const cxB=L+gap+gap/2;
   const a=el("text",{x:cxB,y:H-14,class:"tick","text-anchor":"middle"});
   a.setAttribute("fill",cv("--hazard"));
-  a.textContent="578 empty  ·  562 turned away";s.appendChild(a);
+  a.textContent="578 empty = 550 refused + 28 unreachable";s.appendChild(a);
 }
 
 function drawGap(){
   const s=document.getElementById("c-gap");if(!s)return;s.innerHTML="";
   const W=900,H=260,L=150,R=92,T=32,B=44;
   const pw=W-L-R,ph=H-T-B;
-  const rows=[{k:"A · today",easy:32.7,hard:19.7,gap:13.0},
-              {k:"B · more beds",easy:96.4,hard:71.9,gap:24.5},
-              {k:"C · better-placed",easy:98.6,hard:85.7,gap:12.9}];
-  const X=v=>L+(v/100)*pw, Yr=i=>T+ph/3*(i+0.5);
+  const rows=[{k:"A · today",easy:32.6,hard:20.1,gap:12.5},
+              {k:"B · more beds",easy:96.3,hard:72.6,gap:23.7},
+              {k:"C · more doors",easy:98.5,hard:86.0,gap:12.5},
+              {k:"D · B + reserve",easy:91.5,hard:91.9,gap:-0.4}];
+  const X=v=>L+(v/100)*pw, Yr=i=>T+ph/rows.length*(i+0.5);
   [0,25,50,75,100].forEach(v=>{
     s.appendChild(el("line",{x1:X(v),x2:X(v),y1:T,y2:T+ph,class:"grid"}));
     const t=el("text",{x:X(v),y:H-24,class:"tick","text-anchor":"middle"});
