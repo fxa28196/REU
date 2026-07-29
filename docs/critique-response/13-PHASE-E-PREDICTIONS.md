@@ -25,6 +25,21 @@ mid-episode contributions bRisk·z_R ≈ +0.8 and wOfficial ≈ +1.1 give
 α ≈ −6.2 − 1.9 ≈ −8.1, rounded to −8.0. The E9 occupancy calibration
 (deferred, weekend) will replace this with a fitted value.
 
+> **CORRECTION, added 2026-07-29 after the runs (this arithmetic was wrong).**
+> The derivation above under-counts, and the model disproves it: the realized
+> attempt share among the aware is **0.502**, not 0.385 (measured identically
+> in all three arms at seed 42; ≈0.50 at seeds 43/44). Two errors: the
+> "~240 evaluable hours" is an underestimate — with the 2026 network every
+> shelter is open from tick 0, so the official cue is on and hours are
+> evaluable from the first hour, not from a Sept-10 activation; and
+> `bRisk·z_R` is treated as a constant +0.8 when z_R keeps accumulating
+> through the 188-hour main episode, so the late-episode hazard is far above
+> the assumed mean. Correcting α to hit 0.385 requires roughly
+> **α ≈ −8.7** (a ~0.7 log-odds reduction), which the E9 calibration will
+> establish properly rather than by this arithmetic. **The registered
+> prediction stands as written and is scored as a MISS** — this note records
+> why, and does not retroactively edit the number that was registered.
+
 **lambdaOutreachPerDay = 0 in baseline-real:** the measured 0.356 is
 awareness DURING the event, so it already embeds whatever outreach occurred;
 modelling additional conversion on top would double-count. Deferred +AWARE

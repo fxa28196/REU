@@ -74,6 +74,9 @@ E_NULL = {
     "petPolicyDefault": ("int", "1"),
     "betaTravelTime": ("number", "1.0"),
     "betaCapacityPrior": ("number", "0.0"),
+    # 0 = the archived arm shelter file, byte-for-byte. The null must read
+    # exactly what the archived run read or the R3 proof is not a proof.
+    "shelterPolicyVariant": ("int", "0"),
 }
 
 E_REAL = dict(E_NULL)
@@ -89,6 +92,13 @@ E_REAL.update({
     "barrierDependents": ("number", "0.26"),
     "petPolicyDefault": ("int", "0"),
     "betaCapacityPrior": ("number", "0.2"),
+    # 1 = read the RECORDED pet_intake policy joined from the 2026 inventory
+    # (4 of 48 facilities admit pets, 422 beds). Correcting A-29: the record is
+    # silent for the 2020 shelters but EXPLICIT for the present-day network the
+    # E arms run, so refusing everywhere would contradict the source data.
+    # petPolicyDefault=0 still governs the 3 facilities (and arm C's 10
+    # theoretical new sites) the inventory does not cover.
+    "shelterPolicyVariant": ("int", "1"),
 })
 
 

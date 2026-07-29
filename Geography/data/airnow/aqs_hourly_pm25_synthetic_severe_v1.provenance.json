@@ -1,0 +1,148 @@
+{
+  "label": "CONSTRUCTED COUNTERFACTUAL -- NOT MEASURED DATA",
+  "statement": "This file is a labeled, deterministic transform of the observed EPA AQS hourly PM2.5 record for the Portland metro, September 2020 (parameter 88502). Every value is an observed value multiplied by a constant; every hour is an observed hour or a verbatim repeat of an observed whole day. It is NOT measured data: no monitor recorded these concentrations at these times, and it must never be plotted, cited, or pooled as observed air quality. It is NOT Los Angeles data and NOT Palisades data -- the geography, monitors, and diurnal structure are Portland's. Any 'Palisades-equivalent' framing is a SEVERITY ANALOGY ONLY, describing how bad and how long, not a claim about any particular fire or city.",
+  "generator": "scripts/build_smoke_severe.py",
+  "deterministic": "no RNG, no clock; same inputs and arguments reproduce these bytes",
+  "source_file": "aqs_hourly_pm25_portland_2020-09.csv",
+  "source_sha256": "d908556c347ecdf68342ce859b1c56813cc606f695804c0ba71992604486ca08",
+  "output_sha256": "379e2efa8268407aafcc6791cf181f1b2bf686bec4ca6cded191950bd163cbe7",
+  "parameters": {
+    "scale": "1.75",
+    "stretch": "1.5",
+    "tail_days": 3,
+    "county": "Multnomah",
+    "start": "2020-09-07T00:00",
+    "threshold": "55.5",
+    "episode_min_hour": 79,
+    "sustain": 3
+  },
+  "observed_episode": {
+    "hour_start": 79,
+    "hour_end": 266,
+    "hours": 188,
+    "local_start": "2020-09-10T07:00:00",
+    "local_end": "2020-09-18T02:00:00"
+  },
+  "counterfactual_episode": {
+    "hour_start": 79,
+    "hour_end": 362,
+    "hours": 284,
+    "local_start": "2020-09-10T07:00:00",
+    "local_end": "2020-09-22T02:00:00"
+  },
+  "plateau_days_repeated": [
+    "2020-09-12",
+    "2020-09-13",
+    "2020-09-14",
+    "2020-09-15"
+  ],
+  "days_added": 4,
+  "observed_series": {
+    "hours": 576,
+    "peak_ugm3": 562.7,
+    "mean_ugm3": 96.5905
+  },
+  "counterfactual_series": {
+    "hours": 456,
+    "peak_ugm3": 984.75,
+    "mean_ugm3": 335.6344
+  },
+  "rows": 3890,
+  "checks": [
+    {
+      "name": "writer round-trips the observed CSV byte-identically",
+      "status": "PASS",
+      "detail": "dialect: UTF-8 BOM, CRLF, QUOTE_ALL"
+    },
+    {
+      "name": "deterministic: two builds are byte-identical",
+      "status": "PASS",
+      "detail": "379e2efa8268407a"
+    },
+    {
+      "name": "header line identical to the observed file",
+      "status": "PASS",
+      "detail": "24 columns"
+    },
+    {
+      "name": "column set and order identical",
+      "status": "PASS",
+      "detail": "24"
+    },
+    {
+      "name": "monitor identity columns unchanged",
+      "status": "PASS",
+      "detail": "7 monitor/site tuples"
+    },
+    {
+      "name": "county name values unchanged",
+      "status": "PASS",
+      "detail": "Clackamas,Multnomah,Washington"
+    },
+    {
+      "name": "date/time formats are yyyy-MM-dd and HH:mm",
+      "status": "PASS",
+      "detail": "0 malformed"
+    },
+    {
+      "name": "GMT-to-local offset preserved",
+      "status": "PASS",
+      "detail": "[8.0] vs [8.0]"
+    },
+    {
+      "name": "file hour 0 timestamp matches the observed file",
+      "status": "PASS",
+      "detail": "2020-08-31 16:00:00 vs 2020-08-31 16:00:00"
+    },
+    {
+      "name": "simulation anchor 2020-09-07T00:00 is inside the series",
+      "status": "PASS",
+      "detail": "hour 0 = 9.6 ug/m3"
+    },
+    {
+      "name": "no NaN/gap hours in the Multnomah field",
+      "status": "PASS",
+      "detail": "0 gaps"
+    },
+    {
+      "name": "file hours contiguous with no gaps",
+      "status": "PASS",
+      "detail": "0 missing of 608"
+    },
+    {
+      "name": "pre-episode hours preserved exactly (scaled, not moved)",
+      "status": "PASS",
+      "detail": "0 of 79 hours differ"
+    },
+    {
+      "name": "minor spike unmoved",
+      "status": "PASS",
+      "detail": "hours 16-21 vs 16-21"
+    },
+    {
+      "name": "clean interval between spells unchanged",
+      "status": "PASS",
+      "detail": "57 h vs 57 h"
+    },
+    {
+      "name": "episode stretched by whole days",
+      "status": "PASS",
+      "detail": "284 h = 188 h + 4 x 24 h (1.511x)"
+    },
+    {
+      "name": "episode start unmoved",
+      "status": "PASS",
+      "detail": "hour 79"
+    },
+    {
+      "name": "every value is scale x an observed value",
+      "status": "PASS",
+      "detail": "0 values with no observed pre-image"
+    },
+    {
+      "name": "peak scaled by 1.75",
+      "status": "PASS",
+      "detail": "984.75 vs 984.73"
+    }
+  ]
+}
