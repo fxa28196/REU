@@ -18,3 +18,12 @@ commit <= 4dbeab9. Headline sheltered counts are UNCHANGED run-for-run;
 refused/unreachable reclassify (~12 agents per 2026 run snap to now-orphaned
 freeway-side fragments) and travel distances move ~0.1-2%. Full per-run diff:
 docs/critique-response/11-ROUND5-REPORT.md (U-27 section).
+
+## Fine sweep addendum (2026-07-29, critique follow-up)
+
+BS105/BS110/BS115 (scenarioCodes 15-17, seeds 42-44, commit 0b5? see
+manifests) locate the crossing: 1.05x demand (+342 beds) matches arm C's
+admissions (96.0-96.1%) WITHOUT closing the mobility gap (14.9pp); 1.10x
+(+684 beds) admits every reachable resident (6,814 = 6,842 - 28) and the gap
+vanishes. C's siting advantage on headcount is therefore worth at most ~342
+beds. These refine the P-3c/P-3d misses.

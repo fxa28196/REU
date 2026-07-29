@@ -200,6 +200,48 @@ def main():
                   f"got inside somewhere else (mean stops among the refused: "
                   f"{ref1.door_refusals.mean():.2f}).")
         md.append("")
+    # ---- Model card for the headline coefficient (round-5 critique) -------
+    md.append("## Model card — the arm-D mobility coefficient, stated carefully")
+    md.append("")
+    md.append("**Outcome:** `final_state == SHELTERED` (binary; UNREACHABLE "
+              "excluded — no route exists, so no behaviour is being modelled). "
+              "**Covariates:** age 55+, female, sex-other, mobility, asthma, "
+              "COPD, chronic condition, walking speed (m/s), distance to the "
+              "arm's nearest shelter site (km). **Fitted:** IRLS, "
+              "information-matrix SEs, 9 seeds pooled.")
+    md.append("")
+    dfd = load_arm("D")
+    dfd = dfd[dfd.final_state != "UNREACHABLE"]
+    mmask = dfd.mobility_limited == 1
+    pm = (dfd[mmask].final_state == "SHELTERED").mean()
+    pu = (dfd[~mmask].final_state == "SHELTERED").mean()
+    mor = (pm / (1 - pm)) / (pu / (1 - pu))
+    md.append(f"**Marginal (unconditional) result — quote THIS for equity:** "
+              f"P(in|mobility)={pm:.4f} vs P(in|others)={pu:.4f}; marginal "
+              f"odds ratio = {mor:.3f}. The gap is simply gone.")
+    md.append("")
+    md.append("**Conditional coefficient — a sanity check, not a discovery:** "
+              "conditional on walking speed, the mobility flag flips a slow "
+              "walker from losing the arrival race to holding a reserved "
+              "space, so the logit recovers the admission rule we wrote. Its "
+              "size is NOT quotable: the cross-tab below shows regional "
+              "quasi-separation (every mobility-limited resident above "
+              "1.0 m/s is admitted — cells at exactly 100%), which inflates "
+              "and destabilises the point estimate. Wald intervals under "
+              "near-separation are unreliable; treat the coefficient as "
+              "'large and positive', nothing more precise.")
+    md.append("")
+    md.append("| speed band (m/s) | others n / access % | mobility n / access % |")
+    md.append("|---|---|---|")
+    dfd["band"] = pd.cut(dfd.walking_speed_mps, [0, 0.8, 1.0, 1.2, 1.4, 3.0])
+    for band, g in dfd.groupby("band", observed=True):
+        a = g[g.mobility_limited == 0]
+        b = g[g.mobility_limited == 1]
+        md.append(f"| {band} | {len(a):,} / "
+                  f"{100 * (a.final_state == 'SHELTERED').mean():.1f}% | "
+                  f"{len(b):,} / "
+                  f"{100 * (b.final_state == 'SHELTERED').mean():.1f}% |")
+    md.append("")
     md.append("## Negative control (honesty check)")
     md.append("Asthma and chronic-physical coefficients must be null in "
               "arms A-C: no mechanism links them to movement (no gait-speed "

@@ -66,7 +66,7 @@ arm measured.
    A (reality)  ──measures──▶  "capacity is the binding constraint"
         │
         └── so B relieves capacity, and NOTHING else ──▶ measures:
-                     "578 beds sit empty while 562 people are turned away"
+                     "578 beds sit empty — an identity: 550 refused + 28 unreachable, forced by capacity == population"
                           │
                           └── so C spends the IDENTICAL capacity differently ──▶
                                        measures the placement effect alone
@@ -1784,6 +1784,8 @@ a fixed bed total**.
 | 2 | 45, 46, 47 | `706496d` |
 | 3 | 48, 49, 50 | `97ebd5d` |
 
+*(These three batches are the pre-U-27 replication history; every run was regenerated on the corrected graph at* `deddfca` *with identical sheltered counts.)*
+
 Batch parameter files: `Geography/batch/batch_params_2026_{A,B,C}_seed{42..50}.xml`.
 Archived manifests: `docs/runs/present-day-three-arm/<arm>-seed<seed>/`.
 
@@ -2005,7 +2007,7 @@ Result: **ALL INVARIANTS HOLD for 27 runs.**
 
 ```
 data_version_tag by arm: {'A': 'bdce237a6a6a', 'B': '5f8ece625e63', 'C': '5859e3007f0d'}
-commits: ['706496d', '7e1a271', '97ebd5d']
+commits: ['deddfca']
 population identical across arms within each seed: True
 ```
 
@@ -2029,14 +2031,14 @@ population identical across arms within each seed: True
 | Facilities | 36 | 36 | **46** (36 real + 10 new) |
 | Total beds | 2,234 | 6,842 | 6,842 |
 | **Got inside** | **2,060 (30.1%)** [2,053–2,064] | **6,264 (91.6%)** [6,257–6,268] | **6,570 (96.0%)** [6,563–6,574] |
-| Turned away (all full) | 4,766 [4,762–4,773] | 562 [558–569] | **256** [252–263] |
-| Could not reach any shelter | 16 [14–25] | 16 [14–25] | 16 [14–25] |
-| **Beds left empty** | 174 [170–181] | **578** [574–585] | 272 [268–279] |
-| Average walk | 18,260 m [17,996–18,410] | 7,938 m [7,841–8,522] | **5,689 m** [5,198–5,689] |
-| Average hours in unhealthy air | 135.8 | 17.5 | **8.6** |
-| Person-hours in unhealthy air | 928,934 [928,236–930,338] | 119,921 [119,155–121,255] | **59,060** [58,189–60,311] |
-| Average inhaled dose | 23,374 µg [23,357–23,410] | 3,056 µg [3,039–3,089] | **1,534 µg** [1,513–1,566] |
-| Mean exposure (µg·m⁻³·h) | 37,802 | 4,789 | 2,361 |
+| Turned away (all full) | 4,754 [4,750–4,763] | 550 [546–559] | 244 [240–253] |
+| Could not reach any shelter | 28 [26–36] | 28 [26–36] | 28 [26–36] |
+| **Beds left empty** | 174 [170–181] | 578 [574–585] | 272 [268–279] |
+| Average walk | 18,244 m [18,044–18,502] | 7,896 m [7,848–8,557] | 5,904 m [5,232–5,904] |
+| Average hours in unhealthy air | 135.8 | 17.5 | **8.7** |
+| Person-hours in unhealthy air | 928,918 [928,246–930,346] | 119,973 [119,224–121,329] | 59,200 [58,263–60,522] |
+| Average inhaled dose | 23,373 µg [23,357–23,411] | 3,056 µg [3,039–3,090] | 1,536 µg [1,513–1,569] |
+| Mean exposure (µg·m⁻³·h) | 37,802 | 4,789 | 2,363 |
 
 **No range overlaps between arms on any headline metric.** The effect is far larger
 than seed noise.
@@ -2045,9 +2047,9 @@ than seed noise.
 
 | Comparison | Sheltered | Exposure | Person-hours | Walking |
 |---|---|---|---|---|
-| A → B | ×3.04 | **−87.3%** | −87.1% | −56.5% |
-| B → C | +4.9% | **−50.7%** | −50.8% | −28.3% |
-| A → C | ×3.19 | **−93.8%** | −93.6% | −68.8% |
+| A → B | ×3.04 | **-87.3%** | -87.0% | -56.2% |
+| B → C | +4.9% | **-50.4%** | -50.4% | -30.7% |
+| A → C | ×3.19 | **-93.7%** | -93.6% | -69.7% |
 
 ### 13.2 Every individual run
 
@@ -2055,36 +2057,36 @@ Full table: `docs/final/results-2026/6_SEED_ROBUSTNESS.csv`.
 
 | Arm | Seed | Commit | Got inside | % | Turned away | Unreachable | Beds empty | Avg walk (m) | Avg dose (µg) | Person-h > unhealthy | Total exposure (µg·m⁻³·h) |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| A | 42 | 7e1a271 | 2,060 | 30.1 | 4,766 | 16 | 174 | 18,260 | 23,374 | 928,934 | 258,641,539 |
-| A | 43 | 7e1a271 | 2,055 | 30.0 | 4,762 | 25 | 179 | 18,356 | 23,400 | 929,924 | 258,912,202 |
-| A | 44 | 7e1a271 | 2,056 | 30.0 | 4,762 | 24 | 178 | 18,281 | 23,395 | 929,750 | 258,859,976 |
-| A | 45 | 706496d | 2,055 | 30.0 | 4,771 | 16 | 179 | 18,234 | 23,399 | 929,910 | 258,911,050 |
-| A | 46 | 706496d | 2,053 | 30.0 | 4,773 | 16 | 181 | 17,996 | 23,405 | 930,201 | 259,012,014 |
-| A | 47 | 706496d | 2,053 | 30.0 | 4,771 | 18 | 181 | 18,354 | 23,410 | 930,338 | 259,021,883 |
-| A | 48 | 97ebd5d | 2,053 | 30.0 | 4,766 | 23 | 181 | 18,410 | 23,410 | 930,309 | 259,019,858 |
-| A | 49 | 97ebd5d | 2,064 | 30.2 | 4,764 | 14 | 170 | 18,214 | 23,357 | 928,236 | 258,432,011 |
-| A | 50 | 97ebd5d | 2,055 | 30.0 | 4,767 | 20 | 179 | 18,390 | 23,402 | 929,950 | 258,914,152 |
-| **A mean** | | | **2,056** | **30.0** | **4,766.9** | 19.1 | 178.0 | 18,277 | 23,395 | 929,728 | 258,858,298 |
-| B | 42 | 7e1a271 | 6,264 | 91.6 | 562 | 16 | 578 | 7,938 | 3,056 | 119,921 | 32,765,083 |
-| B | 43 | 7e1a271 | 6,259 | 91.5 | 558 | 25 | 583 | 7,939 | 3,080 | 120,881 | 33,034,278 |
-| B | 44 | 7e1a271 | 6,260 | 91.5 | 558 | 24 | 582 | 8,085 | 3,077 | 120,805 | 32,989,513 |
-| B | 45 | 706496d | 6,259 | 91.5 | 567 | 16 | 583 | 8,120 | 3,082 | 120,929 | 33,039,715 |
-| B | 46 | 706496d | 6,257 | 91.4 | 569 | 16 | 585 | 7,841 | 3,088 | 121,188 | 33,134,453 |
-| B | 47 | 706496d | 6,257 | 91.4 | 567 | 18 | 585 | 7,886 | 3,088 | 121,174 | 33,134,856 |
-| B | 48 | 97ebd5d | 6,257 | 91.4 | 562 | 23 | 585 | 8,002 | 3,089 | 121,255 | 33,140,379 |
-| B | 49 | 97ebd5d | 6,268 | 91.6 | 560 | 14 | 574 | 8,522 | 3,039 | 119,155 | 32,557,100 |
-| B | 50 | 97ebd5d | 6,259 | 91.5 | 563 | 20 | 583 | 7,898 | 3,080 | 120,867 | 33,033,528 |
-| **B mean** | | | **6,260** | **91.5** | **562.9** | 19.1 | 582.0 | 8,026 | 3,075 | 120,686 | 32,980,989 |
-| C | 42 | 7e1a271 | 6,570 | 96.0 | 256 | 16 | 272 | 5,689 | 1,534 | 59,060 | 16,156,745 |
-| C | 43 | 7e1a271 | 6,565 | 96.0 | 252 | 25 | 277 | 5,198 | 1,551 | 59,659 | 16,399,286 |
-| C | 44 | 7e1a271 | 6,566 | 96.0 | 252 | 24 | 276 | 5,443 | 1,551 | 59,724 | 16,364,848 |
-| C | 45 | 706496d | 6,565 | 96.0 | 261 | 16 | 277 | 5,637 | 1,559 | 60,088 | 16,429,603 |
-| C | 46 | 706496d | 6,563 | 95.9 | 263 | 16 | 279 | 5,434 | 1,565 | 60,244 | 16,520,544 |
-| C | 47 | 706496d | 6,563 | 95.9 | 261 | 18 | 279 | 5,387 | 1,564 | 60,154 | 16,515,268 |
-| C | 48 | 97ebd5d | 6,563 | 95.9 | 256 | 23 | 279 | 5,603 | 1,566 | 60,311 | 16,525,765 |
-| C | 49 | 97ebd5d | 6,574 | 96.1 | 254 | 14 | 268 | 5,415 | 1,513 | 58,189 | 15,934,738 |
-| C | 50 | 97ebd5d | 6,565 | 96.0 | 257 | 20 | 277 | 5,507 | 1,558 | 60,015 | 16,425,124 |
-| **C mean** | | | **6,566** | **96.0** | **256.9** | 19.1 | 276.0 | 5,479 | 1,551 | 59,716 | 16,363,547 |
+| A | 42 | deddfca | 2,060 | 30.1 | 4,754 | 28 | 174 | 18,244 | 23,373 | 928,918 | 258,640,439 |
+| A | 43 | deddfca | 2,055 | 30.0 | 4,751 | 36 | 179 | 18,393 | 23,399 | 929,909 | 258,911,149 |
+| A | 44 | deddfca | 2,056 | 30.0 | 4,750 | 36 | 178 | 18,376 | 23,396 | 929,754 | 258,860,287 |
+| A | 45 | deddfca | 2,055 | 30.0 | 4,760 | 27 | 179 | 18,313 | 23,400 | 929,912 | 258,911,207 |
+| A | 46 | deddfca | 2,053 | 30.0 | 4,763 | 26 | 181 | 18,044 | 23,405 | 930,193 | 259,011,367 |
+| A | 47 | deddfca | 2,053 | 30.0 | 4,763 | 26 | 181 | 18,457 | 23,411 | 930,346 | 259,022,531 |
+| A | 48 | deddfca | 2,053 | 30.0 | 4,753 | 36 | 181 | 18,469 | 23,410 | 930,300 | 259,019,306 |
+| A | 49 | deddfca | 2,064 | 30.2 | 4,752 | 26 | 170 | 18,304 | 23,357 | 928,246 | 258,432,705 |
+| A | 50 | deddfca | 2,055 | 30.0 | 4,757 | 30 | 179 | 18,502 | 23,403 | 929,953 | 258,914,334 |
+| **A mean** | | | **2,056** | **30.0** | **4,755.9** | 30.1 | 178.0 | 18,345 | 23,395 | 929,726 | 258,858,147 |
+| B | 42 | deddfca | 6,264 | 91.6 | 550 | 28 | 578 | 7,896 | 3,056 | 119,973 | 32,768,828 |
+| B | 43 | deddfca | 6,259 | 91.5 | 547 | 36 | 583 | 7,907 | 3,080 | 120,945 | 33,039,161 |
+| B | 44 | deddfca | 6,260 | 91.5 | 546 | 36 | 582 | 8,067 | 3,077 | 120,871 | 32,994,689 |
+| B | 45 | deddfca | 6,259 | 91.5 | 556 | 27 | 583 | 8,189 | 3,082 | 120,999 | 33,045,928 |
+| B | 46 | deddfca | 6,257 | 91.4 | 559 | 26 | 585 | 7,926 | 3,089 | 121,257 | 33,141,886 |
+| B | 47 | deddfca | 6,257 | 91.4 | 559 | 26 | 585 | 7,848 | 3,088 | 121,219 | 33,137,962 |
+| B | 48 | deddfca | 6,257 | 91.4 | 549 | 36 | 585 | 7,946 | 3,090 | 121,329 | 33,145,564 |
+| B | 49 | deddfca | 6,268 | 91.6 | 548 | 26 | 574 | 8,557 | 3,039 | 119,224 | 32,562,858 |
+| B | 50 | deddfca | 6,259 | 91.5 | 553 | 30 | 583 | 7,961 | 3,081 | 120,925 | 33,039,443 |
+| **B mean** | | | **6,260** | **91.5** | **551.9** | 30.1 | 582.0 | 8,033 | 3,076 | 120,749 | 32,986,258 |
+| C | 42 | deddfca | 6,570 | 96.0 | 244 | 28 | 272 | 5,904 | 1,536 | 59,200 | 16,168,257 |
+| C | 43 | deddfca | 6,565 | 96.0 | 241 | 36 | 277 | 5,232 | 1,553 | 59,776 | 16,408,010 |
+| C | 44 | deddfca | 6,566 | 96.0 | 240 | 36 | 276 | 5,474 | 1,553 | 59,893 | 16,377,283 |
+| C | 45 | deddfca | 6,565 | 96.0 | 250 | 27 | 277 | 5,670 | 1,560 | 60,191 | 16,437,990 |
+| C | 46 | deddfca | 6,563 | 95.9 | 253 | 26 | 279 | 5,440 | 1,566 | 60,327 | 16,526,728 |
+| C | 47 | deddfca | 6,563 | 95.9 | 253 | 26 | 279 | 5,427 | 1,564 | 60,236 | 16,520,398 |
+| C | 48 | deddfca | 6,563 | 95.9 | 243 | 36 | 279 | 5,876 | 1,569 | 60,522 | 16,542,466 |
+| C | 49 | deddfca | 6,574 | 96.1 | 242 | 26 | 268 | 5,419 | 1,513 | 58,263 | 15,939,780 |
+| C | 50 | deddfca | 6,565 | 96.0 | 247 | 30 | 277 | 5,654 | 1,559 | 60,134 | 16,434,081 |
+| **C mean** | | | **6,566** | **96.0** | **245.9** | 30.1 | 276.0 | 5,566 | 1,553 | 59,838 | 16,372,777 |
 
 **Observation worth noting.** `Could not reach` is **identical across all three arms
 within each seed** (e.g. 16 in seed 42, 25 in seed 43, 14 in seed 49). That is the
@@ -2119,7 +2121,7 @@ B has no shortage. It has exactly enough beds for exactly the population — and
 it still fails 578 people, because the beds are where the *buildings* are, not
 where the *people* are. **This is a geography failure, cleanly separated from a
 capacity failure.** It is also a knife-edge failure: the bed-equivalence sweep
-(§13.7) shows 20% surplus dissolves it entirely.
+(§13.7) shows 10% surplus (+684 beds) dissolves it entirely, and 5% (+342 beds) already matches C's headcount.
 
 C spends the **same total as B, split differently — more doors**. It grows the
 36 real sites 1.5× and opens the difference as ten additional sites. Result:
@@ -2132,7 +2134,7 @@ optimiser; siting quality earns credit on walking distance only.
 
 | Rank | Intervention | Effect |
 |---|---|---|
-| **1** | Add capacity to meet demand | Exposure **−87.3%** — this dominates everything; and 20% surplus (+1,368 beds) lifts admissions to 99.5% and erases the equity gap |
+| **1** | Add capacity to meet demand | Exposure **−87.3%** — this dominates everything; 10% surplus (+684 beds) admits every reachable resident (99.5%) and erases the equity gap; 5% (+342) already matches C's headcount |
 | **2** | Triage reserve (scenario D, r=0.10) | Mobility access gap **~+23.7pp → ~−0.5pp** at identical total admissions and **zero capital cost** — the only tested intervention that closes the gap |
 | 3 | Split the same total across more doors (C) | +306 admitted vs B and **−50.7%** exposure on top of #1 at zero additional beds; headcount gain is dispersion (POOL null), siting credit is walking distance only |
 | 4 | Earlier opening | Not isolated in this experiment; large in the 2020-timing runs |
@@ -2183,13 +2185,18 @@ Arm B's 36 real sites, capacity scaled to s × demand, seeds 42–44:
 |---|---|---|---|
 | 0.8 | 5,474 | 73.3 | 28.3 |
 | 1.0 (=B) | 6,842 | 91.5 | 23.5 |
-| 1.2 | 8,210 | **99.5** | **−0.0** |
+| 1.05 | 7,184 | **96.0–96.1** (= C) | 14.9 |
+| 1.10 | 7,526 | **99.5** (all reachable admitted) | **−0.0** |
+| 1.15 | 7,868 | 99.5 | −0.0 |
+| 1.2 | 8,210 | 99.5 | −0.0 |
 | 1.4 | 9,579 | 99.5 | −0.0 |
 | 1.6 | 10,947 | 99.5 | −0.0 |
 
 We predicted B would not reach C's 96.0% before 1.4–1.6× and that the gap
-would persist under surplus. Both were wrong: **20% surplus beats C's access
-and erases the gap** — the equity result is a property of the scarcity band
+would persist under surplus. Both were wrong, and a fine sweep prices the
+result: **5% surplus (+342 beds at the real sites) already matches C's
+headcount — so C's siting advantage is worth at most ~342 beds — while 10%
+surplus (+684 beds) admits every reachable resident and erases the gap** — the equity result is a property of the scarcity band
 where capacity ≈ demand, which is exactly where the triage reserve earns its
 keep.
 
@@ -2205,8 +2212,7 @@ pooled 9-seed output per arm (`scripts/fit_outcome_models.py`, results in
 `docs/final/results-2026/ML_MODEL_SUMMARY.md`; per-agent training table in
 `ML_TRAINING_DATA.csv`): distance and walking speed dominate everywhere;
 **asthma is null in every arm** (the negative control — the model invents no
-effect it cannot cite); and in arm D the mobility coefficient flips to an odds
-ratio of ~123 — the reserve, learned back from the data. Retry behaviour:
+effect it cannot cite); and in arm D the mobility coefficient flips strongly positive — conditional on walking speed it recovers the admission rule we wrote — a pipeline sanity check, not a discovery; three speed-band cells sit at exactly 100% (regional quasi-separation), so the coefficient's size is unstable and is not quoted. The equity result is the marginal one: mobility-limited 91.7% vs others 92.0% pooled — marginal odds ratio ≈ 0.95–1.07, i.e. the gap is simply gone (full model card in ML_MODEL_SUMMARY.md). Retry behaviour:
 refused residents averaged ~3.1–3.4 door attempts; 6.6% of ever-refused
 residents eventually got inside under scarcity (A) vs 79–91% in B/C/D.
 
@@ -2220,7 +2226,7 @@ residents eventually got inside under scarcity (A) vs 79–91% in B/C/D.
 |---|---|---|---|---|
 | Everyone | 100% | 30.1 | 91.6 | **96.0** |
 | Walks without difficulty | 80.1% | 32.7 | 96.4 | 98.6 |
-| **Has trouble walking** | **19.9%** | **19.7** | **71.9** | **85.7** |
+| **Has trouble walking** | **19.9%** | **20.1** | **72.6** | **86.0** |
 | Age 18–44 | 52.8% | 30.6 | 93.1 | 96.8 |
 | Age 45–64 | 42.0% | 30.4 | 90.8 | 95.8 |
 | **Age 65+** | **5.2%** | **22.4** | **82.4** | **89.8** |
@@ -2239,14 +2245,14 @@ The gap between residents who walk easily and residents who do not:
 | | A | B | C |
 |---|---|---|---|
 | Walks without difficulty | 32.7% | 96.4% | 98.6% |
-| Has trouble walking | 19.7% | 71.9% | 85.7% |
-| **Gap (percentage points)** | **13.0** | **24.5** | **12.9** |
+| Has trouble walking | 20.1% | 72.6% | 86.0% |
+| **Gap (percentage points)** | **12.5** | **23.7** | **12.5** |
 
-> **Pouring 4,608 beds into the same buildings widens the mobility gap from 13.0 to
-> 24.5 percentage points**, because extra capacity at an existing site is captured
+> **Pouring 4,608 beds into the same buildings widens the mobility gap from 12.5 to
+> 23.7 percentage points**, because extra capacity at an existing site is captured
 > first by whoever can walk there fastest. Spending that identical capacity on
-> well-placed new sites brings the gap back to 12.9 **while lifting the slowest
-> group from 71.9% to 85.7%.**
+> more doors brings the gap back to 12.5 **while lifting the slowest
+> group from 72.6% to 86.0%.** What CLOSES the gap is scenario D's 10% reserve (23.7 → −0.5 pp at identical admissions).
 
 The same shape holds for age 65+ (22.4 → 82.4 → 89.8) and COPD (22.2 → 86.2 → 93.8).
 
@@ -2271,7 +2277,7 @@ model is not inventing effects.**
 
 | Group | A | B | C |
 |---|---|---|---|
-| Everyone | 23,374 | 3,056 | 1,534 |
+| Everyone | 23,373 | 3,056 | 1,536 |
 | Walks without difficulty | 22,514 | 1,436 | **679** |
 | Has trouble walking | 26,842 | 9,585 | 4,981 |
 | Age 65+ | 25,944 | 6,104 | 3,614 |
@@ -2739,7 +2745,7 @@ python scripts\build_scenario_c_2026.py           # arm C: 1.5x existing + 10 ne
 > Portland State University. `https://github.com/fxa28196/REU`
 
 Every result in this document was produced at commit `c0cd113` on branch
-`phase2/human-agent-modeling`, from runs stamped `7e1a271`, `706496d` and `97ebd5d`,
+`phase2/human-agent-modeling`, from the corrected-graph runs stamped `deddfca` (pre-U-27 batches `7e1a271`/`706496d`/`97ebd5d` superseded),
 each with a clean working tree.
 
 ---

@@ -287,6 +287,60 @@ claims:
       figure ("was using 2,037", "replaced the 2019 figure of 2,037",
       "391/2,037") deliberately do not match.
 
+  - id: pre-u27-refused-counts
+    pattern: '4,766|refuses 562|562 people|562 turned away|562 of them|refusals to 256|cuts refusals to 256'
+    regex: true
+    case_insensitive: true
+    status: retired
+    note: >-
+      Pre-U-27 headline counts (A 4,766 / B 562 / C 256 refused) superseded by
+      the corrected-graph values (4,754 / 550 / 244) at commit f5eae57; ~12
+      agents per run reclassified refused -> unreachable. Registered after the
+      round-5 canary sweep so the old values cannot re-enter. Precision: the
+      "562" alternatives all carry disambiguating context words, so the
+      measured smoke peak 562.7 never flags.
+
+  - id: pre-u27-unreachable-16
+    pattern: '16, 16,? ?16|\b16 residents cannot|\b16 people who cannot|16 could\s+reach no|at 16 at seed 42'
+    regex: true
+    case_insensitive: true
+    status: retired
+    note: >-
+      Pre-U-27 unreachable count (16 at seed 42) superseded by 28 on the
+      pedestrian-legal graph. Precision: context-anchored alternatives only;
+      bare "16" (dates, hours, h16) never flags.
+
+  - id: pre-correction-gap-values
+    pattern: '13\.0 to 24\.5|24\.5 percentage|gap from 13\.0|71\.9%? to 85\.7|back to 12\.9|24\.4 ?pp|to 0\.1 ?pp'
+    regex: true
+    case_insensitive: true
+    status: retired
+    note: >-
+      Pre-correction mobility-gap trajectory (13.0 -> 24.5 -> 12.9 pp; and the
+      round-5 directive's provisional "24.4pp -> 0.1pp") superseded by the
+      corrected-graph values 12.5 -> 23.7 -> 12.5, with D-r10 at ~-0.5 pp.
+      Registered after the canary sweep.
+
+  - id: or-123-rule-recovery
+    pattern: 'rediscover[a-z]* the (triage )?(admission )?(rule|reserve)|the reserve, (rediscovered|learned back)|odds ratio (of )?~?12[0-9]\b|OR ≈ ?12[0-9]\b|mobility OR ~?12[0-9]\b'
+    regex: true
+    case_insensitive: true
+    status: corrected
+    replacement: >-
+      The arm-D mobility coefficient is the logit recovering, conditional on
+      walking speed, the admission rule we wrote - a pipeline sanity check,
+      not a discovery; its size is unstable under regional quasi-separation
+      and is not quoted. The equity result is marginal: mobility 91.7% vs
+      others 92.0% pooled, marginal OR about 0.95-1.07 (the gap is gone).
+      Full model card in ML_MODEL_SUMMARY.md.
+    note: >-
+      Round-5 external critique: quoting "OR ~123" as if the algorithm
+      discovered the reserve is wrong twice over - the marginal OR is ~1, and
+      the conditional coefficient sits on cells at exactly 100% access
+      (quasi-separation), so the point value is an artifact. Precision: flags
+      the discovery framing and the naked 12x number; the sanity-check
+      phrasing passes.
+
   # ------------------------------------------------------------------- live ---
 
   - id: headline-96-0-number

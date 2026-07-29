@@ -179,6 +179,41 @@ zero cost; dispersion buys headcount without optimisation; surplus dissolves
 the failure mode entirely. *Buy surplus if you can; where you cannot, the
 triage reserve buys the same equity for free.*
 
+## Critique follow-up (2026-07-29, applied same night)
+
+An external spot-critique of the overnight work was verified and folded in:
+
+- **The "OR ≈ 123" claim was retracted and re-stated.** Forensics
+  (`ML_MODEL_SUMMARY.md` model card): the marginal mobility odds ratio in D
+  is **0.95–1.07 pooled** — the equity result is "the gap is gone", not a
+  large OR. The conditional-on-speed coefficient is the logit recovering the
+  admission rule we wrote — a pipeline sanity check — and its size sits on
+  regional quasi-separation (three speed-band cells at exactly 100% access:
+  n=958/597/304), so no point value is quoted. Linter entry
+  `or-123-rule-recovery` blocks the discovery framing structurally.
+- **Canary sweep.** Greps for every pre-correction number found and fixed
+  stale spots the mid-propagation agent deaths had left (TR §13.1/13.2
+  tables regenerated from the corrected CSV; presenter/TR/quote-block
+  values); three new retired linter entries (`pre-u27-refused-counts`,
+  `pre-u27-unreachable-16`, `pre-correction-gap-values`) keep them out.
+- **Run-set composition, stated exactly:** the corrected-graph matrix is
+  **93 runs** — 27 A/B/C + 8 D + 9 CR + 9 CP + 1 histref + 12 coarse
+  bed-sweep + 18 window arms (yes, the 24 h/72 h arms ran — dose numbers in
+  deliverables carry the window disclosure) + **9 fine bed-sweep runs
+  (1.05/1.10/1.15×, codes 15–17)** added for the exchange rate.
+- **The exchange rate (the county-actionable number):** 1.05× demand
+  (+342 beds at the real sites) already matches C's admissions
+  (96.0–96.1%) *without* closing the mobility gap (14.9 pp); 1.10×
+  (+684 beds) admits **every reachable resident** (6,814 = 6,842 − 28) and
+  the gap vanishes. **C's siting advantage on headcount is worth at most
+  ~342 beds.** The knife-edge threshold quoted in deliverables is
+  therefore 10%, not 20%.
+- **Fresh-clone check passed:** depth-1 clone → linter exit 0, all five
+  chapter figures present, `\graphicspath` present.
+- Affiliation remains **user-confirm-required** (flagged in SUBMIT.md §0;
+  normalized text is the email-domain-consistent institution, not a
+  verified fact).
+
 ## Mentor-feedback layer (added this cycle)
 
 - **Raw data**: `docs/final/results-2026/1_EVERY_PERSON.csv` — one row per
