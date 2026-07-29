@@ -1,39 +1,59 @@
-# Round-5 report (IN PROGRESS)
+# Round-5 report
 
 Directive: Round 5 — integrity, round-4 triage, human decision layer.
 Issued 2026-07-28. This file is the report artifact of record (directive §8).
-Sections are filled as phases complete.
+Phases A–D closed 2026-07-29 (overnight session); Phase E excluded from this
+cycle at the user's direction (scenarios A–D only).
 
 ## Phase status
 
 | Phase | Status | Evidence |
 |---|---|---|
 | A1 commit audit + round-4 inputs | DONE | commit 3cd3760 |
-| A2 repro chain (archive CR/CP, provenance, dirty flag, .pyc) | DONE | commit 8ee9c9d; OutcomeLogger now uses `git status --porcelain`; compileJava clean |
+| A2 repro chain incl. D-seed43/44 agents.csv | DONE | commits 8ee9c9d, 4dbeab9 (all four regens bit-identical to the archived record) |
 | A3 six false verification statements | DONE | commit 8ee9c9d, 7 files |
-| A4 claim linter | DONE | `docs/claims.yaml` (18 entries) + `scripts/lint_claims.py`; baseline RED = 50 hits / 10 files (`linter-baseline-2026-07-28.md`) |
-| A2 D-seed43/44 agents.csv regeneration | NOT DONE | interrupted; see §Next |
-| B propagation (items 5–30) | NOT STARTED | worklist = linter baseline |
-| C round-4 triage | DONE (verdicts) | §Round-4 verdict table below |
-| D cheap science (windows, bed-sweep, C-eq, survival, ablation) | NOT STARTED | |
-| E human decision layer | SPEC DONE | `E-LAYER-SPEC.md` (E1 harvest verified, 7 topics; E2/E3 registry diff; 6 predictions registered) |
+| A4 claim linter | DONE + **GREEN** | baseline RED 50 hits/10 files → **exit 0, zero hits** at commit 080a803 |
+| B propagation (items 5–30) | DONE | all ten deliverables on corrected-graph science; commits 14e7465…080a803 |
+| B2 camera-ready mechanics | DONE (2 user items open) | \graphicspath added; SUBMIT.md rebuilt to the real 5-figure set; affiliation normalized to the email-domain institution (user must still confirm); bib mechanism = inline thebibliography; `overleaf 2/` deleted. Still user-owned: NSF award number, Zenodo DOI, repo visibility |
+| B3 temporal narrative | DONE | two-spell disclosure in chapter + presenter script (h16–22 spike, 57 clean hours, episode from h79) |
+| C round-4 triage | DONE | §Round-4 verdict table below; U-27 RESOLVED (next section) |
+| C4 quick fixes | DONE | U-03 bed-sum + U-19 negative controls + U-27 id-set identity in verify_2026_runs.py; U-07 definition string + chronic_physical stratum; U-21 nested-flag fix in verify_round4.py; registry V26/V27/V28; U-20 sex rows in tab:groups; U-22/U-18/U-25 wordings |
+| D cheap science | DONE (D1, D2, D4) | windows, bed sweep, fig5_race; predictions pre-registered in `12-PHASE-D-PREDICTIONS.md`; **two misses, reported below**. D3 C-eq and D5 ablation descoped (recorded there) |
+| E human decision layer | SPEC ONLY (unchanged) | `E-LAYER-SPEC.md`; explicitly excluded from this cycle |
+| Mentor feedback (raw data, regression, justification, hand-off) | DONE | `1_EVERY_PERSON.csv` (+minutes, stops, D rows), `ML_TRAINING_DATA.csv`, `ML_MODEL_SUMMARY.md`, presentation Stage 9, presenter Q&A 14/15, `docs/HANDOFF.md` |
 
-## Gating result — U-27 CONFIRMED (blocks Phase D/E runs)
+## U-27 RESOLVED — freeway filter implemented, bridge audit clean, full matrix re-run
 
-`ContextCreator.java:254-276` adds every street MultiLineString to the routing
-graph; `StreetNetwork.addStreet` takes no class attribute. **2,636
-freeway-class features enter the walking graph**: TYPE 1110 mainline
-(n=1,372, ~400 km) and 1120–1123 ramps (n=1,264, ~190 km), CFCC A15/A63,
-names like "I5 FWY NB" — including **Marquam Bridge** (idx 37720/37721) and
-**Fremont Bridge** (9 deck features), neither of which is pedestrian-legal.
-Agents can therefore walk freeways and cross the Willamette on prohibited
-bridges.
+**Fix (commit `3ee2085`).** `ContextCreator` skips RLIS TYPE ∈
+{1110, 1120, 1121, 1122, 1123} before `addStreet`; every exclusion is counted
+into `simulation.json → street_network_validation.freeway_filter`
+(features_excluded, km_excluded, by_type). Registry row **V26** landed before
+the code per R1. Measured at run time: **2,636 features excluded, 614.1 km** —
+by TYPE: 1110×1,372, 1120×279, 1121×466, 1122×447, 1123×72 (exactly the counts
+verified against Streets.dbf). Graph: 112,070 → 109,434 street edges,
+89,345 → 88,100 nodes, components 154 → 171 (largest 60,444 → 59,725).
 
-Fix (specified, not implemented): skip TYPE ∈ {1110, 1120, 1121, 1122, 1123}
-before `addStreet`; log removal count + km into
-`simulation.json.street_network_validation`; sensitivity on ramp/1200-A11
-classes; re-run seed 42 across arms. Per directive C2 this gates Phase D/E —
-corrected-graph runs must not reuse stale routing.
+**Bridge audit (`scripts/audit_bridges.py`).** Willamette crossings vs the
+pedestrian-legal list: REMOVED — Marquam (17 features) and Fremont (10), the
+two non-pedestrian bridges. All 8 legal bridges remain walkable by name
+(Steel ×6, Tilikum ×3, …). One crossing not on the round-4 list remains:
+**Ross Island Bridge** (TYPE 1300/CFCC A11, carries a sidewalk) — retained
+correctly by the TYPE rule; the round-4 "walkable set" list was incomplete.
+Its A11 coding is exactly the registered 1200/A11 sensitivity (V26
+uncertainty field), deferred with TYPE-1200 (2,139 features) pending a
+per-segment sidewalk source. Residual centreline-intersection artefacts at
+Old Town and Cathedral Park were adjudicated (no bridge exists there).
+Deviation from the acceptance wording: the audit lives in the script + this
+report; the manifests carry the per-run freeway_filter counts.
+
+**Headline diff (54-run re-run matrix, all stamping `deddfca`, clean tree,
+verify_2026_runs.py exit 0).** Every sheltered count in every arm and seed is
+**unchanged to the digit** (A 30.1%, B 91.6%, C 96.0%; POOL null now exact:
+CP draws = C's 6,570/6,565/6,566 in all three r-draws). Per seed, ~11–12
+residents reclassify refused → unreachable (16→28 at seed 42; identical id
+sets across arms, now an automated invariant); travel medians move −1.9% to
++3.2%; exposure totals move ≤0.3%. Pre-U-27 archives remain at commits
+≤ 4dbeab9 and are superseded in place.
 
 ## Round-4 verdict table (U-01…U-27)
 
@@ -101,12 +121,105 @@ walk-only), U-13, U-14 (no presence-fraction sweep), U-17 (no self-rescue
 option), U-18, U-19, U-20 (sex drives speed but appears in no equity table;
 M−F gap +3.2pp in A), U-22, U-23, U-27.
 
-## Next (resume point)
+## Phase D results
 
-1. Regenerate D-seed43/44 `agents.csv` (interrupted mid-run; HEAD 8ee9c9d,
-   clean tree required, runs are sequential — output dirs collide on seed).
-2. Implement the U-27 TYPE filter, re-run, then Phase D/E on the corrected
-   graph.
-3. Phase B propagation against the linter baseline (`lint_claims.py` must
-   exit 0).
-4. E-layer implementation per `E-LAYER-SPEC.md` §7 timeline.
+**D1 windows** (from-start, seeds 42–44): B/C mean-dose ratio 1.29 (24 h) →
+1.33 (72 h) → 1.98 (312 h); walking's share of C's dose benefit 100% → 83% →
+4.5%. Runs archived `docs/runs/phaseD-windows/`; tables
+`docs/final/results-2026/d1_*`. The audit's episode-aligned trajectory
+truncation (62%/51%/2.7%) is a different construction and is cited as such.
+
+**D2 bed-equivalence sweep** (B's real sites, s × demand, seeds 42–44;
+archived `docs/runs/phaseD-bed-sweep/`): admitted 73.3% (0.8×) → 91.5% (1.0×)
+→ **99.5% (1.2×, plateau through 1.6×)**; mobility gap 28.3 → 23.5 →
+**−0.0 pp from 1.2× on**.
+
+**D4 mechanism figure**: `fig5_race.pdf` in the chapter — in B, ~80% of the
+final mobility gap exists one hour after departure; under D-r10 the curves
+converge. D-r10 corrected-graph gap: −0.45/−0.12/+1.52 pp (seeds 42/43/44) at
+total admissions identical to B.
+
+## Prediction outcomes (registered 2026-07-28 20:49, `12-PHASE-D-PREDICTIONS.md`)
+
+| Prediction | Outcome |
+|---|---|
+| P-1a arm ordering preserved | **HIT** (all seeds) |
+| P-1b sheltered moves <1 pp | **HIT** — stronger: moved 0 |
+| P-1c unreachable +10..+30, identical id sets | **HIT** (+11/+12; id-set identity verified) |
+| P-1d D-r10 gap within ±0.3 pp of old value | **HIT** (≈−0.5 vs 0.1; both ≈ closed) |
+| P-1e POOL null survives | **HIT** — now exact to the digit |
+| P-1f travel medians ≤2% | **PARTIAL MISS** — 8 of 54 runs exceed 2% (max +3.2%, C arm and CP r5) |
+| P-1g histref 198/198 unchanged | **HIT** |
+| P-2a dose ratio compresses to ~1.2–1.3 at 24 h | **HIT** (1.29) |
+| P-2b ordering unchanged at all windows | **HIT** |
+| P-3a monotone in s | **HIT** |
+| P-3b s=0.8 between A and B | **HIT** |
+| P-3c B reaches C's access only at s≈1.4–1.6 | **MISS** — crosses at 1.2× and *exceeds* C |
+| P-3d mobility gap persists under surplus | **MISS** — gap vanishes at any surplus |
+
+## Disconfirming results (mandatory content)
+
+Two registered predictions were wrong, in the direction that *weakens* the
+placement/dispersion story and simplifies the policy claim:
+
+1. **P-3c.** A 20% capacity surplus at the existing 36 sites (+1,368 beds)
+   admits 99.5% — more than C's dispersion achieves at exactly-matched
+   capacity. Modest surplus beats optimal splitting on headcount.
+2. **P-3d.** The mobility equity gap does not persist under surplus; it
+   vanishes entirely at 1.2× demand. The "capacity expansion widens the
+   equity gap" finding is therefore a property of the scarcity band where
+   capacity ≈ demand — B's design point — not a general law.
+3. **P-1f (partial).** Travel medians moved up to +3.2% on the corrected
+   graph in 8 of 54 runs, above the predicted ≤2% band (concentrated in arm
+   C, whose new sites sit where routing changed most).
+
+The honest synthesis all deliverables now carry: capacity is first-order; at
+the capacity==demand knife edge the intake rule (D) closes the equity gap at
+zero cost; dispersion buys headcount without optimisation; surplus dissolves
+the failure mode entirely. *Buy surplus if you can; where you cannot, the
+triage reserve buys the same equity for free.*
+
+## Mentor-feedback layer (added this cycle)
+
+- **Raw data**: `docs/final/results-2026/1_EVERY_PERSON.csv` — one row per
+  resident per scenario (now incl. minutes-to-shelter, stops at full doors,
+  and arm-D rows); `ML_TRAINING_DATA.csv` — 27,368 model-ready rows (inputs
+  joined to outcomes).
+- **Learning component**: `scripts/fit_outcome_models.py` →
+  `ML_MODEL_SUMMARY.md`. Logistic regression (binary outcome; evacuation-
+  literature standard family; IRLS, information-matrix SEs) + OLS for
+  time-to-shelter. Asthma null in every arm (negative control); distance and
+  speed dominate; arm D's mobility odds ratio ≈123 (the reserve, learned
+  back). Retry behaviour quantified (mean ~3.1–3.4 stops; 6.6% of refused
+  eventually admitted under scarcity vs 79–91% otherwise).
+- **Justification layer**: presentation Stage 9 ("one row per person" with
+  four real rows + the regression table + every-decision-justified card);
+  presenter script Q&A 14/15.
+- **Hand-off** (in lieu of a risky pre-symposium refactor): `docs/HANDOFF.md`;
+  the consolidation refactor is planned post-symposium, gated on the
+  byte-identity fixtures.
+
+## Recommended framing (directive §8)
+
+The chapter's title **"Capacity Is Not Access"** survives — it is the one
+premise every control strengthened. Recommended abstract skeleton (implemented
+at commit 85b80fe): (1) present system 30.1%; (2) capacity-at-parity 91.6%
+with the forced 578 = 550+28 identity; (3) dispersion 96.0% with the POOL
+attribution; (4) the mobility concentration + D's zero-cost closure; (5) the
+knife-edge sweep, presented as a reported prediction miss; (6) the 1.5–15.6×
+censored calibration bracket making all absolute figures upper bounds.
+Rejected framings: "better placed" (refuted by POOL), "second-best
+intervention is free" (refuted), "28× signal-to-noise" (retired).
+
+## Deadline status vs §7
+
+Mentor draft (Aug 9): **ahead of schedule** — Phases A–D complete and
+propagated, linter green, camera-ready mechanics done except the three
+user-owned items (NSF award number, affiliation confirmation, Zenodo
+DOI/repo visibility). Descoped this cycle, recorded with reasons in
+`12-PHASE-D-PREDICTIONS.md`: episode-aligned window arm (needs a SIM_START
+shift), D3 C-eq, D5 information ablation (E-territory), U-12 recalibration
+(calibration entry stays corrected-pending), 1200/A11 street-class
+sensitivity. Phase E remains spec-only per the user's scope instruction;
+its freeze-plan slot (spec + registry) is already satisfied by
+`E-LAYER-SPEC.md`.
