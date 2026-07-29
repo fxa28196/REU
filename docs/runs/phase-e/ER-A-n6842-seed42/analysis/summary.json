@@ -1,0 +1,1468 @@
+{
+  "schema": "reu-wildfire-shelter-abm/analysis/v1",
+  "analysis": {
+    "generated_utc": "2026-07-29T23:46:12Z",
+    "script": "scripts/analyze_run.py",
+    "script_version": "1.1.0",
+    "analysis_git_commit": "7224cefd4e960a2876a6cbc82fb79b41a867856a",
+    "python": "3.14.6",
+    "pandas": "3.0.5",
+    "matplotlib": "3.11.0"
+  },
+  "reproducibility": {
+    "sim_id": "sim-20260729-194417-seed42",
+    "random_seed": 42,
+    "model_git_commit": "7224cefd4e960a2876a6cbc82fb79b41a867856a",
+    "data_version_tag": "7efd11439abf",
+    "input_datasets": [
+      {
+        "file": "data/Streets.shp",
+        "sha256": "f5e5e311b625f129f94fcf6d3150f8feb521ea5a79039ade43514ebfb35810a8"
+      },
+      {
+        "file": "data/airnow/aqs_hourly_pm25_portland_2020-09.csv",
+        "sha256": "d908556c347ecdf68342ce859b1c56813cc606f695804c0ba71992604486ca08"
+      },
+      {
+        "file": "data/shelters/shelters_2026_current_placement_elayer.csv",
+        "sha256": "d06eb72384d394b49b5f0b9df632566e04e3bc24e01c96211623974640f98b19"
+      },
+      {
+        "file": "data/encampments/irp_campsite_reports_sample.csv",
+        "sha256": "3e557de5db4668c5d30fd7a6fc13bcc38b5e37bab4b9becaf9b3dc35366285ca"
+      }
+    ],
+    "parameters": {
+      "numAgents": 6842,
+      "minutesPerTick": 1.0,
+      "walkingSpeedMps": 1.3,
+      "shelterArrivalDistanceM": 200.0,
+      "simulationHours": 312,
+      "randomSeed": 42,
+      "evacuationThresholdUgM3": 55.5,
+      "scenarioCode": 0,
+      "enableHeterogeneity": 1,
+      "respectShelterOpeningDates": 1,
+      "triageReserveFraction": 0.0,
+      "enableDecisionLayer": 1,
+      "pAwareInit": 0.356,
+      "pHeavyBelongings": 0.284,
+      "pHasPet": 0.117,
+      "pHasDependents": 0.0044,
+      "groupSpeedDeltaMps": 0.06,
+      "lambdaOutreachPerDay": 0.0,
+      "informationRegime": 1,
+      "enableHazardDeparture": 1,
+      "sigmaTheta": 1.0,
+      "alphaHazard": -8.0,
+      "bRisk": 0.4,
+      "wOfficial": 1.1,
+      "gammaVuln": 0.25,
+      "riskHalfLifeH": 48.0,
+      "barrierBelongings": 0.26,
+      "barrierPet": 0.26,
+      "barrierDependents": 0.26,
+      "petPolicyDefault": 0,
+      "betaTravelTime": 1.0,
+      "betaCapacityPrior": 0.2,
+      "shelterPolicyVariant": 1
+    },
+    "run_generated_utc": "2026-07-29T19:44:42.822818"
+  },
+  "verification": {
+    "n_checks": 104,
+    "n_failed": 0,
+    "checks": [
+      {
+        "name": "agents.csv row count == manifest n_agents",
+        "status": "PASS",
+        "detail": "6842 vs 6842"
+      },
+      {
+        "name": "census PRE_EVAC == manifest pre_evac",
+        "status": "PASS",
+        "detail": "1208 vs 1208"
+      },
+      {
+        "name": "census SHELTERED == manifest sheltered",
+        "status": "PASS",
+        "detail": "1215 vs 1215"
+      },
+      {
+        "name": "census EN_ROUTE == manifest en_route",
+        "status": "PASS",
+        "detail": "0 vs 0"
+      },
+      {
+        "name": "census UNREACHABLE == manifest unreachable",
+        "status": "PASS",
+        "detail": "4 vs 4"
+      },
+      {
+        "name": "census REFUSED_ALL_FULL == manifest refused_all_full",
+        "status": "PASS",
+        "detail": "1 vs 1"
+      },
+      {
+        "name": "reached_shelter == (final_state SHELTERED)",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "sim_id constant and == manifest",
+        "status": "PASS",
+        "detail": "['sim-20260729-194417-seed42'] vs sim-20260729-194417-seed42"
+      },
+      {
+        "name": "commit constant and == manifest",
+        "status": "PASS",
+        "detail": "['7224cefd4e960a2876a6cbc82fb79b41a867856a'] vs 7224cefd4e960a2876a6cbc82fb79b41a867856a"
+      },
+      {
+        "name": "random_seed constant and == manifest",
+        "status": "PASS",
+        "detail": "[np.int64(42)] vs 42"
+      },
+      {
+        "name": "data_version constant and == manifest",
+        "status": "PASS",
+        "detail": "['7efd11439abf'] vs 7efd11439abf"
+      },
+      {
+        "name": "shelter Arbor_Lodge_Shelter: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "26 vs 26"
+      },
+      {
+        "name": "shelter Arbor_Lodge_Shelter: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Bybee_Lakes_Hope_Center: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "3 vs 3"
+      },
+      {
+        "name": "shelter Bybee_Lakes_Hope_Center: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Clark_Center: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "90 vs 90"
+      },
+      {
+        "name": "shelter Clark_Center: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Gresham_Womens_Shelter: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "0 vs 0"
+      },
+      {
+        "name": "shelter Gresham_Womens_Shelter: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Jeans_Place: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "56 vs 56"
+      },
+      {
+        "name": "shelter Jeans_Place: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Laurelwood_Center: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "120 vs 120"
+      },
+      {
+        "name": "shelter Laurelwood_Center: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter River_District_Navigatio: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "100 vs 100"
+      },
+      {
+        "name": "shelter River_District_Navigatio: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Walnut_Park_Shelter: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "39 vs 39"
+      },
+      {
+        "name": "shelter Walnut_Park_Shelter: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Willamette_Center: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "83 vs 83"
+      },
+      {
+        "name": "shelter Willamette_Center: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Banfield_Motel_Shelter: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "53 vs 53"
+      },
+      {
+        "name": "shelter Banfield_Motel_Shelter: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Delta_Park_Motel_Shelter: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "11 vs 11"
+      },
+      {
+        "name": "shelter Delta_Park_Motel_Shelter: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Roseway_Inn_Motel_Shelte: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "147 vs 147"
+      },
+      {
+        "name": "shelter Roseway_Inn_Motel_Shelte: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Rockwood_Bridge_Shelter: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "1 vs 1"
+      },
+      {
+        "name": "shelter Rockwood_Bridge_Shelter: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Stark_Street_Motel_Shelt: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "3 vs 3"
+      },
+      {
+        "name": "shelter Stark_Street_Motel_Shelt: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Thayer_Family_Foundation: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "0 vs 0"
+      },
+      {
+        "name": "shelter Thayer_Family_Foundation: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Arbor_Lodge_Village_Pods: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "0 vs 0"
+      },
+      {
+        "name": "shelter Arbor_Lodge_Village_Pods: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Avalon_Village: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "1 vs 1"
+      },
+      {
+        "name": "shelter Avalon_Village: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Beacon_Village: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "4 vs 4"
+      },
+      {
+        "name": "shelter Beacon_Village: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Dignity_Village: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "4 vs 4"
+      },
+      {
+        "name": "shelter Dignity_Village: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Harrison_Community_Villa: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "14 vs 14"
+      },
+      {
+        "name": "shelter Harrison_Community_Villa: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Kenton_Womens_Village: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "1 vs 1"
+      },
+      {
+        "name": "shelter Kenton_Womens_Village: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Oak_Street_Village: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "31 vs 31"
+      },
+      {
+        "name": "shelter Oak_Street_Village: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Parkrose_Community_Villa: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "11 vs 11"
+      },
+      {
+        "name": "shelter Parkrose_Community_Villa: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter St_Andrews_Village: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "0 vs 0"
+      },
+      {
+        "name": "shelter St_Andrews_Village: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter St_Johns_Village: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "21 vs 21"
+      },
+      {
+        "name": "shelter St_Johns_Village: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Lilac_Meadows: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "127 vs 127"
+      },
+      {
+        "name": "shelter Lilac_Meadows: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Porch_Light_Youth_Shelte: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "10 vs 10"
+      },
+      {
+        "name": "shelter Porch_Light_Youth_Shelte: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Street_Light_Youth_Shelt: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "0 vs 0"
+      },
+      {
+        "name": "shelter Street_Light_Youth_Shelt: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Behavioral_Health_Resour: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "8 vs 8"
+      },
+      {
+        "name": "shelter Behavioral_Health_Resour: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Sunderland_RV_Safe_Park: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "3 vs 3"
+      },
+      {
+        "name": "shelter Sunderland_RV_Safe_Park: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Peninsula_Crossing_SRV: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "32 vs 32"
+      },
+      {
+        "name": "shelter Peninsula_Crossing_SRV: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter BIPOC_SRV: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "19 vs 19"
+      },
+      {
+        "name": "shelter BIPOC_SRV: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Queer_Affinity_Village: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "30 vs 30"
+      },
+      {
+        "name": "shelter Queer_Affinity_Village: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Doreens_Place: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "90 vs 90"
+      },
+      {
+        "name": "shelter Doreens_Place: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Menlo_Park_SRV: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "55 vs 55"
+      },
+      {
+        "name": "shelter Menlo_Park_SRV: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "shelter Reedway_SRV: agents.csv arrivals == shelters.csv final_occupancy",
+        "status": "PASS",
+        "detail": "22 vs 22"
+      },
+      {
+        "name": "shelter Reedway_SRV: shelters.csv == simulation.json occupancy/refused",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "sum(final_occupancy) == n sheltered",
+        "status": "PASS",
+        "detail": "1215 vs 1215"
+      },
+      {
+        "name": "exposure mean recomputed == manifest",
+        "status": "PASS",
+        "detail": "48629.8795 vs 48629.8794"
+      },
+      {
+        "name": "exposure median recomputed == manifest",
+        "status": "PASS",
+        "detail": "54002.8192 vs 54002.8192"
+      },
+      {
+        "name": "exposure min recomputed == manifest",
+        "status": "PASS",
+        "detail": "1.1000 vs 1.1"
+      },
+      {
+        "name": "exposure p25 recomputed == manifest",
+        "status": "PASS",
+        "detail": "54002.8192 vs 54002.8192"
+      },
+      {
+        "name": "exposure p75 recomputed == manifest",
+        "status": "PASS",
+        "detail": "54002.8192 vs 54002.8192"
+      },
+      {
+        "name": "exposure p90 recomputed == manifest",
+        "status": "PASS",
+        "detail": "54002.8192 vs 54002.8192"
+      },
+      {
+        "name": "exposure max recomputed == manifest",
+        "status": "PASS",
+        "detail": "54002.8192 vs 54002.8192"
+      },
+      {
+        "name": "exposure total recomputed == manifest",
+        "status": "PASS",
+        "detail": "332725635.2102 vs 332725635.035"
+      },
+      {
+        "name": "exposure gini recomputed == manifest",
+        "status": "PASS",
+        "detail": "0.0981 vs 0.0981"
+      },
+      {
+        "name": "all RR placeholders == 1.0",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "VWE == exposure row-by-row (placeholder RRs)",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "travel_m mean recomputed == manifest",
+        "status": "PASS",
+        "detail": "614.41 vs 614.41"
+      },
+      {
+        "name": "travel_m median recomputed == manifest",
+        "status": "PASS",
+        "detail": "0.00 vs 0.0"
+      },
+      {
+        "name": "travel_m max recomputed == manifest",
+        "status": "PASS",
+        "detail": "37868.58 vs 37868.58"
+      },
+      {
+        "name": "travel_time_min == (arrived - started) * minutesPerTick",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "per-agent peak PM2.5 <= smoke-field peak",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "per-agent avg PM2.5 <= peak PM2.5",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "sum(hours_above_unhealthy) == manifest person-hours",
+        "status": "PASS",
+        "detail": "1195065.00 vs 1195065.0"
+      },
+      {
+        "name": "smoke field out_of_range_lookups == 0",
+        "status": "PASS",
+        "detail": ""
+      },
+      {
+        "name": "walked distance <= planned route + 200 m (A-17)",
+        "status": "PASS",
+        "detail": "basis planned_route_m + snap_gap_m (per-leg, refusal-aware); max surplus 0.0 m over 1216 routed agents"
+      }
+    ]
+  },
+  "summary_statistics": {
+    "total_agents": 6842,
+    "successful_arrivals": 1215,
+    "failed_arrivals": 5627,
+    "failed_by_state": {
+      "UNAWARE": 4414,
+      "PRE_EVAC": 1208,
+      "UNREACHABLE": 4,
+      "REFUSED_ALL_FULL": 1
+    },
+    "arrival_rate": 0.1776,
+    "evacuation_start": {
+      "tick": 1,
+      "local": "2020-09-12T21:00",
+      "all_simultaneous": false
+    },
+    "travel_time_min_arrived": {
+      "mean": 48.27,
+      "median": 24.0,
+      "min": 0.0,
+      "p25": 12.0,
+      "p75": 49.0,
+      "p90": 107.6,
+      "max": 673.0
+    },
+    "travel_distance_m_arrived": {
+      "mean": 3436.75,
+      "median": 1863.14,
+      "min": 44.97,
+      "p25": 975.24,
+      "p75": 3637.07,
+      "p90": 7911.73,
+      "max": 37868.58
+    },
+    "travel_distance_m_all_agents": {
+      "mean": 614.41,
+      "median": 0.0,
+      "min": 0.0,
+      "p25": 0.0,
+      "p75": 0.0,
+      "p90": 1614.9,
+      "max": 37868.58
+    },
+    "exposure_ugm3h": {
+      "mean": 48629.88,
+      "median": 54002.82,
+      "min": 1.1,
+      "p25": 54002.82,
+      "p75": 54002.82,
+      "p90": 54002.82,
+      "max": 54002.82,
+      "total": 332725635.21,
+      "gini": 0.0981
+    },
+    "vwe_ugm3h": {
+      "mean": 48629.88,
+      "median": 54002.82,
+      "min": 1.1,
+      "p25": 54002.82,
+      "p75": 54002.82,
+      "p90": 54002.82,
+      "max": 54002.82,
+      "total": 332725635.21,
+      "gini": 0.0981,
+      "note": "identical to exposure while RR placeholders = 1.0"
+    },
+    "avg_pm25_ugm3": {
+      "mean": 163.54,
+      "median": 173.09,
+      "min": 5.5,
+      "p25": 173.09,
+      "p75": 173.09,
+      "p90": 173.09,
+      "max": 204.66
+    },
+    "peak_pm25_ugm3": {
+      "mean": 533.19,
+      "median": 562.7,
+      "min": 5.5,
+      "p25": 562.7,
+      "p75": 562.7,
+      "p90": 562.7,
+      "max": 562.7
+    },
+    "hours_above_unhealthy": {
+      "mean": 174.67,
+      "median": 194.0,
+      "min": 0.0,
+      "p25": 194.0,
+      "p75": 194.0,
+      "p90": 194.0,
+      "max": 194.0,
+      "total_person_hours": 1195065.0
+    },
+    "exposure_split_mean_ugm3h": {
+      "while_waiting_pre_evac": 48599.8,
+      "while_traveling_or_stranded": 30.08
+    },
+    "capacity_refusals": {
+      "agents_refused_at_least_once": 275,
+      "total_door_refusals": 836,
+      "max_refusals_one_agent": 14,
+      "refused_then_sheltered": 274
+    }
+  },
+  "shelter_statistics": [
+    {
+      "shelter_id": "Arbor_Lodge_Shelter",
+      "name": "Arbor Lodge Shelter",
+      "operating": true,
+      "capacity": 88,
+      "final_occupancy": 26,
+      "peak_occupancy": 26,
+      "unused_capacity": 62,
+      "utilization": 0.2955,
+      "refused_agents": 12,
+      "mean_travel_dist_m_admitted": 1927.05,
+      "arrival_timing": {
+        "first_tick": 567,
+        "first_local": "2020-09-07T09:27",
+        "median_tick": 8743,
+        "last_tick": 17174,
+        "last_local": "2020-09-18T22:14"
+      }
+    },
+    {
+      "shelter_id": "Bybee_Lakes_Hope_Center",
+      "name": "Bybee Lakes Hope Center",
+      "operating": true,
+      "capacity": 175,
+      "final_occupancy": 3,
+      "peak_occupancy": 3,
+      "unused_capacity": 172,
+      "utilization": 0.0171,
+      "refused_agents": 2,
+      "mean_travel_dist_m_admitted": 3370.36,
+      "arrival_timing": {
+        "first_tick": 470,
+        "first_local": "2020-09-07T07:50",
+        "median_tick": 7103,
+        "last_tick": 12867,
+        "last_local": "2020-09-15T22:27"
+      }
+    },
+    {
+      "shelter_id": "Clark_Center",
+      "name": "Clark Center",
+      "operating": true,
+      "capacity": 90,
+      "final_occupancy": 90,
+      "peak_occupancy": 90,
+      "unused_capacity": 0,
+      "utilization": 1.0,
+      "refused_agents": 62,
+      "mean_travel_dist_m_admitted": 1016.47,
+      "arrival_timing": {
+        "first_tick": 12,
+        "first_local": "2020-09-07T00:12",
+        "median_tick": 7842,
+        "last_tick": 14416,
+        "last_local": "2020-09-17T00:16"
+      }
+    },
+    {
+      "shelter_id": "Gresham_Womens_Shelter",
+      "name": "Gresham Women's Shelter",
+      "operating": true,
+      "capacity": 90,
+      "final_occupancy": 0,
+      "peak_occupancy": 0,
+      "unused_capacity": 90,
+      "utilization": 0.0,
+      "refused_agents": 1,
+      "mean_travel_dist_m_admitted": null,
+      "arrival_timing": null
+    },
+    {
+      "shelter_id": "Jeans_Place",
+      "name": "Jean's Place",
+      "operating": true,
+      "capacity": 60,
+      "final_occupancy": 56,
+      "peak_occupancy": 56,
+      "unused_capacity": 4,
+      "utilization": 0.9333,
+      "refused_agents": 50,
+      "mean_travel_dist_m_admitted": 1029.52,
+      "arrival_timing": {
+        "first_tick": 1629,
+        "first_local": "2020-09-08T03:09",
+        "median_tick": 12515,
+        "last_tick": 18666,
+        "last_local": "2020-09-19T23:06"
+      }
+    },
+    {
+      "shelter_id": "Laurelwood_Center",
+      "name": "Laurelwood Center",
+      "operating": true,
+      "capacity": 120,
+      "final_occupancy": 120,
+      "peak_occupancy": 120,
+      "unused_capacity": 0,
+      "utilization": 1.0,
+      "refused_agents": 2,
+      "mean_travel_dist_m_admitted": 4155.99,
+      "arrival_timing": {
+        "first_tick": 244,
+        "first_local": "2020-09-07T04:04",
+        "median_tick": 11026,
+        "last_tick": 18501,
+        "last_local": "2020-09-19T20:21"
+      }
+    },
+    {
+      "shelter_id": "River_District_Navigatio",
+      "name": "River District Navigation Center",
+      "operating": true,
+      "capacity": 100,
+      "final_occupancy": 100,
+      "peak_occupancy": 100,
+      "unused_capacity": 0,
+      "utilization": 1.0,
+      "refused_agents": 82,
+      "mean_travel_dist_m_admitted": 3335.68,
+      "arrival_timing": {
+        "first_tick": 242,
+        "first_local": "2020-09-07T04:02",
+        "median_tick": 6282,
+        "last_tick": 11296,
+        "last_local": "2020-09-14T20:16"
+      }
+    },
+    {
+      "shelter_id": "Walnut_Park_Shelter",
+      "name": "Walnut Park Shelter",
+      "operating": true,
+      "capacity": 72,
+      "final_occupancy": 39,
+      "peak_occupancy": 39,
+      "unused_capacity": 33,
+      "utilization": 0.5417,
+      "refused_agents": 0,
+      "mean_travel_dist_m_admitted": 8923.3,
+      "arrival_timing": {
+        "first_tick": 1703,
+        "first_local": "2020-09-08T04:23",
+        "median_tick": 8365,
+        "last_tick": 18149,
+        "last_local": "2020-09-19T14:29"
+      }
+    },
+    {
+      "shelter_id": "Willamette_Center",
+      "name": "Willamette Center",
+      "operating": true,
+      "capacity": 130,
+      "final_occupancy": 83,
+      "peak_occupancy": 83,
+      "unused_capacity": 47,
+      "utilization": 0.6385,
+      "refused_agents": 0,
+      "mean_travel_dist_m_admitted": 8065.76,
+      "arrival_timing": {
+        "first_tick": 95,
+        "first_local": "2020-09-07T01:35",
+        "median_tick": 12108,
+        "last_tick": 18548,
+        "last_local": "2020-09-19T21:08"
+      }
+    },
+    {
+      "shelter_id": "Banfield_Motel_Shelter",
+      "name": "Banfield Motel Shelter",
+      "operating": true,
+      "capacity": 72,
+      "final_occupancy": 53,
+      "peak_occupancy": 53,
+      "unused_capacity": 19,
+      "utilization": 0.7361,
+      "refused_agents": 29,
+      "mean_travel_dist_m_admitted": 1535.95,
+      "arrival_timing": {
+        "first_tick": 431,
+        "first_local": "2020-09-07T07:11",
+        "median_tick": 8345,
+        "last_tick": 17884,
+        "last_local": "2020-09-19T10:04"
+      }
+    },
+    {
+      "shelter_id": "Delta_Park_Motel_Shelter",
+      "name": "Delta Park Motel Shelter",
+      "operating": true,
+      "capacity": 76,
+      "final_occupancy": 11,
+      "peak_occupancy": 11,
+      "unused_capacity": 65,
+      "utilization": 0.1447,
+      "refused_agents": 12,
+      "mean_travel_dist_m_admitted": 1293.22,
+      "arrival_timing": {
+        "first_tick": 63,
+        "first_local": "2020-09-07T01:03",
+        "median_tick": 9315,
+        "last_tick": 15668,
+        "last_local": "2020-09-17T21:08"
+      }
+    },
+    {
+      "shelter_id": "Roseway_Inn_Motel_Shelte",
+      "name": "Roseway Inn Motel Shelter",
+      "operating": true,
+      "capacity": 150,
+      "final_occupancy": 147,
+      "peak_occupancy": 147,
+      "unused_capacity": 3,
+      "utilization": 0.98,
+      "refused_agents": 21,
+      "mean_travel_dist_m_admitted": 6327.44,
+      "arrival_timing": {
+        "first_tick": 180,
+        "first_local": "2020-09-07T03:00",
+        "median_tick": 11987,
+        "last_tick": 18469,
+        "last_local": "2020-09-19T19:49"
+      }
+    },
+    {
+      "shelter_id": "Rockwood_Bridge_Shelter",
+      "name": "Rockwood Bridge Shelter",
+      "operating": true,
+      "capacity": 52,
+      "final_occupancy": 1,
+      "peak_occupancy": 1,
+      "unused_capacity": 51,
+      "utilization": 0.0192,
+      "refused_agents": 1,
+      "mean_travel_dist_m_admitted": 3872.44,
+      "arrival_timing": {
+        "first_tick": 1666,
+        "first_local": "2020-09-08T03:46",
+        "median_tick": 1666,
+        "last_tick": 1666,
+        "last_local": "2020-09-08T03:46"
+      }
+    },
+    {
+      "shelter_id": "Stark_Street_Motel_Shelt",
+      "name": "Stark Street Motel Shelter",
+      "operating": true,
+      "capacity": 54,
+      "final_occupancy": 3,
+      "peak_occupancy": 3,
+      "unused_capacity": 51,
+      "utilization": 0.0556,
+      "refused_agents": 1,
+      "mean_travel_dist_m_admitted": 24330.83,
+      "arrival_timing": {
+        "first_tick": 10709,
+        "first_local": "2020-09-14T10:29",
+        "median_tick": 11388,
+        "last_tick": 12028,
+        "last_local": "2020-09-15T08:28"
+      }
+    },
+    {
+      "shelter_id": "Thayer_Family_Foundation",
+      "name": "Thayer Family Foundation Veterans Motel Shelter",
+      "operating": true,
+      "capacity": 21,
+      "final_occupancy": 0,
+      "peak_occupancy": 0,
+      "unused_capacity": 21,
+      "utilization": 0.0,
+      "refused_agents": 12,
+      "mean_travel_dist_m_admitted": null,
+      "arrival_timing": null
+    },
+    {
+      "shelter_id": "Arbor_Lodge_Village_Pods",
+      "name": "Arbor Lodge Village Pods",
+      "operating": true,
+      "capacity": 20,
+      "final_occupancy": 0,
+      "peak_occupancy": 0,
+      "unused_capacity": 20,
+      "utilization": 0.0,
+      "refused_agents": 12,
+      "mean_travel_dist_m_admitted": null,
+      "arrival_timing": null
+    },
+    {
+      "shelter_id": "Avalon_Village",
+      "name": "Avalon Village",
+      "operating": true,
+      "capacity": 11,
+      "final_occupancy": 1,
+      "peak_occupancy": 1,
+      "unused_capacity": 10,
+      "utilization": 0.0909,
+      "refused_agents": 1,
+      "mean_travel_dist_m_admitted": 1180.76,
+      "arrival_timing": {
+        "first_tick": 8848,
+        "first_local": "2020-09-13T03:28",
+        "median_tick": 8848,
+        "last_tick": 8848,
+        "last_local": "2020-09-13T03:28"
+      }
+    },
+    {
+      "shelter_id": "Beacon_Village",
+      "name": "Beacon Village",
+      "operating": true,
+      "capacity": 11,
+      "final_occupancy": 4,
+      "peak_occupancy": 4,
+      "unused_capacity": 7,
+      "utilization": 0.3636,
+      "refused_agents": 2,
+      "mean_travel_dist_m_admitted": 915.56,
+      "arrival_timing": {
+        "first_tick": 212,
+        "first_local": "2020-09-07T03:32",
+        "median_tick": 5898,
+        "last_tick": 11650,
+        "last_local": "2020-09-15T02:10"
+      }
+    },
+    {
+      "shelter_id": "Dignity_Village",
+      "name": "Dignity Village",
+      "operating": true,
+      "capacity": 66,
+      "final_occupancy": 4,
+      "peak_occupancy": 4,
+      "unused_capacity": 62,
+      "utilization": 0.0606,
+      "refused_agents": 2,
+      "mean_travel_dist_m_admitted": 1913.07,
+      "arrival_timing": {
+        "first_tick": 2324,
+        "first_local": "2020-09-08T14:44",
+        "median_tick": 10794,
+        "last_tick": 13990,
+        "last_local": "2020-09-16T17:10"
+      }
+    },
+    {
+      "shelter_id": "Harrison_Community_Villa",
+      "name": "Harrison Community Village",
+      "operating": true,
+      "capacity": 42,
+      "final_occupancy": 14,
+      "peak_occupancy": 14,
+      "unused_capacity": 28,
+      "utilization": 0.3333,
+      "refused_agents": 12,
+      "mean_travel_dist_m_admitted": 1619.76,
+      "arrival_timing": {
+        "first_tick": 139,
+        "first_local": "2020-09-07T02:19",
+        "median_tick": 5536,
+        "last_tick": 15470,
+        "last_local": "2020-09-17T17:50"
+      }
+    },
+    {
+      "shelter_id": "Kenton_Womens_Village",
+      "name": "Kenton Women's Village",
+      "operating": true,
+      "capacity": 21,
+      "final_occupancy": 1,
+      "peak_occupancy": 1,
+      "unused_capacity": 20,
+      "utilization": 0.0476,
+      "refused_agents": 12,
+      "mean_travel_dist_m_admitted": 952.62,
+      "arrival_timing": {
+        "first_tick": 8174,
+        "first_local": "2020-09-12T16:14",
+        "median_tick": 8174,
+        "last_tick": 8174,
+        "last_local": "2020-09-12T16:14"
+      }
+    },
+    {
+      "shelter_id": "Oak_Street_Village",
+      "name": "Oak Street Village",
+      "operating": true,
+      "capacity": 32,
+      "final_occupancy": 31,
+      "peak_occupancy": 31,
+      "unused_capacity": 1,
+      "utilization": 0.9688,
+      "refused_agents": 12,
+      "mean_travel_dist_m_admitted": 1396.25,
+      "arrival_timing": {
+        "first_tick": 325,
+        "first_local": "2020-09-07T05:25",
+        "median_tick": 9432,
+        "last_tick": 16529,
+        "last_local": "2020-09-18T11:29"
+      }
+    },
+    {
+      "shelter_id": "Parkrose_Community_Villa",
+      "name": "Parkrose Community Village",
+      "operating": true,
+      "capacity": 11,
+      "final_occupancy": 11,
+      "peak_occupancy": 11,
+      "unused_capacity": 0,
+      "utilization": 1.0,
+      "refused_agents": 86,
+      "mean_travel_dist_m_admitted": 3660.37,
+      "arrival_timing": {
+        "first_tick": 1936,
+        "first_local": "2020-09-08T08:16",
+        "median_tick": 8541,
+        "last_tick": 9547,
+        "last_local": "2020-09-13T15:07"
+      }
+    },
+    {
+      "shelter_id": "St_Andrews_Village",
+      "name": "St Andrews Village",
+      "operating": true,
+      "capacity": 11,
+      "final_occupancy": 0,
+      "peak_occupancy": 0,
+      "unused_capacity": 11,
+      "utilization": 0.0,
+      "refused_agents": 10,
+      "mean_travel_dist_m_admitted": null,
+      "arrival_timing": null
+    },
+    {
+      "shelter_id": "St_Johns_Village",
+      "name": "St Johns Village",
+      "operating": true,
+      "capacity": 21,
+      "final_occupancy": 21,
+      "peak_occupancy": 21,
+      "unused_capacity": 0,
+      "utilization": 1.0,
+      "refused_agents": 14,
+      "mean_travel_dist_m_admitted": 1102.24,
+      "arrival_timing": {
+        "first_tick": 267,
+        "first_local": "2020-09-07T04:27",
+        "median_tick": 10022,
+        "last_tick": 16169,
+        "last_local": "2020-09-18T05:29"
+      }
+    },
+    {
+      "shelter_id": "Lilac_Meadows",
+      "name": "Lilac Meadows",
+      "operating": true,
+      "capacity": 127,
+      "final_occupancy": 127,
+      "peak_occupancy": 127,
+      "unused_capacity": 0,
+      "utilization": 1.0,
+      "refused_agents": 50,
+      "mean_travel_dist_m_admitted": 2797.23,
+      "arrival_timing": {
+        "first_tick": 122,
+        "first_local": "2020-09-07T02:02",
+        "median_tick": 7267,
+        "last_tick": 13578,
+        "last_local": "2020-09-16T10:18"
+      }
+    },
+    {
+      "shelter_id": "Porch_Light_Youth_Shelte",
+      "name": "Porch Light Youth Shelter",
+      "operating": true,
+      "capacity": 30,
+      "final_occupancy": 10,
+      "peak_occupancy": 10,
+      "unused_capacity": 20,
+      "utilization": 0.3333,
+      "refused_agents": 29,
+      "mean_travel_dist_m_admitted": 807.49,
+      "arrival_timing": {
+        "first_tick": 1534,
+        "first_local": "2020-09-08T01:34",
+        "median_tick": 9464,
+        "last_tick": 17828,
+        "last_local": "2020-09-19T09:08"
+      }
+    },
+    {
+      "shelter_id": "Street_Light_Youth_Shelt",
+      "name": "Street Light Youth Shelter",
+      "operating": true,
+      "capacity": 30,
+      "final_occupancy": 0,
+      "peak_occupancy": 0,
+      "unused_capacity": 30,
+      "utilization": 0.0,
+      "refused_agents": 29,
+      "mean_travel_dist_m_admitted": null,
+      "arrival_timing": null
+    },
+    {
+      "shelter_id": "Behavioral_Health_Resour",
+      "name": "Behavioral Health Resource Center",
+      "operating": true,
+      "capacity": 33,
+      "final_occupancy": 8,
+      "peak_occupancy": 8,
+      "unused_capacity": 25,
+      "utilization": 0.2424,
+      "refused_agents": 31,
+      "mean_travel_dist_m_admitted": 3609.59,
+      "arrival_timing": {
+        "first_tick": 16559,
+        "first_local": "2020-09-18T11:59",
+        "median_tick": 17021,
+        "last_tick": 18289,
+        "last_local": "2020-09-19T16:49"
+      }
+    },
+    {
+      "shelter_id": "Sunderland_RV_Safe_Park",
+      "name": "Sunderland RV Safe Park",
+      "operating": true,
+      "capacity": 61,
+      "final_occupancy": 3,
+      "peak_occupancy": 3,
+      "unused_capacity": 58,
+      "utilization": 0.0492,
+      "refused_agents": 2,
+      "mean_travel_dist_m_admitted": 2643.49,
+      "arrival_timing": {
+        "first_tick": 7652,
+        "first_local": "2020-09-12T07:32",
+        "median_tick": 8248,
+        "last_tick": 12215,
+        "last_local": "2020-09-15T11:35"
+      }
+    },
+    {
+      "shelter_id": "Peninsula_Crossing_SRV",
+      "name": "Peninsula Crossing Trail Safe Rest Village",
+      "operating": true,
+      "capacity": 66,
+      "final_occupancy": 32,
+      "peak_occupancy": 32,
+      "unused_capacity": 34,
+      "utilization": 0.4848,
+      "refused_agents": 10,
+      "mean_travel_dist_m_admitted": 1582.01,
+      "arrival_timing": {
+        "first_tick": 15,
+        "first_local": "2020-09-07T00:15",
+        "median_tick": 9340,
+        "last_tick": 18222,
+        "last_local": "2020-09-19T15:42"
+      }
+    },
+    {
+      "shelter_id": "BIPOC_SRV",
+      "name": "BIPOC Safe Rest Village",
+      "operating": true,
+      "capacity": 42,
+      "final_occupancy": 19,
+      "peak_occupancy": 19,
+      "unused_capacity": 23,
+      "utilization": 0.4524,
+      "refused_agents": 33,
+      "mean_travel_dist_m_admitted": 1234.0,
+      "arrival_timing": {
+        "first_tick": 4092,
+        "first_local": "2020-09-09T20:12",
+        "median_tick": 14763,
+        "last_tick": 18685,
+        "last_local": "2020-09-19T23:25"
+      }
+    },
+    {
+      "shelter_id": "Queer_Affinity_Village",
+      "name": "Queer Affinity Safe Rest Village",
+      "operating": true,
+      "capacity": 38,
+      "final_occupancy": 30,
+      "peak_occupancy": 30,
+      "unused_capacity": 8,
+      "utilization": 0.7895,
+      "refused_agents": 28,
+      "mean_travel_dist_m_admitted": 2511.97,
+      "arrival_timing": {
+        "first_tick": 553,
+        "first_local": "2020-09-07T09:13",
+        "median_tick": 9799,
+        "last_tick": 18384,
+        "last_local": "2020-09-19T18:24"
+      }
+    },
+    {
+      "shelter_id": "Doreens_Place",
+      "name": "Doreen's Place (Transition Projects)",
+      "operating": true,
+      "capacity": 90,
+      "final_occupancy": 90,
+      "peak_occupancy": 90,
+      "unused_capacity": 0,
+      "utilization": 1.0,
+      "refused_agents": 74,
+      "mean_travel_dist_m_admitted": 1421.95,
+      "arrival_timing": {
+        "first_tick": 790,
+        "first_local": "2020-09-07T13:10",
+        "median_tick": 11780,
+        "last_tick": 16130,
+        "last_local": "2020-09-18T04:50"
+      }
+    },
+    {
+      "shelter_id": "Menlo_Park_SRV",
+      "name": "Menlo Park Safe Rest Village",
+      "operating": true,
+      "capacity": 55,
+      "final_occupancy": 55,
+      "peak_occupancy": 55,
+      "unused_capacity": 0,
+      "utilization": 1.0,
+      "refused_agents": 96,
+      "mean_travel_dist_m_admitted": 2850.4,
+      "arrival_timing": {
+        "first_tick": 22,
+        "first_local": "2020-09-07T00:22",
+        "median_tick": 4101,
+        "last_tick": 7777,
+        "last_local": "2020-09-12T09:37"
+      }
+    },
+    {
+      "shelter_id": "Reedway_SRV",
+      "name": "Reedway Safe Rest Village",
+      "operating": true,
+      "capacity": 66,
+      "final_occupancy": 22,
+      "peak_occupancy": 22,
+      "unused_capacity": 44,
+      "utilization": 0.3333,
+      "refused_agents": 4,
+      "mean_travel_dist_m_admitted": 1672.13,
+      "arrival_timing": {
+        "first_tick": 901,
+        "first_local": "2020-09-07T15:01",
+        "median_tick": 12356,
+        "last_tick": 18687,
+        "last_local": "2020-09-19T23:27"
+      }
+    }
+  ],
+  "exposure_analysis": {
+    "highest_exposure_agents": [
+      {
+        "agent_id": "Site 0",
+        "final_state": "UNAWARE",
+        "shelter_reached": null,
+        "cumulative_dose_ugm3h": 54002.82,
+        "travel_time_min": null,
+        "hours_above_unhealthy": 194.0
+      },
+      {
+        "agent_id": "Site 6841",
+        "final_state": "UNAWARE",
+        "shelter_reached": null,
+        "cumulative_dose_ugm3h": 54002.82,
+        "travel_time_min": null,
+        "hours_above_unhealthy": 194.0
+      },
+      {
+        "agent_id": "Site 6840",
+        "final_state": "UNAWARE",
+        "shelter_reached": null,
+        "cumulative_dose_ugm3h": 54002.82,
+        "travel_time_min": null,
+        "hours_above_unhealthy": 194.0
+      },
+      {
+        "agent_id": "Site 6839",
+        "final_state": "UNAWARE",
+        "shelter_reached": null,
+        "cumulative_dose_ugm3h": 54002.82,
+        "travel_time_min": null,
+        "hours_above_unhealthy": 194.0
+      },
+      {
+        "agent_id": "Site 6838",
+        "final_state": "UNAWARE",
+        "shelter_reached": null,
+        "cumulative_dose_ugm3h": 54002.82,
+        "travel_time_min": null,
+        "hours_above_unhealthy": 194.0
+      }
+    ],
+    "lowest_exposure_agents": [
+      {
+        "agent_id": "Site 4855",
+        "final_state": "SHELTERED",
+        "shelter_reached": "Clark_Center",
+        "cumulative_dose_ugm3h": 1.1,
+        "travel_time_min": 11.0,
+        "hours_above_unhealthy": 0.0
+      },
+      {
+        "agent_id": "Site 718",
+        "final_state": "SHELTERED",
+        "shelter_reached": "Clark_Center",
+        "cumulative_dose_ugm3h": 1.19,
+        "travel_time_min": 12.0,
+        "hours_above_unhealthy": 0.0
+      },
+      {
+        "agent_id": "Site 2850",
+        "final_state": "SHELTERED",
+        "shelter_reached": "Peninsula_Crossing_SRV",
+        "cumulative_dose_ugm3h": 1.38,
+        "travel_time_min": 14.0,
+        "hours_above_unhealthy": 0.0
+      },
+      {
+        "agent_id": "Site 2638",
+        "final_state": "SHELTERED",
+        "shelter_reached": "Menlo_Park_SRV",
+        "cumulative_dose_ugm3h": 2.02,
+        "travel_time_min": 21.0,
+        "hours_above_unhealthy": 0.0
+      },
+      {
+        "agent_id": "Site 6522",
+        "final_state": "SHELTERED",
+        "shelter_reached": "Delta_Park_Motel_Shelter",
+        "cumulative_dose_ugm3h": 5.78,
+        "travel_time_min": 3.0,
+        "hours_above_unhealthy": 0.0
+      }
+    ],
+    "travel_time_vs_exposure_arrived": {
+      "pearson_r": 0.1957,
+      "spearman_rho": 0.1515,
+      "n": 1215,
+      "note": "Structurally near-deterministic: with a county-uniform smoke field and simultaneous evacuation, dose differences among sheltered agents are driven almost entirely by time outdoors (= travel time)."
+    }
+  },
+  "routing_anomaly": {
+    "basis": "planned_route_m + snap_gap_m (per-leg, refusal-aware)",
+    "n_with_route": 1216,
+    "n_flagged": 0,
+    "flag_threshold_m": 200.0,
+    "detour_max_m": 0.0,
+    "detour_median_flagged_m": null,
+    "distinct_detour_values_m": [],
+    "flagged_agents": []
+  },
+  "figures": [
+    "fig1_travel_time_hist.png",
+    "fig2_travel_distance_hist.png",
+    "fig3_exposure_distribution.png",
+    "fig4_exposure_by_agent.png",
+    "fig5_shelter_utilization.png"
+  ]
+}
