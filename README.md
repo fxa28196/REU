@@ -11,8 +11,8 @@ University · mentor Prof. Christof Teuscher
 ## The question
 
 If the September 2020 wildfire smoke returned today, what would happen to the people
-living outside — and which fix actually helps: **more shelter capacity, or
-better-placed capacity?**
+living outside — and which fix actually helps: **more shelter capacity, or the same
+capacity split across more sites?**
 
 These sound like variations on one idea. They are not, and the difference decides
 both how many people get indoors and *which* people do.
@@ -20,7 +20,8 @@ both how many people get indoors and *which* people do.
 ## What the model does
 
 6,842 unsheltered residents — the 2025 Point-in-Time count for the county — each start
-at one of 2,981 real reported campsite locations and carry an individually sampled
+at a real reported campsite location (3,400 reports resolving to 3,317 distinct
+coordinates; any one run seeds residents at a subset) and carry an individually sampled
 age, sex, mobility status, and asthma/COPD status drawn from published sources. When
 the air crosses the EPA "Unhealthy" threshold and a shelter is open, each walks
 Portland's real street network at their own speed toward the nearest facility with
@@ -32,38 +33,52 @@ peaked at 562.7 µg/m³ and stayed above the threshold for 194 of 312 hours.
 ## The results
 
 Three scenarios, nine random seeds each — 27 runs. Scenarios B and C hold total
-capacity *identical*, so any difference between them is attributable to placement
-alone.
+capacity *identical* — they differ only in how the same total is split across sites.
+(Table shows seed 42; nine-seed means and ranges are in
+[`docs/final/results-2026/6_SEED_ROBUSTNESS.csv`](docs/final/results-2026/6_SEED_ROBUSTNESS.csv).)
 
-| | A — today | B — more capacity | C — same capacity, better placed |
+| | A — today | B — more capacity | C — same total, more doors |
 |---|---|---|---|
 | Facilities / spaces | 36 / 2,234 | 36 / 6,842 | 46 / 6,842 |
 | Reached a shelter | **30.1%** | **91.6%** | **96.0%** |
-| Turned away | 4,766 | 562 | **256** |
+| Turned away | 4,754 | 550 | **244** |
+| Could not reach any shelter | 28 | 28 | 28 |
 | Spaces left empty | 174 | **578** | 272 |
-| Mean distance walked | 18,260 m | 7,938 m | **5,689 m** |
+| Mean distance walked | 18,244 m | 7,896 m | **5,904 m** |
 
 Two findings:
 
-**Scenario B leaves 578 spaces empty while turning 562 people away.** It has exactly
-one space per person and still fails, because the capacity went where the *buildings*
-are rather than where the *people* are. That is a geography failure, cleanly separated
-from a capacity failure.
+**Scenario B leaves 578 spaces empty while turning 550 people away — and 28 more
+cannot reach any shelter at all.** The near-equality is forced, not discovered: B holds
+exactly one space per person, so every resident refused or cut off leaves a bed empty
+by construction (578 = 550 + 28). What scenario C shows is the fix: splitting the
+identical total across ten additional sites — more doors, not better-chosen doors —
+cuts refusals to 244. Ten sites drawn at random from the same candidate pool reproduce
+C's sheltered count run for run, so the headcount gain is dispersion, not optimised
+placement; placement earns credit only for the shorter walks (7,896 m → 5,904 m), and
+that credit assumes the siting algorithm's perfect information.
 
 **Capacity expansion alone widens the equity gap** between residents who walk easily
-and those who do not — from 13.0 to 24.5 percentage points — because extra capacity at
-an existing site is claimed first by whoever reaches it fastest. Spending that
-identical capacity on well-placed sites returns the gap to 12.9.
+and those who do not — from 12.5 to 23.7 percentage points (seed 42) — because extra
+capacity at an existing site is claimed first by whoever reaches it fastest. Splitting
+the same total across more doors returns the gap to 12.5. What actually closes it is
+triage, not siting: scenario D reserves 10% of B's beds for residents who walk with
+difficulty, taking the gap from +23.7 to −0.5 points at identical overall access and
+zero capital cost.
 
 ## What this does not claim
 
 No health outcome is modelled: the model measures smoke exposure and inhaled
 particulate mass, and predicts no illness, hospitalisation or death. The ten "new
 sites" in scenario C are street-network nodes chosen by an algorithm, not buildings —
-no zoning, cost, staffing or air-filtration analysis stands behind them. And against
-the one observed occupancy record the model over-predicts by 1.52×, which is why every
-access figure here is an **upper bound**. The limitations are enumerated in the
-technical reference; several of them cut against the paper's own conclusions.
+no zoning, cost, staffing or air-filtration analysis stands behind them. The B-vs-C
+contrast and the equity gap are knife-edge phenomena of capacity exactly matching
+demand — a bed sweep the study did not predict in advance shows access reaching 99.5%
+and the mobility gap vanishing already at 1.2× demand. And against the one observed
+occupancy record the model over-predicts by 1.5–15.6× (censored bracket; 1.52× is the uncensored lower edge),
+which is why every access figure here is an **upper bound**; the final point value
+awaits the U-12 recalibration. The limitations are enumerated in the technical
+reference; several of them cut against the paper's own conclusions.
 
 ---
 
@@ -92,7 +107,7 @@ A full 312-hour run at n = 6,842 takes about 40–70 seconds.
 |---|---|
 | `Geography/src/geography/` | The model — 14 Java classes |
 | `Geography/data/` | All inputs, plus `README.md`, the provenance registry (source, URL, retrieval date, SHA-256, transformations) |
-| `Geography/data/registry/` | Variable and assumption registries — the model refuses to start if a sourced variable lacks a resolvable citation |
+| `Geography/data/registry/` | Variable and assumption registries — a pre-run gate refuses to start the model if a sourced variable's source field is empty (a non-emptiness check; it does not test citation resolvability) |
 | `Geography/batch/` | 27 run configurations (3 arms × seeds 42–50) |
 | `scripts/` | Data acquisition, analysis, scenario construction, figure generation, verification |
 | `docs/final/` | Results, technical reference, presenter script, plain-language summary |

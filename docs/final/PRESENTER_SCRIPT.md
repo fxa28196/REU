@@ -25,7 +25,7 @@ Three habits will carry the whole talk:
 | Term | What to say if asked |
 |---|---|
 | **random starting point** (= *seed*, = *run ID*) | "The model uses random numbers. A random starting point is the one number that fixes the whole sequence, so the same starting point always produces the same run. We label them 42 through 50." **Use "random starting point" in the talk; only say "seed" if the slide says it.** |
-| **scenario** (never "arm") | A, B, or C. One word only. |
+| **scenario** (never "arm") | A, B, or C — and D, which is B with one intake rule changed. One word only. |
 | **intersection** (= *node*) | The model turns the street map into a set of intersections joined by street segments. That is what lets it find routes. Say "intersection." |
 | **street segment** (= *edge*) | A piece of street between two intersections. The wormholes were **impossible connections** between segments. |
 | **tick** | "The model advances in one-minute steps. Each step is a tick." |
@@ -56,11 +56,11 @@ Three habits will carry the whole talk:
 
 **Two.** Today, about three in ten of them get inside. Specifically: 2,060 people out of 6,842 are admitted to a shelter. Seven in ten spend the event outdoors in unhealthy air.
 
-**Three.** We tested two fixes. Adding beds to the buildings that already exist is the big one — it takes 30% up to 92%. But it leaves 578 beds sitting empty while 562 people are turned away, because those beds are in places people cannot reach. Take that exact same quantity of beds and put it in better places, and you get 96% — for zero additional beds.
+**Three.** We tested two fixes. Adding beds to the buildings that already exist is the big one — it takes 30% up to 92%. But because capacity then equals population exactly, the arithmetic is forced: 578 beds finish the event empty, and that is exactly 550 people turned away plus 28 who cannot reach any shelter by any route. Split that same total across ten additional sites — more doors, not better-chosen doors — and you get 96% for zero additional beds; ten sites drawn at random from the same candidate list do just as well on headcount. And the surviving punchline is Scenario D: hold ten per cent of each shelter's spaces for the people who walk slowest, and the mobility access gap collapses from about 24 points to about zero — same beds, same buildings, zero capital cost.
 
 **Four.** Four health-risk numbers in the original project brief could not be found in the papers they were credited to. So we switched health weighting off entirely and report vulnerable groups separately instead. **No result in this study depends on a number we could not trace.**
 
-**Five.** Every run is reproducible. Twenty-seven simulation runs, nine different random starting points, every input file fingerprinted, and the model literally refuses to start if a number in it lacks a source.
+**Five.** Every run is reproducible. Twenty-seven simulation runs, nine different random starting points, every input file fingerprinted, and the model literally refuses to start if a number in it lacks a source. And as an honesty check we fit a regression to the model's own output: it learns back only the mechanisms we built, and finds nothing we didn't.
 
 ---
 

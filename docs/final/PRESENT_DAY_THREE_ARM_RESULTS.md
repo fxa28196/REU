@@ -30,7 +30,7 @@ measured.
 |---|---|---|---|---|
 | **A** | **Reality.** Real shelters, real locations, real bed counts. | 36 real | 2,234 | — |
 | **B** | **More beds in the buildings we already have.** Every real site grows 3.06×. | 36 real | 6,842 | capacity only |
-| **C** | **Existing sites grow modestly (1.5×), and the rest is built as 10 new shelters at optimal locations.** | 36 real + 10 new | 6,842 | *where* the new capacity sits |
+| **C** | **Existing sites grow modestly (1.5×), and the rest is built as 10 additional shelters at optimiser-chosen locations.** | 36 real + 10 new | 6,842 | same total, more doors |
 
 **A is a measurement, not a treatment.** Its job is to reveal which constraint
 actually binds. It reported: capacity. So B relieves capacity and nothing else.
@@ -42,9 +42,21 @@ at its real coordinates — a real shelter system cannot be picked up and set do
 somewhere else. C only decides where the *new* capacity goes.
 
 Because B and C hold total capacity equal at 6,842, a B→C difference isolates
-**where the marginal capacity sits** and nothing else.
+**how the same total is spent** — how many doors it is split across, and where
+those doors sit. A randomised control separates those two ingredients below.
 
 ---
+
+> **What changed tonight (2026-07-28, U-27).** The walking network previously
+> admitted limited-access freeway geometry; the corrected build excludes it
+> (2,636 freeway features, 614 km removed — the graph is now 109,434 edges /
+> 88,100 nodes / 171 components, largest 59,725). All 27 runs were regenerated
+> on the corrected graph. **No sheltered count changed in any arm or seed** —
+> A 30.1%, B 91.6%, C 96.0% all survive — but 12 agents per run whose only
+> route used a freeway fragment are reclassified from "turned away" to
+> "couldn't reach any shelter" (seed 42: 16 → 28), so refusals fall by the
+> same 12 (B 562 → 550, C 256 → 244) and travel/dose metrics move by roughly
+> 0.1–2%. Every number below is from the corrected-graph runs.
 
 ## Results
 
@@ -52,21 +64,23 @@ Seed 42 is the reported run; the range across **all nine seeds (42–50)** is in
 brackets. Every run passed `scripts/verify_2026_runs.py` (clean git tree,
 matching source checksums, byte-identical population across arms within each
 seed); the full 27-run table is `results-2026/6_SEED_ROBUSTNESS.csv`.
-**No range overlaps between arms on any headline metric.**
+**No range overlaps between arms on any headline metric** (the couldn't-reach
+count is excluded from that statement: it is identical across arms by
+construction, because it depends only on the network and the start points).
 
 | | **A — today** | **B — bigger existing sites** | **C — modest growth + 10 new sites** |
 |---|---|---|---|
 | Facilities | 36 | 36 | **46** (36 real + 10 new) |
 | Total beds | 2,234 | 6,842 | 6,842 |
 | Got inside | **2,060 (30.1%)** [2,053–2,064] | **6,264 (91.6%)** [6,257–6,268] | **6,570 (96.0%)** [6,563–6,574] |
-| Turned away | **4,766** [4,762–4,773] | **562** [558–569] | **256** [252–263] |
-| Couldn't reach any shelter | 16 [14–25] | 16 [14–25] | 16 [14–25] |
+| Turned away | **4,754** [4,750–4,763] | **550** [546–559] | **244** [240–253] |
+| Couldn't reach any shelter | 28 [26–36] | 28 [26–36] | 28 [26–36] |
 | Beds left empty | 174 [170–181] | 578 [574–585] | 272 [268–279] |
-| Average walk | 18,260 m [17,996–18,410] | 7,938 m [7,841–8,522] | 5,689 m [5,198–5,689] |
-| Average hours in unhealthy air | 135.8 | 17.5 | **8.6** |
-| Person-hours in unhealthy air | 928,934 [928,236–930,338] | 119,921 [119,155–121,255] | **59,060** [58,189–60,311] |
-| Average smoke inhaled | 23,374 µg [23,357–23,410] | 3,056 µg [3,039–3,089] | **1,534 µg** [1,513–1,566] |
-| Mean exposure (µg·m⁻³·h) | 37,802 | 4,789 | 2,361 |
+| Average walk | 18,244 m [18,044–18,502] | 7,896 m [7,848–8,557] | 5,904 m [5,232–5,904] |
+| Average hours in unhealthy air | 135.8 | 17.5 | **8.7** |
+| Person-hours in unhealthy air | 928,918 [928,246–930,346] | 119,973 [119,224–121,329] | **59,200** [58,263–60,522] |
+| Average smoke inhaled | 23,373 µg [23,357–23,411] | 3,056 µg [3,039–3,090] | **1,536 µg** [1,513–1,569] |
+| Mean exposure (µg·m⁻³·h) | 37,802 | 4,789 | 2,363 |
 
 **Replication protocol.** The experiment was run three times with three seeds
 per batch: seeds 42/43/44 (the original set), 45/46/47 (second batch), and
@@ -75,23 +89,42 @@ files are `Geography/batch/batch_params_2026_{A,B,C}_seed{42..50}.xml`;
 archived manifests for every run are under
 `docs/runs/present-day-three-arm/<arm>-seed<seed>/`.
 
-**A → B:** sheltered ×3.04, exposure **−87.3%**, person-hours **−87.1%**, walking **−56.5%**
-**B → C:** sheltered +4.9%, exposure **−50.7%**, person-hours **−50.8%**, walking **−28.3%**, **refusals cut in half (562 → 256)**
-**A → C:** sheltered ×3.19, exposure **−93.8%**, person-hours **−93.6%**, inhaled dose **−93.4%**, walking **−68.8%**
+**A → B:** sheltered ×3.04, exposure **−87.3%**, person-hours **−87.1%**, walking **−56.7%**
+**B → C:** sheltered +4.9%, exposure **−50.7%**, person-hours **−50.7%**, walking **−25.2%**, **refusals cut by more than half (550 → 244)**
+**A → C:** sheltered ×3.19, exposure **−93.7%**, person-hours **−93.6%**, inhaled dose **−93.4%**, walking **−67.6%**
 
-### The finding that matters most
+### The capacity/geography separation — and why B's near-equality is forced
 
-**Scenario B leaves 578 beds empty while turning 562 people away.** Those two
-numbers are nearly equal. B has no shortage — the beds exist and go unused,
-because the people who need them cannot reach them.
+In B, total capacity equals total population: 6,842 beds for 6,842 people.
+Under that construction, every bed left empty must be mirrored by a person left
+outside, so B's ledger — **578 beds empty = 550 turned away + 28 who could not
+reach any shelter** (seed 42) — is an identity, not a discovery. What is
+informative is *why* the ledger is non-zero at all: doors fill and doors are
+unreachable. Capacity alone does not deliver access.
 
-That is a geography failure, and it is what C fixes. C spends **exactly the
-same 6,842 beds**, but instead of tripling the size of buildings that are
-already in the wrong places, it grows them modestly and puts the difference
-into 10 new shelters where people actually are.
+C spends **exactly the same 6,842 beds**, but instead of tripling the size of
+the existing buildings, it grows them modestly and puts the difference through
+**ten additional doors**.
 
-**Same beds, better places: refusals halve, empty beds halve, walking drops
-28%, and smoke inhaled drops half again.**
+**Same total as B, split differently — more doors: refusals cut by more than
+half (550 → 244), empty beds halve (578 → 272), walking drops a quarter, and
+smoke inhaled drops by half again.**
+
+The credit for that line splits in two. The refusal and empty-bed halving is
+**dispersion**: a control that draws the ten extra sites *at random* from the
+same 498-node candidate pool reproduces C's sheltered count run for run
+(6,570 / 6,565 / 6,566 at seeds 42–44, three independent draws). The walk
+reduction (−25.2% at seed 42) is the one component that is genuine siting
+credit, and it is conditional on the optimiser's perfect information. It also
+buys less protection than it appears to: over the full 312-hour window,
+shorter walking explains only 4.5% of C's dose benefit (the B/C dose ratio
+grows from 1.29× in the first 24 h to 1.98× at 312 h; `d1_summary.md`) — most
+of the dose gain is being indoors at all.
+
+The findings that carry weight sit elsewhere: **(i)** at every capacity scale
+tested, the residual access gap concentrates in mobility-limited residents,
+and **(ii)** a 10% triage reserve (scenario D) closes that gap at zero capital
+cost. Both are laid out below.
 
 ---
 
@@ -102,50 +135,76 @@ Percentage of each group that got inside:
 | Group | Share | A | B | C |
 |---|---|---|---|---|
 | Everyone | 100% | 30.1 | 91.6 | **96.0** |
-| Walks without difficulty | 80.1% | 32.7 | 96.4 | 98.6 |
-| **Has trouble walking** | **19.9%** | **19.7** | **71.9** | **85.7** |
-| Age 18–44 | 52.8% | 30.6 | 93.1 | 96.8 |
-| Age 45–64 | 42.0% | 30.4 | 90.8 | 95.8 |
-| **Age 65+** | **5.2%** | **22.4** | **82.4** | **89.8** |
-| Has asthma | 14.8% | 29.2 | 90.6 | 95.7 |
-| **Has COPD** | **10.8%** | **22.2** | **86.2** | **93.8** |
-| Long-term physical condition | 39.6% | 30.2 | 91.1 | 95.8 |
-| Counted as more vulnerable | 71.1% | 28.2 | 88.8 | 94.7 |
+| Walks without difficulty | 80.1% | 32.6 | 96.3 | 98.5 |
+| **Has trouble walking** | **19.9%** | **20.1** | **72.6** | **86.0** |
+| Age 18–44 | 52.8% | 30.6 | 93.2 | 96.9 |
+| Age 45–64 | 42.0% | 30.5 | 90.8 | 95.6 |
+| **Age 65+** | **5.2%** | **22.4** | **81.6** | **90.1** |
+| Has asthma | 14.8% | 29.3 | 91.1 | 95.8 |
+| **Has COPD** | **10.8%** | **22.6** | **87.3** | **95.1** |
+| Long-term physical condition | 39.6% | 30.1 | 91.0 | 95.7 |
+| Counted as more vulnerable | 71.1% | 28.2 | 88.9 | 94.8 |
 
-**Adding beds to existing buildings widens the equity gap. Placing new beds
-well narrows it again.**
+**Adding beds to existing buildings widens the equity gap. Splitting the same
+total across more doors narrows it — and a triage rule closes it.**
 
 The mobility gap — the difference between people who walk easily and people who
 don't:
 
-| | A | B | C |
-|---|---|---|---|
-| Gap (percentage points) | 13.0 | **24.5** | **12.9** |
+| | A | B | C | D — B + 10% triage reserve |
+|---|---|---|---|---|
+| Gap (percentage points) | 12.5 | **23.7** | **12.5** | **−0.5** |
 
-In A the gap is 13 points. Pouring 4,608 beds into the *same* buildings widens
-it to 24.5, because extra capacity at an existing site is captured first by
-whoever can walk there fastest. Spending that same capacity on well-placed new
-sites brings the gap back to 12.9 **while lifting the slowest group from 71.9%
-to 85.7%**.
+In A the gap is 12.5 points. Pouring 4,608 beds into the *same* buildings
+widens it to 23.7, because extra capacity at an existing site is captured first
+by whoever can walk there fastest. Splitting that same capacity across ten
+additional sites brings the gap back to where A had it (12.5) **while lifting
+the slowest group from 72.6% to 86.0%** — a dispersion effect, not an optimiser
+achievement.
 
-The same pattern holds for age 65+ (22.4 → 82.4 → 89.8) and COPD
-(22.2 → 86.2 → 93.8). COPD tracks mobility because it is the one condition with
+The same pattern holds for age 65+ (22.4 → 81.6 → 90.1) and COPD
+(22.6 → 87.3 → 95.1). COPD tracks mobility because it is the one condition with
 a measured walking-speed decrement (−0.19 m/s, Buekers 2024). Asthma shows
 almost no access penalty, and that is correct rather than an omission: no
 gait-speed evidence exists for asthma, so inventing one would have manufactured
 the finding.
 
-**The gap is narrowed, not closed.** 14.3% of people with mobility limitations
-are still outside in C. Ten new shelters are not enough to reach everyone.
+**The gap is narrowed, not closed — by geometry.** 14.0% of people with
+mobility limitations are still outside in C. Ten additional shelters are not
+enough to reach everyone. What does close the gap is not construction at all:
+
+### What actually closes the gap — and how fragile the gap itself is
+
+**Scenario D** keeps B's 36 sites and 6,842 beds and changes only the admission
+rule: each shelter holds 10% of its beds in reserve for the slowest walkers.
+Access does not move — 6,264 inside and 550 turned away at seed 42, exactly B's
+counts — but the mobility gap collapses from **23.7 points to −0.5** (seed 43:
+24.5 → −0.1; seed 44: 22.4 → +1.5). Larger reserves overshoot: at 15% the
+reserve strands beds (6,087 inside at seed 42) and the gap over-corrects to
+−13.3 points. A 10% reserve is a rule change with zero capital cost.
+
+A capacity sweep then puts both headline findings in their place. Holding B's
+geometry and sweeping total beds, access reaches **99.5% already at 1.2×
+demand**, and the mobility gap **vanishes (≈0 points) at every surplus tested**
+(1.2×–1.6×); at exactly 1.0× — scenario B — the gap is ~23.5 points on the
+sweep's nine-seed mean, and under scarcity (0.8×) it widens to 28.3. Both the
+equity gap and the headcount value of splitting capacity across more doors are
+**knife-edge phenomena of capacity == demand**. We registered predictions
+before running the sweep and missed on both counts (P-3c, P-3d — see
+limitations). D's triage reserve is the zero-cost fix exactly at that knife
+edge; any bed surplus also dissolves the gap, by brute force.
 
 ---
 
 ## The population is real, and so is every starting point
 
-Residents are placed at **2,981 distinct real City-of-Portland campsite report
-locations**, and every result row carries the actual start coordinate
-(`start_lon`, `start_lat`) so the demand geography can be audited without
-re-joining any file.
+Residents are placed at real City-of-Portland campsite report locations. The
+source feed contains **3,400 reports resolving to 3,317 distinct coordinates**,
+and any one run seeds residents at a subset of them — **2,918 distinct start
+locations** in the corrected-graph seed-42 arm-A run (a per-run sampling
+outcome, not a property of the file). Every result row carries the actual
+start coordinate (`Start longitude`, `Start latitude`) so the demand geography
+can be audited without re-joining any file.
 
 Sampled attributes reproduce their published marginals (seed 42):
 
@@ -171,10 +230,10 @@ A, B and C for all three seeds). Only the shelters differ.
 
 | File | What it is |
 |---|---|
-| `1_EVERY_PERSON.csv` | one row per person: who they are, where they started, what happened |
+| `1_EVERY_PERSON.csv` | one row per person: who they are, where they started, what happened (includes the scenario-D triage-reserve rows) |
 | `2_BY_GROUP.csv` | outcomes by age, sex, mobility, asthma, COPD |
 | `3_WHOLE_POPULATION.csv` | the headline table, all three seeds |
-| `4_WHERE_PEOPLE_STARTED.csv` | the 2,981 real encampment locations and how many started at each |
+| `4_WHERE_PEOPLE_STARTED.csv` | the realised encampment start locations for the reported run and how many people started at each |
 | `5_EVERY_SHELTER.csv` | every facility: where it is, how full it got, how many it turned away |
 | `figures/fig1_headline.png` | got inside / turned away / hours in smoke |
 | `figures/fig2_empty_beds_vs_turned_away.png` | the geography failure in one picture |
@@ -183,15 +242,19 @@ A, B and C for all three seeds). Only the shelters differ.
 | `figures/fig5_walking.png` | how far people had to walk |
 | `figures/fig6_dose.png` | smoke actually breathed in |
 | `6_SEED_ROBUSTNESS.csv` | all 27 runs (9 seeds × 3 arms): every headline metric per run, plus per-arm min/mean/max |
+| `d1_summary.md` / `d1_window_rows.csv` | dose by time window: B/C ratio and walking's share of C's dose benefit |
+| `d2_summary.md` / `d2_sweep_rows.csv` | the bed sweep: access and mobility gap as total capacity scales 0.8×–1.6× |
 
 ---
 
 ## What this does and does not claim
 
-**The claim:** *optimized shelter placement improves outcomes under the modelled
-assumptions* — specifically, that for a fixed total capacity, placing new
-capacity at optimized locations outperforms enlarging existing facilities, both
-in aggregate and in equity.
+**The claim:** *for a fixed total capacity, splitting the same total across
+more sites outperforms enlarging existing facilities under the modelled
+assumptions, in aggregate and in equity.* The headcount part of that gain is
+dispersion, not optimised siting — the random-sites control reproduces C's
+sheltered count in every seed tested — and the siting optimiser earns its
+credit in walking distance, conditional on perfect information.
 
 **Not claimed:** that this recreates what happened in 2020. It does not, and
 calibration does not support it. This is a present-day question asked with a
@@ -227,3 +290,12 @@ historical smoke field.
     2020, and they are complaint-driven, so they carry visibility bias.
 12. **All facilities are modelled as open from hour 0**, appropriate for a
     year-round present-day system but not a claim about activation timing.
+13. **The B–C contrast lives on a knife edge, and we did not predict that.**
+    B and C hold capacity exactly equal to population. The bed sweep shows
+    access reaching 99.5% at 1.2× demand and a ≈0 mobility gap at every
+    surplus tested, so both the equity gap and dispersion's headcount value
+    are properties of capacity == demand, not general laws. Our registered
+    predictions for the sweep (P-3c, P-3d) were misses, and we report them as
+    such. The knife edge is where a system that sizes capacity to counted
+    demand would sit — but the sweep bounds how quickly these findings
+    dissolve once there is any surplus.
