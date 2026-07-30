@@ -91,6 +91,18 @@ E_PARAMS = [
     "petPolicyDefault", "betaTravelTime", "betaCapacityPrior",
 ]
 
+# The 7 Scenario-E parameters (V46-V51; shelterPolicyVariant is V45/Phase-E).
+SE_PARAMS = [
+    "smokeSeriesCode", "smokeScale", "closuresCode", "pStuck",
+    "stuckDelayH", "pushThetaThreshold", "kPush",
+]
+
+# Scenario-E appended agents.csv counters (V48-V51 audit trail).
+SE_AGENT_COLS = ["blockages_encountered", "push_throughs", "reroutes",
+                 "stuck_events"]
+
+SEVERE_SMOKE_CSV = "data/airnow/aqs_hourly_pm25_synthetic_severe_v1.csv"
+
 # Appended-only output columns (OutcomeLogger, commit c88de56). The archive
 # predates them, so the R3 comparison necessarily excludes them.
 E_AGENT_COLS = ["aware_initial", "aware_tick", "heavy_belongings", "has_pet",
@@ -320,10 +332,24 @@ def compare_table(ck, label, null_df, ref_df, key, e_only_cols, extra_exclude):
 
 def check_r3(ck, null_run, ref_run, extra_exclude):
     print(f"\n--- (a) R3 NULL IDENTITY: {null_run.name}  vs  {ref_run.name} ---")
+    # The archive predates BOTH appended blocks: the six Phase-E attribute
+    # columns AND the four Scenario-E counters, so the null may carry all ten
+    # as null-only columns. The counters must additionally be all-zero in the
+    # null (checked below) or the exclusion would hide live obstacle activity.
     compare_table(ck, "agents.csv", null_run.agents, ref_run.agents,
-                  "agent_id", E_AGENT_COLS, extra_exclude)
+                  "agent_id", E_AGENT_COLS + SE_AGENT_COLS, extra_exclude)
     compare_table(ck, "shelters.csv", null_run.shelters, ref_run.shelters,
                   "shelter_id", E_SHELTER_COLS, extra_exclude)
+
+    present = [c for c in SE_AGENT_COLS if c in null_run.agents.columns]
+    if present:
+        tot = int(sum(pd.to_numeric(null_run.agents[c], errors="coerce")
+                      .fillna(0).sum() for c in present))
+        ck.add("(a) null run has all-zero Scenario-E counters", tot == 0,
+               f"sum over {present} = {tot}")
+    else:
+        ck.skip("(a) null run has all-zero Scenario-E counters",
+                "agents.csv predates the Scenario-E counter block")
 
     # simulation.json population census, shared keys only.
     np_, rp = null_run.population, ref_run.population
@@ -591,7 +617,141 @@ def check_manifest(ck, run):
            dirty is False, f"git_working_tree_dirty={dirty!r}")
 
 
-def check_run(ck, run, e_arm):
+# --------------------------------------------------------------------------
+# (i) - (l): Scenario-E checks (V46-V51), --se runs only
+# --------------------------------------------------------------------------
+def check_se_manifest(ck, run):
+    missing = [p for p in SE_PARAMS if p not in run.params]
+    ck.add(f"(i) [{run.name}] all 7 Scenario-E parameters in the manifest",
+           not missing,
+           f"missing {len(missing)}: {missing}" if missing
+           else "; ".join(f"{p}={run.params[p]}" for p in SE_PARAMS))
+
+
+def check_se_smoke(ck, run):
+    series = int(float(run.params.get("smokeSeriesCode", 0)))
+    scale = float(run.params.get("smokeScale", 1.0))
+    smoke = run.manifest.get("smoke_field", {})
+    files = [d.get("file", "") for d in run.repro.get("input_datasets", [])]
+
+    if series != 1:
+        ck.skip(f"(j) [{run.name}] severe-series provenance",
+                f"smokeSeriesCode={series} (observed series)")
+        return
+    ok_file = SEVERE_SMOKE_CSV in files
+    ck.add(f"(j) [{run.name}] manifest checksums the severe series it read",
+           ok_file, f"input_datasets carries {SEVERE_SMOKE_CSV}: {ok_file}")
+    hours = int(smoke.get("hours", -1))
+    ck.add(f"(j) [{run.name}] severe series length is 456 h",
+           hours == 456, f"smoke_field.hours={hours}")
+    peak = float(smoke.get("peak_hourly_ugm3", float("nan")))
+    want = 984.75 * scale
+    ck.add(f"(j) [{run.name}] peak == 984.75 x smokeScale",
+           abs(peak - want) <= 0.06,
+           f"peak={peak} want={want:.2f} (scale={scale}); the manifest prints "
+           f"%.1f so slack is 0.06")
+    oor = int(smoke.get("out_of_range_lookups", -1))
+    ck.add(f"(j) [{run.name}] out_of_range_lookups == 0",
+           oor == 0, f"out_of_range_lookups={oor}")
+
+
+def check_se_closures(ck, run):
+    code = int(float(run.params.get("closuresCode", 0)))
+    cl = run.manifest.get("closures")
+    if cl is None:
+        ck.add(f"(k) [{run.name}] closures block present", False,
+               "simulation.json has no closures key (pre-Scenario-E writer?)")
+        return
+    ck.add(f"(k) [{run.name}] closures.code == closuresCode param",
+           int(cl.get("code", -1)) == code,
+           f"closures.code={cl.get('code')} param={code}")
+    if code == 0:
+        ck.add(f"(k) [{run.name}] no-closure run carries the minimal block",
+               set(cl.keys()) == {"code"}, f"keys={sorted(cl.keys())}")
+        return
+
+    sched_file = cl.get("schedule_file", "")
+    csv_path = ROOT / "Geography" / sched_file
+    if not csv_path.is_file():
+        ck.add(f"(k) [{run.name}] closure schedule file exists", False,
+               f"{csv_path} not found")
+        return
+    sched = pd.read_csv(csv_path, dtype=str)
+    n_rows = len(sched)
+    pairs = {tuple(sorted((a, b)))
+             for a, b in zip(sched["node_a"], sched["node_b"])}
+    hours_csv = sorted({int(h) for h in sched["activation_hour"]})
+
+    ck.add(f"(k) [{run.name}] scheduled edges == closure CSV rows",
+           int(cl.get("scheduled_undirected_edges", -1)) == n_rows,
+           f"manifest={cl.get('scheduled_undirected_edges')} csv={n_rows}")
+    ck.add(f"(k) [{run.name}] every scheduled closure matches a graph edge",
+           int(cl.get("matching_graph_edges", -1)) == n_rows,
+           f"matching={cl.get('matching_graph_edges')} of {n_rows} -- a "
+           f"mismatch means node-id drift between the schedule and the graph")
+    ck.add(f"(k) [{run.name}] blocked_edges_at_end == distinct scheduled pairs",
+           int(cl.get("blocked_edges_at_end", -1)) == len(pairs),
+           f"blocked_at_end={cl.get('blocked_edges_at_end')} "
+           f"distinct_pairs={len(pairs)} (rows={n_rows})")
+    ck.add(f"(k) [{run.name}] closure_version_at_end == wave count",
+           int(cl.get("closure_version_at_end", -1)) == len(hours_csv),
+           f"version={cl.get('closure_version_at_end')} waves={len(hours_csv)}")
+    ck.add(f"(k) [{run.name}] wave_hours match the CSV activation hours",
+           list(cl.get("wave_hours", [])) == hours_csv,
+           f"manifest={cl.get('wave_hours')} csv={hours_csv}")
+
+
+def check_se_counters(ck, run):
+    code = int(float(run.params.get("closuresCode", 0)))
+    missing = [c for c in SE_AGENT_COLS if c not in run.agents.columns]
+    if missing:
+        ck.add(f"(l) [{run.name}] Scenario-E counters present", False,
+               f"agents.csv missing {missing}")
+        return
+    blk = run.num("blockages_encountered").fillna(0)
+    psh = run.num("push_throughs").fillna(0)
+    rrt = run.num("reroutes").fillna(0)
+    stk = run.num("stuck_events").fillna(0)
+
+    if code == 0:
+        tot = int(blk.sum() + psh.sum() + rrt.sum() + stk.sum())
+        ck.add(f"(l) [{run.name}] closure-free run has all-zero counters",
+               tot == 0,
+               f"sum over all four counters = {tot}")
+        return
+
+    bad_decide = int((blk != psh + rrt).sum())
+    ck.add(f"(l) [{run.name}] every blockage resolved to exactly one decision",
+           bad_decide == 0,
+           f"rows where blockages != pushes + reroutes: {bad_decide} "
+           f"(totals: blockages={int(blk.sum())} pushes={int(psh.sum())} "
+           f"reroutes={int(rrt.sum())})")
+    bad_stuck = int((stk > psh).sum())
+    ck.add(f"(l) [{run.name}] stuck events never exceed push-throughs",
+           bad_stuck == 0, f"rows violating stuck<=pushes: {bad_stuck} "
+           f"(total stuck={int(stk.sum())})")
+
+    n_push, n_stuck = int(psh.sum()), int(stk.sum())
+    p_stuck = float(run.params.get("pStuck", 0.0))
+    if n_push > 0:
+        share = n_stuck / n_push
+        se = math.sqrt(p_stuck * (1 - p_stuck) / n_push)
+        ck.add(f"(l) [{run.name}] stuck share within 3 binomial SE of pStuck",
+               abs(share - p_stuck) <= 3 * se + ROUND_SLACK,
+               f"stuck/pushes={share:.4f} vs pStuck={p_stuck} "
+               f"(n={n_push}, 3SE={3 * se:.4f})")
+        n_blocked = int((blk > 0).sum())
+        n_events = int(blk.sum())
+        push_share = psh.sum() / n_events if n_events else float("nan")
+        print(f"        OBSERVATION [P-SE5]: {n_blocked} residents blocked, "
+              f"{n_events} blockage events, push share {push_share:.3f} "
+              f"(registered band 0.35-0.60; scored in the predictions doc, "
+              f"not gated here)")
+    else:
+        print("        OBSERVATION: zero push-throughs in this run")
+
+
+def check_run(ck, run, e_arm, se_arm=False):
     print(f"\n--- per-run checks: {run.name}  ({run.path}) ---")
     check_bed_sum(ck, run)
     check_asthma_control(ck, run)
@@ -604,6 +764,11 @@ def check_run(ck, run, e_arm):
                 "not an E arm (--er); the null has zero barrier cost by design")
     check_e_census(ck, run)
     check_manifest(ck, run)
+    if se_arm:
+        check_se_manifest(ck, run)
+        check_se_smoke(ck, run)
+        check_se_closures(ck, run)
+        check_se_counters(ck, run)
 
 
 # --------------------------------------------------------------------------
@@ -618,6 +783,11 @@ def main():
                          "docs/runs/present-day-three-arm/A-seed42 or A-seed42")
     ap.add_argument("--er", metavar="RUNDIR", nargs="+", default=[],
                     help="baseline-real E arm run directories")
+    ap.add_argument("--se", metavar="RUNDIR", nargs="+", default=[],
+                    help="Scenario-E run directories (codes 18-20): every --er "
+                         "check plus the V46-V51 gates (severe-series "
+                         "provenance, closure census vs the schedule CSV, "
+                         "counter identities)")
     ap.add_argument("--exclude-col", metavar="NAME", action="append", default=[],
                     help="additional column to exclude from the R3 identity "
                          "comparison (repeatable). Use only with a written "
@@ -626,8 +796,8 @@ def main():
 
     if bool(args.null) != bool(args.reference):
         ap.error("--null and --reference must be given together")
-    if not args.null and not args.er:
-        ap.error("nothing to do: give --null/--reference and/or --er")
+    if not args.null and not args.er and not args.se:
+        ap.error("nothing to do: give --null/--reference, --er and/or --se")
 
     ck = Checks()
     extra_exclude = set(args.exclude_col)
@@ -643,6 +813,9 @@ def main():
 
     for spec in args.er:
         check_run(ck, Run(resolve_run(spec)), e_arm=True)
+
+    for spec in args.se:
+        check_run(ck, Run(resolve_run(spec)), e_arm=True, se_arm=True)
 
     n_fail = len(ck.failed)
     n_skip = sum(1 for c in ck.results if c["status"] == "SKIP")

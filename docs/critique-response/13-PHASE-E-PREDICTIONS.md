@@ -134,4 +134,85 @@ triage were shown to be ineffective.
 
 ## Scenario-E (severe-event) predictions
 
-To be appended in this file BEFORE any Scenario-E run (codes 18–20).
+Registered 2026-07-30, BEFORE any Scenario-E run. The git commit carrying
+this section is the timestamp; every Scenario-E run manifest must stamp a
+commit at or after it.
+
+### Configuration being predicted
+
+Codes {18, 19, 20} × seeds {42, 43, 44}: the ER baseline-real configuration
+carried VERBATIM (awareness 0.356, L1, hazard departure with sigmaTheta 1.0 /
+bRisk 0.4 / wOfficial 1.1 / gammaVuln 0.25 / half-life 48 h, barrier costs
+0.26, pets refused at unrecorded sites, betaCapacityPrior 0.2,
+shelterPolicyVariant 1, alphaHazard −8.0 as registered — the known-wrong
+value is kept so E18 is comparable to ER-A run-for-run; the E9 refit replaces
+both later), plus the Scenario-E layer: smokeSeriesCode 1, smokeScale 1.0
+(central = the baked 1.75× transform, A-33), closuresCode 1 (base schedule:
+3 bridges + 15 arterials, one wave at hour 79), pStuck 0.3, stuckDelayH 3.0,
+pushThetaThreshold −0.25, kPush 1.0, simulationHours 456. Code 20 adds
+`triageReserveFraction 0.10`. Controls, same seeds: codes 18/19/20 with
+closuresCode 0, so the smoke effect and the obstacle effect separate cleanly.
+
+**pushThetaThreshold = −0.25 derivation (band-anchored arithmetic, not a fit
+to any simulation output):** the V51 empirical band says 55–75% of people who
+enter smoke continue through it (Wood 1972: 74% of movers; Bryan 1977: 70.1%;
+Jin 1997 dense smoke: 55%). For an UNBURDENED resident (c_i = 0, no mobility
+penalty) the rule gives P(push) = P(theta_i ≥ threshold) with
+theta_i ~ N(0, sigmaTheta² = 1); the band midpoint 0.60 ⇒ threshold =
+Φ⁻¹(0.40) ≈ −0.25. Burdens then RAISE the effective threshold (kPush = 1.0:
+a mobility-limited resident needs theta ≥ 0.75, P ≈ 0.23), so the
+population-level push share is predicted BELOW the unburdened 0.60 — the
+burden gradient is the falsifiable content, the band anchors only the
+unburdened intercept. kPush = 1.0 and pStuck/stuckDelayH centrals remain
+declared assumptions (A-35).
+
+### Predictions (directional, falsifiable)
+
+- **P-SE1 (attempts rise; awareness still binds).** The severe series raises
+  z_R faster and holds it longer (456 h, peak 984.75), so the attempt share
+  among the aware EXCEEDS ER's realized 0.502 — registered band 0.55–0.75.
+  Every arm's sheltered share still stays under the 35.6% awareness ceiling,
+  and arm 18 still ends with empty beds system-wide (attempts ≈ 0.65 × 0.356
+  × 6,842 ≈ 1,600 < 2,234 spaces) — non-arrival stays behaviour-limited even
+  in the severe world, though arm 18's door-level capacity refusals rise
+  above ER-A's 295.
+- **P-SE2 (dose rises more than the concentration does).** Population mean
+  cumulative dose in E18 exceeds ER-A's by MORE than the 1.75× concentration
+  transform alone — the episode is also longer (284 vs 188 h main episode)
+  and never-departers absorb the whole difference at full exposure. If the
+  smokeScale sweep (0.857 / 1.143) runs, dose per capita rises superlinearly
+  in effective scale for the never-departed stratum.
+- **P-SE3 (closures reopen a C-over-A difference — in the cost channel).**
+  Under closuresCode 1, residents EN_ROUTE at the hour-79 wave in arm 19
+  (46 doors) suffer LESS added dose and shorter reroute detours than the same
+  stratum in arm 18 (36 doors): multi-site redundancy means the recomputed
+  best door is nearer. The closure-free controls show no such difference, so
+  the gap is attributable to the obstacle layer. Sheltered COUNTS stay equal
+  within seed noise in both arms (the connectivity proof guarantees no
+  shelter is severed, so closures cost time and dose, not access). If the
+  sheltered gap DOES reopen beyond seed noise, that is the louder finding —
+  it would be the first condition in this study where placement changes WHO
+  gets in rather than what it costs.
+- **P-SE4 (arm 20 stays inert — registered negative control).** Closures do
+  not reintroduce system capacity pressure (≤ ~1,600 attempts against 6,842
+  spaces), so E20 records zero (or single-digit) capacity refusals and its
+  667 reserved beds arbitrate nothing, exactly as ER-D. Stated in advance so
+  the inertness is a registered expectation, not a post-hoc excuse.
+- **P-SE5 (who gambles at a blockage).** Among residents whose remaining
+  route crosses a blocked edge: mean theta of pushers > mean theta of
+  rerouters; push share among mobility-limited or multi-barrier residents is
+  under half the unburdened share; the population push share lands BELOW the
+  unburdened 0.60 (blend of burden strata; registered band 0.35–0.60); stuck
+  events ≈ pStuck × push-throughs (0.3 ± seed noise). Auditable per agent
+  from the four appended counters.
+- **P-SE6 (exposure bimodality sharpens).** In closure arms the
+  hours-above-unhealthy gap between the never-sheltered and the sheltered
+  strata widens by MORE than the 1.75× transform relative to ER-A: the
+  sheltered-early population is capped early while the stranded/delayed
+  population accrues through a longer, higher episode.
+
+### Scoring rule
+
+Outcomes reported in this file after the matrix, misses stated as misses
+with appended corrections, never edits — the P-E1/alphaHazard precedent
+applies verbatim.
