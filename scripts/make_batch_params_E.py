@@ -120,6 +120,36 @@ def write_file(name, header, seed, scenario_code, extra, reserve=None):
     print("wrote", os.path.relpath(path, os.path.join(HERE, "..")))
 
 
+# Scenario E (V46-V51): the ER baseline-real configuration VERBATIM plus the
+# severe layer. Value rationale registered in 13-PHASE-E-PREDICTIONS.md
+# ("Scenario-E predictions") BEFORE any run:
+#   smokeSeriesCode   1      severe v1 series (A-33 counterfactual)
+#   smokeScale        1.0    central = the baked 1.75x transform (V47)
+#   closuresCode      1      base schedule, one wave at hour 79 (V48, A-34)
+#   pStuck            0.3    midpoint of V49 sweep 0.1-0.5 (A-35)
+#   stuckDelayH       3.0    V50 central (A-35)
+#   pushThetaThreshold -0.25 band-anchored: P(push|unburdened)=0.60, the V51
+#                            fire-incident continue band midpoint (Wood/Bryan/Jin)
+#   kPush             1.0    A-35 declared coupling
+#   simulationHours   456    the severe series length (V-SIMH clamp)
+E_SEV = dict(E_REAL)
+E_SEV.update({
+    "smokeSeriesCode": ("int", "1"),
+    "smokeScale": ("number", "1.0"),
+    "closuresCode": ("int", "1"),
+    "pStuck": ("number", "0.3"),
+    "stuckDelayH": ("number", "3.0"),
+    "pushThetaThreshold": ("number", "-0.25"),
+    "kPush": ("number", "1.0"),
+    "simulationHours": ("int", "456"),
+})
+
+# Closure-free control: identical severe smoke, no obstacle layer, so the
+# smoke effect and the obstacle effect separate cleanly (P-SE3's control).
+E_SEV_NOCLOSE = dict(E_SEV)
+E_SEV_NOCLOSE.update({"closuresCode": ("int", "0")})
+
+
 def main():
     # E0 null (R3): arm geometry A/B/C, decision layer on but fully degenerate.
     for arm, code in (("A", 0), ("B", 1), ("C", 2)):
@@ -141,6 +171,25 @@ def main():
                 "(A-29). Predictions registered in docs/critique-response/"
                 "13-PHASE-E-PREDICTIONS.md BEFORE any run." % (arm, seed),
                 seed, code, E_REAL, reserve=reserve)
+    # Scenario E severe: codes 18 (A geometry), 19 (C), 20 (D = B file +
+    # reserve), seeds 42-44, with and without the closure schedule.
+    for arm, code, reserve in (("E18", 18, None), ("E19", 19, None), ("E20", 20, "0.10")):
+        for seed in (42, 43, 44):
+            write_file(
+                "batch_params_2026_SE_%s_seed%d.xml" % (arm, seed),
+                "SCENARIO-E SEVERE COUNTERFACTUAL, %s, seed %d: ER baseline-real values "
+                "verbatim plus smokeSeriesCode 1 / smokeScale 1.0 / closuresCode 1 / "
+                "pStuck 0.3 / stuckDelayH 3.0 / pushThetaThreshold -0.25 / kPush 1.0 / "
+                "456 h (V46-V51, A-33/A-34/A-35). Concentrations are a labeled "
+                "counterfactual, never observed magnitudes. Predictions P-SE1..P-SE6 "
+                "registered BEFORE any run." % (arm, seed),
+                seed, code, E_SEV, reserve=reserve)
+            write_file(
+                "batch_params_2026_SEnc_%s_seed%d.xml" % (arm, seed),
+                "SCENARIO-E NO-CLOSURE CONTROL, %s, seed %d: identical severe smoke, "
+                "closuresCode 0 - isolates the smoke effect so the obstacle effect is "
+                "attributable (P-SE3 control)." % (arm, seed),
+                seed, code, E_SEV_NOCLOSE, reserve=reserve)
 
 
 if __name__ == "__main__":
