@@ -15,7 +15,7 @@
 # arm at the same seed silently overwrites it otherwise.
 param(
   [Parameter(Mandatory = $true)]
-  [ValidateSet('nulls', 'severe', 'controls')]
+  [ValidateSet('nulls', 'severe', 'controls', 'worst', 'worstcontrols')]
   [string]$Phase,
   [int]$TimeoutSec = 1800
 )
@@ -42,11 +42,29 @@ if ($Phase -eq 'nulls') {
                   seed = $seed; name = "SE-$arm-seed$seed" }
     }
   }
-} else {
+} elseif ($Phase -eq 'controls') {
   foreach ($arm in 'E18', 'E19', 'E20') {
     foreach ($seed in 42, 43, 44) {
       $runs += @{ params = "batch\batch_params_2026_SEnc_${arm}_seed$seed.xml"
                   seed = $seed; name = "SEnc-$arm-seed$seed" }
+    }
+  }
+} elseif ($Phase -eq 'worst') {
+  # v2 worst case: the draw range on the reality arm, central draw on C/D.
+  foreach ($arm in 'E18', 'E19', 'E20') {
+    $draws = if ($arm -eq 'E18') { 1, 2, 3 } else { , 1 }
+    foreach ($d in $draws) {
+      foreach ($seed in 42, 43, 44) {
+        $runs += @{ params = "batch\batch_params_2026_SE2_${arm}_d${d}_seed$seed.xml"
+                    seed = $seed; name = "SE2-$arm-d$d-seed$seed" }
+      }
+    }
+  }
+} else {
+  foreach ($arm in 'E18', 'E19', 'E20') {
+    foreach ($seed in 42, 43, 44) {
+      $runs += @{ params = "batch\batch_params_2026_SE2nc_${arm}_seed$seed.xml"
+                  seed = $seed; name = "SE2nc-$arm-seed$seed" }
     }
   }
 }

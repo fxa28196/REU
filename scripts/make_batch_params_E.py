@@ -158,6 +158,21 @@ E_SEV.update({
 E_SEV_NOCLOSE = dict(E_SEV)
 E_SEV_NOCLOSE.update({"closuresCode": ("int", "0")})
 
+# Scenario E v2: THE WORST PLAUSIBLE CASE (V46 series 2 / V48 code 3).
+# Smoke anchored to the worst verified urban wildfire-smoke hour on record
+# (Canberra Florey 2496.1 ug/m3, embedded 4.436x transform, A-33); closures
+# from the worst-case family - 72 edges in 6 waves, the first inside hours
+# 2-6 of onset per the documented same-day pattern (A-34), selected per
+# committed draw via closureDraw. Everything else = ER baseline-real verbatim.
+E_SEV2 = dict(E_SEV)
+E_SEV2.update({
+    "smokeSeriesCode": ("int", "2"),
+    "closuresCode": ("int", "3"),
+})
+
+E_SEV2_NOCLOSE = dict(E_SEV2)
+E_SEV2_NOCLOSE.update({"closuresCode": ("int", "0")})
+
 
 def main():
     # E0 null (R3): arm geometry A/B/C, decision layer on but fully degenerate.
@@ -199,6 +214,32 @@ def main():
                 "closuresCode 0 - isolates the smoke effect so the obstacle effect is "
                 "attributable (P-SE3 control)." % (arm, seed),
                 seed, code, E_SEV_NOCLOSE, reserve=reserve)
+    # Scenario E v2 worst case. Registered scope: the draw range is a property
+    # of the closure LAYER, so it is swept on the reality arm (E18 x draws
+    # 1-3); the C/D geometries run the central draw; every arm gets a
+    # closure-free control at the same severity.
+    for arm, code, reserve in (("E18", 18, None), ("E19", 19, None), ("E20", 20, "0.10")):
+        for seed in (42, 43, 44):
+            draws = (1, 2, 3) if arm == "E18" else (1,)
+            for d in draws:
+                params = dict(E_SEV2)
+                params["closureDraw"] = ("int", str(d))
+                write_file(
+                    "batch_params_2026_SE2_%s_d%d_seed%d.xml" % (arm, d, seed),
+                    "SCENARIO-E v2 WORST PLAUSIBLE CASE, %s, draw r%d, seed %d: smoke "
+                    "anchored to the worst verified urban wildfire-smoke hour on record "
+                    "(Canberra Florey 2496.1 ug/m3, 4.436x, A-33); worst-family closures "
+                    "(72 edges, 6 waves, first wave hours 2-6, A-34) draw r%d. ER "
+                    "baseline-real values otherwise verbatim. Counterfactual, never "
+                    "observed magnitudes. Predictions P-SE7..P-SE11 registered BEFORE "
+                    "any run." % (arm, d, seed, d),
+                    seed, code, params, reserve=reserve)
+            write_file(
+                "batch_params_2026_SE2nc_%s_seed%d.xml" % (arm, seed),
+                "SCENARIO-E v2 NO-CLOSURE CONTROL, %s, seed %d: identical worst-case "
+                "smoke, closuresCode 0 - isolates the smoke effect from the obstacle "
+                "effect." % (arm, seed),
+                seed, code, E_SEV2_NOCLOSE, reserve=reserve)
 
 
 if __name__ == "__main__":

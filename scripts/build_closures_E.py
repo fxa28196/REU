@@ -212,6 +212,12 @@ LEGAL_BRIDGES = {
 # below) are excluded: ramps are not walkable destinations to close, and closing
 # a residential stub is not a "street closure" in any operational sense.
 ARTERIAL_TYPES = {1200, 1300, 1400}
+# Local-street classes for the worst-case family's mode-B (debris/line)
+# blockages: RLIS 1450 local streets and 1500 minor/private locals. Their
+# WEIGHT is a declared assumption (A-34): local closures demonstrably happen
+# (Grants Pass 6th & G St, Sept 2020, downed lines) but are under-enumerated
+# because DOT feeds report DOT roads, so no empirical rate exists.
+LOCAL_TYPES = {1450, 1500}
 MIN_ARTERIAL_LEN_M = 60.0       # a 10 m stub closure is not an incident
 PAD_DEG = 0.02                  # demand-bbox pad, identical to build_scenario_c_2026.py
 
@@ -219,10 +225,30 @@ DEFAULT_SEVER_DETOUR_M = 1000.0
 SEVER_CAP_M = 20000.0           # bounded-Dijkstra horizon for the severance test
 
 SEVERITY_PLAN = {
-    # severity -> list of (wave_index, n_bridges, n_arterials)
-    "base": [(1, 3, 15)],
-    "extreme": [(1, 2, 15), (2, 2, 15)],
+    # severity -> list of (wave_index, n_bridges, n_arterials, n_locals).
+    # base/extreme keep n_locals=0: their committed CSVs must stay exactly
+    # reproducible from the same seeds.
+    "base": [(1, 3, 15, 0)],
+    "extreme": [(1, 2, 15, 0), (2, 2, 15, 0)],
+    # WORST-CASE family (V48 code 3, A-34). Composition IS the declared
+    # class-weight model: 4 bridges total (extreme's count - bridge closures
+    # are PURE assumption, no documented wildfire river-bridge closure exists
+    # anywhere, so there is no evidential basis to exceed it; closing more
+    # would also start severing the river banks, which S2 rightly rejects),
+    # 38 arterials (the evidence-backed dominant class in every documented
+    # event), 30 local streets (mode B, assumption-weighted). SIX waves:
+    # wave 1 lands in hours 2-6 of onset (documented same-day pattern:
+    # Camp ~2-3 h, Delta same afternoon, Lahaina 06:20 day one, Almeda,
+    # PCH), later waves accumulate through the event (the ODOT list grew
+    # over days); hours are drawn per attempt from the seeded stream.
+    "worst": [(1, 2, 8, 5), (2, 1, 6, 5), (3, 1, 6, 5),
+              (4, 0, 6, 5), (5, 0, 6, 5), (6, 0, 6, 5)],
 }
+# Wave-hour draw windows for the worst family (inclusive): wave 1 early per
+# the same-day evidence; waves 2-6 anywhere from half a day in, up to hour
+# 350 (inside the stretched main episode; the run ends at 455).
+WORST_WAVE1_WINDOW = (2, 6)
+WORST_LATER_WINDOW = (12, 350)
 
 # WGS84 ellipsoid + Web Mercator sphere; identical to scripts/test_routing.py
 _A = 6378137.0
@@ -511,14 +537,17 @@ def discover_bridges(adjacency, feats, pair_features, sever_detour_m):
     return chosen, audit_rows
 
 
-def arterial_pool(feats, pair_features, coords, bbox, pool_nodes):
-    """Named arterial edges wholly inside the demand bounding box, restricted to
-    `pool_nodes` (the component that actually carries the demand). Closing a
-    street elsewhere in the graph would be a decorative no-op."""
+def arterial_pool(feats, pair_features, coords, bbox, pool_nodes,
+                  types=frozenset(ARTERIAL_TYPES)):
+    """Named street edges of the given RLIS classes wholly inside the demand
+    bounding box, restricted to `pool_nodes` (the component that actually
+    carries the demand). Closing a street elsewhere in the graph would be a
+    decorative no-op. Serves both the arterial pool (default classes) and the
+    worst-family local-street pool (LOCAL_TYPES) under identical rules."""
     lo_lon, hi_lon, lo_lat, hi_lat = bbox
     pool = defaultdict(list)
     for ft in feats:
-        if ft["type"] not in ARTERIAL_TYPES or ft["struc"] == BRIDGE_STRUC_TYPE:
+        if ft["type"] not in types or ft["struc"] == BRIDGE_STRUC_TYPE:
             continue
         name = ft["name"]
         upper = name.upper()
@@ -547,12 +576,13 @@ def arterial_pool(feats, pair_features, coords, bbox, pool_nodes):
 # draw + safety
 # --------------------------------------------------------------------------
 
-def draw_schedule(rng, plan, bridge_choices, art_pool, wave_hours):
+def draw_schedule(rng, plan, bridge_choices, art_pool, local_pool, wave_hours):
     """One attempt. Returns the closure rows (dicts) for all waves."""
     bridges_left = sorted(bridge_choices)
     names_left = sorted(art_pool)
+    local_left = sorted(local_pool)
     rows = []
-    for wave, n_bridges, n_arterials in plan:
+    for wave, n_bridges, n_arterials, n_locals in plan:
         hour = wave_hours[wave]
         picked_bridges = rng.sample(bridges_left, n_bridges)
         for b in picked_bridges:
@@ -560,6 +590,9 @@ def draw_schedule(rng, plan, bridge_choices, art_pool, wave_hours):
         picked_names = rng.sample(names_left, n_arterials)
         for n in picked_names:
             names_left.remove(n)
+        picked_locals = rng.sample(local_left, n_locals) if n_locals else []
+        for n in picked_locals:
+            local_left.remove(n)
         for b in sorted(picked_bridges):
             ft = bridge_choices[b]
             rows.append({"feature": ft, "kind": "bridge", "wave": wave,
@@ -568,6 +601,10 @@ def draw_schedule(rng, plan, bridge_choices, art_pool, wave_hours):
             ft = rng.choice(art_pool[n])
             rows.append({"feature": ft, "kind": "arterial", "wave": wave,
                          "activation_hour": hour, "bridge": None})
+        for n in sorted(picked_locals):
+            ft = rng.choice(local_pool[n])
+            rows.append({"feature": ft, "kind": "local", "wave": wave,
+                         "activation_hour": hour, "bridge": None})
     return rows
 
 
@@ -575,7 +612,7 @@ def safety_check(adjacency, incident, rows, plan, wave_hours, shelter_nodes,
                  encampment_nodes, pre_cid, pre_comps):
     """S1/S2/S3 at every cumulative wave state. Returns (ok, gates)."""
     gates, ok = [], True
-    waves = sorted({w for w, _, _ in plan})
+    waves = sorted({w for w, _, _, _ in plan})
 
     pre_shelters_by_comp = defaultdict(int)
     for node in shelter_nodes.values():
@@ -654,9 +691,13 @@ def main():
     args = ap.parse_args()
 
     plan = SEVERITY_PLAN[args.severity]
+    # base/extreme wave hours come from the CLI (fixed, as committed); the
+    # worst family draws its hours from the seeded stream per attempt, so a
+    # placeholder dict is built here and overwritten inside the attempt loop.
     wave_hours = {1: args.wave1_hour, 2: args.wave2_hour}
-    n_bridges = sum(b for _, b, _ in plan)
-    n_arterials = sum(a for _, _, a in plan)
+    n_bridges = sum(b for _, b, _, _ in plan)
+    n_arterials = sum(a for _, _, a, _ in plan)
+    n_locals = sum(l for _, _, _, l in plan)
     stamp = _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     print(f"build_closures_E v{SCRIPT_VERSION} @ {stamp}")
@@ -664,13 +705,18 @@ def main():
     print("  No incident record exists for these closures. They are drawn by a seeded")
     print("  PRNG from real RLIS street features under stated rules; the features and")
     print("  their node ids are real, WHICH ones shut and WHEN is invented.")
-    print(f"severity      : {args.severity}  ({n_bridges} bridges + {n_arterials} arterials, "
-          f"{len(plan)} wave(s))")
+    print(f"severity      : {args.severity}  ({n_bridges} bridges + {n_arterials} arterials "
+          f"+ {n_locals} local streets, {len(plan)} wave(s))")
     print(f"SITE SEED     : {args.site_seed}   (python random.Random({args.site_seed}) - "
           f"same idiom as build_scenario_crandom_2026.py)")
-    print("waves         : " + ", ".join(
-        f"wave {w} -> hour {wave_hours[w]} ({b} bridges + {a} arterials)"
-        for w, b, a in plan))
+    if args.severity == "worst":
+        print("waves         : hours DRAWN per attempt from the seeded stream - "
+              f"wave 1 in {WORST_WAVE1_WINDOW} (same-day closure evidence, A-34), "
+              f"waves 2-{len(plan)} sorted draws in {WORST_LATER_WINDOW}")
+    else:
+        print("waves         : " + ", ".join(
+            f"wave {w} -> hour {wave_hours[w]} ({b} bridges + {a} arterials)"
+            for w, b, a, _ in plan))
 
     # ---- graph ----------------------------------------------------------
     print(f"\nreading {DBF.name} + {SHP.name} (Web Mercator metres -> WGS84 degrees) ...")
@@ -815,11 +861,34 @@ def main():
         sys.exit(f"ABORT: severity {args.severity} needs {n_arterials} distinct arterial "
                  f"streets but the pool has {len(art_pool)}.")
 
+    local_pool = {}
+    if n_locals:
+        local_pool = arterial_pool(feats, pair_features, coords, bbox, pool_nodes,
+                                   LOCAL_TYPES)
+        n_lseg = sum(len(v) for v in local_pool.values())
+        print(f"local pool   : {n_lseg} closable segments on {len(local_pool)} distinct "
+              f"named local streets (RLIS TYPE {sorted(LOCAL_TYPES)}, same rules; "
+              f"mode-B debris/line blockages, weight = DECLARED ASSUMPTION per A-34)")
+        if len(local_pool) < n_locals:
+            sys.exit(f"ABORT: severity {args.severity} needs {n_locals} distinct local "
+                     f"streets but the pool has {len(local_pool)}.")
+
     # ---- seeded draw with safety-driven re-draw --------------------------
     rng = random.Random(args.site_seed)
     rows = gates = None
     for attempt in range(1, args.max_attempts + 1):
-        cand = draw_schedule(rng, plan, bridge_choices, art_pool, wave_hours)
+        if args.severity == "worst":
+            # Hours drawn BEFORE the site draws, every attempt, from the same
+            # seeded stream: wave 1 in the same-day window, later waves sorted
+            # over the event. Deterministic per (site-seed, attempt).
+            wave_hours = {1: rng.randint(*WORST_WAVE1_WINDOW)}
+            later = sorted(rng.sample(
+                range(WORST_LATER_WINDOW[0], WORST_LATER_WINDOW[1] + 1),
+                len(plan) - 1))
+            for i, h in enumerate(later, start=2):
+                wave_hours[i] = h
+        cand = draw_schedule(rng, plan, bridge_choices, art_pool, local_pool,
+                             wave_hours)
         ok, cand_gates = safety_check(adjacency, incident, cand, plan, wave_hours,
                                       shelter_nodes, encampment_nodes, pre_cid, pre_comps)
         if ok:
@@ -858,15 +927,21 @@ def main():
            f"threshold {args.sever_detour:.0f} m")
     ck.add("no duplicate closed edge", len({r["feature"]["pair_key"] for r in rows}) == len(rows),
            f"{len(rows)} rows, {len({r['feature']['pair_key'] for r in rows})} distinct pairs")
-    ck.add("every arterial closure lies inside the demand bounding box",
+    ck.add("every arterial/local closure lies inside the demand bounding box",
            all(bbox[0] <= coords[g][0] <= bbox[1] and bbox[2] <= coords[g][1] <= bbox[3]
-               for r in rows if r["kind"] == "arterial"
+               for r in rows if r["kind"] in ("arterial", "local")
                for g in (r["feature"]["g_from"], r["feature"]["g_to"])), str(bbox))
     ck.add("closure count matches the severity plan",
            sum(1 for r in rows if r["kind"] == "bridge") == n_bridges
-           and sum(1 for r in rows if r["kind"] == "arterial") == n_arterials,
+           and sum(1 for r in rows if r["kind"] == "arterial") == n_arterials
+           and sum(1 for r in rows if r["kind"] == "local") == n_locals,
            f"{sum(1 for r in rows if r['kind'] == 'bridge')} bridges, "
-           f"{sum(1 for r in rows if r['kind'] == 'arterial')} arterials")
+           f"{sum(1 for r in rows if r['kind'] == 'arterial')} arterials, "
+           f"{sum(1 for r in rows if r['kind'] == 'local')} locals")
+    if args.severity == "worst":
+        ck.add("wave 1 lands inside the same-day evidence window (A-34)",
+               WORST_WAVE1_WINDOW[0] <= min(wave_hours.values()) <= WORST_WAVE1_WINDOW[1],
+               f"wave hours realised: {sorted(wave_hours.values())}")
     for g in gates:
         ck.add(f"S1 wave {g['wave']} (hour {g['hour']}): every shelter keeps an unblocked "
                f"incident edge",
@@ -888,8 +963,8 @@ def main():
     rows.sort(key=lambda r: (r["activation_hour"], r["kind"] != "bridge",
                              r["feature"]["name"], r["feature"]["pair_key"]))
     print(f"\nCLOSURE SCHEDULE - {len(rows)} edges "
-          f"({n_bridges} bridges, {n_arterials} arterials), severity {args.severity}, "
-          f"site-seed {args.site_seed}")
+          f"({n_bridges} bridges, {n_arterials} arterials, {n_locals} locals), "
+          f"severity {args.severity}, site-seed {args.site_seed}")
     print(f"  {'hour':>4s}  {'kind':<8s} {'node_a':>8s} {'node_b':>8s}  {'label':<34s} "
           f"{'TYPE':>5s} {'len_m':>7s}")
     for r in rows:
@@ -963,8 +1038,26 @@ def main():
         "severity": args.severity,
         "site_seed": args.site_seed,
         "site_selection_rng": f"python random.Random({args.site_seed})",
-        "waves": [{"wave": w_, "activation_hour": wave_hours[w_], "bridges": b, "arterials": a}
-                  for w_, b, a in plan],
+        "waves": [{"wave": w_, "activation_hour": wave_hours[w_], "bridges": b,
+                   "arterials": a, "locals": l}
+                  for w_, b, a, l in plan],
+        "worst_family_wave_windows": ({"wave1": list(WORST_WAVE1_WINDOW),
+                                       "later": list(WORST_LATER_WINDOW),
+                                       "note": ("hours drawn from the seeded stream per "
+                                               "attempt; wave 1 window anchored to the "
+                                               "documented same-day closure pattern, "
+                                               "A-34")} if args.severity == "worst"
+                                      else None),
+        "class_weight_model": ({"bridges": "PURE ASSUMPTION - no documented wildfire "
+                                "river-bridge closure found anywhere; capped at the "
+                                "extreme plan's 4",
+                                "arterials": "evidence-backed dominant class (A-34: "
+                                "KLCC 2020 list, NIST TN 2252, KCLU 2025, formal "
+                                "ORS 810.030 orders)",
+                                "locals": "DECLARED ASSUMPTION - mechanism real "
+                                "(debris/downed lines; Grants Pass 6th & G St, Sept "
+                                "2020) but under-enumerated; sensitivity-test this "
+                                "weight"} if args.severity == "worst" else None),
         "output_csv": rel_to_root(out),
         "csv_columns": CSV_COLUMNS,
         "graph": {
@@ -1020,6 +1113,13 @@ def main():
                                "be a no-op. Ross Island Bridge: walkable but not on the "
                                "V26 pedestrian-legal list."),
         },
+        "local_pool": ({"rlis_types": sorted(LOCAL_TYPES),
+                        "min_length_m": MIN_ARTERIAL_LEN_M,
+                        "distinct_named_streets": len(local_pool),
+                        "closable_segments": sum(len(v) for v in local_pool.values()),
+                        "mode": "B - debris/downed-line blockages",
+                        "weight_status": "DECLARED ASSUMPTION (A-34)"}
+                       if n_locals else None),
         "arterial_pool": {"rlis_types": sorted(ARTERIAL_TYPES),
                           "min_length_m": MIN_ARTERIAL_LEN_M,
                           "distinct_named_streets": len(art_pool),

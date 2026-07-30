@@ -1,31 +1,73 @@
 {
   "schema": "reu-wildfire-shelter-abm/scenario-e-closures/v1",
-  "generated_utc": "2026-07-30T07:04:46Z",
+  "generated_utc": "2026-07-30T07:05:11Z",
   "generator": "scripts/build_closures_E.py v1.0.0",
   "status": "CONSTRUCTED COUNTERFACTUAL - NO INCIDENT RECORD EXISTS",
   "provenance_note": "The street features, their RLIS PDX node ids, their classification and the eight pedestrian-legal Willamette crossings are real (Metro RLIS Streets.dbf; registry V26). WHICH features close and WHEN is invented: drawn by python random.Random(1) from the pools described below. No agency closure log was used because none exists in this repository for the modelled window. Results built on this file are a network-degradation stress test, not a reconstruction of a real event.",
-  "severity": "extreme",
+  "severity": "worst",
   "site_seed": 1,
   "site_selection_rng": "python random.Random(1)",
   "waves": [
     {
       "wave": 1,
-      "activation_hour": 79,
+      "activation_hour": 3,
       "bridges": 2,
-      "arterials": 15,
-      "locals": 0
+      "arterials": 8,
+      "locals": 5
     },
     {
       "wave": 2,
-      "activation_hour": 150,
-      "bridges": 2,
-      "arterials": 15,
-      "locals": 0
+      "activation_hour": 44,
+      "bridges": 1,
+      "arterials": 6,
+      "locals": 5
+    },
+    {
+      "wave": 3,
+      "activation_hour": 72,
+      "bridges": 1,
+      "arterials": 6,
+      "locals": 5
+    },
+    {
+      "wave": 4,
+      "activation_hour": 142,
+      "bridges": 0,
+      "arterials": 6,
+      "locals": 5
+    },
+    {
+      "wave": 5,
+      "activation_hour": 265,
+      "bridges": 0,
+      "arterials": 6,
+      "locals": 5
+    },
+    {
+      "wave": 6,
+      "activation_hour": 303,
+      "bridges": 0,
+      "arterials": 6,
+      "locals": 5
     }
   ],
-  "worst_family_wave_windows": null,
-  "class_weight_model": null,
-  "output_csv": "Geography/data/closures/closures_E_r1_extreme.csv",
+  "worst_family_wave_windows": {
+    "wave1": [
+      2,
+      6
+    ],
+    "later": [
+      12,
+      350
+    ],
+    "note": "hours drawn from the seeded stream per attempt; wave 1 window anchored to the documented same-day closure pattern, A-34"
+  },
+  "class_weight_model": {
+    "bridges": "PURE ASSUMPTION - no documented wildfire river-bridge closure found anywhere; capped at the extreme plan's 4",
+    "arterials": "evidence-backed dominant class (A-34: KLCC 2020 list, NIST TN 2252, KCLU 2025, formal ORS 810.030 orders)",
+    "locals": "DECLARED ASSUMPTION - mechanism real (debris/downed lines; Grants Pass 6th & G St, Sept 2020) but under-enumerated; sensitivity-test this weight"
+  },
+  "output_csv": "Geography/data/closures/closures_E_r1_worst.csv",
   "csv_columns": [
     "node_a",
     "node_b",
@@ -98,7 +140,7 @@
       45.470215,
       45.587793
     ],
-    "arterials_drawn_inside_the_core": 23,
+    "arterials_drawn_inside_the_core": 25,
     "source": "Geography/data/encampments/irp_campsite_reports_sample.csv"
   },
   "bridge_pool": {
@@ -681,7 +723,17 @@
     },
     "never_closable": "Marquam (I-5) and Fremont (I-405): freeway TYPE, removed from the pedestrian graph by U-27, so closing them would be a no-op. Ross Island Bridge: walkable but not on the V26 pedestrian-legal list."
   },
-  "local_pool": null,
+  "local_pool": {
+    "rlis_types": [
+      1450,
+      1500
+    ],
+    "min_length_m": 60.0,
+    "distinct_named_streets": 2327,
+    "closable_segments": 21760,
+    "mode": "B - debris/downed-line blockages",
+    "weight_status": "DECLARED ASSUMPTION (A-34)"
+  },
   "arterial_pool": {
     "rlis_types": [
       1200,
@@ -698,79 +750,79 @@
   },
   "closures": [
     {
-      "node_a": 55315,
-      "node_b": 105693,
-      "activation_hour": 79,
-      "label": "HAWTHORNE BRG",
+      "node_a": 53193,
+      "node_b": 53407,
+      "activation_hour": 3,
+      "label": "MORRISON BRG",
       "kind": "bridge",
       "wave": 1,
       "rlis_type": 1400,
-      "length_m": 273.4,
+      "length_m": 134.0,
       "midpoint_lonlat": [
-        -122.668045,
-        45.512488
+        -122.669606,
+        45.517837
       ]
     },
     {
-      "node_a": 72486,
-      "node_b": 72513,
-      "activation_hour": 79,
-      "label": "SELLWOOD BRG",
+      "node_a": 109313,
+      "node_b": 109315,
+      "activation_hour": 3,
+      "label": "TILIKUM CROSSING BRG",
       "kind": "bridge",
       "wave": 1,
-      "rlis_type": 1300,
-      "length_m": 373.9,
+      "rlis_type": 5402,
+      "length_m": 237.0,
       "midpoint_lonlat": [
-        -122.663846,
-        45.464294
+        -122.665042,
+        45.506289
       ]
     },
     {
-      "node_a": 51516,
-      "node_b": 51524,
-      "activation_hour": 79,
+      "node_a": 51040,
+      "node_b": 51047,
+      "activation_hour": 3,
       "label": "E BURNSIDE ST",
       "kind": "arterial",
       "wave": 1,
       "rlis_type": 1300,
       "length_m": 79.3,
       "midpoint_lonlat": [
-        -122.595113,
-        45.523129
+        -122.659707,
+        45.522934
       ]
     },
     {
-      "node_a": 37543,
-      "node_b": 37552,
-      "activation_hour": 79,
+      "node_a": 37492,
+      "node_b": 37496,
+      "activation_hour": 3,
       "label": "N KILLINGSWORTH ST",
       "kind": "arterial",
       "wave": 1,
       "rlis_type": 1400,
-      "length_m": 78.5,
+      "length_m": 79.4,
       "midpoint_lonlat": [
-        -122.687481,
-        45.562704
+        -122.696646,
+        45.562742
       ]
     },
     {
-      "node_a": 31519,
-      "node_b": 31582,
-      "activation_hour": 79,
-      "label": "N ST LOUIS AVE",
-      "kind": "arterial",
+      "node_a": 40928,
+      "node_b": 41181,
+      "activation_hour": 3,
+      "label": "NE 135TH AVE",
+      "kind": "local",
       "wave": 1,
-      "rlis_type": 1300,
-      "length_m": 79.9,
+      "rlis_type": 1500,
+      "length_m": 118.7,
       "midpoint_lonlat": [
-        -122.757539,
-        45.592908
+        -122.524057,
+        45.549806
       ]
     },
     {
       "node_a": 45397,
       "node_b": 45712,
-      "activation_hour": 79,
+      "activation_hour": 3,
       "label": "NE 24TH AVE",
       "kind": "arterial",
       "wave": 1,
@@ -782,51 +834,65 @@
       ]
     },
     {
-      "node_a": 33062,
-      "node_b": 110285,
-      "activation_hour": 79,
-      "label": "NE AIRPORT WAY",
-      "kind": "arterial",
+      "node_a": 47445,
+      "node_b": 48555,
+      "activation_hour": 3,
+      "label": "NW CULPEPPER TER",
+      "kind": "local",
       "wave": 1,
-      "rlis_type": 1300,
-      "length_m": 706.5,
+      "rlis_type": 1500,
+      "length_m": 270.6,
       "midpoint_lonlat": [
-        -122.589017,
-        45.584946
+        -122.708483,
+        45.528297
       ]
     },
     {
-      "node_a": 44597,
-      "node_b": 46054,
-      "activation_hour": 79,
+      "node_a": 102410,
+      "node_b": 106830,
+      "activation_hour": 3,
       "label": "NW NAITO PKWY",
       "kind": "arterial",
       "wave": 1,
       "rlis_type": 1400,
-      "length_m": 559.9,
+      "length_m": 308.0,
       "midpoint_lonlat": [
-        -122.685271,
-        45.536071
+        -122.67521,
+        45.529858
       ]
     },
     {
-      "node_a": 59484,
-      "node_b": 108950,
-      "activation_hour": 79,
-      "label": "S KELLY AVE",
-      "kind": "arterial",
+      "node_a": 32872,
+      "node_b": 33120,
+      "activation_hour": 3,
+      "label": "NW WOOD ST",
+      "kind": "local",
       "wave": 1,
-      "rlis_type": 1300,
-      "length_m": 61.5,
+      "rlis_type": 1500,
+      "length_m": 135.6,
       "midpoint_lonlat": [
-        -122.676703,
-        45.503037
+        -122.776012,
+        45.585513
+      ]
+    },
+    {
+      "node_a": 61651,
+      "node_b": 62082,
+      "activation_hour": 3,
+      "label": "SE 158TH AVE",
+      "kind": "local",
+      "wave": 1,
+      "rlis_type": 1500,
+      "length_m": 139.9,
+      "midpoint_lonlat": [
+        -122.501236,
+        45.49983
       ]
     },
     {
       "node_a": 53837,
       "node_b": 53849,
-      "activation_hour": 79,
+      "activation_hour": 3,
       "label": "SE MORRISON ST",
       "kind": "arterial",
       "wave": 1,
@@ -840,7 +906,7 @@
     {
       "node_a": 60264,
       "node_b": 60278,
-      "activation_hour": 79,
+      "activation_hour": 3,
       "label": "SE POWELL BLVD",
       "kind": "arterial",
       "wave": 1,
@@ -854,7 +920,7 @@
     {
       "node_a": 77432,
       "node_b": 77584,
-      "activation_hour": 79,
+      "activation_hour": 3,
       "label": "SW 49TH AVE",
       "kind": "arterial",
       "wave": 1,
@@ -866,325 +932,843 @@
       ]
     },
     {
-      "node_a": 70448,
-      "node_b": 70791,
-      "activation_hour": 79,
-      "label": "SW BARBUR BLVD",
-      "kind": "arterial",
+      "node_a": 75289,
+      "node_b": 75458,
+      "activation_hour": 3,
+      "label": "SW 59TH PL",
+      "kind": "local",
       "wave": 1,
-      "rlis_type": 1300,
-      "length_m": 219.4,
+      "rlis_type": 1500,
+      "length_m": 110.1,
       "midpoint_lonlat": [
-        -122.689566,
-        45.470355
+        -122.737934,
+        45.451786
       ]
     },
     {
-      "node_a": 66166,
-      "node_b": 102577,
-      "activation_hour": 79,
-      "label": "SW BEAVERTON HILLSDALE HWY",
-      "kind": "arterial",
-      "wave": 1,
-      "rlis_type": 1300,
-      "length_m": 164.8,
-      "midpoint_lonlat": [
-        -122.71295,
-        45.48288
-      ]
-    },
-    {
-      "node_a": 58068,
-      "node_b": 58921,
-      "activation_hour": 79,
-      "label": "SW BROADWAY DR",
-      "kind": "arterial",
-      "wave": 1,
-      "rlis_type": 1400,
-      "length_m": 232.7,
-      "midpoint_lonlat": [
-        -122.685165,
-        45.505037
-      ]
-    },
-    {
-      "node_a": 55405,
-      "node_b": 55526,
-      "activation_hour": 79,
+      "node_a": 55636,
+      "node_b": 55761,
+      "activation_hour": 3,
       "label": "SW CLAY ST",
       "kind": "arterial",
       "wave": 1,
       "rlis_type": 1300,
-      "length_m": 85.5,
+      "length_m": 79.2,
       "midpoint_lonlat": [
-        -122.679461,
-        45.513202
+        -122.677454,
+        45.512665
       ]
     },
     {
-      "node_a": 71610,
-      "node_b": 110531,
-      "activation_hour": 79,
-      "label": "SW GARDEN HOME RD",
-      "kind": "arterial",
-      "wave": 1,
-      "rlis_type": 1400,
-      "length_m": 66.8,
-      "midpoint_lonlat": [
-        -122.752115,
-        45.465713
-      ]
-    },
-    {
-      "node_a": 32941,
-      "node_b": 33288,
-      "activation_hour": 150,
-      "label": "ST JOHNS BRG",
+      "node_a": 72486,
+      "node_b": 72513,
+      "activation_hour": 44,
+      "label": "SELLWOOD BRG",
       "kind": "bridge",
       "wave": 2,
       "rlis_type": 1300,
-      "length_m": 336.9,
+      "length_m": 373.9,
       "midpoint_lonlat": [
-        -122.763891,
-        45.585525
+        -122.663846,
+        45.464294
       ]
     },
     {
-      "node_a": 109313,
-      "node_b": 109315,
-      "activation_hour": 150,
-      "label": "TILIKUM CROSSING BRG",
-      "kind": "bridge",
+      "node_a": 33347,
+      "node_b": 33441,
+      "activation_hour": 44,
+      "label": "N DECATUR ST",
+      "kind": "local",
       "wave": 2,
-      "rlis_type": 5402,
-      "length_m": 237.0,
+      "rlis_type": 1500,
+      "length_m": 109.7,
       "midpoint_lonlat": [
-        -122.665042,
-        45.506289
+        -122.749871,
+        45.583901
       ]
     },
     {
-      "node_a": 101143,
-      "node_b": 103418,
-      "activation_hour": 150,
-      "label": "N GOING ST",
+      "node_a": 43493,
+      "node_b": 43758,
+      "activation_hour": 44,
+      "label": "NE 131ST AVE",
+      "kind": "local",
+      "wave": 2,
+      "rlis_type": 1500,
+      "length_m": 84.8,
+      "midpoint_lonlat": [
+        -122.528128,
+        45.542029
+      ]
+    },
+    {
+      "node_a": 36497,
+      "node_b": 36595,
+      "activation_hour": 44,
+      "label": "NE MORTON ST",
+      "kind": "local",
+      "wave": 2,
+      "rlis_type": 1500,
+      "length_m": 142.0,
+      "midpoint_lonlat": [
+        -122.6521,
+        45.569969
+      ]
+    },
+    {
+      "node_a": 102649,
+      "node_b": 109280,
+      "activation_hour": 44,
+      "label": "NW YEON AVE",
       "kind": "arterial",
       "wave": 2,
-      "rlis_type": 1400,
-      "length_m": 77.9,
+      "rlis_type": 1200,
+      "length_m": 112.8,
       "midpoint_lonlat": [
-        -122.696129,
-        45.556002
+        -122.723018,
+        45.550881
       ]
     },
     {
-      "node_a": 34869,
-      "node_b": 34980,
-      "activation_hour": 150,
-      "label": "NE COLUMBIA BLVD",
-      "kind": "arterial",
-      "wave": 2,
-      "rlis_type": 1300,
-      "length_m": 148.8,
-      "midpoint_lonlat": [
-        -122.651775,
-        45.578316
-      ]
-    },
-    {
-      "node_a": 37670,
-      "node_b": 37902,
-      "activation_hour": 150,
-      "label": "NE COLUMBIA CT",
-      "kind": "arterial",
-      "wave": 2,
-      "rlis_type": 1300,
-      "length_m": 389.7,
-      "midpoint_lonlat": [
-        -122.570211,
-        45.563412
-      ]
-    },
-    {
-      "node_a": 38593,
-      "node_b": 38673,
-      "activation_hour": 150,
-      "label": "NE LOMBARD ST",
-      "kind": "arterial",
-      "wave": 2,
-      "rlis_type": 1300,
-      "length_m": 60.4,
-      "midpoint_lonlat": [
-        -122.561004,
-        45.559492
-      ]
-    },
-    {
-      "node_a": 103790,
-      "node_b": 104107,
-      "activation_hour": 150,
-      "label": "NW FRONT AVE",
-      "kind": "arterial",
-      "wave": 2,
-      "rlis_type": 1400,
-      "length_m": 78.6,
-      "midpoint_lonlat": [
-        -122.687045,
-        45.537065
-      ]
-    },
-    {
-      "node_a": 44036,
-      "node_b": 102118,
-      "activation_hour": 150,
-      "label": "NW WARDWAY ST",
+      "node_a": 56782,
+      "node_b": 109305,
+      "activation_hour": 44,
+      "label": "S HARBOR DR",
       "kind": "arterial",
       "wave": 2,
       "rlis_type": 1300,
-      "length_m": 159.5,
+      "length_m": 231.8,
       "midpoint_lonlat": [
-        -122.71045,
-        45.537874
+        -122.676336,
+        45.508619
       ]
     },
     {
-      "node_a": 60517,
-      "node_b": 108411,
-      "activation_hour": 150,
-      "label": "S HOOD AVE",
-      "kind": "arterial",
-      "wave": 2,
-      "rlis_type": 1300,
-      "length_m": 118.0,
-      "midpoint_lonlat": [
-        -122.674027,
-        45.499437
-      ]
-    },
-    {
-      "node_a": 73324,
-      "node_b": 105255,
-      "activation_hour": 150,
-      "label": "SE 162ND AVE",
-      "kind": "arterial",
-      "wave": 2,
-      "rlis_type": 1400,
-      "length_m": 116.7,
-      "midpoint_lonlat": [
-        -122.496764,
-        45.464522
-      ]
-    },
-    {
-      "node_a": 71352,
-      "node_b": 71549,
-      "activation_hour": 150,
+      "node_a": 62982,
+      "node_b": 63193,
+      "activation_hour": 44,
       "label": "SE 52ND AVE",
       "kind": "arterial",
       "wave": 2,
       "rlis_type": 1400,
+      "length_m": 76.2,
+      "midpoint_lonlat": [
+        -122.60903,
+        45.493904
+      ]
+    },
+    {
+      "node_a": 73572,
+      "node_b": 73785,
+      "activation_hour": 44,
+      "label": "SE JOHNSON CREEK BLVD",
+      "kind": "arterial",
+      "wave": 2,
+      "rlis_type": 1400,
+      "length_m": 159.8,
+      "midpoint_lonlat": [
+        -122.614887,
+        45.461177
+      ]
+    },
+    {
+      "node_a": 59416,
+      "node_b": 59424,
+      "activation_hour": 44,
+      "label": "SE WINDSOR CT",
+      "kind": "local",
+      "wave": 2,
+      "rlis_type": 1500,
+      "length_m": 166.7,
+      "midpoint_lonlat": [
+        -122.614028,
+        45.504709
+      ]
+    },
+    {
+      "node_a": 53620,
+      "node_b": 53907,
+      "activation_hour": 44,
+      "label": "SW COLUMBIA ST",
+      "kind": "arterial",
+      "wave": 2,
+      "rlis_type": 1400,
+      "length_m": 159.8,
+      "midpoint_lonlat": [
+        -122.690685,
+        45.516968
+      ]
+    },
+    {
+      "node_a": 74070,
+      "node_b": 105615,
+      "activation_hour": 44,
+      "label": "SW TAYLORS FERRY RD",
+      "kind": "arterial",
+      "wave": 2,
+      "rlis_type": 1400,
+      "length_m": 61.7,
+      "midpoint_lonlat": [
+        -122.706475,
+        45.457812
+      ]
+    },
+    {
+      "node_a": 61806,
+      "node_b": 61961,
+      "activation_hour": 44,
+      "label": "SW TUNNELWOOD ST",
+      "kind": "local",
+      "wave": 2,
+      "rlis_type": 1500,
+      "length_m": 136.8,
+      "midpoint_lonlat": [
+        -122.716796,
+        45.49577
+      ]
+    },
+    {
+      "node_a": 48707,
+      "node_b": 48973,
+      "activation_hour": 72,
+      "label": "STEEL BRG",
+      "kind": "bridge",
+      "wave": 3,
+      "rlis_type": 1400,
+      "length_m": 123.0,
+      "midpoint_lonlat": [
+        -122.669182,
+        45.52756
+      ]
+    },
+    {
+      "node_a": 33401,
+      "node_b": 33862,
+      "activation_hour": 72,
+      "label": "N GLOUCESTER AVE",
+      "kind": "local",
+      "wave": 3,
+      "rlis_type": 1500,
+      "length_m": 243.9,
+      "midpoint_lonlat": [
+        -122.721953,
+        45.584187
+      ]
+    },
+    {
+      "node_a": 49632,
+      "node_b": 50052,
+      "activation_hour": 72,
+      "label": "NW MAYWOOD DR",
+      "kind": "local",
+      "wave": 3,
+      "rlis_type": 1500,
+      "length_m": 326.7,
+      "midpoint_lonlat": [
+        -122.706527,
+        45.524259
+      ]
+    },
+    {
+      "node_a": 78058,
+      "node_b": 78559,
+      "activation_hour": 72,
+      "label": "S TERWILLIGER BLVD",
+      "kind": "arterial",
+      "wave": 3,
+      "rlis_type": 1400,
+      "length_m": 342.7,
+      "midpoint_lonlat": [
+        -122.669079,
+        45.439412
+      ]
+    },
+    {
+      "node_a": 54166,
+      "node_b": 54618,
+      "activation_hour": 72,
+      "label": "SE 102ND AVE",
+      "kind": "arterial",
+      "wave": 3,
+      "rlis_type": 1400,
+      "length_m": 119.8,
+      "midpoint_lonlat": [
+        -122.558459,
+        45.517692
+      ]
+    },
+    {
+      "node_a": 71929,
+      "node_b": 71938,
+      "activation_hour": 72,
+      "label": "SE MILLER ST",
+      "kind": "local",
+      "wave": 3,
+      "rlis_type": 1500,
+      "length_m": 155.5,
+      "midpoint_lonlat": [
+        -122.654996,
+        45.466469
+      ]
+    },
+    {
+      "node_a": 62301,
+      "node_b": 62307,
+      "activation_hour": 72,
+      "label": "SE RHONE ST",
+      "kind": "local",
+      "wave": 3,
+      "rlis_type": 1500,
       "length_m": 77.7,
       "midpoint_lonlat": [
-        -122.610021,
-        45.468644
+        -122.638626,
+        45.496047
       ]
     },
     {
-      "node_a": 55696,
-      "node_b": 55714,
-      "activation_hour": 150,
-      "label": "SE MADISON ST",
-      "kind": "arterial",
-      "wave": 2,
-      "rlis_type": 1400,
-      "length_m": 79.3,
-      "midpoint_lonlat": [
-        -122.654701,
-        45.512934
-      ]
-    },
-    {
-      "node_a": 68667,
-      "node_b": 68752,
-      "activation_hour": 150,
-      "label": "SE WOODSTOCK BLVD",
-      "kind": "arterial",
-      "wave": 2,
-      "rlis_type": 1300,
-      "length_m": 66.4,
-      "midpoint_lonlat": [
-        -122.564766,
-        45.47802
-      ]
-    },
-    {
-      "node_a": 55852,
-      "node_b": 56155,
-      "activation_hour": 150,
+      "node_a": 52621,
+      "node_b": 52914,
+      "activation_hour": 72,
       "label": "SW BROADWAY",
       "kind": "arterial",
-      "wave": 2,
+      "wave": 3,
       "rlis_type": 1400,
-      "length_m": 79.4,
+      "length_m": 79.2,
       "midpoint_lonlat": [
-        -122.683968,
-        45.511355
+        -122.679996,
+        45.518686
       ]
     },
     {
-      "node_a": 62196,
-      "node_b": 62470,
-      "activation_hour": 150,
-      "label": "SW SCHOLLS FERRY RD",
+      "node_a": 58426,
+      "node_b": 110215,
+      "activation_hour": 72,
+      "label": "SW CARUTHERS ST",
       "kind": "arterial",
-      "wave": 2,
-      "rlis_type": 1400,
-      "length_m": 99.0,
+      "wave": 3,
+      "rlis_type": 1300,
+      "length_m": 125.6,
       "midpoint_lonlat": [
-        -122.743437,
-        45.493758
+        -122.680862,
+        45.505303
       ]
     },
     {
-      "node_a": 58741,
-      "node_b": 58787,
-      "activation_hour": 150,
+      "node_a": 61312,
+      "node_b": 102486,
+      "activation_hour": 72,
+      "label": "SW DOWNS VIEW CT",
+      "kind": "local",
+      "wave": 3,
+      "rlis_type": 1500,
+      "length_m": 289.4,
+      "midpoint_lonlat": [
+        -122.720339,
+        45.49754
+      ]
+    },
+    {
+      "node_a": 58787,
+      "node_b": 58814,
+      "activation_hour": 72,
       "label": "SW SHERIDAN ST",
       "kind": "arterial",
-      "wave": 2,
+      "wave": 3,
       "rlis_type": 1300,
-      "length_m": 91.7,
+      "length_m": 73.3,
       "midpoint_lonlat": [
-        -122.682539,
-        45.505186
+        -122.681858,
+        45.505086
       ]
     },
     {
-      "node_a": 68309,
-      "node_b": 68320,
-      "activation_hour": 150,
-      "label": "SW VERMONT ST",
+      "node_a": 50011,
+      "node_b": 50052,
+      "activation_hour": 72,
+      "label": "W BURNSIDE ST",
       "kind": "arterial",
-      "wave": 2,
+      "wave": 3,
       "rlis_type": 1400,
-      "length_m": 76.1,
+      "length_m": 250.1,
       "midpoint_lonlat": [
-        -122.727261,
-        45.476283
+        -122.706018,
+        45.524076
+      ]
+    },
+    {
+      "node_a": 37802,
+      "node_b": 37939,
+      "activation_hour": 142,
+      "label": "N GREELEY AVE",
+      "kind": "arterial",
+      "wave": 4,
+      "rlis_type": 1400,
+      "length_m": 85.6,
+      "midpoint_lonlat": [
+        -122.69516,
+        45.561313
+      ]
+    },
+    {
+      "node_a": 29735,
+      "node_b": 29984,
+      "activation_hour": 142,
+      "label": "N JAMES ST",
+      "kind": "local",
+      "wave": 4,
+      "rlis_type": 1500,
+      "length_m": 178.2,
+      "midpoint_lonlat": [
+        -122.758134,
+        45.603244
+      ]
+    },
+    {
+      "node_a": 45079,
+      "node_b": 45087,
+      "activation_hour": 142,
+      "label": "NE HANCOCK ST",
+      "kind": "local",
+      "wave": 4,
+      "rlis_type": 1500,
+      "length_m": 80.8,
+      "midpoint_lonlat": [
+        -122.599537,
+        45.53655
+      ]
+    },
+    {
+      "node_a": 32375,
+      "node_b": 107462,
+      "activation_hour": 142,
+      "label": "NW GERMANTOWN RD",
+      "kind": "arterial",
+      "wave": 4,
+      "rlis_type": 1400,
+      "length_m": 78.9,
+      "midpoint_lonlat": [
+        -122.775901,
+        45.587906
+      ]
+    },
+    {
+      "node_a": 43531,
+      "node_b": 43565,
+      "activation_hour": 142,
+      "label": "NW NICOLAI ST",
+      "kind": "arterial",
+      "wave": 4,
+      "rlis_type": 1300,
+      "length_m": 111.1,
+      "midpoint_lonlat": [
+        -122.712523,
+        45.538421
+      ]
+    },
+    {
+      "node_a": 71032,
+      "node_b": 71327,
+      "activation_hour": 142,
+      "label": "S TAYLORS FERRY RD",
+      "kind": "arterial",
+      "wave": 4,
+      "rlis_type": 1400,
+      "length_m": 121.1,
+      "midpoint_lonlat": [
+        -122.672738,
+        45.46865
+      ]
+    },
+    {
+      "node_a": 100383,
+      "node_b": 100384,
+      "activation_hour": 142,
+      "label": "SE 142ND AVE",
+      "kind": "local",
+      "wave": 4,
+      "rlis_type": 1500,
+      "length_m": 112.3,
+      "midpoint_lonlat": [
+        -122.516719,
+        45.47712
+      ]
+    },
+    {
+      "node_a": 66093,
+      "node_b": 66097,
+      "activation_hour": 142,
+      "label": "SE MITCHELL ST",
+      "kind": "local",
+      "wave": 4,
+      "rlis_type": 1500,
+      "length_m": 70.9,
+      "midpoint_lonlat": [
+        -122.583456,
+        45.485575
+      ]
+    },
+    {
+      "node_a": 54166,
+      "node_b": 54174,
+      "activation_hour": 142,
+      "label": "SE WASHINGTON ST",
+      "kind": "arterial",
+      "wave": 4,
+      "rlis_type": 1300,
+      "length_m": 63.0,
+      "midpoint_lonlat": [
+        -122.558297,
+        45.518346
+      ]
+    },
+    {
+      "node_a": 108592,
+      "node_b": 108593,
+      "activation_hour": 142,
+      "label": "SW CANYON RD",
+      "kind": "arterial",
+      "wave": 4,
+      "rlis_type": 1400,
+      "length_m": 88.0,
+      "midpoint_lonlat": [
+        -122.700267,
+        45.518512
+      ]
+    },
+    {
+      "node_a": 67207,
+      "node_b": 110498,
+      "activation_hour": 142,
+      "label": "SW CHELTENHAM ST",
+      "kind": "local",
+      "wave": 4,
+      "rlis_type": 1500,
+      "length_m": 77.0,
+      "midpoint_lonlat": [
+        -122.692668,
+        45.479782
+      ]
+    },
+    {
+      "node_a": 30921,
+      "node_b": 30930,
+      "activation_hour": 265,
+      "label": "N BANK ST",
+      "kind": "local",
+      "wave": 5,
+      "rlis_type": 1500,
+      "length_m": 160.0,
+      "midpoint_lonlat": [
+        -122.732452,
+        45.59683
+      ]
+    },
+    {
+      "node_a": 41118,
+      "node_b": 41517,
+      "activation_hour": 265,
+      "label": "NE 60TH AVE",
+      "kind": "local",
+      "wave": 5,
+      "rlis_type": 1500,
+      "length_m": 147.6,
+      "midpoint_lonlat": [
+        -122.601455,
+        45.548231
+      ]
+    },
+    {
+      "node_a": 47147,
+      "node_b": 47186,
+      "activation_hour": 265,
+      "label": "NE HALSEY ST",
+      "kind": "arterial",
+      "wave": 5,
+      "rlis_type": 1300,
+      "length_m": 196.2,
+      "midpoint_lonlat": [
+        -122.506512,
+        45.533675
+      ]
+    },
+    {
+      "node_a": 42100,
+      "node_b": 108748,
+      "activation_hour": 265,
+      "label": "NW FRONT AVE",
+      "kind": "arterial",
+      "wave": 5,
+      "rlis_type": 1400,
+      "length_m": 130.1,
+      "midpoint_lonlat": [
+        -122.698179,
+        45.543809
+      ]
+    },
+    {
+      "node_a": 76921,
+      "node_b": 77787,
+      "activation_hour": 265,
+      "label": "S RIVERSIDE DR",
+      "kind": "arterial",
+      "wave": 5,
+      "rlis_type": 1300,
+      "length_m": 501.3,
+      "midpoint_lonlat": [
+        -122.656862,
+        45.444456
+      ]
+    },
+    {
+      "node_a": 52337,
+      "node_b": 52684,
+      "activation_hour": 265,
+      "label": "SE CESAR E CHAVEZ BLVD",
+      "kind": "arterial",
+      "wave": 5,
+      "rlis_type": 1400,
+      "length_m": 77.7,
+      "midpoint_lonlat": [
+        -122.623055,
+        45.52029
+      ]
+    },
+    {
+      "node_a": 59297,
+      "node_b": 59538,
+      "activation_hour": 265,
+      "label": "SE GRAND AVE",
+      "kind": "arterial",
+      "wave": 5,
+      "rlis_type": 1300,
+      "length_m": 78.7,
+      "midpoint_lonlat": [
+        -122.660801,
+        45.503459
+      ]
+    },
+    {
+      "node_a": 51205,
+      "node_b": 51655,
+      "activation_hour": 265,
+      "label": "SE LAURELHURST PL",
+      "kind": "local",
+      "wave": 5,
+      "rlis_type": 1500,
+      "length_m": 116.1,
+      "midpoint_lonlat": [
+        -122.6255,
+        45.522742
+      ]
+    },
+    {
+      "node_a": 51806,
+      "node_b": 52150,
+      "activation_hour": 265,
+      "label": "SE SANDY BLVD",
+      "kind": "arterial",
+      "wave": 5,
+      "rlis_type": 1400,
+      "length_m": 108.7,
+      "midpoint_lonlat": [
+        -122.656168,
+        45.52114
+      ]
+    },
+    {
+      "node_a": 50400,
+      "node_b": 51183,
+      "activation_hour": 265,
+      "label": "SW MARCONI AVE",
+      "kind": "local",
+      "wave": 5,
+      "rlis_type": 1500,
+      "length_m": 172.4,
+      "midpoint_lonlat": [
+        -122.705325,
+        45.52178
+      ]
+    },
+    {
+      "node_a": 55369,
+      "node_b": 102446,
+      "activation_hour": 265,
+      "label": "SW MONTGOMERY PL",
+      "kind": "local",
+      "wave": 5,
+      "rlis_type": 1500,
+      "length_m": 214.6,
+      "midpoint_lonlat": [
+        -122.698931,
+        45.514254
+      ]
+    },
+    {
+      "node_a": 32508,
+      "node_b": 32592,
+      "activation_hour": 303,
+      "label": "N COLUMBIA BLVD",
+      "kind": "arterial",
+      "wave": 6,
+      "rlis_type": 1300,
+      "length_m": 90.8,
+      "midpoint_lonlat": [
+        -122.697087,
+        45.588749
+      ]
+    },
+    {
+      "node_a": 39999,
+      "node_b": 40006,
+      "activation_hour": 303,
+      "label": "N FAILING ST",
+      "kind": "local",
+      "wave": 6,
+      "rlis_type": 1500,
+      "length_m": 79.6,
+      "midpoint_lonlat": [
+        -122.685156,
+        45.55089
+      ]
+    },
+    {
+      "node_a": 48071,
+      "node_b": 48202,
+      "activation_hour": 303,
+      "label": "NE LAURELHURST PL",
+      "kind": "local",
+      "wave": 6,
+      "rlis_type": 1500,
+      "length_m": 166.1,
+      "midpoint_lonlat": [
+        -122.618653,
+        45.52976
+      ]
+    },
+    {
+      "node_a": 40110,
+      "node_b": 40264,
+      "activation_hour": 303,
+      "label": "NW FINZER CT",
+      "kind": "local",
+      "wave": 6,
+      "rlis_type": 1500,
+      "length_m": 125.2,
+      "midpoint_lonlat": [
+        -122.771928,
+        45.54865
+      ]
+    },
+    {
+      "node_a": 38586,
+      "node_b": 38936,
+      "activation_hour": 303,
+      "label": "NW KITTRIDGE AVE",
+      "kind": "arterial",
+      "wave": 6,
+      "rlis_type": 1400,
+      "length_m": 208.0,
+      "midpoint_lonlat": [
+        -122.73204,
+        45.55662
+      ]
+    },
+    {
+      "node_a": 60935,
+      "node_b": 61180,
+      "activation_hour": 303,
+      "label": "S HOOD AVE",
+      "kind": "arterial",
+      "wave": 6,
+      "rlis_type": 1300,
+      "length_m": 78.1,
+      "midpoint_lonlat": [
+        -122.673938,
+        45.498986
+      ]
+    },
+    {
+      "node_a": 53504,
+      "node_b": 53830,
+      "activation_hour": 303,
+      "label": "SE 43RD AVE",
+      "kind": "local",
+      "wave": 6,
+      "rlis_type": 1500,
+      "length_m": 73.2,
+      "midpoint_lonlat": [
+        -122.617807,
+        45.517943
+      ]
+    },
+    {
+      "node_a": 74120,
+      "node_b": 74128,
+      "activation_hour": 303,
+      "label": "SE CLATSOP ST",
+      "kind": "arterial",
+      "wave": 6,
+      "rlis_type": 1400,
+      "length_m": 111.2,
+      "midpoint_lonlat": [
+        -122.510452,
+        45.461262
+      ]
+    },
+    {
+      "node_a": 60275,
+      "node_b": 60285,
+      "activation_hour": 303,
+      "label": "SE DIVISION ST",
+      "kind": "arterial",
+      "wave": 6,
+      "rlis_type": 1300,
+      "length_m": 82.1,
+      "midpoint_lonlat": [
+        -122.505967,
+        45.504306
+      ]
+    },
+    {
+      "node_a": 53812,
+      "node_b": 53822,
+      "activation_hour": 303,
+      "label": "SE STARK ST",
+      "kind": "arterial",
+      "wave": 6,
+      "rlis_type": 1300,
+      "length_m": 62.0,
+      "midpoint_lonlat": [
+        -122.55764,
+        45.519055
+      ]
+    },
+    {
+      "node_a": 73936,
+      "node_b": 74295,
+      "activation_hour": 303,
+      "label": "SW BRIER PL",
+      "kind": "local",
+      "wave": 6,
+      "rlis_type": 1500,
+      "length_m": 153.6,
+      "midpoint_lonlat": [
+        -122.678893,
+        45.457634
       ]
     }
   ],
   "connectivity_check": [
     {
       "wave": 1,
-      "hour": 79,
-      "edges_blocked": 17,
+      "hour": 3,
+      "edges_blocked": 15,
       "shelters_with_no_unblocked_incident_edge": [],
       "shelters_severed_from_their_component": [],
       "components_before": 171,
-      "components_after": 172,
-      "components_split_by_the_closures": 1,
-      "nodes_losing_reachability": 6,
+      "components_after": 171,
+      "components_split_by_the_closures": 0,
+      "nodes_losing_reachability": 0,
       "graph_nodes_total": 88100,
       "encampment_points_total": 3400,
       "encampment_points_losing_some_shelter_access": 0,
@@ -1193,14 +1777,78 @@
     },
     {
       "wave": 2,
-      "hour": 150,
-      "edges_blocked": 34,
+      "hour": 44,
+      "edges_blocked": 27,
       "shelters_with_no_unblocked_incident_edge": [],
       "shelters_severed_from_their_component": [],
       "components_before": 171,
       "components_after": 173,
       "components_split_by_the_closures": 1,
-      "nodes_losing_reachability": 13,
+      "nodes_losing_reachability": 2,
+      "graph_nodes_total": 88100,
+      "encampment_points_total": 3400,
+      "encampment_points_losing_some_shelter_access": 0,
+      "encampment_points_losing_all_shelter_access": 0,
+      "encampment_shelter_pairs_lost": 0
+    },
+    {
+      "wave": 3,
+      "hour": 72,
+      "edges_blocked": 39,
+      "shelters_with_no_unblocked_incident_edge": [],
+      "shelters_severed_from_their_component": [],
+      "components_before": 171,
+      "components_after": 174,
+      "components_split_by_the_closures": 1,
+      "nodes_losing_reachability": 16,
+      "graph_nodes_total": 88100,
+      "encampment_points_total": 3400,
+      "encampment_points_losing_some_shelter_access": 0,
+      "encampment_points_losing_all_shelter_access": 0,
+      "encampment_shelter_pairs_lost": 0
+    },
+    {
+      "wave": 4,
+      "hour": 142,
+      "edges_blocked": 50,
+      "shelters_with_no_unblocked_incident_edge": [],
+      "shelters_severed_from_their_component": [],
+      "components_before": 171,
+      "components_after": 176,
+      "components_split_by_the_closures": 1,
+      "nodes_losing_reachability": 19,
+      "graph_nodes_total": 88100,
+      "encampment_points_total": 3400,
+      "encampment_points_losing_some_shelter_access": 0,
+      "encampment_points_losing_all_shelter_access": 0,
+      "encampment_shelter_pairs_lost": 0
+    },
+    {
+      "wave": 5,
+      "hour": 265,
+      "edges_blocked": 61,
+      "shelters_with_no_unblocked_incident_edge": [],
+      "shelters_severed_from_their_component": [],
+      "components_before": 171,
+      "components_after": 177,
+      "components_split_by_the_closures": 1,
+      "nodes_losing_reachability": 20,
+      "graph_nodes_total": 88100,
+      "encampment_points_total": 3400,
+      "encampment_points_losing_some_shelter_access": 0,
+      "encampment_points_losing_all_shelter_access": 0,
+      "encampment_shelter_pairs_lost": 0
+    },
+    {
+      "wave": 6,
+      "hour": 303,
+      "edges_blocked": 72,
+      "shelters_with_no_unblocked_incident_edge": [],
+      "shelters_severed_from_their_component": [],
+      "components_before": 171,
+      "components_after": 179,
+      "components_split_by_the_closures": 1,
+      "nodes_losing_reachability": 22,
       "graph_nodes_total": 88100,
       "encampment_points_total": 3400,
       "encampment_points_losing_some_shelter_access": 0,
@@ -1212,7 +1860,7 @@
     {
       "name": "no closure carries a freeway RLIS TYPE (U-27 / V26)",
       "status": "PASS",
-      "detail": "types [1300, 1400, 5402]"
+      "detail": "types [1200, 1300, 1400, 1500, 5402]"
     },
     {
       "name": "every closed node pair resolves to exactly one street feature",
@@ -1222,7 +1870,7 @@
     {
       "name": "every bridge closure is on the V26 pedestrian-legal list",
       "status": "PASS",
-      "detail": "['Hawthorne Bridge', 'Sellwood Bridge', 'St Johns Bridge', 'Tilikum Crossing']"
+      "detail": "['Morrison Bridge', 'Sellwood Bridge', 'Steel Bridge', 'Tilikum Crossing']"
     },
     {
       "name": "every bridge closure actually severs its crossing",
@@ -1232,7 +1880,7 @@
     {
       "name": "no duplicate closed edge",
       "status": "PASS",
-      "detail": "34 rows, 34 distinct pairs"
+      "detail": "72 rows, 72 distinct pairs"
     },
     {
       "name": "every arterial/local closure lies inside the demand bounding box",
@@ -1242,35 +1890,100 @@
     {
       "name": "closure count matches the severity plan",
       "status": "PASS",
-      "detail": "4 bridges, 30 arterials, 0 locals"
+      "detail": "4 bridges, 38 arterials, 30 locals"
     },
     {
-      "name": "S1 wave 1 (hour 79): every shelter keeps an unblocked incident edge",
+      "name": "wave 1 lands inside the same-day evidence window (A-34)",
+      "status": "PASS",
+      "detail": "wave hours realised: [3, 44, 72, 142, 265, 303]"
+    },
+    {
+      "name": "S1 wave 1 (hour 3): every shelter keeps an unblocked incident edge",
       "status": "PASS",
       "detail": "0 of 46 stranded"
     },
     {
-      "name": "S2 wave 1 (hour 79): every shelter stays in the largest post-closure fragment of its own pre-closure component",
+      "name": "S2 wave 1 (hour 3): every shelter stays in the largest post-closure fragment of its own pre-closure component",
       "status": "PASS",
       "detail": "0 of 46 severed"
     },
     {
-      "name": "S3 wave 1 (hour 79): no encampment demand point loses ALL shelter access",
+      "name": "S3 wave 1 (hour 3): no encampment demand point loses ALL shelter access",
       "status": "PASS",
       "detail": "0 of 3400 walled off"
     },
     {
-      "name": "S1 wave 2 (hour 150): every shelter keeps an unblocked incident edge",
+      "name": "S1 wave 2 (hour 44): every shelter keeps an unblocked incident edge",
       "status": "PASS",
       "detail": "0 of 46 stranded"
     },
     {
-      "name": "S2 wave 2 (hour 150): every shelter stays in the largest post-closure fragment of its own pre-closure component",
+      "name": "S2 wave 2 (hour 44): every shelter stays in the largest post-closure fragment of its own pre-closure component",
       "status": "PASS",
       "detail": "0 of 46 severed"
     },
     {
-      "name": "S3 wave 2 (hour 150): no encampment demand point loses ALL shelter access",
+      "name": "S3 wave 2 (hour 44): no encampment demand point loses ALL shelter access",
+      "status": "PASS",
+      "detail": "0 of 3400 walled off"
+    },
+    {
+      "name": "S1 wave 3 (hour 72): every shelter keeps an unblocked incident edge",
+      "status": "PASS",
+      "detail": "0 of 46 stranded"
+    },
+    {
+      "name": "S2 wave 3 (hour 72): every shelter stays in the largest post-closure fragment of its own pre-closure component",
+      "status": "PASS",
+      "detail": "0 of 46 severed"
+    },
+    {
+      "name": "S3 wave 3 (hour 72): no encampment demand point loses ALL shelter access",
+      "status": "PASS",
+      "detail": "0 of 3400 walled off"
+    },
+    {
+      "name": "S1 wave 4 (hour 142): every shelter keeps an unblocked incident edge",
+      "status": "PASS",
+      "detail": "0 of 46 stranded"
+    },
+    {
+      "name": "S2 wave 4 (hour 142): every shelter stays in the largest post-closure fragment of its own pre-closure component",
+      "status": "PASS",
+      "detail": "0 of 46 severed"
+    },
+    {
+      "name": "S3 wave 4 (hour 142): no encampment demand point loses ALL shelter access",
+      "status": "PASS",
+      "detail": "0 of 3400 walled off"
+    },
+    {
+      "name": "S1 wave 5 (hour 265): every shelter keeps an unblocked incident edge",
+      "status": "PASS",
+      "detail": "0 of 46 stranded"
+    },
+    {
+      "name": "S2 wave 5 (hour 265): every shelter stays in the largest post-closure fragment of its own pre-closure component",
+      "status": "PASS",
+      "detail": "0 of 46 severed"
+    },
+    {
+      "name": "S3 wave 5 (hour 265): no encampment demand point loses ALL shelter access",
+      "status": "PASS",
+      "detail": "0 of 3400 walled off"
+    },
+    {
+      "name": "S1 wave 6 (hour 303): every shelter keeps an unblocked incident edge",
+      "status": "PASS",
+      "detail": "0 of 46 stranded"
+    },
+    {
+      "name": "S2 wave 6 (hour 303): every shelter stays in the largest post-closure fragment of its own pre-closure component",
+      "status": "PASS",
+      "detail": "0 of 46 severed"
+    },
+    {
+      "name": "S3 wave 6 (hour 303): no encampment demand point loses ALL shelter access",
       "status": "PASS",
       "detail": "0 of 3400 walled off"
     }
@@ -1279,7 +1992,7 @@
     "CONSTRUCTED COUNTERFACTUAL: no incident record exists; the schedule is a seeded draw, so it cannot support any claim about what did or would happen on a particular date.",
     "One draw is one closure pattern. Treat spread across --site-seed values as a range, not a confidence interval.",
     "Closures are edge-level and permanent once active: no partial capacity, no reopening, no contraflow, no detour signage.",
-    "The arterial pool is uniform over qualifying named streets in the demand bounding box, which is NOT uniform over demand: the box is several times the area of the demand footprint, so draws land disproportionately in the periphery (same caveat as build_scenario_crandom_2026.py). 23 of 30 arterials fell inside the p05-p95 demand core in this draw. Restricting the pool to the primary demand component removes the wrong-component no-ops but does not make the draw demand-weighted.",
+    "The arterial pool is uniform over qualifying named streets in the demand bounding box, which is NOT uniform over demand: the box is several times the area of the demand footprint, so draws land disproportionately in the periphery (same caveat as build_scenario_crandom_2026.py). 25 of 38 arterials fell inside the p05-p95 demand core in this draw. Restricting the pool to the primary demand component removes the wrong-component no-ops but does not make the draw demand-weighted.",
     "The safety check guarantees shelters stay attached to the largest component; it does NOT guarantee the walk stays short. Detour length is an outcome of the run, not a constraint on the draw."
   ]
 }
