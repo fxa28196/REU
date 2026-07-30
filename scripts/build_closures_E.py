@@ -899,10 +899,15 @@ def main():
         bad = sorted({s for g in cand_gates
                       for s in g["shelters_with_no_unblocked_incident_edge"]
                       + g["shelters_severed_from_their_component"]})
-        camps = max(g["encampment_points_losing_all_shelter_access"] for g in cand_gates)
+        # NOT named `camps`: that is the encampment coordinate list, and
+        # shadowing it here made the provenance writer crash at len(camps)
+        # for any draw accepted after a rejection (found by the pre-push
+        # audit: r2/r3 worst reports were missing for exactly this reason).
+        n_walled = max(g["encampment_points_losing_all_shelter_access"]
+                       for g in cand_gates)
         print(f"  attempt {attempt}: REJECTED - would cut off {len(bad)} shelter(s) "
               f"[{', '.join(bad[:6])}{' ...' if len(bad) > 6 else ''}] and strand "
-              f"{camps} encampment point(s) from every shelter; re-drawing")
+              f"{n_walled} encampment point(s) from every shelter; re-drawing")
     else:
         sys.exit(f"ABORT: {args.max_attempts} seeded draws all cut a shelter or an "
                  f"encampment off the street network. Nothing was written. Widen the "

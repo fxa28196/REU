@@ -389,6 +389,21 @@ plus nine SE2nc controls — all clean-tree, 546/546 checks in
   refusals swing by > 100 across draws at the same seed (443/406/327),
   the registered pattern-varies channel.
 
+> **CORRECTION, 2026-07-30, found by the pre-push audit (appended, not
+> edited).** Both Scenario-E configuration paragraphs above register
+> `pushThetaThreshold −0.25`, and every SE/SE2 batch params file carries
+> `value="-0.25"` — but every run manifest records the EXECUTED value as
+> **0.0**. Root cause, probe-verified twice: Repast's batch parser silently
+> zeroes NEGATIVE `constant_type="number"` constants (positives pass;
+> `constant_type="double"` executes −0.25 correctly — the generator now
+> emits "double" for negative values). IMPACT: NONE on any reported number —
+> the parameter is consulted only at a blockage encounter, and all 24
+> closure runs recorded ZERO blockage events, so the V51 decision rule never
+> executed in any run. The registered band-anchored derivation of −0.25
+> stands for future sweeps; the executed-config record stands as 0.0; the
+> manifests were truthful throughout, which is how the audit caught it.
+> The runs are deliberately NOT re-run over an unconsulted parameter.
+
 **v2 headline, carefully bounded.** At the worst verified urban
 wildfire-smoke severity on record (Canberra-anchored, 4.436×) with 72
 early, evidence-timed street closures, the model's structure holds:

@@ -22,7 +22,7 @@
 	<parameter name="informationRegime" type="constant" constant_type="int" value="1"/>
 	<parameter name="enableHazardDeparture" type="constant" constant_type="int" value="1"/>
 	<parameter name="sigmaTheta" type="constant" constant_type="number" value="1.0"/>
-	<parameter name="alphaHazard" type="constant" constant_type="number" value="-8.0"/>
+	<parameter name="alphaHazard" type="constant" constant_type="double" value="-8.0"/>
 	<parameter name="bRisk" type="constant" constant_type="number" value="0.4"/>
 	<parameter name="wOfficial" type="constant" constant_type="number" value="1.1"/>
 	<parameter name="gammaVuln" type="constant" constant_type="number" value="0.25"/>
