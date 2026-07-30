@@ -231,3 +231,71 @@ declared assumptions (A-35).
 Outcomes reported in this file after the matrix, misses stated as misses
 with appended corrections, never edits — the P-E1/alphaHazard precedent
 applies verbatim.
+
+## Scenario-E prediction outcomes (runs 2026-07-30, commit 495d845, 455 h)
+
+Eighteen runs — {E18,E19,E20} × seeds {42,43,44}, closuresCode 1 and the
+closure-free controls — all clean-tree, all 455 h per the appended amendment,
+387/387 checks in `scripts/verify_E_runs.py --se` (216 severe + 171 control),
+`out_of_range_lookups = 0` everywhere. Sheltered counts (severe, by seed):
+E18 1252/1223/1247, E19 1257/1226/1252, E20 1257/1225/1252 — between-arm
+difference ≤ 5 against a between-seed spread of ~29.
+
+- **P-SE1 — MISS on the attempt band, CONFIRMED on mechanism.** Attempt share
+  among the aware rose at every seed (0.5198/0.5018/0.5042 vs ER's
+  0.5025/0.4782/0.4854) but stopped ~0.03 above ER — far below the registered
+  0.55–0.75 band. Same failure shape as P-E1: the logistic squashes the
+  larger z_R, so a 1.75× concentration multiplies dose, not departures. The
+  mechanism claims all held: sheltered share ≤ 18.4% against the 35.6%
+  awareness ceiling, and E18 ends with empty beds (≤ 1,252 sheltered vs
+  2,234 spaces). The sub-clause "E18's capacity refusals rise above ER-A's"
+  is also NOT confirmed — 291/229/244 vs 295/212/231 is flat within noise.
+- **P-SE2 — CONFIRMED, decisively.** Mean dose per capita is 2.74–2.75× the
+  ER baseline at every seed, against the 1.75× concentration transform: the
+  stretched episode and the never-departed majority carry the difference.
+  (The smokeScale sweep arms did not run; the superlinearity clause is
+  untested, not scored.)
+- **P-SE3 — sheltered-equality clause CONFIRMED; cost-channel clause NOT
+  EVALUABLE (empty stratum).** Sheltered counts stayed equal within seed
+  noise exactly as predicted. But the registered cost stratum — "residents
+  EN_ROUTE at the hour-79 wave" whose route crosses a closure — is EMPTY
+  (blockage_events = 0 in all nine closure runs; see P-SE5). Adjacent
+  observations, reported not scored: population mean dose differs from the
+  closure-free controls by < 5 µg per capita (noise); and the closure arms
+  show consistently FEWER arm-A capacity refusals than their controls
+  (291 vs 347, 229 vs 259, 244 vs 271) — the recomputed routing spreads
+  arrivals away from the small central sites that fill first. A closure
+  schedule redistributed WHERE refusals happen without changing WHO gets in.
+- **P-SE4 — CONFIRMED.** E20 records ZERO capacity refusals at every seed
+  (its 371/314/359 refusals are all pet/adults-only policy bounces); the 667
+  reserved beds arbitrate nothing, exactly as registered in advance.
+- **P-SE5 — NOT EVALUABLE (empty stratum), and the emptiness is the
+  finding.** Zero blockage events in all nine closure runs. The arithmetic:
+  departures spread over ~455 h at ~3–8/hour while the median walk lasts
+  24 min (p90 107 min), so ~4 of 6,842 residents are mid-walk at any wave
+  instant — and none of their routes crossed the 18 closed edges. The
+  985-per-run departures AFTER the wave all route on the recomputed trees,
+  absorbing closures as silent detours. Consequence, stated plainly: **under
+  hazard-staggered departure, street closures act through geometry (detours,
+  redistribution), not through face-to-face blockage gambles** — the V51
+  push-vs-reroute machinery (implemented, R3-proven, census-verified) is
+  starved of subjects in any realistic staggered regime, because max
+  concurrent walkers ≈ departure rate × walk duration stays single-digit.
+  The mechanism becomes testable only where walks and waves overlap densely:
+  simultaneous-departure regimes (the legacy latch), much longer walks, or
+  wave times drawn inside the departure surge — registered here as the
+  follow-up sweep, not silently substituted.
+- **P-SE6 — CONFIRMED.** The never-sheltered vs sheltered
+  hours-above-unhealthy gap widened to 1.96×/1.97×/2.02× the ER gap —
+  above the 1.75× transform at every seed. The never-sheltered stratum
+  saturates the entire 306 unhealthy hours of the severe series (ER: the
+  full 194); the sheltered cap early.
+
+**Headline, carefully bounded.** Under a beyond-observed severe
+counterfactual, the awareness ceiling still binds: severity multiplied the
+COST of non-arrival (dose ×2.75) while barely moving arrival (17.8% →
+18.3%). Placement (E19) and triage (E20) remain as inert as in ER — and the
+closure layer shows that even physical street closures cannot make placement
+matter for WHO gets in when capacity never binds; they only redistribute
+door-level refusals. Every Scenario-E magnitude is a labeled counterfactual
+(A-33) and must never be quoted as an observed quantity.
