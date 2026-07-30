@@ -131,7 +131,16 @@ def write_file(name, header, seed, scenario_code, extra, reserve=None):
 #   pushThetaThreshold -0.25 band-anchored: P(push|unburdened)=0.60, the V51
 #                            fire-incident continue band midpoint (Wood/Bryan/Jin)
 #   kPush             1.0    A-35 declared coupling
-#   simulationHours   456    the severe series length (V-SIMH clamp)
+#   simulationHours   455    one hour UNDER the 456-slice series length. The
+#                            schedule's inclusive final tick reads hour index
+#                            simulationHours; the observed file carries 576
+#                            slices against a 312 h window so the baseline
+#                            never noticed, but the severe file is exactly 456
+#                            slices, so 456 h pokes one slice past the end and
+#                            books ~11k fabricated-zero lookups (found by the
+#                            (j) out_of_range gate on the first matrix). 455
+#                            consumes every real slice with zero fabrication,
+#                            inside the spec's registered "<= 456".
 E_SEV = dict(E_REAL)
 E_SEV.update({
     "smokeSeriesCode": ("int", "1"),
@@ -141,7 +150,7 @@ E_SEV.update({
     "stuckDelayH": ("number", "3.0"),
     "pushThetaThreshold": ("number", "-0.25"),
     "kPush": ("number", "1.0"),
-    "simulationHours": ("int", "456"),
+    "simulationHours": ("int", "455"),
 })
 
 # Closure-free control: identical severe smoke, no obstacle layer, so the

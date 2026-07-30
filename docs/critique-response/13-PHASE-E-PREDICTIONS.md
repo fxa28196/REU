@@ -153,6 +153,21 @@ pushThetaThreshold −0.25, kPush 1.0, simulationHours 456. Code 20 adds
 `triageReserveFraction 0.10`. Controls, same seeds: codes 18/19/20 with
 closuresCode 0, so the smoke effect and the obstacle effect separate cleanly.
 
+> **AMENDMENT, 2026-07-30, after the first matrix and BEFORE any scoring
+> (appended, not edited — the 456 above stands as registered).** The first
+> 18-run matrix at `simulationHours 456` tripped the (j) invariant the spec
+> itself registered (`out_of_range_lookups == 0`): the schedule's inclusive
+> final tick reads hour index `simulationHours`, the severe series is exactly
+> 456 slices (indices 0–455), so every outdoor resident's final-tick lookup
+> read one slice past the end and returned a fabricated 0 (~11.2k lookups per
+> run; numerically ~1 minute of zero concentration, but a fabrication the
+> gate exists to forbid). The observed file carries 576 slices against a
+> 312 h window, which is why no baseline run ever tripped it. The matrix was
+> stopped, discarded (`Geography/output/superseded-456h/`, never verified,
+> never scored) and re-run at **455 h** — inside the spec's registered
+> "≤ 456", consuming every real slice with zero fabrication. No prediction
+> references hour 456; all P-SE stand unchanged.
+
 **pushThetaThreshold = −0.25 derivation (band-anchored arithmetic, not a fit
 to any simulation output):** the V51 empirical band says 55–75% of people who
 enter smoke continue through it (Wood 1972: 74% of movers; Bryan 1977: 70.1%;
