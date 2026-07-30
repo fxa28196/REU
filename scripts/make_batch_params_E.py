@@ -111,6 +111,13 @@ def write_file(name, header, seed, scenario_code, extra, reserve=None):
         params["triageReserveFraction"] = ("number", reserve)
     params.update(extra)
     for pname, (ptype, pval) in params.items():
+        # Repast's batch parser silently zeroes NEGATIVE constant_type="number"
+        # values (probe-verified 2026-07-30: value="-0.25" executed as 0.0
+        # while every positive came through; constant_type="double" executes
+        # -0.25 correctly). Found by the pre-push audit; correction note in
+        # 13-PHASE-E-PREDICTIONS.md.
+        if ptype == "number" and str(pval).lstrip().startswith("-"):
+            ptype = "double"
         lines.append('\t<parameter name="%s" type="constant" constant_type="%s" value="%s"/>'
                      % (pname, ptype, pval))
     lines.append("</sweep>")
