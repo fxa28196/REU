@@ -208,6 +208,23 @@ public class StreetNetwork {
 	private long nextSyntheticId = -1000;
 	private ValidationReport report;
 
+	// ---- Scenario-E obstacle layer (V48). ----------------------------------
+	/** Blocked undirected edges as an adjacency set: node -> blocked neighbours.
+	 *  EMPTY in every run with closuresCode=0, and the emptiness short-circuit in
+	 *  {@link #computeTree} means the obstacle layer costs one boolean test there
+	 *  — which is what keeps every archived arm bit-identical. Keyed by node id
+	 *  pairs, never strings: ids can be negative (synthetic split nodes) and the
+	 *  relaxation loop runs ~10M times across the shelter trees. */
+	private final Map<Long, Set<Long>> blockedAdj = new HashMap<Long, Set<Long>>();
+	/** Bumped once per closure wave; agents compare it against the version they
+	 *  last planned under to know a re-scan of their route is due. */
+	private int closureVersion = 0;
+	/** True when this run carries a closure schedule (closuresCode > 0), set at
+	 *  context build BEFORE any wave fires. Agents build their node-path
+	 *  bookkeeping only when this is on, so runs without closures allocate
+	 *  nothing new. */
+	private boolean closureScheduleActive = false;
+
 	// U-27 exclusion accumulators, copied into the ValidationReport at
 	// finaliseGraph() (the report object does not exist earlier).
 	private int excludedFreewayFeatures = 0;
@@ -459,6 +476,136 @@ public class StreetNetwork {
 		return directed / 2;
 	}
 
+	// ---- Scenario-E obstacle layer (V48): blocking + node paths ------------
+
+	/** Declares that this run carries a closure schedule (closuresCode > 0).
+	 *  Called once at context build, BEFORE any wave fires, so agents know to
+	 *  keep node-path bookkeeping from their first planned leg. */
+	public void declareClosureSchedule() {
+		closureScheduleActive = true;
+	}
+
+	/** True when this run carries a closure schedule; false in every legacy arm. */
+	public boolean hasClosureSchedule() {
+		return closureScheduleActive;
+	}
+
+	/** Blocks the undirected edge a–b (both stored directions). Idempotent. */
+	public void blockEdge(long a, long b) {
+		blockedHalf(a).add(Long.valueOf(b));
+		blockedHalf(b).add(Long.valueOf(a));
+	}
+
+	private Set<Long> blockedHalf(long node) {
+		Set<Long> s = blockedAdj.get(Long.valueOf(node));
+		if (s == null) {
+			s = new HashSet<Long>();
+			blockedAdj.put(Long.valueOf(node), s);
+		}
+		return s;
+	}
+
+	/** Whether the undirected edge a–b is blocked. The isEmpty() short-circuit
+	 *  is the R3 argument: with closuresCode=0 nothing is ever blocked and this
+	 *  is a single boolean test on the routing hot path. */
+	public boolean isBlocked(long a, long b) {
+		if (blockedAdj.isEmpty()) {
+			return false;
+		}
+		Set<Long> s = blockedAdj.get(Long.valueOf(a));
+		return s != null && s.contains(Long.valueOf(b));
+	}
+
+	/** Number of blocked UNDIRECTED edges (for the manifest census). */
+	public int blockedEdgeCount() {
+		int directed = 0;
+		for (Set<Long> s : blockedAdj.values()) {
+			directed += s.size();
+		}
+		return directed / 2;
+	}
+
+	/** Whether the undirected edge a–b exists in the adjacency. Census aid for
+	 *  the closure loader: a scheduled pair that matches no graph edge blocks
+	 *  nothing and must be reported, not silently swallowed. */
+	public boolean hasEdge(long a, long b) {
+		List<Edge> edges = adjacency.get(Long.valueOf(a));
+		if (edges == null) {
+			return false;
+		}
+		for (Edge e : edges) {
+			if (e.toNode == b) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** Closure-wave version: 0 until the first wave, +1 per wave. */
+	public int getClosureVersion() {
+		return closureVersion;
+	}
+
+	/** Called once per closure wave, after its edges are blocked. */
+	public void bumpClosureVersion() {
+		closureVersion++;
+	}
+
+	/** Node chain of a shortest path plus, for each node, the index of its
+	 *  coordinate in the {@link #pathToSource} polyline for the SAME (tree,
+	 *  fromNode) pair. Lets an agent test only the REMAINING part of its route
+	 *  against the blocked set — a closure behind a walker is not an obstacle —
+	 *  without this class knowing anything about agents. */
+	public static final class NodePath {
+		/** fromNode → … → tree.sourceNode. */
+		public final List<Long> nodes;
+		/** coordOffset[i] = index of nodes.get(i)'s coordinate in the
+		 *  pathToSource list (offset 0 is the fromNode coordinate; each edge
+		 *  contributes its polyline-vertex count minus one). */
+		public final int[] coordOffset;
+
+		NodePath(List<Long> nodes, int[] coordOffset) {
+			this.nodes = nodes;
+			this.coordOffset = coordOffset;
+		}
+	}
+
+	/**
+	 * Node sequence (with coordinate offsets) from {@code fromNode} to the
+	 * tree's source, or null if unreachable. Mirrors {@link #pathToSource}
+	 * exactly — same walk, same orientation, same defensive null — and is kept
+	 * separate so the coordinate path's behaviour and callers are untouched.
+	 */
+	public NodePath nodesToSource(ShortestPathTree tree, long fromNode) {
+		if (Double.isInfinite(tree.distanceTo(fromNode))) {
+			return null;
+		}
+		List<Long> nodes = new ArrayList<Long>();
+		List<Integer> offsets = new ArrayList<Integer>();
+		nodes.add(Long.valueOf(fromNode));
+		offsets.add(Integer.valueOf(0));
+		int coordIndex = 0;
+		long node = fromNode;
+		while (node != tree.sourceNode) {
+			Edge e = tree.predecessorEdge.get(node);
+			if (e == null) {
+				return null; // defensive: broken tree (mirrors pathToSource)
+			}
+			// pathToSource adds e.coords[length-2 .. 0] for this edge — that is
+			// coords.length-1 vertices, the last of which is e.fromNode's
+			// polyline endpoint. The offset arithmetic mirrors that exactly.
+			coordIndex += e.coords.length - 1;
+			node = e.fromNode;
+			nodes.add(Long.valueOf(node));
+			offsets.add(Integer.valueOf(coordIndex));
+		}
+		int[] off = new int[offsets.size()];
+		for (int i = 0; i < off.length; i++) {
+			off[i] = offsets.get(i).intValue();
+		}
+		return new NodePath(nodes, off);
+	}
+
 	/** Dijkstra from the given source over the whole reachable component. */
 	public ShortestPathTree computeTree(long sourceNode) {
 		ShortestPathTree tree = new ShortestPathTree(sourceNode);
@@ -482,6 +629,12 @@ public class StreetNetwork {
 				continue;
 			}
 			for (Edge e : edges) {
+				// Scenario-E closures (V48): a blocked street cannot carry a
+				// route. Free when no closure schedule is active — the isEmpty()
+				// short-circuit inside isBlocked() is a single boolean test.
+				if (!blockedAdj.isEmpty() && isBlocked(node, e.toNode)) {
+					continue;
+				}
 				double nd = d + e.lengthM;
 				Double old = tree.distM.get(e.toNode);
 				if (old == null || nd < old.doubleValue()) {

@@ -60,15 +60,42 @@ public class OutcomeLogger {
 	/** Null when the Phase-E decision layer is disabled; supplies the realised
 	 *  E-attribute marginals (incl. the A-28 joint prevalences) for the manifest. */
 	private final geography.agents.ELayerSampler eSampler;
+	/** Null when no closure schedule is active (closuresCode=0). */
+	private final ClosureCensus closures;
+
+	/** Scenario-E closure provenance for the manifest (V48): what was
+	 *  scheduled, how much of it matched a real graph edge, and — read from
+	 *  the network at export time — how much actually got blocked. The verify
+	 *  tooling checks scheduled == the closure CSV's row count. */
+	public static final class ClosureCensus {
+		public final int closuresCode;
+		public final String scheduleFile;
+		public final int scheduledEdges;
+		public final int matchingGraphEdges;
+		public final java.util.List<Integer> waveHours;
+		public final StreetNetwork network;
+
+		public ClosureCensus(int closuresCode, String scheduleFile, int scheduledEdges,
+				int matchingGraphEdges, java.util.List<Integer> waveHours,
+				StreetNetwork network) {
+			this.closuresCode = closuresCode;
+			this.scheduleFile = scheduleFile;
+			this.scheduledEdges = scheduledEdges;
+			this.matchingGraphEdges = matchingGraphEdges;
+			this.waveHours = waveHours;
+			this.network = network;
+		}
+	}
 
 	public OutcomeLogger(Context<Object> context, SmokeField smokeField, long seed,
 			String[] paramNames, Object[] paramValues, String[] inputDataFiles,
 			StreetNetwork.ValidationReport netReport, ScienceRegistry registry,
 			String scenarioName, geography.agents.PopulationSampler sampler,
-			geography.agents.ELayerSampler eSampler) {
+			geography.agents.ELayerSampler eSampler, ClosureCensus closures) {
 		this.scenarioName = scenarioName;
 		this.sampler = sampler;
 		this.eSampler = eSampler;
+		this.closures = closures;
 		this.context = context;
 		this.smokeField = smokeField;
 		this.seed = seed;
@@ -142,7 +169,11 @@ public class OutcomeLogger {
 					// normal trait draw (population-invariant across sigma sweeps);
 					// the applied trait is sigmaTheta * theta_z.
 					+ "aware_initial,aware_tick,heavy_belongings,has_pet,"
-					+ "has_dependents,theta_z");
+					+ "has_dependents,theta_z,"
+					// Scenario-E obstacle-layer counters (V48-V51), appended per
+					// the same contract. Always numeric (like door_refusals):
+					// they are event counts, structurally 0 outside Scenario E.
+					+ "blockages_encountered,push_throughs,reroutes,stuck_events");
 			for (GisAgent a : agents) {
 				boolean reached = a.getState() == GisAgent.State.SHELTERED;
 				String shelter = reached && a.getTargetShelter() != null ? a.getTargetShelter().getId() : "";
@@ -191,7 +222,7 @@ public class OutcomeLogger {
 								da.heavyBelongings ? 1 : 0, da.hasPet ? 1 : 0,
 								da.hasDependents ? 1 : 0, da.thetaZ);
 				w.printf(Locale.US,
-						"%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s,%.2f,%.4f,%.4f,%.4f,%.4f,%s,%s,%s,%.3f,%.3f,%s,%.2f,%.2f,%d,%s,%s,%.4f,%.4f,%.4f,%.3f,%.4f,%s%n",
+						"%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%s,%.2f,%.4f,%.4f,%.4f,%.4f,%s,%s,%s,%.3f,%.3f,%s,%.2f,%.2f,%d,%s,%s,%.4f,%.4f,%.4f,%.3f,%.4f,%s,%d,%d,%d,%d%n",
 						a.getName(), simId, commit, seed, dataVersionTag,
 						a.getEncampmentId(), startLonS, startLatS,
 						shelter, reached ? "yes" : "no",
@@ -205,7 +236,9 @@ public class OutcomeLogger {
 						csv(scenarioName), het,
 						a.getAirVolumeBreathedM3(), a.getMeanVentilationM3h(),
 						a.getInhaledDoseUg(), a.getHealthRiskMultiplier(),
-						a.getHealthRiskScore(), dec);
+						a.getHealthRiskScore(), dec,
+						a.getBlockagesEncountered(), a.getPushThroughs(),
+						a.getReroutes(), a.getStuckEvents());
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("writeAgents failed", e);
@@ -300,6 +333,27 @@ public class OutcomeLogger {
 			w.printf(Locale.US, "    \"peak_hourly_ugm3\": %.1f,%n", smokeField.peakHourly());
 			w.println("    \"out_of_range_lookups\": " + smokeField.getOutOfRangeLookups());
 			w.println("  },");
+			// Scenario-E closure provenance (V48). Appended block: absent-code
+			// runs emit the minimal form so the key is always present and a
+			// parser never has to guess whether closures were possible.
+			if (closures == null) {
+				w.println("  \"closures\": {\"code\": 0},");
+			} else {
+				StringBuilder hours = new StringBuilder("[");
+				for (int i = 0; i < closures.waveHours.size(); i++) {
+					hours.append(i == 0 ? "" : ", ").append(closures.waveHours.get(i));
+				}
+				hours.append("]");
+				w.println("  \"closures\": {");
+				w.println("    \"code\": " + closures.closuresCode + ",");
+				w.println("    \"schedule_file\": \"" + jsonEsc(closures.scheduleFile) + "\",");
+				w.println("    \"scheduled_undirected_edges\": " + closures.scheduledEdges
+						+ ", \"matching_graph_edges\": " + closures.matchingGraphEdges + ",");
+				w.println("    \"wave_hours\": " + hours + ",");
+				w.println("    \"blocked_edges_at_end\": " + closures.network.blockedEdgeCount()
+						+ ", \"closure_version_at_end\": " + closures.network.getClosureVersion());
+				w.println("  },");
+			}
 			writeNetworkValidation(w);
 			writeGovernance(w);
 			writeStratifiedExposure(w, agents);

@@ -132,12 +132,20 @@ public class GisAgent {
 		public final boolean petPolicyAdmitDefault;
 		public final double betaTravelTime;     // V43
 		public final double betaCapacityPrior;  // V43
+		// Scenario-E blockage decision (V49-V51). Read ONLY at a blocked edge,
+		// which cannot occur without a closure wave (closuresCode > 0), so
+		// these are inert in every other run whatever their values.
+		public final double pushThetaThreshold; // V51
+		public final double kPush;              // V51
+		public final double pStuck;             // V49
+		public final double stuckDelayH;        // V50
 
 		public DecisionConfig(int informationRegime, int enableHazardDeparture,
 				double alphaHazard, double bRisk, double wOfficial, double gammaVuln,
 				double sigmaTheta, double riskHalfLifeH, double lambdaOutreachPerDay,
 				double barrierBelongings, double barrierPet, double barrierDependents,
-				boolean petPolicyAdmitDefault, double betaTravelTime, double betaCapacityPrior) {
+				boolean petPolicyAdmitDefault, double betaTravelTime, double betaCapacityPrior,
+				double pushThetaThreshold, double kPush, double pStuck, double stuckDelayH) {
 			this.informationRegime = informationRegime;
 			this.enableHazardDeparture = enableHazardDeparture;
 			this.alphaHazard = alphaHazard;
@@ -153,6 +161,10 @@ public class GisAgent {
 			this.petPolicyAdmitDefault = petPolicyAdmitDefault;
 			this.betaTravelTime = betaTravelTime;
 			this.betaCapacityPrior = betaCapacityPrior;
+			this.pushThetaThreshold = pushThetaThreshold;
+			this.kPush = kPush;
+			this.pStuck = pStuck;
+			this.stuckDelayH = stuckDelayH;
 		}
 	}
 
@@ -176,6 +188,35 @@ public class GisAgent {
 	private Shelter targetShelter = null;
 	private List<Coordinate> routePath = null;
 	private int pathIndex = 0;
+
+	// ---- Scenario-E obstacle layer (V48-V51). All of this is dead weight ---
+	// unless a closure schedule is active: routeNodes stays null (the network
+	// flag gates its construction), closureVersion never moves off 0, and
+	// stuckUntilTick stays NaN — so every legacy arm executes the pre-E
+	// movement code verbatim.
+	/** Node chain + coordinate offsets of the current planned leg; null when
+	 *  no closure schedule is active (nothing would ever scan it). */
+	private StreetNetwork.NodePath routeNodes = null;
+	/** Closure version this agent's current leg was planned under; a wave that
+	 *  bumps the network's version triggers exactly one re-scan per agent. */
+	private int seenClosureVersion = 0;
+	/** Tick until which a stuck pusher is delayed en route (V49/V50), NaN when
+	 *  not stuck. A stuck resident is outdoors at RESTING ventilation, still
+	 *  accruing dose — the dose IS the penalty. The wait is served where the
+	 *  wave caught the walker; under the county-uniform field (V5) the dose
+	 *  penalty is identical wherever along the route it is served. */
+	private double stuckUntilTick = Double.NaN;
+	/** Blocked pairs this resident already accepted in a push decision, as
+	 *  canonical "min:max" node keys. One gamble covers every closure known on
+	 *  the remaining route at decision time; later waves adjudicate only NEW
+	 *  obstacles — never the same edge twice (no double counters, no second
+	 *  pStuck draw for one physical blockage). Null until the first push. */
+	private java.util.Set<String> pushedBlockages = null;
+	/** Append-only exported counters (V51 audit trail). */
+	private int blockagesEncountered = 0;
+	private int pushThroughs = 0;
+	private int reroutes = 0;
+	private int stuckEvents = 0;
 	/** Street-graph node the next route leg is planned FROM: the start node
 	 *  until the first capacity refusal, thereafter the node of the shelter
 	 *  that refused this resident (A-17 — re-route from the current position,
@@ -296,7 +337,12 @@ public class GisAgent {
 			// is walking breathes more air than one waiting, so inhales more
 			// particulate from the same concentration. No health attribute
 			// enters here - susceptibility is applied downstream, if ever.
-			double ventilationM3h = (state == State.EN_ROUTE)
+			// A Scenario-E stuck resident (V50) is EN_ROUTE but WAITING at the
+			// blockage, so it breathes at the resting rate — the registered
+			// semantics of the delay. stuckUntilTick is NaN in every run
+			// without closures, so the legacy expression is untouched there.
+			boolean stuckNow = !Double.isNaN(stuckUntilTick) && tick < stuckUntilTick;
+			double ventilationM3h = (state == State.EN_ROUTE && !stuckNow)
 					? INHALATION_WALKING_M3H : INHALATION_RESTING_M3H;
 			airVolumeBreathedM3 += ventilationM3h * dtHours;
 			inhaledDoseUg += c * ventilationM3h * dtHours;
@@ -427,11 +473,34 @@ public class GisAgent {
 			retargetCount = 0;
 			targetShelter = null;
 			routePath = null;
+			routeNodes = null;
 			pathIndex = 0;
 		}
 
 		if (state != State.EN_ROUTE) {
 			return; // terminal states persist in place (still accruing if outside)
+		}
+
+		// ---- Scenario-E obstacle layer (V48-V51) ---------------------------
+		// Both branches are unreachable without a closure wave: stuckUntilTick
+		// is only ever set at a blockage, and closureVersion only moves when a
+		// wave fires. Legacy arms fall straight through.
+		if (!Double.isNaN(stuckUntilTick)) {
+			if (tick < stuckUntilTick) {
+				return; // stuck at the blockage: outdoors, resting ventilation,
+						// accruing dose (already booked above) — the penalty
+			}
+			stuckUntilTick = Double.NaN; // delay served; resume the pushed path
+		}
+		if (routePath != null && routeNodes != null
+				&& network.getClosureVersion() != seenClosureVersion) {
+			reactToClosureWave(tick, minutesPerTick);
+			if (!Double.isNaN(stuckUntilTick)) {
+				return; // pushed through and got stuck right here (V49)
+			}
+			// a reroute cleared routePath; the planning block below re-plans
+			// this same tick from the node this resident actually stands at,
+			// over the trees the wave just recomputed
 		}
 
 		// --- Routing (capacity-aware under L0; belief-aware under L1) --------
@@ -508,6 +577,7 @@ public class GisAgent {
 				currentNodeId = targetShelter.getGraphNodeId();
 				targetShelter = null;
 				routePath = null;
+				routeNodes = null;
 				pathIndex = 0;
 				retargetCount++;
 				// Under L0/legacy the retry cap guards against livelock. Under
@@ -568,6 +638,12 @@ public class GisAgent {
 			plannedRouteM += bestDistM;
 			routePath = network.pathToSource(best.getRouteTree(), currentNodeId);
 			pathIndex = 0;
+			// Scenario-E: keep the node chain only when a closure schedule
+			// exists (V48) — otherwise nothing would ever scan it and the
+			// allocation would be pure waste in every legacy arm.
+			routeNodes = network.hasClosureSchedule()
+					? network.nodesToSource(best.getRouteTree(), currentNodeId) : null;
+			seenClosureVersion = network.getClosureVersion();
 		} else if (anyReachable) {
 			state = State.REFUSED_ALL_FULL;
 		} else {
@@ -655,11 +731,120 @@ public class GisAgent {
 			plannedRouteM += bestDistM;
 			routePath = network.pathToSource(best.getRouteTree(), currentNodeId);
 			pathIndex = 0;
+			// Scenario-E node chain, same contract as the legacy chooser.
+			routeNodes = network.hasClosureSchedule()
+					? network.nodesToSource(best.getRouteTree(), currentNodeId) : null;
+			seenClosureVersion = network.getClosureVersion();
 		} else if (anyReachable) {
 			state = State.REFUSED_ALL_FULL;
 		} else {
 			state = State.UNREACHABLE;
 		}
+	}
+
+	/**
+	 * Scenario-E blockage decision (V49-V51), run at most once per closure
+	 * wave per agent, and only for an agent mid-walk on a path planned BEFORE
+	 * the wave (fresh paths are planned on the recomputed trees and already
+	 * avoid every closure).
+	 *
+	 * <p>Scans only the REMAINING route: an edge (k,k+1) is "ahead" iff this
+	 * walker has not yet reached node k's coordinate ({@code coordOffset[k] >=
+	 * pathIndex}). A walker already at or past the junction — including one
+	 * caught mid-street by the wave — is grandfathered through: closures block
+	 * ENTRY to a street, not people already on it. An agent whose remaining
+	 * route is untouched makes no decision, which is the honest behaviour.
+	 *
+	 * <p>On a hit, the V51 rule: push iff the persistent trait clears a
+	 * threshold RAISED by this resident's own burdens. The decision is made
+	 * ONCE PER WAVE against the whole remaining route: a push accepts every
+	 * closure currently on it (recorded in {@link #pushedBlockages}, so a
+	 * later wave can never re-litigate the same physical obstacle — no double
+	 * counters, no second pStuck draw), keeps the stale path, and draws
+	 * Bernoulli(pStuck) on the per-agent decision stream. Stuck means a
+	 * stuckDelayH-hour delay served en route where the wave caught the walker,
+	 * outdoors, at resting ventilation (V50) — under the county-uniform field
+	 * the dose penalty is identical wherever along the route it is served. One
+	 * within-tick granularity note: the decision tick itself was already
+	 * booked at walking ventilation by the exposure block above; at 1 min/tick
+	 * against a 180-min delay that overstates the stuck penalty by ~0.5% of
+	 * one delay-hour per event, accepted and conservative. A reroute drops the
+	 * path and re-plans from the last node actually reached, over the trees
+	 * the wave just recomputed; the existing UNREACHABLE / REFUSED_ALL_FULL
+	 * classification handles the no-route case unchanged. Without a decision
+	 * layer (cfg null) there is no trait to gamble on, so every blocked
+	 * resident reroutes — the safe degenerate, flagged at startup.
+	 */
+	private void reactToClosureWave(double tick, double minutesPerTick) {
+		seenClosureVersion = network.getClosureVersion();
+		List<Long> nodes = routeNodes.nodes;
+		int[] off = routeNodes.coordOffset;
+		int hit = -1;
+		for (int k = 0; k + 1 < nodes.size(); k++) {
+			if (off[k] >= pathIndex
+					&& network.isBlocked(nodes.get(k).longValue(), nodes.get(k + 1).longValue())
+					&& (pushedBlockages == null || !pushedBlockages.contains(
+							pairKey(nodes.get(k).longValue(), nodes.get(k + 1).longValue())))) {
+				hit = k;
+				break;
+			}
+		}
+		if (hit < 0) {
+			return; // remaining route untouched by this wave (or already pushed)
+		}
+		blockagesEncountered++;
+		boolean push = false;
+		if (decisionConfig != null && decisionAttributes != null) {
+			double mobilityPenalty = (attributes != null && attributes.mobilityLimited)
+					? 1.0 : 0.0;
+			push = thetaScaled >= decisionConfig.pushThetaThreshold
+					+ decisionConfig.kPush * (barrierCost + mobilityPenalty);
+		}
+		if (push) {
+			pushThroughs++;
+			// The gamble covers every closure on the remaining route as of this
+			// decision, this wave's and earlier ones' alike.
+			if (pushedBlockages == null) {
+				pushedBlockages = new java.util.HashSet<String>();
+			}
+			for (int k = 0; k + 1 < nodes.size(); k++) {
+				long a = nodes.get(k).longValue(), b = nodes.get(k + 1).longValue();
+				if (off[k] >= pathIndex && network.isBlocked(a, b)) {
+					pushedBlockages.add(pairKey(a, b));
+				}
+			}
+			if (decisionRng.nextDouble() < decisionConfig.pStuck) {
+				stuckEvents++;
+				stuckUntilTick = tick
+						+ decisionConfig.stuckDelayH * (60.0 / minutesPerTick);
+			}
+			// stale path kept: the resident walks through the closed street
+		} else {
+			reroutes++;
+			// Re-plan from the last node actually reached (largest k with
+			// coordOffset[k] < pathIndex; 0 when the walk has not started) —
+			// "where this resident stands", not the leg's original origin.
+			int lastReached = 0;
+			for (int k = 0; k < nodes.size(); k++) {
+				if (off[k] < pathIndex) {
+					lastReached = k;
+				} else {
+					break;
+				}
+			}
+			currentNodeId = nodes.get(lastReached).longValue();
+			targetShelter = null;
+			routePath = null;
+			routeNodes = null;
+			pathIndex = 0;
+		}
+	}
+
+	/** Canonical undirected-pair key for {@link #pushedBlockages}. Cold path
+	 *  (once per blockage event), so a string key is fine here — unlike the
+	 *  Dijkstra relaxation, where it is banned. */
+	private static String pairKey(long a, long b) {
+		return a <= b ? a + ":" + b : b + ":" + a;
 	}
 
 	/** L1 counterpart of {@link #anyShelterAvailable}: an operating, open,
@@ -811,6 +996,15 @@ public class GisAgent {
 	public double getSnapGapM() { return snapGapM; }
 	/** Number of capacity refusals this resident experienced at a shelter door. */
 	public int getRetargetCount() { return retargetCount; }
+	// Scenario-E obstacle-layer counters (V48-V51), all 0 outside Scenario E.
+	/** Closure waves that actually intersected this resident's remaining route. */
+	public int getBlockagesEncountered() { return blockagesEncountered; }
+	/** Blockages this resident chose to walk through (V51). */
+	public int getPushThroughs() { return pushThroughs; }
+	/** Blockages this resident chose to reroute around (V51). */
+	public int getReroutes() { return reroutes; }
+	/** Push-throughs that cost a stuckDelayH wait (V49/V50). */
+	public int getStuckEvents() { return stuckEvents; }
 	public double getExposureUgM3h() { return exposureUgM3h; }
 	public double getVweUgM3h() { return vweUgM3h; }
 	public double getExposureWhileTravelingUgM3h() { return exposureWhileTravelingUgM3h; }
