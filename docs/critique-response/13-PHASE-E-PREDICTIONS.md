@@ -344,3 +344,57 @@ r3 {2, 35, 37, 40, 75, 76}.
 ### Scoring rule
 
 Same as v1: outcomes appended after the matrix; misses stay misses.
+
+## Scenario-E v2 prediction outcomes (runs 2026-07-30, commit 257017d, 455 h)
+
+Twenty-four runs — E18 × draws r1/r2/r3, E19/E20 × r1, seeds 42/43/44,
+plus nine SE2nc controls — all clean-tree, 546/546 checks in
+`verify_E_runs.py --se`, `out_of_range_lookups = 0` and peak 2,496.1
+(× scale 1.0) everywhere. R3 re-proved at this commit before the matrix.
+
+- **P-SE7 — CONFIRMED.** Mean dose 204,368–205,991 µg across every run:
+  inside the registered ±10% band around 207,000, and 6.87–6.94× ER-A
+  (> 6.5). Dose tracks the concentration anchor linearly through the
+  never-departed majority.
+- **P-SE8 — CONFIRMED.** Attempt share among the aware rose at every seed
+  (0.5424/0.5214/0.5258 vs v1's 0.5198/0.5018/0.5042) and stayed below
+  0.60; sheltered share peaked at 19.2% against the 35.6% awareness
+  ceiling. Even the worst verified urban smoke hour on record moves
+  departure by ~2 pp: the logistic saturates exactly as registered.
+- **P-SE9 — CONFIRMED on the ceiling and the mechanism; the r1/r2
+  sub-clause did not materialize.** Blockage events were ZERO in all
+  fifteen closure runs — within the registered ≤ ~30 ceiling and exactly
+  zero for r3 as registered, but r1/r2 did not "record the matrix's only
+  events": there were none anywhere. The registered single-digit-per-wave
+  concurrency estimate was itself an overestimate — with ~4 concurrent
+  walkers and 72 closed edges among ~110,000, the expected event count per
+  run is of order one, and zero across 15 runs says it is below that. The
+  mechanism finding from v1 now holds at maximum severity: **street
+  closures in a hazard-staggered population act entirely through
+  rerouted geometry — the face-to-face gamble (V51) is a measure-zero
+  event at ANY documented severity.**
+- **P-SE10 — MISS as registered, and the miss is the finding.** The
+  registered direction (E18 closure arms record FEWER capacity refusals
+  than controls at every seed) holds for draws r2 (406/288/349 vs
+  429/307/357) and r3 (327/218/266 — the strongest, front-loaded draw)
+  but REVERSES for r1 at seeds 42 and 44 (443/362 vs 429/357). The
+  redistribution signature is real but DRAW-DEPENDENT: which streets
+  close determines whether arrivals spread away from or pile into the
+  small sites that fill first. This is precisely what the A-34
+  range-across-draws protocol exists to expose; a single-schedule design
+  would have reported whichever sign its one draw happened to produce.
+- **P-SE11 — CONFIRMED, decisively.** Sheltered counts across draws vary
+  by ≤ 2 residents (1307/1307/1309; 1272/1271/1271; 1301/1302/1301) —
+  access is draw-robust as the S1–S3 gates guarantee — while capacity
+  refusals swing by > 100 across draws at the same seed (443/406/327),
+  the registered pattern-varies channel.
+
+**v2 headline, carefully bounded.** At the worst verified urban
+wildfire-smoke severity on record (Canberra-anchored, 4.436×) with 72
+early, evidence-timed street closures, the model's structure holds:
+awareness still caps arrival (~19% sheltered), severity multiplies the
+dose of the unsheltered (~6.9× the ER baseline; the never-sheltered
+saturate 342 unhealthy hours), placement and triage remain inert for WHO
+gets in, and closures act through silent detours whose refusal-pattern
+consequences depend on the specific draw. Every magnitude is a labeled
+counterfactual (A-33/A-34), never an observed quantity.
