@@ -46,9 +46,13 @@ u_i(t) = α + b_R·z_R(t) + w·officialCue(t) + s·socialCue(t) + θ_i − c_i
 - z_R(t): dose-accumulating risk cue (half-life swept 12–72 h; Castillo 2023
   shows response to cumulative exposure days, not instantaneous PM2.5).
 - Susceptibility: γ_vuln·(COPD, asthma, age 65+, mobility) enters z_R's
-  weight; sign sourced (Evers et al. 2022 n=1,200 same-event Oregon:
-  vulnerable-household POSITIVE on protective action), magnitude ASSUMPTION,
-  swept 0…+0.5 log-odds. Asthma now legitimately enters susceptibility —
+  weight; sign sourced (Coughlan, Huber-Stearns, Clark & Deak 2022, Oregon
+  Wildfire Smoke Communications and Impacts, EWP Working Paper 111, UO/OHA,
+  n=1,200 same-event Oregon survey, Scholars' Bank handle 1794/27179:
+  vulnerable-household POSITIVE on protective action and on having been
+  evacuated — CITATION CORRECTED 2026-07-30, previously misattributed to a
+  nonexistent "Evers et al. 2022"; see registry V39 for the caveats),
+  magnitude ASSUMPTION, swept 0…+0.5 log-odds. Asthma now legitimately enters susceptibility —
   U-19's negative-control invariant updates to: asthma affects departure
   timing only, never gait speed, never dose physics (assert both).
 - c_i = Σ barrier costs (belongings, pet×petIntake, dependents×adults-only);
