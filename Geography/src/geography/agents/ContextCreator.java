@@ -203,16 +203,26 @@ public class ContextCreator implements ContextBuilder {
 	private static final String SCENARIO_E19_NAME = "E19_severe_counterfactual_over_C_expanded_plus_new_sites";
 	private static final String SCENARIO_E20_NAME = "E20_severe_counterfactual_over_D_need_based_admission";
 
-	/** Scenario-E severe smoke series (V46, A-33): a DECLARED COUNTERFACTUAL —
-	 *  the observed series scaled 1.75x with its main episode stretched — built
-	 *  by scripts/build_smoke_severe.py. Never measured data, never LA data. */
+	/** Scenario-E severe smoke series (V46, A-33): DECLARED COUNTERFACTUALS
+	 *  built by scripts/build_smoke_severe.py — the observed series scaled with
+	 *  its main episode stretched. v1 = 1.75x (peak 984.75). v2 = the WORST
+	 *  PLAUSIBLE CASE: 4.436x, whose peak (2496.1) equals the worst verified
+	 *  hourly PM2.5 over an intact non-evacuated city (Florey, Canberra,
+	 *  5-6 Jan 2020, ACT open data; the Fort McMurray 5229 ceiling is cited in
+	 *  A-33 but deliberately not scaled to). Never measured data. */
 	private static final String SMOKE_SEVERE_CSV = "data/airnow/aqs_hourly_pm25_synthetic_severe_v1.csv";
+	private static final String SMOKE_SEVERE_V2_CSV = "data/airnow/aqs_hourly_pm25_synthetic_severe_v2.csv";
 
 	/** Scenario-E closure schedules (V48, A-34), scripts/build_closures_E.py.
-	 *  Schema: node_a,node_b,activation_hour,label,kind. Both carry a committed
-	 *  connectivity proof that no shelter is isolated by the schedule. */
+	 *  Schema: node_a,node_b,activation_hour,label,kind. All carry a committed
+	 *  connectivity proof that no shelter is isolated by the schedule. Code 3
+	 *  selects the worst-case family (early multi-wave, class-weighted, 72
+	 *  edges) by draw: closures_E_r&lt;closureDraw&gt;_worst.csv. */
 	private static final String CLOSURES_BASE_CSV = "data/closures/closures_E_r1.csv";
 	private static final String CLOSURES_EXTREME_CSV = "data/closures/closures_E_r1_extreme.csv";
+	private static final String CLOSURES_WORST_PREFIX = "data/closures/closures_E_r";
+	private static final String CLOSURES_WORST_SUFFIX = "_worst.csv";
+	private static final int CLOSURE_WORST_DRAWS = 3;
 
 	// V13 anchor: simulation hour 0 = local midnight at the start of the study
 	// window (Portland's Sept 7-19 2020 smoke episode).
@@ -309,16 +319,24 @@ public class ContextCreator implements ContextBuilder {
 		// V51 fire-incident continue-through-smoke band (55-75%).
 		double pushThetaThreshold = doubleParam(parm, "pushThetaThreshold", -0.25);
 		double kPush = doubleParam(parm, "kPush", 1.0);
+		int closureDraw = intParam(parm, "closureDraw", 1);
 		// Fail-fast on unknown selector codes (the ScienceRegistry/V45
 		// convention): a typo'd params file must stop the run, not silently
 		// select a different arm than its manifest claims.
-		if (smokeSeriesCode != 0 && smokeSeriesCode != 1) {
+		if (smokeSeriesCode < 0 || smokeSeriesCode > 2) {
 			throw new IllegalStateException("smokeSeriesCode=" + smokeSeriesCode
-					+ " is not a registered series (V46: 0=observed, 1=severe v1)");
+					+ " is not a registered series (V46: 0=observed, 1=severe v1, "
+					+ "2=worst-case v2)");
 		}
-		if (closuresCode < 0 || closuresCode > 2) {
+		if (closuresCode < 0 || closuresCode > 3) {
 			throw new IllegalStateException("closuresCode=" + closuresCode
-					+ " is not a registered schedule (V48: 0=none, 1=base, 2=extreme)");
+					+ " is not a registered schedule (V48: 0=none, 1=base, "
+					+ "2=extreme, 3=worst family)");
+		}
+		if (closuresCode == 3 && (closureDraw < 1 || closureDraw > CLOSURE_WORST_DRAWS)) {
+			throw new IllegalStateException("closureDraw=" + closureDraw
+					+ " but only draws 1.." + CLOSURE_WORST_DRAWS
+					+ " are committed (V48 worst family)");
 		}
 		String scenarioName;
 		String sheltersCsv;
@@ -491,19 +509,24 @@ public class ContextCreator implements ContextBuilder {
 
 		// ---- Smoke field (V46/V47: observed EPA AQS, or the labeled severe
 		// counterfactual, times the runtime scale) ---------------------------
-		String smokeCsv = (smokeSeriesCode == 1) ? SMOKE_SEVERE_CSV : SMOKE_CSV;
+		String smokeCsv = (smokeSeriesCode == 2) ? SMOKE_SEVERE_V2_CSV
+				: (smokeSeriesCode == 1) ? SMOKE_SEVERE_CSV : SMOKE_CSV;
 		SmokeField smokeField = new SmokeField(smokeCsv, "Multnomah", SIM_START, smokeScale);
 		System.out.printf("[SmokeField] %d hourly slices from %s; peak %.1f ug/m3 "
 				+ "(series %d%s, scale %.3f)%n",
 				smokeField.hours(), SIM_START, smokeField.peakHourly(),
 				smokeSeriesCode,
-				smokeSeriesCode == 1 ? " = SYNTHETIC SEVERE COUNTERFACTUAL (A-33)" : " = observed",
+				smokeSeriesCode == 2 ? " = WORST-CASE COUNTERFACTUAL v2 (A-33, Canberra-anchored)"
+						: smokeSeriesCode == 1 ? " = SYNTHETIC SEVERE COUNTERFACTUAL v1 (A-33)"
+						: " = observed",
 				smokeScale);
-		if (smokeSeriesCode == 1) {
-			System.out.println("[SmokeField][WARN] severe series is a CONSTRUCTED "
-					+ "COUNTERFACTUAL (A-33): concentrations exceed every documented "
-					+ "value from the Jan-2025 LA fires and must never be reported as "
-					+ "observed magnitudes.");
+		if (smokeSeriesCode >= 1) {
+			System.out.println("[SmokeField][WARN] synthetic series is a CONSTRUCTED "
+					+ "COUNTERFACTUAL (A-33) and must never be reported as observed "
+					+ "magnitudes." + (smokeSeriesCode == 2
+							? " v2's peak equals the worst verified urban wildfire-smoke "
+							+ "hour on record (2496.1 ug/m3, Florey, Canberra, Jan 2020)."
+							: ""));
 		}
 		if (scenarioCode >= 18 && scenarioCode <= 20 && smokeSeriesCode == 0) {
 			System.out.println("[Scenario][WARN] scenarioCode " + scenarioCode
@@ -614,7 +637,9 @@ public class ContextCreator implements ContextBuilder {
 		int closureEdgesMatchingGraph = 0;
 		java.util.List<Integer> closureWaveHours = new java.util.ArrayList<Integer>();
 		if (closuresCode != 0) {
-			closuresCsv = (closuresCode == 2) ? CLOSURES_EXTREME_CSV : CLOSURES_BASE_CSV;
+			closuresCsv = (closuresCode == 3)
+					? CLOSURES_WORST_PREFIX + closureDraw + CLOSURES_WORST_SUFFIX
+					: (closuresCode == 2) ? CLOSURES_EXTREME_CSV : CLOSURES_BASE_CSV;
 			network.declareClosureSchedule();
 			java.util.TreeMap<Integer, java.util.List<long[]>> waves =
 					new java.util.TreeMap<Integer, java.util.List<long[]>>();
@@ -798,7 +823,7 @@ public class ContextCreator implements ContextBuilder {
 				"shelterPolicyVariant",
 				// Scenario E (V46-V51), appended per the same contract.
 				"smokeSeriesCode", "smokeScale", "closuresCode", "pStuck",
-				"stuckDelayH", "pushThetaThreshold", "kPush" };
+				"stuckDelayH", "pushThetaThreshold", "kPush", "closureDraw" };
 		Object[] pVals = { numAgents, minutesPerTick, parm.getValue("walkingSpeedMps"),
 				parm.getValue("shelterArrivalDistanceM"), simulationHours, seed,
 				paramOrDefault(parm, "evacuationThresholdUgM3", "unset"), scenarioCode,
@@ -811,7 +836,7 @@ public class ContextCreator implements ContextBuilder {
 				petPolicyDefault, betaTravelTime, betaCapacityPrior,
 				shelterPolicyVariant,
 				smokeSeriesCode, smokeScale, closuresCode, pStuck,
-				stuckDelayH, pushThetaThreshold, kPush };
+				stuckDelayH, pushThetaThreshold, kPush, closureDraw };
 		// The chosen smoke CSV replaces the fixed constant so a severe-series
 		// run's manifest checksums the file it actually read; the closure
 		// schedule is appended only when one is active. With every Scenario-E

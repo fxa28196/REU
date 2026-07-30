@@ -386,6 +386,10 @@ def main():
                     help="earliest hour index the episode search may start at")
     ap.add_argument("--sustain", type=int, default=DEFAULT_SUSTAIN,
                     help="consecutive hours at/above threshold to count as sustained")
+    ap.add_argument("--anchor-note", default=None,
+                    help="one-paragraph statement of the severity anchor this "
+                         "scale factor was derived from, recorded verbatim in "
+                         "the provenance sidecar (v2: the Canberra record)")
     ap.add_argument("--dry-run", action="store_true",
                     help="run every check and print the summary, write nothing")
     args = ap.parse_args()
@@ -570,6 +574,9 @@ def main():
             "SEVERITY ANALOGY ONLY, describing how bad and how long, not a claim "
             "about any particular fire or city."),
         "generator": "scripts/build_smoke_severe.py",
+        "severity_anchor": args.anchor_note or (
+            "not stated for this build; see the registry row for the scale "
+            "factor's rationale"),
         "deterministic": "no RNG, no clock; same inputs and arguments reproduce these bytes",
         "source_file": src_path.name,
         "source_sha256": sha256_bytes(src_bytes),

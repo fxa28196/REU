@@ -91,7 +91,9 @@ E_PARAMS = [
     "petPolicyDefault", "betaTravelTime", "betaCapacityPrior",
 ]
 
-# The 7 Scenario-E parameters (V46-V51; shelterPolicyVariant is V45/Phase-E).
+# The 7 core Scenario-E parameters (V46-V51; shelterPolicyVariant is
+# V45/Phase-E). closureDraw is checked separately: it entered the manifest
+# with the worst-case family, so the archived v1 SE runs legitimately lack it.
 SE_PARAMS = [
     "smokeSeriesCode", "smokeScale", "closuresCode", "pStuck",
     "stuckDelayH", "pushThetaThreshold", "kPush",
@@ -101,7 +103,12 @@ SE_PARAMS = [
 SE_AGENT_COLS = ["blockages_encountered", "push_throughs", "reroutes",
                  "stuck_events"]
 
-SEVERE_SMOKE_CSV = "data/airnow/aqs_hourly_pm25_synthetic_severe_v1.csv"
+# smokeSeriesCode -> (file the manifest must checksum, unscaled peak ug/m3).
+# Peaks from the builders' provenance sidecars (19/19 checks each).
+SEVERE_SERIES = {
+    1: ("data/airnow/aqs_hourly_pm25_synthetic_severe_v1.csv", 984.75),
+    2: ("data/airnow/aqs_hourly_pm25_synthetic_severe_v2.csv", 2496.10),
+}
 
 # Appended-only output columns (OutcomeLogger, commit c88de56). The archive
 # predates them, so the R3 comparison necessarily excludes them.
@@ -622,10 +629,16 @@ def check_manifest(ck, run):
 # --------------------------------------------------------------------------
 def check_se_manifest(ck, run):
     missing = [p for p in SE_PARAMS if p not in run.params]
-    ck.add(f"(i) [{run.name}] all 7 Scenario-E parameters in the manifest",
+    ck.add(f"(i) [{run.name}] all {len(SE_PARAMS)} Scenario-E parameters in "
+           f"the manifest",
            not missing,
            f"missing {len(missing)}: {missing}" if missing
            else "; ".join(f"{p}={run.params[p]}" for p in SE_PARAMS))
+    code = int(float(run.params.get("closuresCode", 0)))
+    if code == 3:
+        ck.add(f"(i) [{run.name}] worst-family run records closureDraw",
+               "closureDraw" in run.params,
+               f"closureDraw={run.params.get('closureDraw', 'ABSENT')}")
 
 
 def check_se_smoke(ck, run):
@@ -634,19 +647,20 @@ def check_se_smoke(ck, run):
     smoke = run.manifest.get("smoke_field", {})
     files = [d.get("file", "") for d in run.repro.get("input_datasets", [])]
 
-    if series != 1:
+    if series not in SEVERE_SERIES:
         ck.skip(f"(j) [{run.name}] severe-series provenance",
                 f"smokeSeriesCode={series} (observed series)")
         return
-    ok_file = SEVERE_SMOKE_CSV in files
+    series_csv, series_peak = SEVERE_SERIES[series]
+    ok_file = series_csv in files
     ck.add(f"(j) [{run.name}] manifest checksums the severe series it read",
-           ok_file, f"input_datasets carries {SEVERE_SMOKE_CSV}: {ok_file}")
+           ok_file, f"input_datasets carries {series_csv}: {ok_file}")
     hours = int(smoke.get("hours", -1))
     ck.add(f"(j) [{run.name}] severe series length is 456 h",
            hours == 456, f"smoke_field.hours={hours}")
     peak = float(smoke.get("peak_hourly_ugm3", float("nan")))
-    want = 984.75 * scale
-    ck.add(f"(j) [{run.name}] peak == 984.75 x smokeScale",
+    want = series_peak * scale
+    ck.add(f"(j) [{run.name}] peak == {series_peak} x smokeScale",
            abs(peak - want) <= 0.06,
            f"peak={peak} want={want:.2f} (scale={scale}); the manifest prints "
            f"%.1f so slack is 0.06")

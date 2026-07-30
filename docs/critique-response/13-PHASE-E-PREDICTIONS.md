@@ -299,3 +299,48 @@ closure layer shows that even physical street closures cannot make placement
 matter for WHO gets in when capacity never binds; they only redistribute
 door-level refusals. Every Scenario-E magnitude is a labeled counterfactual
 (A-33) and must never be quoted as an observed quantity.
+
+## Scenario-E v2 (worst plausible case) predictions
+
+Registered 2026-07-30, BEFORE any v2 run. Configuration: ER baseline-real
+verbatim plus smokeSeriesCode 2 (Canberra-anchored 4.436×, peak 2,496.1 —
+A-33 two-tier anchor), closuresCode 3 (worst family: 72 edges, 6 waves,
+wave 1 in hours 2–6 per the same-day evidence, A-34), smokeScale 1.0,
+simulationHours 455. Registered scope: E18 × draws r1/r2/r3 × seeds
+42/43/44; E19/E20 × draw r1 × seeds; closure-free controls (SE2nc) for all
+three arms × seeds — 24 runs. Realized wave hours per committed draw:
+r1 {3, 44, 72, 142, 265, 303}, r2 {5, 92, 130, 163, 214, 263},
+r3 {2, 35, 37, 40, 75, 76}.
+
+- **P-SE7 (dose tracks the anchor linearly).** Mean dose per capita in
+  E18-v2 lands within ±10% of (4.436/1.75) × the v1 value — i.e. ≈ 2.53 ×
+  ~81,900 ≈ 207,000 µg — because the never-departed majority absorbs
+  concentration multiplicatively. Equivalently > 6.5 × ER-A.
+- **P-SE8 (attempts saturate, ceiling holds).** Attempt share among the
+  aware rises above v1's 0.502–0.520 but stays BELOW 0.60 (logistic
+  saturation—the same mechanism that produced the P-SE1 miss, now stated as
+  the prediction); sheltered share stays under the 35.6% awareness ceiling
+  in every arm.
+- **P-SE9 (early closures make detours, not gambles — the concurrency
+  arithmetic, now registered as a test).** Wave 1 (hours 2–6) precedes the
+  first possible departures (first threshold crossing at hour 16), so wave 1
+  produces ZERO blockage events everywhere. Only waves landing inside the
+  departure window can intersect walkers: registered expectations — draw r3
+  (all waves ≤ hour 76) records zero or near-zero blockage events; draws
+  r1/r2 (waves at hours 92–303) record the matrix's only events, and the
+  matrix-wide total stays ≤ ~30 (concurrent walkers ≈ departure rate ×
+  24-min walks ≈ single digits per wave).
+- **P-SE10 (redistribution, not access).** Sheltered counts stay equal
+  within seed noise across arms and vs controls even at 4.436× smoke and 72
+  closures. The closure signature appears in WHERE refusals happen: E18-v2
+  closure arms record FEWER arm-A capacity refusals than their SE2nc
+  controls at every seed (the v1 redistribution signature, now registered
+  as a direction).
+- **P-SE11 (draw robustness).** Across draws r1–r3 (E18), sheltered share
+  varies by under 1 pp — access is draw-robust because the S1–S3 gates
+  forbid severance — while refusal counts and detour patterns vary by draw;
+  reported as a range per A-34, never from one schedule.
+
+### Scoring rule
+
+Same as v1: outcomes appended after the matrix; misses stay misses.

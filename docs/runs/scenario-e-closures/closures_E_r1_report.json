@@ -1,6 +1,6 @@
 {
   "schema": "reu-wildfire-shelter-abm/scenario-e-closures/v1",
-  "generated_utc": "2026-07-29T23:39:57Z",
+  "generated_utc": "2026-07-30T07:04:36Z",
   "generator": "scripts/build_closures_E.py v1.0.0",
   "status": "CONSTRUCTED COUNTERFACTUAL - NO INCIDENT RECORD EXISTS",
   "provenance_note": "The street features, their RLIS PDX node ids, their classification and the eight pedestrian-legal Willamette crossings are real (Metro RLIS Streets.dbf; registry V26). WHICH features close and WHEN is invented: drawn by python random.Random(1) from the pools described below. No agency closure log was used because none exists in this repository for the modelled window. Results built on this file are a network-degradation stress test, not a reconstruction of a real event.",
@@ -12,9 +12,12 @@
       "wave": 1,
       "activation_hour": 79,
       "bridges": 3,
-      "arterials": 15
+      "arterials": 15,
+      "locals": 0
     }
   ],
+  "worst_family_wave_windows": null,
+  "class_weight_model": null,
   "output_csv": "Geography/data/closures/closures_E_r1.csv",
   "csv_columns": [
     "node_a",
@@ -671,6 +674,7 @@
     },
     "never_closable": "Marquam (I-5) and Fremont (I-405): freeway TYPE, removed from the pedestrian graph by U-27, so closing them would be a no-op. Ross Island Bridge: walkable but not on the V26 pedestrian-legal list."
   },
+  "local_pool": null,
   "arterial_pool": {
     "rlis_types": [
       1200,
@@ -984,14 +988,14 @@
       "detail": "18 rows, 18 distinct pairs"
     },
     {
-      "name": "every arterial closure lies inside the demand bounding box",
+      "name": "every arterial/local closure lies inside the demand bounding box",
       "status": "PASS",
       "detail": "(-122.80581, -122.456835, 45.417541, 45.665031000000006)"
     },
     {
       "name": "closure count matches the severity plan",
       "status": "PASS",
-      "detail": "3 bridges, 15 arterials"
+      "detail": "3 bridges, 15 arterials, 0 locals"
     },
     {
       "name": "S1 wave 1 (hour 79): every shelter keeps an unblocked incident edge",
