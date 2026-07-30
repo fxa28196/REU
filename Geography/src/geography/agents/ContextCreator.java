@@ -192,6 +192,28 @@ public class ContextCreator implements ContextBuilder {
 	 *  first-served. No building, no relocation, no extra bed. */
 	private static final String SCENARIO_D_NAME = "D_need_based_admission_real_locations";
 
+	/** Scenario E — the severe counterfactual (14-SCENARIO-E-SPEC.md): the same
+	 *  city and the same population under a far worse event. Codes 18/19/20 are
+	 *  LABELS for the verify tooling; the severity itself is carried by
+	 *  smokeSeriesCode/smokeScale (V46/V47) and closuresCode (V48), which the
+	 *  batch params file sets explicitly. 18 = severe over arm A's shelter
+	 *  file, 19 = over arm C's, 20 = over arm D (arm B's file +
+	 *  triageReserveFraction, exactly the code-7 pattern). */
+	private static final String SCENARIO_E18_NAME = "E18_severe_counterfactual_over_A_present_day";
+	private static final String SCENARIO_E19_NAME = "E19_severe_counterfactual_over_C_expanded_plus_new_sites";
+	private static final String SCENARIO_E20_NAME = "E20_severe_counterfactual_over_D_need_based_admission";
+
+	/** Scenario-E severe smoke series (V46, A-33): a DECLARED COUNTERFACTUAL —
+	 *  the observed series scaled 1.75x with its main episode stretched — built
+	 *  by scripts/build_smoke_severe.py. Never measured data, never LA data. */
+	private static final String SMOKE_SEVERE_CSV = "data/airnow/aqs_hourly_pm25_synthetic_severe_v1.csv";
+
+	/** Scenario-E closure schedules (V48, A-34), scripts/build_closures_E.py.
+	 *  Schema: node_a,node_b,activation_hour,label,kind. Both carry a committed
+	 *  connectivity proof that no shelter is isolated by the schedule. */
+	private static final String CLOSURES_BASE_CSV = "data/closures/closures_E_r1.csv";
+	private static final String CLOSURES_EXTREME_CSV = "data/closures/closures_E_r1_extreme.csv";
+
 	// V13 anchor: simulation hour 0 = local midnight at the start of the study
 	// window (Portland's Sept 7-19 2020 smoke episode).
 	private static final LocalDateTime SIM_START = LocalDateTime.of(2020, 9, 7, 0, 0);
@@ -268,6 +290,36 @@ public class ContextCreator implements ContextBuilder {
 		// three-arm chain are unaffected. See A-29 and
 		// scripts/build_shelter_policy_elayer.py.
 		int shelterPolicyVariant = intParam(parm, "shelterPolicyVariant", 0);
+
+		// ---- Scenario E (V46-V51) ------------------------------------------
+		// Same defensive contract as every block above: every default is
+		// behaviour-preserving. smokeSeriesCode 0 reads the observed series,
+		// smokeScale 1.0 is the exact identity (IEEE 754: x*1.0 == x),
+		// closuresCode 0 schedules nothing, and the three decision
+		// coefficients are only ever read at a blockage — which cannot occur
+		// without a closure wave — so all archived params files keep running
+		// unchanged and the R3 null holds by construction.
+		int smokeSeriesCode = intParam(parm, "smokeSeriesCode", 0);
+		double smokeScale = doubleParam(parm, "smokeScale", 1.0);
+		int closuresCode = intParam(parm, "closuresCode", 0);
+		double pStuck = doubleParam(parm, "pStuck", 0.3);
+		double stuckDelayH = doubleParam(parm, "stuckDelayH", 3.0);
+		// -0.25 = the band-anchored central registered in 13-PHASE-E-PREDICTIONS:
+		// P(push | unburdened) = P(theta >= -0.25) ~= 0.60, the midpoint of the
+		// V51 fire-incident continue-through-smoke band (55-75%).
+		double pushThetaThreshold = doubleParam(parm, "pushThetaThreshold", -0.25);
+		double kPush = doubleParam(parm, "kPush", 1.0);
+		// Fail-fast on unknown selector codes (the ScienceRegistry/V45
+		// convention): a typo'd params file must stop the run, not silently
+		// select a different arm than its manifest claims.
+		if (smokeSeriesCode != 0 && smokeSeriesCode != 1) {
+			throw new IllegalStateException("smokeSeriesCode=" + smokeSeriesCode
+					+ " is not a registered series (V46: 0=observed, 1=severe v1)");
+		}
+		if (closuresCode < 0 || closuresCode > 2) {
+			throw new IllegalStateException("closuresCode=" + closuresCode
+					+ " is not a registered schedule (V48: 0=none, 1=base, 2=extreme)");
+		}
 		String scenarioName;
 		String sheltersCsv;
 		if (scenarioCode == 1) {
@@ -323,6 +375,18 @@ public class ContextCreator implements ContextBuilder {
 		} else if (scenarioCode == 17) {
 			scenarioName = SCENARIO_BS115_NAME;
 			sheltersCsv = SHELTERS_BS115_CSV;
+		} else if (scenarioCode == 18) {
+			scenarioName = SCENARIO_E18_NAME;
+			sheltersCsv = SHELTERS_A_CSV;
+		} else if (scenarioCode == 19) {
+			scenarioName = SCENARIO_E19_NAME;
+			sheltersCsv = SHELTERS_C_CSV;
+		} else if (scenarioCode == 20) {
+			// Like code 7: arm D is arm B's shelter file, unchanged, plus
+			// triageReserveFraction — the file carries the sites, the parameter
+			// carries the intake rule.
+			scenarioName = SCENARIO_E20_NAME;
+			sheltersCsv = SHELTERS_B_CSV;
 		} else {
 			scenarioName = SCENARIO_A_NAME;
 			sheltersCsv = SHELTERS_A_CSV;
@@ -425,15 +489,37 @@ public class ContextCreator implements ContextBuilder {
 					+ "see simulation.json street_network_validation");
 		}
 
-		// ---- Smoke field (real EPA AQS hourly PM2.5) -----------------------
-		SmokeField smokeField = new SmokeField(SMOKE_CSV, "Multnomah", SIM_START);
-		System.out.printf("[SmokeField] %d hourly slices from %s; peak %.1f ug/m3%n",
-				smokeField.hours(), SIM_START, smokeField.peakHourly());
+		// ---- Smoke field (V46/V47: observed EPA AQS, or the labeled severe
+		// counterfactual, times the runtime scale) ---------------------------
+		String smokeCsv = (smokeSeriesCode == 1) ? SMOKE_SEVERE_CSV : SMOKE_CSV;
+		SmokeField smokeField = new SmokeField(smokeCsv, "Multnomah", SIM_START, smokeScale);
+		System.out.printf("[SmokeField] %d hourly slices from %s; peak %.1f ug/m3 "
+				+ "(series %d%s, scale %.3f)%n",
+				smokeField.hours(), SIM_START, smokeField.peakHourly(),
+				smokeSeriesCode,
+				smokeSeriesCode == 1 ? " = SYNTHETIC SEVERE COUNTERFACTUAL (A-33)" : " = observed",
+				smokeScale);
+		if (smokeSeriesCode == 1) {
+			System.out.println("[SmokeField][WARN] severe series is a CONSTRUCTED "
+					+ "COUNTERFACTUAL (A-33): concentrations exceed every documented "
+					+ "value from the Jan-2025 LA fires and must never be reported as "
+					+ "observed magnitudes.");
+		}
+		if (scenarioCode >= 18 && scenarioCode <= 20 && smokeSeriesCode == 0) {
+			System.out.println("[Scenario][WARN] scenarioCode " + scenarioCode
+					+ " is a Scenario-E label but smokeSeriesCode=0 (observed series): "
+					+ "this run is label-only, not the severe counterfactual.");
+		}
 
 		// ---- Real shelters (Sept 2020) -------------------------------------
 		List<Map<String, String>> shelterRows = CsvLoader.read(sheltersCsv);
 		int operatingCount = 0;
 		double ticksPerHour = 60.0 / minutesPerTick;
+		// Load-ordered shelter list for the Scenario-E closure waves: each wave
+		// recomputes every shelter's Dijkstra tree once, and iterating this list
+		// (never context.getObjects, whose order is unspecified) keeps the
+		// recompute deterministic. Tree computation draws no RNG either way.
+		List<Shelter> shelterList = new ArrayList<Shelter>();
 		for (Map<String, String> r : shelterRows) {
 			String capStr = r.get("capacity");
 			Integer capacity = (capStr == null || capStr.isEmpty()) ? null : Integer.valueOf(capStr);
@@ -477,6 +563,7 @@ public class ContextCreator implements ContextBuilder {
 			long nodeId = network.nearestNode(c);
 			shelter.setGraphNodeId(nodeId);
 			shelter.setRouteTree(network.computeTree(nodeId));
+			shelterList.add(shelter);
 			if (operating) operatingCount++;
 		}
 		System.out.println("[Shelters] " + shelterRows.size() + " loaded from " + sheltersCsv
@@ -514,6 +601,84 @@ public class ContextCreator implements ContextBuilder {
 			System.out.println("[Shelters][WARN] opening-date gate DISABLED: every shelter is "
 					+ "open from tick 0, which is counterfactual (the real sites opened "
 					+ "2020-09-10/11). See assumption A-02.");
+		}
+
+		// ---- Scenario-E street closures (V48, A-34) ------------------------
+		// Blocked edges leave the routing graph at scheduled one-shot waves;
+		// each wave recomputes every shelter tree ONCE (36-46 SSSPs, tens of
+		// seconds, 1-2 waves — never per tick). closuresCode=0 schedules
+		// nothing, declares nothing, blocks nothing: the archived arms cannot
+		// tell this code exists.
+		String closuresCsv = null;
+		int scheduledClosureEdges = 0;
+		int closureEdgesMatchingGraph = 0;
+		java.util.List<Integer> closureWaveHours = new java.util.ArrayList<Integer>();
+		if (closuresCode != 0) {
+			closuresCsv = (closuresCode == 2) ? CLOSURES_EXTREME_CSV : CLOSURES_BASE_CSV;
+			network.declareClosureSchedule();
+			java.util.TreeMap<Integer, java.util.List<long[]>> waves =
+					new java.util.TreeMap<Integer, java.util.List<long[]>>();
+			int rowNo = 1;   // header is row 1; data starts at 2
+			for (Map<String, String> r : CsvLoader.read(closuresCsv)) {
+				rowNo++;
+				long a, b;
+				int hour;
+				try {
+					a = Long.parseLong(r.get("node_a").trim());
+					b = Long.parseLong(r.get("node_b").trim());
+					hour = Integer.parseInt(r.get("activation_hour").trim());
+				} catch (RuntimeException bad) {
+					throw new IllegalStateException(closuresCsv + " row " + rowNo
+							+ " is malformed (need numeric node_a,node_b,"
+							+ "activation_hour): " + r, bad);
+				}
+				if (hour < 0) {
+					throw new IllegalStateException(closuresCsv + " row " + rowNo
+							+ ": negative activation_hour " + hour);
+				}
+				if (hour >= Math.min(simulationHours, smokeField.hours())) {
+					System.out.println("[Closures][WARN] " + closuresCsv + " row "
+							+ rowNo + ": activation_hour " + hour + " is at/after "
+							+ "the run end -- this wave is scheduled but inert.");
+				}
+				java.util.List<long[]> wave = waves.get(Integer.valueOf(hour));
+				if (wave == null) {
+					wave = new java.util.ArrayList<long[]>();
+					waves.put(Integer.valueOf(hour), wave);
+				}
+				wave.add(new long[] { a, b });
+				scheduledClosureEdges++;
+				if (network.hasEdge(a, b)) {
+					closureEdgesMatchingGraph++;
+				}
+			}
+			ISchedule waveSchedule = RunEnvironment.getInstance().getCurrentSchedule();
+			for (Map.Entry<Integer, java.util.List<long[]>> w : waves.entrySet()) {
+				int hour = w.getKey().intValue();
+				closureWaveHours.add(w.getKey());
+				// FIRST_PRIORITY: the wave lands at the top of its tick, before
+				// any resident steps, so every agent that tick sees the same
+				// post-wave world regardless of shuffle order.
+				waveSchedule.schedule(
+						ScheduleParameters.createOneTime(hour * ticksPerHour,
+								ScheduleParameters.FIRST_PRIORITY),
+						new ClosureWave(network, shelterList, w.getValue(), hour), "apply");
+			}
+			System.out.printf("[Closures] %s: %d undirected closures scheduled "
+					+ "(%d match a graph edge) in %d wave(s) at hours %s%n",
+					closuresCsv, scheduledClosureEdges, closureEdgesMatchingGraph,
+					closureWaveHours.size(), closureWaveHours);
+			if (closureEdgesMatchingGraph < scheduledClosureEdges) {
+				System.out.println("[Closures][WARN] " + (scheduledClosureEdges
+						- closureEdgesMatchingGraph) + " scheduled closure(s) match no "
+						+ "graph edge (corrupt-id correction or filtered feature): they "
+						+ "block nothing. Cross-check the schedule against the graph.");
+			}
+			if (enableDecisionLayer == 0) {
+				System.out.println("[Closures][WARN] closures active with the decision "
+						+ "layer OFF: every blocked resident reroutes (no push-through "
+						+ "trait exists). Scenario-E arms run with the layer ON.");
+			}
 		}
 
 		// ---- Residents at real encampment locations (D2b) ------------------
@@ -593,7 +758,8 @@ public class ContextCreator implements ContextBuilder {
 					wOfficial, gammaVuln, sigmaTheta, riskHalfLifeH,
 					lambdaOutreachPerDay, barrierBelongings, barrierPet,
 					barrierDependents, petPolicyDefault == 1,
-					betaTravelTime, betaCapacityPrior);
+					betaTravelTime, betaCapacityPrior,
+					pushThetaThreshold, kPush, pStuck, stuckDelayH);
 			for (GisAgent resident : createdResidents) {
 				resident.setDecisionLayer(decisionConfig, eSampler.sample());
 			}
@@ -629,7 +795,10 @@ public class ContextCreator implements ContextBuilder {
 				"alphaHazard", "bRisk", "wOfficial", "gammaVuln", "riskHalfLifeH",
 				"barrierBelongings", "barrierPet", "barrierDependents",
 				"petPolicyDefault", "betaTravelTime", "betaCapacityPrior",
-				"shelterPolicyVariant" };
+				"shelterPolicyVariant",
+				// Scenario E (V46-V51), appended per the same contract.
+				"smokeSeriesCode", "smokeScale", "closuresCode", "pStuck",
+				"stuckDelayH", "pushThetaThreshold", "kPush" };
 		Object[] pVals = { numAgents, minutesPerTick, parm.getValue("walkingSpeedMps"),
 				parm.getValue("shelterArrivalDistanceM"), simulationHours, seed,
 				paramOrDefault(parm, "evacuationThresholdUgM3", "unset"), scenarioCode,
@@ -640,12 +809,28 @@ public class ContextCreator implements ContextBuilder {
 				alphaHazard, bRisk, wOfficial, gammaVuln, riskHalfLifeH,
 				barrierBelongings, barrierPet, barrierDependents,
 				petPolicyDefault, betaTravelTime, betaCapacityPrior,
-				shelterPolicyVariant };
-		String[] dataFiles = { STREETS_SHP, SMOKE_CSV, sheltersCsv, ENCAMPMENTS_CSV };
+				shelterPolicyVariant,
+				smokeSeriesCode, smokeScale, closuresCode, pStuck,
+				stuckDelayH, pushThetaThreshold, kPush };
+		// The chosen smoke CSV replaces the fixed constant so a severe-series
+		// run's manifest checksums the file it actually read; the closure
+		// schedule is appended only when one is active. With every Scenario-E
+		// default (series 0, no closures) this list is byte-identical to the
+		// legacy four entries, so data_version_tag stays comparable with every
+		// archived run.
+		List<String> dataFileList = new ArrayList<String>(java.util.Arrays.asList(
+				STREETS_SHP, smokeCsv, sheltersCsv, ENCAMPMENTS_CSV));
+		if (closuresCsv != null) {
+			dataFileList.add(closuresCsv);
+		}
+		String[] dataFiles = dataFileList.toArray(new String[0]);
 
 		@SuppressWarnings("unchecked")
 		OutcomeLogger logger = new OutcomeLogger(context, smokeField, seed, pNames, pVals,
-				dataFiles, netReport, registry, scenarioName, sampler, eSampler);
+				dataFiles, netReport, registry, scenarioName, sampler, eSampler,
+				closuresCode == 0 ? null : new OutcomeLogger.ClosureCensus(
+						closuresCode, closuresCsv, scheduledClosureEdges,
+						closureEdgesMatchingGraph, closureWaveHours, network));
 		ISchedule schedule = RunEnvironment.getInstance().getCurrentSchedule();
 		schedule.schedule(ScheduleParameters.createAtEnd(ScheduleParameters.LAST_PRIORITY), logger, "export");
 
@@ -712,6 +897,53 @@ public class ContextCreator implements ContextBuilder {
 		if (v == null) return null;
 		String s = v.toString().trim();
 		return s.isEmpty() ? null : s;
+	}
+
+	/**
+	 * One Scenario-E closure wave (V48), scheduled as a Repast one-shot at
+	 * {@code activation_hour * ticksPerHour} with FIRST_PRIORITY so it lands
+	 * before any resident steps that tick. Blocks its edges, bumps the closure
+	 * version (the signal agents re-scan on), then recomputes every shelter's
+	 * Dijkstra tree ONCE over the reduced graph — so every route planned from
+	 * this tick on already avoids the closures, and only residents mid-walk on
+	 * a stale path face the push-vs-reroute decision (V51).
+	 */
+	public static final class ClosureWave {
+		private final StreetNetwork network;
+		private final List<Shelter> shelters;
+		private final java.util.List<long[]> edges;
+		private final int hour;
+
+		ClosureWave(StreetNetwork network, List<Shelter> shelters,
+				java.util.List<long[]> edges, int hour) {
+			this.network = network;
+			this.shelters = shelters;
+			this.edges = edges;
+			this.hour = hour;
+		}
+
+		/** Invoked by the schedule (method name is bound by string). */
+		public void apply() {
+			for (long[] e : edges) {
+				// Only pairs that exist as graph edges enter the blocked set:
+				// a phantom pair (corrupt-id or filtered feature, warned at
+				// load) blocks nothing and must not pad the manifest census.
+				if (network.hasEdge(e[0], e[1])) {
+					network.blockEdge(e[0], e[1]);
+				}
+			}
+			network.bumpClosureVersion();
+			int recomputed = 0;
+			for (Shelter s : shelters) {
+				s.setRouteTree(network.computeTree(s.getGraphNodeId()));
+				recomputed++;
+			}
+			System.out.printf("[Closures] wave at hour %d: +%d edges blocked "
+					+ "(%d undirected total); %d shelter trees recomputed; "
+					+ "closure version now %d%n",
+					hour, edges.size(), network.blockedEdgeCount(), recomputed,
+					network.getClosureVersion());
+		}
 	}
 
 	private List<SimpleFeature> loadFeaturesFromShapefile(String filename) {

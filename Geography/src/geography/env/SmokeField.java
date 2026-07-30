@@ -41,6 +41,24 @@ public class SmokeField {
 	 * @param startDateTime  simulation hour 0 (local time), e.g. 2020-09-07T00:00
 	 */
 	public SmokeField(String csvPath, String county, LocalDateTime startDateTime) {
+		this(csvPath, county, startDateTime, 1.0);
+	}
+
+	/**
+	 * Scenario-E variant (V47): every hourly value is multiplied by
+	 * {@code scaleFactor} once, here at construction, so exposure, dose and
+	 * hours-above-unhealthy all scale coherently from one place. Scale 1.0 is
+	 * the identity — the delegating constructor above uses it, so every
+	 * pre-Scenario-E call site is byte-identical. NaN gap hours stay NaN
+	 * (a scaled gap is still a gap, never a fabricated zero).
+	 *
+	 * @param scaleFactor  multiplier on every hourly µg/m³ value (V47); the
+	 *                     synthetic severe v1 series already embeds its central
+	 *                     1.75× transform, so a series-1 run's effective
+	 *                     severity is 1.75 × this factor
+	 */
+	public SmokeField(String csvPath, String county, LocalDateTime startDateTime,
+			double scaleFactor) {
 		this.county = county;
 		this.startDateTime = startDateTime;
 
@@ -90,7 +108,10 @@ public class SmokeField {
 			double[] sc = sumCount.get(h);
 			// Missing hours remain Double.NaN so a gap is never silently zero
 			// (VALIDATION_STRATEGY §5). Callers treat NaN as "no data".
-			hourlyUgM3[h] = (sc == null || sc[1] == 0) ? Double.NaN : sc[0] / sc[1];
+			// The V47 scale multiplies real values only; NaN * scale is NaN
+			// anyway, but the branch keeps the gap semantics explicit.
+			hourlyUgM3[h] = (sc == null || sc[1] == 0) ? Double.NaN
+					: (sc[0] / sc[1]) * scaleFactor;
 		}
 	}
 
