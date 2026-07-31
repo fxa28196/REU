@@ -1,0 +1,217 @@
+name: websim CI
+
+# CI for the browser-native TypeScript port (websim/). Grows with the work
+# packages: WP9 adds the replay + mutation gates against the LFS validation
+# working set, WP13 the accessibility gate, WP14 the publish step itself. The
+# WP4 raw-coordinate/salt/k gate (`check:deploy`) already runs, in the
+# strict-artifacts job -- it is the only job that holds the built assets and the
+# raw feed it has to be checked against. The claim linter runs from day 1
+# (plan section 5.3), and the scratch guard (`check:scratch`, README section 8.2)
+# runs after the suite in every job that runs the suite: pipeline/out is
+# git-ignored in full, so scratch a test leaves behind is invisible to `git
+# status` and can flip a later artifact gate's verdict.
+#
+# Two jobs, and the split is deliberate:
+#
+#   build          -- everything a clean clone can do with `npm ci` alone. This is
+#                     the job that must never depend on a local artefact.
+#   cross-engine   -- plan section 3.3's "Chrome/Firefox/WebKit/Node -> byte-identical"
+#                     gate and section 5.3's three-browser job. Needs ~400 MB of
+#                     Playwright browsers, so it lives on its own config
+#                     (engine/vitest.browser.config.ts) and its own job rather than
+#                     turning `npm test` into something a fresh checkout cannot run.
+#   strict-artifacts -- the runner that HAS the oracle dumps / packed assets / archive
+#                     bundles. It sets WEBSIM_REQUIRE_ARTIFACTS=1, which turns every
+#                     artifact-gated skip into a hard failure (see the "Skip-vs-fail
+#                     policy" section of websim/README.md). Plan section 5.3 requires
+#                     the harness to degrade LOUDLY and never skip silently; on a
+#                     runner that owns the data, "loudly" means red.
+#
+# The skip-vs-fail contract in one line: a job WITHOUT the artifacts leaves
+# WEBSIM_REQUIRE_ARTIFACTS off and gets loud, attributed, reported-as-skipped
+# suites; a job WITH the artifacts sets it to 1 and gets a failure the moment an
+# artifact stops being produced.
+
+# The read-only instrument inputs are trigger paths too: websim's contract plane
+# asserts that its presets equal Geography/batch/*.xml parameter for parameter,
+# and that its parameter metadata matches the science registry. A change on the
+# Java side that those tests would catch must re-run them.
+on:
+  push:
+    paths:
+      - "websim/**"
+      - "Geography/batch/**"
+      - "Geography/data/registry/**"
+      - ".github/workflows/websim-ci.yml"
+  pull_request:
+    paths:
+      - "websim/**"
+      - "Geography/batch/**"
+      - "Geography/data/registry/**"
+      - ".github/workflows/websim-ci.yml"
+  workflow_dispatch:
+    inputs:
+      strict_artifacts:
+        description: >-
+          Run the strict-artifacts job (WEBSIM_REQUIRE_ARTIFACTS=1). Only useful on a
+          runner that actually holds pipeline/out and the archive; on a hosted runner
+          every artifact-gated suite will fail by design.
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: websim-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: websim
+
+jobs:
+  build:
+    name: typecheck / test / claim-lint
+    runs-on: ubuntu-latest
+    # A hosted runner is a clean clone: pipeline/out, pipeline/local-raw and the
+    # 375 MB docs/runs archive are all absent. The var is set to "0" EXPLICITLY
+    # rather than left unset, so the honest reading of this job is on the record:
+    # it knowingly runs degraded, and every gate it cannot run prints a `!!`
+    # banner naming the artifact and the evidence forgone. The strict-artifacts
+    # job below is where the same gates are required to pass.
+    env:
+      WEBSIM_REQUIRE_ARTIFACTS: "0"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: websim/package-lock.json
+
+      - name: Install (clean, from the lockfile)
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      # Runs AFTER the suite, and cannot be a test itself: while vitest is still
+      # running, other workers are still writing under pipeline/out, so the end
+      # state is only observable from outside the runner. pipeline/out is
+      # git-ignored in full, so scratch left behind never shows up in a diff --
+      # and stale scratch under out/ can flip an artifact gate's verdict (see the
+      # comment in pipeline/test/reproducibility.test.ts), which turns "untidy"
+      # into "a suite that lies about what it proved".
+      - name: Scratch guard (the suite left nothing behind under pipeline/out)
+        run: npm run check:scratch
+
+      - name: Claim linter
+        run: npm run lint:claims
+
+  cross-engine:
+    name: cross-engine determinism (Chromium / Firefox / WebKit)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: websim/package-lock.json
+
+      - name: Install (clean, from the lockfile)
+        run: npm ci
+
+      # Pinned to the `playwright` version in package-lock.json so the browser build
+      # and the driver cannot drift apart. `--with-deps` pulls the system libraries
+      # WebKit needs on ubuntu-latest.
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium firefox webkit
+
+      # Asserts the SAME committed digests the Node suite asserts, inside three real
+      # engines. Failure means an outcome-relevant value is engine-dependent, which is
+      # release-blocking for a determinism claim -- see docs/DR-WP3-cross-engine.md.
+      - name: Cross-engine determinism matrix
+        run: npm run test:browser
+
+  strict-artifacts:
+    name: strict (artifacts required, no skips permitted)
+    # Opt-in, because it only means anything where the artifacts exist. Set the
+    # repository variable WEBSIM_ARTIFACT_RUNNER=true once a runner holds them
+    # (and WEBSIM_ARTIFACT_RUNNER_LABEL to that runner's label), or dispatch the
+    # workflow with strict_artifacts checked. Without either it does not run,
+    # so this file never queues a job against a runner that does not exist.
+    if: ${{ vars.WEBSIM_ARTIFACT_RUNNER == 'true' || inputs.strict_artifacts }}
+    runs-on: ${{ vars.WEBSIM_ARTIFACT_RUNNER_LABEL || 'self-hosted' }}
+    env:
+      # The whole point of the job. Every artifact-gated suite must RUN; a suite
+      # that would have skipped is a failure here, which is what makes the gates
+      # provably able to fail rather than observed-green-by-vacuity (plan 5.2).
+      WEBSIM_REQUIRE_ARTIFACTS: "1"
+      # Point the archive-reading tools at the curated working set if the runner
+      # keeps it somewhere other than docs/runs/.
+      WEBSIM_ARCHIVE_ROOT: ${{ vars.WEBSIM_ARCHIVE_ROOT }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: websim/package-lock.json
+
+      - name: Install (clean, from the lockfile)
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      # `npm test` would honour the job-level env just as well; test:strict is
+      # used so the intent is legible in the log and so a local reproduction is
+      # one documented command rather than a shell-specific env incantation.
+      - name: Test (artifact-gated suites required to run)
+        run: npm run test:strict
+
+      # The committed clean-clone oracle (engine/test/fixtures/graph-slice/) is a
+      # slice cut from the artifacts this runner holds. The `build` job proves the
+      # slice still reproduces the Java rows; only a runner with the originals can
+      # prove the slice still matches the ORIGINALS it claims to be cut from. Drift
+      # here means the committed fixture has silently stopped representing the
+      # certified graph, which would make a green clean clone meaningless.
+      - name: Committed graph slice reproduces from the certified artifacts
+        run: npm run check:committed-slice -w @websim/pipeline
+
+      # WP4 publication gate (plan section 4, Q4). It greps the BUILT public
+      # assets for raw campsite coordinates, raw inc_ids, below-k display cells
+      # and salt material, so it can only run where pipeline/out/assets and the
+      # local-raw feed both exist -- i.e. exactly this runner. It exits 2 rather
+      # than 0 when the assets, the raw feed or the salt are missing, because
+      # absence of raw data cannot be proved without the raw data; that refusal
+      # is the reason the step is here and not in the clean-clone `build` job.
+      # `pipeline/test/deploy-check.test.ts` covers the detectors themselves on
+      # every runner; this step is the only place they meet the real bytes.
+      - name: Deploy gate (no raw coordinates, ids, small cells or salt in the built assets)
+        run: npm run check:deploy -w @websim/pipeline
+
+      # The runner that HOLDS pipeline/out is the one where leftover scratch does
+      # real damage: it sits next to the artifacts an artifact gate probes for.
+      # Same guard, same allowlist -- and here the allowlist is being checked
+      # against a fully populated out/, so a new artifact directory that nobody
+      # added to PRODUCED_ENTRIES turns this job red instead of drifting.
+      - name: Scratch guard (the suite left nothing behind under pipeline/out)
+        run: npm run check:scratch
+
+      - name: Claim linter
+        run: npm run lint:claims

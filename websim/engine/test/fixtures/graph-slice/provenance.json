@@ -1,0 +1,48 @@
+{
+  "what": "A distance-ball slice of the certified street graph plus the certified shelter-tree rows for exactly that ball. Committed so a clean checkout executes real bit-identity assertions with pipeline/out absent.",
+  "generator": "websim/pipeline/scripts/build-committed-slice.ts",
+  "inputs": {
+    "graph_topology": {
+      "path": "websim/pipeline/out/assets/graph-topology.bin",
+      "sha256": "11cac904ae2d27e2c2e3d8afe851bdd906409b42f91882d3eb293bb8ec4b761e"
+    },
+    "shelter_tree": {
+      "path": "websim/pipeline/out/world-fixtures/trees/A/tree-000.tsv",
+      "sha256": "6eddc33081d2d919399344e15108d0c4f87c526bc1d21d29d79e2e2fd5b8b629",
+      "world_manifest_name": "trees.A.0"
+    },
+    "shelter_csv": "Geography/data/shelters/shelters_2026_current_placement.csv"
+  },
+  "parameters": {
+    "target_nodes": 20000,
+    "tie_inclusive_at_radius": true
+  },
+  "slice": {
+    "source_node_id": 35116,
+    "nodes": 20000,
+    "edges": 28573,
+    "directed_records": 57146,
+    "max_degree": 7,
+    "negative_node_ids": 5,
+    "radius_m_hex": "40ce1b54709dd90a",
+    "full_graph_nodes": 88100,
+    "full_graph_edges": 109434,
+    "full_tree_reachable": 27543
+  },
+  "verified_at_build": {
+    "distances_bit_equal": 20000,
+    "predecessor_edges_equal": 20000,
+    "of_rows": 20000,
+    "reachable_count": 20000
+  },
+  "outputs": {
+    "slice-topology.bin": {
+      "bytes": 1222904,
+      "sha256": "f12d474bd78a1c596aa3a4c90330e330388c3e36f883146cce962dbb3e92beb1"
+    },
+    "slice-tree.tsv": {
+      "bytes": 580864,
+      "sha256": "12e3a14a6fd58a9cb13c62a206082a2fc566b6b049d0267af33c9124ebe6426d"
+    }
+  }
+}
