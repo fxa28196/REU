@@ -1,0 +1,2099 @@
+{
+  "schema": "reu-wildfire-shelter-abm/golden-summary/v1/demographic-marginals",
+  "about": "Realised demographic marginals per archived run. Tier 3 requires these to be EQUAL, not close: the PopulationSampler is bit-exact, so a live run at the same seed must reproduce the same shares exactly (plan §5.1).",
+  "method": "`derived_from_agents_csv` counts raw flag cells in agents.csv (`1` is true, anything else false) over all rows and divides by the row count, rounded to 1e-6. `age_55plus` uses age_years >= 55. `manifest_population_sampling` is the instrument's own 4-decimal report, kept alongside so the rounding gap between the two is visible rather than reconciled.",
+  "provenance": {
+    "source_index": "sources.json",
+    "note": "Every key of `values` is (or names) a run directory. Resolve it in sources.json for the SHA-256 and byte length of the archive files the numbers were derived from."
+  },
+  "values": {
+    "phase-e/E0null-A-n6842-seed42": {
+      "preset_family": "E0",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "phase-e/E0null-B-n6842-seed42": {
+      "preset_family": "E0",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "phase-e/E0null-C-n6842-seed42": {
+      "preset_family": "E0",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "phase-e/ER-A-n6842-seed42": {
+      "preset_family": "ER",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "phase-e/ER-A-n6842-seed43": {
+      "preset_family": "ER",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "phase-e/ER-A-n6842-seed44": {
+      "preset_family": "ER",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    },
+    "phase-e/ER-C-n6842-seed42": {
+      "preset_family": "ER",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "phase-e/ER-C-n6842-seed43": {
+      "preset_family": "ER",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "phase-e/ER-C-n6842-seed44": {
+      "preset_family": "ER",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    },
+    "phase-e/ER-D-n6842-seed42": {
+      "preset_family": "ER",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "phase-e/ER-D-n6842-seed43": {
+      "preset_family": "ER",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "phase-e/ER-D-n6842-seed44": {
+      "preset_family": "ER",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    },
+    "present-day-three-arm/A-seed42": {
+      "preset_family": "A",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "present-day-three-arm/A-seed43": {
+      "preset_family": "A",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "present-day-three-arm/A-seed44": {
+      "preset_family": "A",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    },
+    "present-day-three-arm/A-seed45": {
+      "preset_family": "A",
+      "seed": 45,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.202572,
+        "asthma": 0.152587,
+        "copd": 0.102309,
+        "any_respiratory": 0.238527,
+        "chronic_physical": 0.390383,
+        "vulnerable_any": 0.710026,
+        "age_55plus": 0.268196,
+        "male": 0.681087,
+        "mean_walking_speed_mps": 1.275127
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2026,
+        "realised_asthma": 0.1526,
+        "realised_copd": 0.1023,
+        "realised_any_respiratory": 0.2385,
+        "realised_age_55plus": 0.2682,
+        "mean_walking_speed_mps": 1.2751
+      }
+    },
+    "present-day-three-arm/A-seed46": {
+      "preset_family": "A",
+      "seed": 46,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.210611,
+        "asthma": 0.155802,
+        "copd": 0.109909,
+        "any_respiratory": 0.24905,
+        "chronic_physical": 0.399445,
+        "vulnerable_any": 0.725957,
+        "age_55plus": 0.263373,
+        "male": 0.691026,
+        "mean_walking_speed_mps": 1.271168
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2106,
+        "realised_asthma": 0.1558,
+        "realised_copd": 0.1099,
+        "realised_any_respiratory": 0.249,
+        "realised_age_55plus": 0.2634,
+        "mean_walking_speed_mps": 1.2712
+      }
+    },
+    "present-day-three-arm/A-seed47": {
+      "preset_family": "A",
+      "seed": 47,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.19848,
+        "asthma": 0.149518,
+        "copd": 0.103186,
+        "any_respiratory": 0.236627,
+        "chronic_physical": 0.399445,
+        "vulnerable_any": 0.712072,
+        "age_55plus": 0.26425,
+        "male": 0.690295,
+        "mean_walking_speed_mps": 1.276302
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1985,
+        "realised_asthma": 0.1495,
+        "realised_copd": 0.1032,
+        "realised_any_respiratory": 0.2366,
+        "realised_age_55plus": 0.2643,
+        "mean_walking_speed_mps": 1.2763
+      }
+    },
+    "present-day-three-arm/A-seed48": {
+      "preset_family": "A",
+      "seed": 48,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.195411,
+        "asthma": 0.147471,
+        "copd": 0.103917,
+        "any_respiratory": 0.235311,
+        "chronic_physical": 0.393891,
+        "vulnerable_any": 0.704911,
+        "age_55plus": 0.258696,
+        "male": 0.683718,
+        "mean_walking_speed_mps": 1.280468
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1954,
+        "realised_asthma": 0.1475,
+        "realised_copd": 0.1039,
+        "realised_any_respiratory": 0.2353,
+        "realised_age_55plus": 0.2587,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "present-day-three-arm/A-seed49": {
+      "preset_family": "A",
+      "seed": 49,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.205349,
+        "asthma": 0.152295,
+        "copd": 0.105086,
+        "any_respiratory": 0.240281,
+        "chronic_physical": 0.390675,
+        "vulnerable_any": 0.708711,
+        "age_55plus": 0.267027,
+        "male": 0.679187,
+        "mean_walking_speed_mps": 1.272905
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2053,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.1051,
+        "realised_any_respiratory": 0.2403,
+        "realised_age_55plus": 0.267,
+        "mean_walking_speed_mps": 1.2729
+      }
+    },
+    "present-day-three-arm/A-seed50": {
+      "preset_family": "A",
+      "seed": 50,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.214557,
+        "asthma": 0.14791,
+        "copd": 0.10304,
+        "any_respiratory": 0.235165,
+        "chronic_physical": 0.400906,
+        "vulnerable_any": 0.717188,
+        "age_55plus": 0.265419,
+        "male": 0.684303,
+        "mean_walking_speed_mps": 1.269723
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2146,
+        "realised_asthma": 0.1479,
+        "realised_copd": 0.103,
+        "realised_any_respiratory": 0.2352,
+        "realised_age_55plus": 0.2654,
+        "mean_walking_speed_mps": 1.2697
+      }
+    },
+    "present-day-three-arm/B-seed42": {
+      "preset_family": "B",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "present-day-three-arm/B-seed43": {
+      "preset_family": "B",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "present-day-three-arm/B-seed44": {
+      "preset_family": "B",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    },
+    "present-day-three-arm/B-seed45": {
+      "preset_family": "B",
+      "seed": 45,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.202572,
+        "asthma": 0.152587,
+        "copd": 0.102309,
+        "any_respiratory": 0.238527,
+        "chronic_physical": 0.390383,
+        "vulnerable_any": 0.710026,
+        "age_55plus": 0.268196,
+        "male": 0.681087,
+        "mean_walking_speed_mps": 1.275127
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2026,
+        "realised_asthma": 0.1526,
+        "realised_copd": 0.1023,
+        "realised_any_respiratory": 0.2385,
+        "realised_age_55plus": 0.2682,
+        "mean_walking_speed_mps": 1.2751
+      }
+    },
+    "present-day-three-arm/B-seed46": {
+      "preset_family": "B",
+      "seed": 46,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.210611,
+        "asthma": 0.155802,
+        "copd": 0.109909,
+        "any_respiratory": 0.24905,
+        "chronic_physical": 0.399445,
+        "vulnerable_any": 0.725957,
+        "age_55plus": 0.263373,
+        "male": 0.691026,
+        "mean_walking_speed_mps": 1.271168
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2106,
+        "realised_asthma": 0.1558,
+        "realised_copd": 0.1099,
+        "realised_any_respiratory": 0.249,
+        "realised_age_55plus": 0.2634,
+        "mean_walking_speed_mps": 1.2712
+      }
+    },
+    "present-day-three-arm/B-seed47": {
+      "preset_family": "B",
+      "seed": 47,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.19848,
+        "asthma": 0.149518,
+        "copd": 0.103186,
+        "any_respiratory": 0.236627,
+        "chronic_physical": 0.399445,
+        "vulnerable_any": 0.712072,
+        "age_55plus": 0.26425,
+        "male": 0.690295,
+        "mean_walking_speed_mps": 1.276302
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1985,
+        "realised_asthma": 0.1495,
+        "realised_copd": 0.1032,
+        "realised_any_respiratory": 0.2366,
+        "realised_age_55plus": 0.2643,
+        "mean_walking_speed_mps": 1.2763
+      }
+    },
+    "present-day-three-arm/B-seed48": {
+      "preset_family": "B",
+      "seed": 48,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.195411,
+        "asthma": 0.147471,
+        "copd": 0.103917,
+        "any_respiratory": 0.235311,
+        "chronic_physical": 0.393891,
+        "vulnerable_any": 0.704911,
+        "age_55plus": 0.258696,
+        "male": 0.683718,
+        "mean_walking_speed_mps": 1.280468
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1954,
+        "realised_asthma": 0.1475,
+        "realised_copd": 0.1039,
+        "realised_any_respiratory": 0.2353,
+        "realised_age_55plus": 0.2587,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "present-day-three-arm/B-seed49": {
+      "preset_family": "B",
+      "seed": 49,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.205349,
+        "asthma": 0.152295,
+        "copd": 0.105086,
+        "any_respiratory": 0.240281,
+        "chronic_physical": 0.390675,
+        "vulnerable_any": 0.708711,
+        "age_55plus": 0.267027,
+        "male": 0.679187,
+        "mean_walking_speed_mps": 1.272905
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2053,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.1051,
+        "realised_any_respiratory": 0.2403,
+        "realised_age_55plus": 0.267,
+        "mean_walking_speed_mps": 1.2729
+      }
+    },
+    "present-day-three-arm/B-seed50": {
+      "preset_family": "B",
+      "seed": 50,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.214557,
+        "asthma": 0.14791,
+        "copd": 0.10304,
+        "any_respiratory": 0.235165,
+        "chronic_physical": 0.400906,
+        "vulnerable_any": 0.717188,
+        "age_55plus": 0.265419,
+        "male": 0.684303,
+        "mean_walking_speed_mps": 1.269723
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2146,
+        "realised_asthma": 0.1479,
+        "realised_copd": 0.103,
+        "realised_any_respiratory": 0.2352,
+        "realised_age_55plus": 0.2654,
+        "mean_walking_speed_mps": 1.2697
+      }
+    },
+    "present-day-three-arm/C-seed42": {
+      "preset_family": "C",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "present-day-three-arm/C-seed43": {
+      "preset_family": "C",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "present-day-three-arm/C-seed44": {
+      "preset_family": "C",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    },
+    "present-day-three-arm/C-seed45": {
+      "preset_family": "C",
+      "seed": 45,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.202572,
+        "asthma": 0.152587,
+        "copd": 0.102309,
+        "any_respiratory": 0.238527,
+        "chronic_physical": 0.390383,
+        "vulnerable_any": 0.710026,
+        "age_55plus": 0.268196,
+        "male": 0.681087,
+        "mean_walking_speed_mps": 1.275127
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2026,
+        "realised_asthma": 0.1526,
+        "realised_copd": 0.1023,
+        "realised_any_respiratory": 0.2385,
+        "realised_age_55plus": 0.2682,
+        "mean_walking_speed_mps": 1.2751
+      }
+    },
+    "present-day-three-arm/C-seed46": {
+      "preset_family": "C",
+      "seed": 46,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.210611,
+        "asthma": 0.155802,
+        "copd": 0.109909,
+        "any_respiratory": 0.24905,
+        "chronic_physical": 0.399445,
+        "vulnerable_any": 0.725957,
+        "age_55plus": 0.263373,
+        "male": 0.691026,
+        "mean_walking_speed_mps": 1.271168
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2106,
+        "realised_asthma": 0.1558,
+        "realised_copd": 0.1099,
+        "realised_any_respiratory": 0.249,
+        "realised_age_55plus": 0.2634,
+        "mean_walking_speed_mps": 1.2712
+      }
+    },
+    "present-day-three-arm/C-seed47": {
+      "preset_family": "C",
+      "seed": 47,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.19848,
+        "asthma": 0.149518,
+        "copd": 0.103186,
+        "any_respiratory": 0.236627,
+        "chronic_physical": 0.399445,
+        "vulnerable_any": 0.712072,
+        "age_55plus": 0.26425,
+        "male": 0.690295,
+        "mean_walking_speed_mps": 1.276302
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1985,
+        "realised_asthma": 0.1495,
+        "realised_copd": 0.1032,
+        "realised_any_respiratory": 0.2366,
+        "realised_age_55plus": 0.2643,
+        "mean_walking_speed_mps": 1.2763
+      }
+    },
+    "present-day-three-arm/C-seed48": {
+      "preset_family": "C",
+      "seed": 48,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.195411,
+        "asthma": 0.147471,
+        "copd": 0.103917,
+        "any_respiratory": 0.235311,
+        "chronic_physical": 0.393891,
+        "vulnerable_any": 0.704911,
+        "age_55plus": 0.258696,
+        "male": 0.683718,
+        "mean_walking_speed_mps": 1.280468
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1954,
+        "realised_asthma": 0.1475,
+        "realised_copd": 0.1039,
+        "realised_any_respiratory": 0.2353,
+        "realised_age_55plus": 0.2587,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "present-day-three-arm/C-seed49": {
+      "preset_family": "C",
+      "seed": 49,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.205349,
+        "asthma": 0.152295,
+        "copd": 0.105086,
+        "any_respiratory": 0.240281,
+        "chronic_physical": 0.390675,
+        "vulnerable_any": 0.708711,
+        "age_55plus": 0.267027,
+        "male": 0.679187,
+        "mean_walking_speed_mps": 1.272905
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2053,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.1051,
+        "realised_any_respiratory": 0.2403,
+        "realised_age_55plus": 0.267,
+        "mean_walking_speed_mps": 1.2729
+      }
+    },
+    "present-day-three-arm/C-seed50": {
+      "preset_family": "C",
+      "seed": 50,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.214557,
+        "asthma": 0.14791,
+        "copd": 0.10304,
+        "any_respiratory": 0.235165,
+        "chronic_physical": 0.400906,
+        "vulnerable_any": 0.717188,
+        "age_55plus": 0.265419,
+        "male": 0.684303,
+        "mean_walking_speed_mps": 1.269723
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2146,
+        "realised_asthma": 0.1479,
+        "realised_copd": 0.103,
+        "realised_any_respiratory": 0.2352,
+        "realised_age_55plus": 0.2654,
+        "mean_walking_speed_mps": 1.2697
+      }
+    },
+    "scenario-e-v2/E0null-A-seed42": {
+      "preset_family": "E0",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e-v2/E0null-B-seed42": {
+      "preset_family": "E0",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e-v2/E0null-C-seed42": {
+      "preset_family": "E0",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e-v2/SE2-E18-d1-seed42": {
+      "preset_family": "SE2",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e-v2/SE2-E18-d1-seed43": {
+      "preset_family": "SE2",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "scenario-e-v2/SE2-E18-d1-seed44": {
+      "preset_family": "SE2",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    },
+    "scenario-e-v2/SE2-E18-d2-seed42": {
+      "preset_family": "SE2",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e-v2/SE2-E18-d2-seed43": {
+      "preset_family": "SE2",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "scenario-e-v2/SE2-E18-d2-seed44": {
+      "preset_family": "SE2",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    },
+    "scenario-e-v2/SE2-E18-d3-seed42": {
+      "preset_family": "SE2",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e-v2/SE2-E18-d3-seed43": {
+      "preset_family": "SE2",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "scenario-e-v2/SE2-E18-d3-seed44": {
+      "preset_family": "SE2",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    },
+    "scenario-e-v2/SE2-E19-d1-seed42": {
+      "preset_family": "SE2",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e-v2/SE2-E19-d1-seed43": {
+      "preset_family": "SE2",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "scenario-e-v2/SE2-E19-d1-seed44": {
+      "preset_family": "SE2",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    },
+    "scenario-e-v2/SE2-E20-d1-seed42": {
+      "preset_family": "SE2",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e-v2/SE2-E20-d1-seed43": {
+      "preset_family": "SE2",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "scenario-e-v2/SE2-E20-d1-seed44": {
+      "preset_family": "SE2",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    },
+    "scenario-e-v2/SE2nc-E18-seed42": {
+      "preset_family": "SE2nc",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e-v2/SE2nc-E18-seed43": {
+      "preset_family": "SE2nc",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "scenario-e-v2/SE2nc-E18-seed44": {
+      "preset_family": "SE2nc",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    },
+    "scenario-e-v2/SE2nc-E19-seed42": {
+      "preset_family": "SE2nc",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e-v2/SE2nc-E19-seed43": {
+      "preset_family": "SE2nc",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "scenario-e-v2/SE2nc-E19-seed44": {
+      "preset_family": "SE2nc",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    },
+    "scenario-e-v2/SE2nc-E20-seed42": {
+      "preset_family": "SE2nc",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e-v2/SE2nc-E20-seed43": {
+      "preset_family": "SE2nc",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "scenario-e-v2/SE2nc-E20-seed44": {
+      "preset_family": "SE2nc",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    },
+    "scenario-e/E0null-A-seed42": {
+      "preset_family": "E0",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e/E0null-B-seed42": {
+      "preset_family": "E0",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e/E0null-C-seed42": {
+      "preset_family": "E0",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e/SE-E18-seed42": {
+      "preset_family": "SE",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e/SE-E18-seed43": {
+      "preset_family": "SE",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "scenario-e/SE-E18-seed44": {
+      "preset_family": "SE",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    },
+    "scenario-e/SE-E19-seed42": {
+      "preset_family": "SE",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e/SE-E19-seed43": {
+      "preset_family": "SE",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "scenario-e/SE-E19-seed44": {
+      "preset_family": "SE",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    },
+    "scenario-e/SE-E20-seed42": {
+      "preset_family": "SE",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e/SE-E20-seed43": {
+      "preset_family": "SE",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "scenario-e/SE-E20-seed44": {
+      "preset_family": "SE",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    },
+    "scenario-e/SEnc-E18-seed42": {
+      "preset_family": "SEnc",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e/SEnc-E18-seed43": {
+      "preset_family": "SEnc",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "scenario-e/SEnc-E18-seed44": {
+      "preset_family": "SEnc",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    },
+    "scenario-e/SEnc-E19-seed42": {
+      "preset_family": "SEnc",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e/SEnc-E19-seed43": {
+      "preset_family": "SEnc",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "scenario-e/SEnc-E19-seed44": {
+      "preset_family": "SEnc",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    },
+    "scenario-e/SEnc-E20-seed42": {
+      "preset_family": "SEnc",
+      "seed": 42,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.198772,
+        "asthma": 0.147764,
+        "copd": 0.107863,
+        "any_respiratory": 0.238088,
+        "chronic_physical": 0.396375,
+        "vulnerable_any": 0.711196,
+        "age_55plus": 0.262204,
+        "male": 0.685618,
+        "mean_walking_speed_mps": 1.280519
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1988,
+        "realised_asthma": 0.1478,
+        "realised_copd": 0.1079,
+        "realised_any_respiratory": 0.2381,
+        "realised_age_55plus": 0.2622,
+        "mean_walking_speed_mps": 1.2805
+      }
+    },
+    "scenario-e/SEnc-E20-seed43": {
+      "preset_family": "SEnc",
+      "seed": 43,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.199503,
+        "asthma": 0.152295,
+        "copd": 0.097778,
+        "any_respiratory": 0.234288,
+        "chronic_physical": 0.395645,
+        "vulnerable_any": 0.704326,
+        "age_55plus": 0.256212,
+        "male": 0.689418,
+        "mean_walking_speed_mps": 1.279642
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.1995,
+        "realised_asthma": 0.1523,
+        "realised_copd": 0.0978,
+        "realised_any_respiratory": 0.2343,
+        "realised_age_55plus": 0.2562,
+        "mean_walking_speed_mps": 1.2796
+      }
+    },
+    "scenario-e/SEnc-E20-seed44": {
+      "preset_family": "SEnc",
+      "seed": 44,
+      "derived_from_agents_csv": {
+        "n": 6842,
+        "mobility_limited": 0.209296,
+        "asthma": 0.148056,
+        "copd": 0.100409,
+        "any_respiratory": 0.233119,
+        "chronic_physical": 0.396229,
+        "vulnerable_any": 0.717042,
+        "age_55plus": 0.272581,
+        "male": 0.680649,
+        "mean_walking_speed_mps": 1.275175
+      },
+      "manifest_population_sampling": {
+        "realised_mobility_limited": 0.2093,
+        "realised_asthma": 0.1481,
+        "realised_copd": 0.1004,
+        "realised_any_respiratory": 0.2331,
+        "realised_age_55plus": 0.2726,
+        "mean_walking_speed_mps": 1.2752
+      }
+    }
+  }
+}

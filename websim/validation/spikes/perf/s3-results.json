@@ -1,0 +1,698 @@
+{
+  "spike": "WP2-S3 perf harness on the real graph",
+  "generatedUtc": "2026-07-31T05:00:48.842Z",
+  "host": {
+    "node": "v24.18.0",
+    "platform": "win32 x64",
+    "cpu": "11th Gen Intel(R) Core(TM) i7-11700KF @ 3.60GHz",
+    "logicalCores": 16,
+    "totalMemGb": 15.9
+  },
+  "budgets": {
+    "defaultPreset": {
+      "agents": 2037,
+      "hours": 312,
+      "ticksPerHour": 60,
+      "wallBudgetS": 60
+    },
+    "worstCase": {
+      "agents": 6842,
+      "hours": 455,
+      "ticksPerHour": 60,
+      "wallBudgetS": 480,
+      "waves": 6
+    },
+    "closureWaveS": 5,
+    "closureWaveTargetS": 1.5
+  },
+  "load": {
+    "nodesParsedMs": 104.86449999999999,
+    "edgesParsedMs": 106.73350000000002,
+    "adjacencyParsedMs": 76.67219999999998,
+    "polylinesParsedMs": 178.81980000000004,
+    "segmentGeometryMs": 509.8537,
+    "totalMs": 976.9437,
+    "bytesRead": 46391196,
+    "vertexCount": 659576,
+    "nodeCoordHexMismatches": 0,
+    "edgeLengthHexMismatches": 0,
+    "segmentSumMaxAbsDiffM": 2.597516868263483e-8,
+    "segmentSumBitExactEdges": 5848,
+    "segmentSumWithin1eMinus9": 81560,
+    "graphBytes": 32789472,
+    "nodeCount": 88100,
+    "edgeCount": 109434,
+    "directedRecords": 218868
+  },
+  "componentGeometry": [
+    {
+      "size": 59725,
+      "bbox": [
+        -123.46245212819875,
+        44.88546627493192,
+        -121.649618333668,
+        45.81209581417794
+      ],
+      "centroid": [
+        -122.68075622594816,
+        45.43208534854825
+      ]
+    },
+    {
+      "size": 27543,
+      "bbox": [
+        -122.8364958082098,
+        45.43254152511167,
+        -122.47263579491512,
+        45.64987734502568
+      ],
+      "centroid": [
+        -122.63786053661121,
+        45.52078531691549
+      ]
+    }
+  ],
+  "csrCensusGate": {
+    "pass": true,
+    "components": 171,
+    "largest": 59725,
+    "topComponentSizes": [
+      59725,
+      27543,
+      237,
+      55,
+      19
+    ],
+    "expected": {
+      "exporter": "GraphExport (SPIKE S2)",
+      "u27_freeway_filter_applied": true,
+      "streets_shp": "data/Streets.shp",
+      "shapefile_features_read": 112070,
+      "features_not_multilinestring": 0,
+      "features_display_only_nonnumeric_nodes": 0,
+      "node_site_tolerance_m": 100,
+      "reattach_tolerance_m": 10,
+      "features": 109434,
+      "attr_node_ids": 88078,
+      "final_graph_nodes": 88100,
+      "affected_attr_node_ids": 25,
+      "sites_reattached": 3,
+      "sites_split_synthetic": 22,
+      "impossible_edges_after_fix": 0,
+      "max_endpoint_gap_m": 11.94472522691336,
+      "components": 171,
+      "largest_component_nodes": 59725,
+      "undirected_street_edges": 109434,
+      "directed_edge_records": 218868,
+      "node_count_api": 88100,
+      "freeway_filter": {
+        "features_excluded": 2636,
+        "km_excluded": 614.0663851358678,
+        "by_type": {
+          "1110": 1372,
+          "1120": 279,
+          "1121": 466,
+          "1122": 447,
+          "1123": 72
+        }
+      },
+      "node_id_min": -1021,
+      "node_id_max": 17023620,
+      "node_ids_negative": 22,
+      "max_degree": 7,
+      "polyline_vertices_total": 659576,
+      "adjacency_reconstruction_mismatches": 0,
+      "coord_precision": {
+        "node_values": 176200,
+        "node_roundtrip_6dp": 0,
+        "node_roundtrip_7dp": 0,
+        "polyline_values": 1319152,
+        "polyline_roundtrip_6dp": 0,
+        "polyline_roundtrip_7dp": 0
+      },
+      "timing_ms": {
+        "shapefile_load": 3561,
+        "build_index": 593,
+        "total": 9484
+      },
+      "input_sha256": {
+        "data/Streets.shp": "f5e5e311b625f129f94fcf6d3150f8feb521ea5a79039ade43514ebfb35810a8",
+        "data/Streets.dbf": "636b9ca18b0bf0c2f47474f7810d81634f04cd86439e86d34f4233782d7fab94",
+        "data/Streets.shx": "0c5cecb995dd3af50bf2b0c2fa976202f283e7c08aa56ed4aab6ed01cd48a651",
+        "data/Streets.prj": "f2e7fb14d55bdd8d6a3bc2c272a48729d8f9d0ad72936e20eae6a9a81c2fccd0"
+      },
+      "corrections": [
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107665,
+          "graph_node_id": -1000,
+          "dist_from_primary_m": 8520.9,
+          "lon": -122.781836,
+          "lat": 45.536632,
+          "first_feature": "NW UNNAMED RD",
+          "claims": 1
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107668,
+          "graph_node_id": -1001,
+          "dist_from_primary_m": 9293.3,
+          "lon": -122.548095,
+          "lat": 45.473256,
+          "first_feature": "SE 112TH AVE",
+          "claims": 3
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107673,
+          "graph_node_id": -1002,
+          "dist_from_primary_m": 12220,
+          "lon": -122.757688,
+          "lat": 45.533733,
+          "first_feature": "NW SKYLINE BLVD",
+          "claims": 3
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107674,
+          "graph_node_id": -1003,
+          "dist_from_primary_m": 10493.1,
+          "lon": -122.755777,
+          "lat": 45.533851,
+          "first_feature": "NW UNNAMED RD",
+          "claims": 1
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107677,
+          "graph_node_id": -1004,
+          "dist_from_primary_m": 4273.2,
+          "lon": -122.736811,
+          "lat": 45.497955,
+          "first_feature": "SW PATTON RD",
+          "claims": 2
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107681,
+          "graph_node_id": -1005,
+          "dist_from_primary_m": 18554.8,
+          "lon": -122.578222,
+          "lat": 45.463299,
+          "first_feature": "SE UNNAMED RD",
+          "claims": 3
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107682,
+          "graph_node_id": -1006,
+          "dist_from_primary_m": 18562.3,
+          "lon": -122.577925,
+          "lat": 45.464029,
+          "first_feature": "SE UNNAMED RD",
+          "claims": 1
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107684,
+          "graph_node_id": -1007,
+          "dist_from_primary_m": 17971.1,
+          "lon": -122.573647,
+          "lat": 45.466774,
+          "first_feature": "SE LAMBERT ST",
+          "claims": 2
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107696,
+          "graph_node_id": -1008,
+          "dist_from_primary_m": 7918.5,
+          "lon": -122.57741,
+          "lat": 45.466855,
+          "first_feature": "SE LAMBERT ST",
+          "claims": 3
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107699,
+          "graph_node_id": -1009,
+          "dist_from_primary_m": 8002.8,
+          "lon": -122.576602,
+          "lat": 45.46862,
+          "first_feature": "SE FLAVEL ST",
+          "claims": 3
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107697,
+          "graph_node_id": -1010,
+          "dist_from_primary_m": 7944.8,
+          "lon": -122.57762,
+          "lat": 45.468644,
+          "first_feature": "SE FLAVEL ST",
+          "claims": 3
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107695,
+          "graph_node_id": -1011,
+          "dist_from_primary_m": 7993,
+          "lon": -122.576805,
+          "lat": 45.466841,
+          "first_feature": "SE LAMBERT ST",
+          "claims": 3
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107705,
+          "graph_node_id": -1012,
+          "dist_from_primary_m": 9229.3,
+          "lon": -122.57639,
+          "lat": 45.4675,
+          "first_feature": "SE UNNAMED RD",
+          "claims": 3
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107708,
+          "graph_node_id": -1013,
+          "dist_from_primary_m": 15281.5,
+          "lon": -122.5766,
+          "lat": 45.468052,
+          "first_feature": "SE UNNAMED RD",
+          "claims": 3
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107714,
+          "graph_node_id": -1014,
+          "dist_from_primary_m": 16587.1,
+          "lon": -122.549385,
+          "lat": 45.491568,
+          "first_feature": "SE UNNAMED RD",
+          "claims": 3
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107719,
+          "graph_node_id": -1015,
+          "dist_from_primary_m": 1654.7,
+          "lon": -122.667509,
+          "lat": 45.513695,
+          "first_feature": "SE MAIN ST",
+          "claims": 1
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107722,
+          "graph_node_id": -1016,
+          "dist_from_primary_m": 17221.6,
+          "lon": -122.579067,
+          "lat": 45.469549,
+          "first_feature": "SE 82ND AVE",
+          "claims": 3
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107657,
+          "graph_node_id": -1017,
+          "dist_from_primary_m": 11026,
+          "lon": -122.678876,
+          "lat": 45.562672,
+          "first_feature": "N KILLINGSWORTH ST",
+          "claims": 2
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107680,
+          "graph_node_id": -1018,
+          "dist_from_primary_m": 7002.1,
+          "lon": -122.661342,
+          "lat": 45.443469,
+          "first_feature": "S AVENTINE CT",
+          "claims": 1
+        },
+        {
+          "kind": "REATTACHED",
+          "attr_node_id": 107679,
+          "graph_node_id": 77406,
+          "dist_from_primary_m": 7146.9,
+          "lon": -122.664406,
+          "lat": 45.443211,
+          "first_feature": "S AVENTINE CT",
+          "claims": 1
+        },
+        {
+          "kind": "REATTACHED",
+          "attr_node_id": 107671,
+          "graph_node_id": 17022100,
+          "dist_from_primary_m": 16801.2,
+          "lon": -122.766114,
+          "lat": 45.532807,
+          "first_feature": "NW RYAN ST",
+          "claims": 1
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107700,
+          "graph_node_id": -1019,
+          "dist_from_primary_m": 7983.1,
+          "lon": -122.675734,
+          "lat": 45.452968,
+          "first_feature": "S PALATER RD",
+          "claims": 3
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107701,
+          "graph_node_id": -1020,
+          "dist_from_primary_m": 7915,
+          "lon": -122.676233,
+          "lat": 45.452422,
+          "first_feature": "S TERWILLIGER BLVD",
+          "claims": 3
+        },
+        {
+          "kind": "REATTACHED",
+          "attr_node_id": 107718,
+          "graph_node_id": 17015842,
+          "dist_from_primary_m": 14327.7,
+          "lon": -122.746632,
+          "lat": 45.476476,
+          "first_feature": "SW VERMONT ST",
+          "claims": 1
+        },
+        {
+          "kind": "SPLIT",
+          "attr_node_id": 107660,
+          "graph_node_id": -1021,
+          "dist_from_primary_m": 11077.6,
+          "lon": -122.804942,
+          "lat": 45.607776,
+          "first_feature": "NW BPA RD",
+          "claims": 1
+        }
+      ]
+    }
+  },
+  "sources": {
+    "rows": 46,
+    "distinctAfterSnap": 44,
+    "benchmarkDistinct": 46,
+    "collidedRows": 2,
+    "csv": "C:\\Users\\Chick\\OneDrive\\Desktop\\reu\\Geography\\data\\shelters\\shelters_2026_expanded_plus_new_sites.csv",
+    "maxSnapGapDeg": 0.0030334042318970033,
+    "shelterNamesSample": [
+      "Arbor_Lodge_Shelter",
+      "Bybee_Lakes_Hope_Center",
+      "Clark_Center"
+    ],
+    "byComponent": [
+      {
+        "componentSize": 27543,
+        "shelters": 43
+      },
+      {
+        "componentSize": 59725,
+        "shelters": 3
+      }
+    ]
+  },
+  "sssp": {
+    "legacyPerTreeMs": {
+      "min": 2.207300000000032,
+      "p50": 2.3777000000000044,
+      "mean": 2.5704108695652286,
+      "p95": 5.274200000000064,
+      "max": 5.689800000000105,
+      "sum": 118.23890000000051
+    },
+    "postWavePerTreeMs": {
+      "min": 2.187900000000127,
+      "p50": 2.3507999999999356,
+      "mean": 2.60836304347827,
+      "p95": 5.423000000000002,
+      "max": 6.047500000000127,
+      "sum": 119.98470000000043
+    },
+    "blockedFeatures": 443,
+    "settledPerTree": {
+      "min": 27543,
+      "p50": 27543,
+      "mean": 29641.82608695652,
+      "p95": 59725,
+      "max": 59725,
+      "sum": 1363524
+    },
+    "relaxationsPerTree": {
+      "min": 75590,
+      "p50": 75590,
+      "mean": 79905.56521739131,
+      "p95": 141762,
+      "max": 141762,
+      "sum": 3675656
+    },
+    "stalePopsPerTree": {
+      "min": 3397,
+      "p50": 3770,
+      "mean": 3761.3260869565215,
+      "p95": 4047,
+      "max": 4076,
+      "sum": 173021
+    },
+    "retainedTreeBytes": 48631200,
+    "projectedPool4WallMs": 29.559725000000128,
+    "pessimisticLargestComponentPerTreeMs": {
+      "min": 5.135200000000168,
+      "p50": 5.2716999999997824,
+      "mean": 5.303086956521749,
+      "p95": 5.602900000000091,
+      "max": 5.729699999999866,
+      "sum": 243.94200000000046
+    }
+  },
+  "pool": {
+    "workers1": {
+      "wallMs": 240.32330000000002,
+      "busiestWorkerMs": 126.2618,
+      "perWorker": [
+        126.2618
+      ]
+    },
+    "workers2": {
+      "wallMs": 191.09809999999993,
+      "busiestWorkerMs": 67.83420000000001,
+      "perWorker": [
+        64.26189999999997,
+        67.83420000000001
+      ]
+    },
+    "workers4": {
+      "wallMs": 186.35320000000002,
+      "busiestWorkerMs": 40.85099999999966,
+      "perWorker": [
+        40.85099999999966,
+        40.57210000000032,
+        35.57349999999997,
+        38.39339999999993
+      ]
+    },
+    "workers8": {
+      "wallMs": 212.81759999999986,
+      "busiestWorkerMs": 37.91750000000002,
+      "perWorker": [
+        23.977100000000064,
+        21.680499999999938,
+        27.67589999999973,
+        37.91750000000002,
+        32.95820000000003,
+        30.70159999999987,
+        21.870699999999943,
+        22.03729999999996
+      ]
+    }
+  },
+  "paths": {
+    "paths": 7000,
+    "buildMs": 39.896000000000186,
+    "vertexCount": 1779948,
+    "bytes": 56986340,
+    "meanVertices": 254.27828571428572,
+    "meanLengthM": 11642.408409803846,
+    "maxVertices": 742,
+    "reachableNodes": 27543
+  },
+  "tick": {
+    "calibration": {
+      "literalJavaMovement": {
+        "wallMs": 12956.337800000001,
+        "agentTicks": 4200000,
+        "agentTicksPerSecond": 324165.6758902967,
+        "directCalls": 4160788,
+        "inverseCalls": 10925007,
+        "hazardEvaluations": 70000,
+        "vertexAdvances": 6764219,
+        "arrivals": 39212,
+        "outOfRangeLookups": 0,
+        "checksum": 322112228.62691885
+      },
+      "directStandard": {
+        "wallMs": 17080.3626,
+        "agentTicks": 21000000,
+        "agentTicksPerSecond": 1229482.095421089,
+        "directCalls": 20790723,
+        "inverseCalls": 0,
+        "hazardEvaluations": 350000,
+        "vertexAdvances": 33614136,
+        "arrivals": 209277,
+        "outOfRangeLookups": 0,
+        "checksum": 1610969202.173202
+      },
+      "directPositionOnly": {
+        "wallMs": 15763.617599999998,
+        "agentTicks": 21000000,
+        "agentTicksPerSecond": 1332181.5165067187,
+        "directCalls": 20790723,
+        "inverseCalls": 0,
+        "hazardEvaluations": 350000,
+        "vertexAdvances": 33614136,
+        "arrivals": 209277,
+        "outOfRangeLookups": 0,
+        "checksum": 1610969202.173202
+      },
+      "deferred30": {
+        "wallMs": 1353.1875,
+        "agentTicks": 21000000,
+        "agentTicksPerSecond": 15518913.676042678,
+        "directCalls": 698119,
+        "inverseCalls": 0,
+        "hazardEvaluations": 350000,
+        "vertexAdvances": 33614136,
+        "arrivals": 209277,
+        "outOfRangeLookups": 0,
+        "checksum": 1610969141.999228
+      },
+      "deferred60": {
+        "wallMs": 1062.690499999997,
+        "agentTicks": 21000000,
+        "agentTicksPerSecond": 19761162.82210113,
+        "directCalls": 348977,
+        "inverseCalls": 0,
+        "hazardEvaluations": 350000,
+        "vertexAdvances": 33614136,
+        "arrivals": 209277,
+        "outOfRangeLookups": 0,
+        "checksum": 1610969094.5121129
+      },
+      "noGeodesic": {
+        "wallMs": 787.0434000000023,
+        "agentTicks": 21000000,
+        "agentTicksPerSecond": 26682137.223944623,
+        "directCalls": 0,
+        "inverseCalls": 0,
+        "hazardEvaluations": 350000,
+        "vertexAdvances": 33614136,
+        "arrivals": 209277,
+        "outOfRangeLookups": 0,
+        "checksum": 1610969011.082177
+      },
+      "geodesicShareOfWall": 0.9539211538752694,
+      "positionOnlyMaskSaving": 0.07709116198739263
+    },
+    "budgetedDefault": {
+      "wallMs": 28931.638699999996,
+      "agentTicks": 38132640,
+      "agentTicksPerSecond": 1318025.5842196732,
+      "directCalls": 37747081,
+      "inverseCalls": 0,
+      "hazardEvaluations": 635544,
+      "vertexAdvances": 61214408,
+      "arrivals": 385559,
+      "outOfRangeLookups": 122220,
+      "checksum": 3154964848.8456984
+    },
+    "budgetedWorstCase": {
+      "wallMs": 151541.0415,
+      "agentTicks": 186786600,
+      "agentTicksPerSecond": 1232580.9440870183,
+      "directCalls": 184911499,
+      "inverseCalls": 0,
+      "hazardEvaluations": 3113110,
+      "vertexAdvances": 298487456,
+      "arrivals": 1875101,
+      "outOfRangeLookups": 410520,
+      "checksum": 15127389454.967897
+    },
+    "tunedDefault": {
+      "wallMs": 1837.2001000000164,
+      "agentTicks": 38132640,
+      "agentTicksPerSecond": 20755844.722629648,
+      "directCalls": 633859,
+      "inverseCalls": 0,
+      "hazardEvaluations": 635544,
+      "vertexAdvances": 61214408,
+      "arrivals": 385559,
+      "outOfRangeLookups": 122220,
+      "checksum": 3154964819.2145057
+    },
+    "tunedWorstCase": {
+      "wallMs": 9714.306899999996,
+      "agentTicks": 186786600,
+      "agentTicksPerSecond": 19227990.418956198,
+      "directCalls": 3105089,
+      "inverseCalls": 0,
+      "hazardEvaluations": 3113110,
+      "vertexAdvances": 298487456,
+      "arrivals": 1875101,
+      "outOfRangeLookups": 410520,
+      "checksum": 15127389348.943865
+    }
+  },
+  "verdicts": {
+    "closureWave": {
+      "measuredS": 0.11998470000000043,
+      "deratedS": 0.23996940000000086,
+      "budgetS": 5,
+      "verdict": "MET",
+      "derate": 2,
+      "targetS": 1.5,
+      "meetsStretchTarget": true
+    },
+    "defaultPreset": {
+      "measuredS": 28.931638699999997,
+      "deratedS": 57.863277399999994,
+      "budgetS": 60,
+      "verdict": "MET (tight)",
+      "derate": 2
+    },
+    "worstCase": {
+      "measuredS": 152.2609497,
+      "deratedS": 304.5218994,
+      "budgetS": 480,
+      "verdict": "MET",
+      "derate": 2,
+      "tickS": 151.5410415,
+      "waveS": 0.11998470000000043,
+      "waves": 6
+    },
+    "defaultPresetTuned": {
+      "measuredS": 1.8372001000000164,
+      "deratedS": 3.674400200000033,
+      "budgetS": 60,
+      "verdict": "MET",
+      "derate": 2
+    },
+    "worstCaseTuned": {
+      "measuredS": 10.434215099999998,
+      "deratedS": 20.868430199999995,
+      "budgetS": 480,
+      "verdict": "MET",
+      "derate": 2
+    }
+  },
+  "escalation": {
+    "anyAtRiskUntuned": false,
+    "tunedClearsAllBudgets": true,
+    "openWasmDecisionRecord": false
+  }
+}

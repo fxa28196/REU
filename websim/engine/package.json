@@ -1,0 +1,30 @@
+{
+  "name": "@websim/engine",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Deterministic simulation core: pure TypeScript, zero DOM, no Date, no Math.random. Runs inside one Web Worker.",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./graph": "./src/graph/index.ts",
+    "./loader": "./src/loader/index.ts",
+    "./geo": "./src/geo/geodesic.ts",
+    "./world": "./src/world/index.ts",
+    "./agents": "./src/agents/index.ts",
+    "./shelters": "./src/shelters/index.ts",
+    "./closures": "./src/closures/index.ts",
+    "./sim": "./src/sim.ts",
+    "./output": "./src/output/logger.ts",
+    "./smoke": "./src/smoke/field.ts",
+    "./mathx": "./src/mathx/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@websim/shared": "*",
+    "geographiclib-geodesic": "2.2.0"
+  }
+}

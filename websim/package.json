@@ -1,0 +1,35 @@
+{
+  "name": "websim",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Browser-native TypeScript port + web UI of the wildfire shelter ABM (see docs/IMPLEMENTATION_PLAN.md). The Java/Repast model stays the certified instrument.",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "shared",
+    "engine",
+    "pipeline",
+    "app",
+    "validation"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:strict": "tsx tools/test-strict.ts",
+    "test:browser": "vitest run --config engine/vitest.browser.config.ts",
+    "typecheck": "npm run typecheck --workspaces && tsc -p tools --noEmit",
+    "lint:claims": "tsx tools/lint-claims.ts",
+    "check:scratch": "tsx tools/check-scratch.ts",
+    "ci": "npm run typecheck && npm test && npm run check:scratch && npm run lint:claims"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@vitest/browser": "3.2.7",
+    "playwright": "1.56.1",
+    "tsx": "^4.19.2",
+    "typescript": "~5.6.3",
+    "vitest": "^3.2.4"
+  }
+}

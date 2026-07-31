@@ -1,0 +1,23 @@
+{
+  "name": "@websim/shared",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Contract plane: RunConfig / ExecutedManifest / asset-manifest types and the single Zod schema (WP0 part 2).",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./config": "./src/config.ts",
+    "./schema": "./src/schema.ts",
+    "./assets": "./src/assets.ts",
+    "./presets/definitions": "./src/presets/definitions.ts",
+    "./graph-asset": "./src/graph-asset.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  }
+}

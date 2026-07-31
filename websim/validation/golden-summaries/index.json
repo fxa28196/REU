@@ -1,0 +1,59 @@
+{
+  "schema": "reu-wildfire-shelter-abm/golden-summary/v1/index",
+  "about": "Committed digests of the read-only Java golden archive (docs/runs/, ~375 MB, 154 manifests, 136 of them with per-agent CSVs). Hosted CI never sees the archive; these files are what Tier-3 checks compare against, and every value in them resolves through sources.json to the archive bytes it was derived from.",
+  "rebuild": "npx tsx pipeline/scripts/build-golden-summaries.ts [--check] against a local archive (WEBSIM_ARCHIVE_ROOT, else docs/runs/).",
+  "files": [
+    {
+      "file": "sources.json",
+      "schema": "reu-wildfire-shelter-abm/golden-summary/v1/sources",
+      "about": "Provenance for every number in the other golden-summary files: the archive run directory each value was derived from, and the byte length and SHA-256 of each file read from it.",
+      "sha256": "bb78f04a92ebfffbd35c1229f0cc88ca9fe5ce925364186599c2aaed2e8a16c9"
+    },
+    {
+      "file": "sheltered-envelopes.json",
+      "schema": "reu-wildfire-shelter-abm/golden-summary/v1/sheltered-envelopes",
+      "about": "Per archived configuration, the seed-to-seed envelope of the headline population outcomes. Tier 3 requires a live sheltered count to land inside the archived range for the same configuration (plan §5.1).",
+      "sha256": "4260b46910cd0dc71fbfee6b19ddc749c7d9931e995882256c802d0658c5c546"
+    },
+    {
+      "file": "demographic-marginals.json",
+      "schema": "reu-wildfire-shelter-abm/golden-summary/v1/demographic-marginals",
+      "about": "Realised demographic marginals per archived run. Tier 3 requires these to be EQUAL, not close: the PopulationSampler is bit-exact, so a live run at the same seed must reproduce the same shares exactly (plan §5.1).",
+      "sha256": "8b75111aeb2959c867d7451dade518e5c80b5b2a1b0894d865e09754514f12c4"
+    },
+    {
+      "file": "exposure-identities.json",
+      "schema": "reu-wildfire-shelter-abm/golden-summary/v1/exposure-identities",
+      "about": "The hand-checkable exposure facts a port must reproduce exactly: the single never-sheltered exposure value, the vwe/dose row identity, and the resting-dose ratio (PORT_MAP §6.1, plan §5.1 Tier 3).",
+      "sha256": "52bed430d648227681fbd9ecdcf9ea5b1cff399671a5f0f518077089f71bc5a2"
+    },
+    {
+      "file": "capacity-sums.json",
+      "schema": "reu-wildfire-shelter-abm/golden-summary/v1/capacity-sums",
+      "about": "U-03 bed-sum inputs: the designed system capacity each archived configuration ran with. verify_2026_runs.py asserts A == 2234 and B/C == 6842 (plan §5.1, §5.2).",
+      "sha256": "afa16f2b4df7726f73424c63c9e456ef48e2fc9bb90d831e0a5c20de20ba401f"
+    },
+    {
+      "file": "cross-arm-hashes.json",
+      "schema": "reu-wildfire-shelter-abm/golden-summary/v1/cross-arm-hashes",
+      "about": "verify_2026_runs.py's two cross-arm identities: within a seed the sampled population and the UNREACHABLE id set must be identical across arms A, B and C, because both are properties of the world build and the graph, not of shelter capacity (plan §5.1).",
+      "sha256": "caf5f31b703c1b71c54288fc5a35e3d4f3f53b07f8d17a0cda1d67e1b59f7b58"
+    }
+  ],
+  "archive_census": {
+    "runs_digested": 87,
+    "runs_with_agents_csv": 87,
+    "runs_with_shelters_csv": 87,
+    "preset_families_digested": [
+      "A",
+      "B",
+      "C",
+      "E0",
+      "ER",
+      "SE",
+      "SE2",
+      "SE2nc",
+      "SEnc"
+    ]
+  }
+}

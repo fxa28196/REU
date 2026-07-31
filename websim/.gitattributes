@@ -1,0 +1,35 @@
+# websim byte-fidelity policy
+# =============================================================================
+# This port's entire premise is byte-identity against a certified Java model.
+# Fixture files under engine/test/fixtures/, pipeline/java-exporter/fixtures/
+# and validation/ are carried with SHA-256 provenance digests (see e.g.
+# engine/test/fixtures/graph-slice/provenance.json and the corpus digest suite
+# at engine/test/determinism/corpus.digest.test.ts). Those digests were computed
+# over the bytes as dumped by the Java exporters, which are LF-terminated.
+#
+# This repository is developed on Windows, where git's default `core.autocrlf`
+# is `true`. Without the rule below, git rewrites LF to CRLF on checkout, so a
+# fresh clone would materialise fixture bytes that differ from the ones the
+# digests were taken over -- every provenance assertion would fail, and it would
+# fail only on a clean clone, i.e. exactly in CI and never on the machine that
+# wrote the files. That is the same "green locally, red on first push" failure
+# class the WP7 remediation pass was opened to eliminate.
+#
+# `-text` disables all end-of-line conversion: git stores and restores these
+# bytes verbatim on every platform. It is deliberately applied to the WHOLE
+# subtree rather than to a fixture allow-list, because a new dumper adding a new
+# fixture directory must not be able to reintroduce the defect by omission.
+#
+# Consequence to be aware of: source files here keep LF on Windows checkouts.
+# That is intended. Determinism outranks editor convention in this tree.
+* -text
+
+# Binary assets: also marked explicitly so git never attempts a textual diff or
+# merge on them, independent of the blanket rule above.
+*.bin binary
+*.br binary
+*.gz binary
+*.zip binary
+*.png binary
+*.jpg binary
+*.pdf binary

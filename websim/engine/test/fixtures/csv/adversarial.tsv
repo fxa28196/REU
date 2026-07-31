@@ -1,0 +1,304 @@
+# CsvLoader adversarial byte fixtures -- geography.data.CsvLoader, JDK 17.0.19
+# Produced by websim/pipeline/java-exporter/src-csv (WP5). Every outcome below is
+# what the CERTIFIED loader did with these exact bytes, not what the spec says.
+# CASE\tname\tmode\tinput_hex   then ROWS\tn | THROW\tmessage_hex, ROW lines, END.
+# Hex is of UTF-8 bytes; an empty string is an empty token.
+# why plain-lf: baseline
+CASE	plain-lf	read	612c622c630a312c322c330a342c352c360a
+ROWS	2
+ROW	0	3	61:31	62:32	63:33
+ROW	1	3	61:34	62:35	63:36
+END
+CASE	plain-lf	readStrict	612c622c630a312c322c330a342c352c360a
+ROWS	2
+ROW	0	3	61:31	62:32	63:33
+ROW	1	3	61:34	62:35	63:36
+END
+# why plain-crlf: CRLF is one terminator, not two
+CASE	plain-crlf	read	612c622c630d0a312c322c330d0a
+ROWS	1
+ROW	0	3	61:31	62:32	63:33
+END
+CASE	plain-crlf	readStrict	612c622c630d0a312c322c330d0a
+ROWS	1
+ROW	0	3	61:31	62:32	63:33
+END
+# why plain-cr: bare CR is a readLine terminator too
+CASE	plain-cr	read	612c622c630d312c322c330d
+ROWS	1
+ROW	0	3	61:31	62:32	63:33
+END
+CASE	plain-cr	readStrict	612c622c630d312c322c330d
+ROWS	1
+ROW	0	3	61:31	62:32	63:33
+END
+# why no-final-terminator: a final unterminated line is still a line
+CASE	no-final-terminator	read	612c620a312c32
+ROWS	1
+ROW	0	2	61:31	62:32
+END
+CASE	no-final-terminator	readStrict	612c620a312c32
+ROWS	1
+ROW	0	2	61:31	62:32
+END
+# why trailing-terminator: a trailing terminator produces NO extra empty line
+CASE	trailing-terminator	read	612c620a312c320a
+ROWS	1
+ROW	0	2	61:31	62:32
+END
+CASE	trailing-terminator	readStrict	612c620a312c320a
+ROWS	1
+ROW	0	2	61:31	62:32
+END
+# why bom-header: leading U+FEFF is stripped from the header
+CASE	bom-header	read	efbbbf612c620a312c320a
+ROWS	1
+ROW	0	2	61:31	62:32
+END
+CASE	bom-header	readStrict	efbbbf612c620a312c320a
+ROWS	1
+ROW	0	2	61:31	62:32
+END
+# why bom-midfile: a BOM on a DATA line is data: it is not stripped, and U+FEFF > U+0020 so trim keeps it
+CASE	bom-midfile	read	612c620aefbbbf312c320a
+ROWS	1
+ROW	0	2	61:efbbbf31	62:32
+END
+CASE	bom-midfile	readStrict	612c620aefbbbf312c320a
+ROWS	1
+ROW	0	2	61:efbbbf31	62:32
+END
+# why bom-only-line: a line holding only U+FEFF is NOT blank to Java trim() -- JS String.trim() would skip it
+CASE	bom-only-line	read	612c620aefbbbf0a312c320a
+ROWS	2
+ROW	0	2	61:efbbbf	62:
+ROW	1	2	61:31	62:32
+END
+CASE	bom-only-line	readStrict	612c620aefbbbf0a312c320a
+THROW	java.lang.IllegalStateException	2446494c45243a206c696e652032206861732031206669656c6473206275742074686520686561646572206465636c6172657320322028616e20756e71756f74656420636f6d6d6120696e20612070726f7365206669656c642069732074686520757375616c20636175736529
+END
+# why blank-lines: blank = trim().isEmpty(), skipped
+CASE	blank-lines	read	612c620a0a2020200a090a312c320a
+ROWS	1
+ROW	0	2	61:31	62:32
+END
+CASE	blank-lines	readStrict	612c620a0a2020200a090a312c320a
+ROWS	1
+ROW	0	2	61:31	62:32
+END
+# why quoted-comma: quoted comma is not a separator
+CASE	quoted-comma	read	612c620a22782c79222c7a0a
+ROWS	1
+ROW	0	2	61:782c79	62:7a
+END
+CASE	quoted-comma	readStrict	612c620a22782c79222c7a0a
+ROWS	1
+ROW	0	2	61:782c79	62:7a
+END
+# why escaped-quote: "" is one literal quote
+CASE	escaped-quote	read	612c620a226865207361696420222268692222222c7a0a
+ROWS	1
+ROW	0	2	61:686520736169642022686922	62:7a
+END
+CASE	escaped-quote	readStrict	612c620a226865207361696420222268692222222c7a0a
+ROWS	1
+ROW	0	2	61:686520736169642022686922	62:7a
+END
+# why quote-opens-midfield: a quote may open mid-field; the state machine has no 'quoted fields start at the field' rule
+CASE	quote-opens-midfield	read	612c620a616222632c6422652c7a0a
+ROWS	1
+ROW	0	2	61:6162632c6465	62:7a
+END
+CASE	quote-opens-midfield	readStrict	612c620a616222632c6422652c7a0a
+ROWS	1
+ROW	0	2	61:6162632c6465	62:7a
+END
+# why unterminated-quote: an unterminated quote emits the text accumulated so far -- no throw
+CASE	unterminated-quote	read	612c620a226e6576657220636c6f7365642c7a0a
+ROWS	1
+ROW	0	2	61:6e6576657220636c6f7365642c7a	62:
+END
+CASE	unterminated-quote	readStrict	612c620a226e6576657220636c6f7365642c7a0a
+THROW	java.lang.IllegalStateException	2446494c45243a206c696e652032206861732031206669656c6473206275742074686520686561646572206465636c6172657320322028616e20756e71756f74656420636f6d6d6120696e20612070726f7365206669656c642069732074686520757375616c20636175736529
+END
+# why empty-quotes: "" is the empty field
+CASE	empty-quotes	read	612c620a22222c22220a
+ROWS	1
+ROW	0	2	61:	62:
+END
+CASE	empty-quotes	readStrict	612c620a22222c22220a
+ROWS	1
+ROW	0	2	61:	62:
+END
+# why trim-quoted: EVERY field is trimmed, quoted content included
+CASE	trim-quoted	read	612c620a222020782020222c22202079220a
+ROWS	1
+ROW	0	2	61:78	62:79
+END
+CASE	trim-quoted	readStrict	612c620a222020782020222c22202079220a
+ROWS	1
+ROW	0	2	61:78	62:79
+END
+# why trim-unquoted: unquoted fields trimmed too
+CASE	trim-unquoted	read	612c620a202020782020202c202020790a
+ROWS	1
+ROW	0	2	61:78	62:79
+END
+CASE	trim-unquoted	readStrict	612c620a202020782020202c202020790a
+ROWS	1
+ROW	0	2	61:78	62:79
+END
+# why trim-nbsp: Java trim() strips <= U+0020 ONLY: U+00A0 survives, JS String.prototype.trim() would eat it
+CASE	trim-nbsp	read	612c620ac2a078c2a02c790a
+ROWS	1
+ROW	0	2	61:c2a078c2a0	62:79
+END
+CASE	trim-nbsp	readStrict	612c620ac2a078c2a02c790a
+ROWS	1
+ROW	0	2	61:c2a078c2a0	62:79
+END
+# why trim-control: trim() strips ANY code unit <= U+0020, including U+0001 and U+001F
+CASE	trim-control	read	612c620a01781f2c790a
+ROWS	1
+ROW	0	2	61:78	62:79
+END
+CASE	trim-control	readStrict	612c620a01781f2c790a
+ROWS	1
+ROW	0	2	61:78	62:79
+END
+# why trim-nul: NUL is <= U+0020 and is trimmed like whitespace
+CASE	trim-nul	read	612c620a0078002c790a
+ROWS	1
+ROW	0	2	61:78	62:79
+END
+CASE	trim-nul	readStrict	612c620a0078002c790a
+ROWS	1
+ROW	0	2	61:78	62:79
+END
+# why short-row: short rows are padded with ""
+CASE	short-row	read	612c622c630a312c320a
+ROWS	1
+ROW	0	3	61:31	62:32	63:
+END
+CASE	short-row	readStrict	612c622c630a312c320a
+THROW	java.lang.IllegalStateException	2446494c45243a206c696e652032206861732032206669656c6473206275742074686520686561646572206465636c6172657320332028616e20756e71756f74656420636f6d6d6120696e20612070726f7365206669656c642069732074686520757375616c20636175736529
+END
+# why extra-fields: fields beyond the header are silently dropped
+CASE	extra-fields	read	612c620a312c322c332c340a
+ROWS	1
+ROW	0	2	61:31	62:32
+END
+CASE	extra-fields	readStrict	612c620a312c322c332c340a
+THROW	java.lang.IllegalStateException	2446494c45243a206c696e652032206861732034206669656c6473206275742074686520686561646572206465636c6172657320322028616e20756e71756f74656420636f6d6d6120696e20612070726f7365206669656c642069732074686520757375616c20636175736529
+END
+# why trailing-comma: a trailing comma produces a final empty field
+CASE	trailing-comma	read	612c620a312c0a
+ROWS	1
+ROW	0	2	61:31	62:
+END
+CASE	trailing-comma	readStrict	612c620a312c0a
+ROWS	1
+ROW	0	2	61:31	62:
+END
+# why all-commas: three empty fields
+CASE	all-commas	read	612c622c630a2c2c0a
+ROWS	1
+ROW	0	3	61:	62:	63:
+END
+CASE	all-commas	readStrict	612c622c630a2c2c0a
+ROWS	1
+ROW	0	3	61:	62:	63:
+END
+# why single-field: no comma at all
+CASE	single-field	read	610a780a
+ROWS	1
+ROW	0	1	61:78
+END
+CASE	single-field	readStrict	610a780a
+ROWS	1
+ROW	0	1	61:78
+END
+# why dup-headers: read: LinkedHashMap keeps the FIRST position and the LAST value; readStrict throws
+CASE	dup-headers	read	612c622c610a312c322c330a
+ROWS	1
+ROW	0	2	61:33	62:32
+END
+CASE	dup-headers	readStrict	612c622c610a312c322c330a
+THROW	java.lang.IllegalStateException	2446494c45243a206475706c696361746520636f6c756d6e206e616d6520276127
+END
+# why dup-headers-blank: two empty header names are duplicates too
+CASE	dup-headers-blank	read	612c2c0a312c322c330a
+ROWS	1
+ROW	0	2	61:31	:33
+END
+CASE	dup-headers-blank	readStrict	612c2c0a312c322c330a
+THROW	java.lang.IllegalStateException	2446494c45243a206475706c696361746520636f6c756d6e206e616d65202727
+END
+# why empty-file: read returns []; readStrict throws 'file is empty'
+CASE	empty-file	read	
+ROWS	0
+END
+CASE	empty-file	readStrict	
+THROW	java.lang.IllegalStateException	2446494c45243a2066696c6520697320656d707479
+END
+# why header-only: zero rows, no error
+CASE	header-only	read	612c620a
+ROWS	0
+END
+CASE	header-only	readStrict	612c620a
+ROWS	0
+END
+# why strict-field-count: readStrict rejects a wrong field count
+CASE	strict-field-count	read	612c620a312c320a312c322c330a
+ROWS	2
+ROW	0	2	61:31	62:32
+ROW	1	2	61:31	62:32
+END
+CASE	strict-field-count	readStrict	612c620a312c320a312c322c330a
+THROW	java.lang.IllegalStateException	2446494c45243a206c696e652033206861732033206669656c6473206275742074686520686561646572206465636c6172657320322028616e20756e71756f74656420636f6d6d6120696e20612070726f7365206669656c642069732074686520757375616c20636175736529
+END
+# why strict-lineno-after-blank: lineNo increments BEFORE the blank-line skip, so the blank still advances it
+CASE	strict-lineno-after-blank	read	612c620a0a312c322c330a
+ROWS	1
+ROW	0	2	61:31	62:32
+END
+CASE	strict-lineno-after-blank	readStrict	612c620a0a312c322c330a
+THROW	java.lang.IllegalStateException	2446494c45243a206c696e652033206861732033206669656c6473206275742074686520686561646572206465636c6172657320322028616e20756e71756f74656420636f6d6d6120696e20612070726f7365206669656c642069732074686520757375616c20636175736529
+END
+# why utf8-nonascii: multi-byte UTF-8 round-trip
+CASE	utf8-nonascii	read	69642c6e616d650a312c52656ec3a920c385737472c3b66d0a
+ROWS	1
+ROW	0	2	6964:31	6e616d65:52656ec3a920c385737472c3b66d
+END
+CASE	utf8-nonascii	readStrict	69642c6e616d650a312c52656ec3a920c385737472c3b66d0a
+ROWS	1
+ROW	0	2	6964:31	6e616d65:52656ec3a920c385737472c3b66d
+END
+# why utf8-astral: surrogate pair round-trip
+CASE	utf8-astral	read	69642c6e616d650a312c636166c3a920f09f94a50a
+ROWS	1
+ROW	0	2	6964:31	6e616d65:636166c3a920f09f94a5
+END
+CASE	utf8-astral	readStrict	69642c6e616d650a312c636166c3a920f09f94a50a
+ROWS	1
+ROW	0	2	6964:31	6e616d65:636166c3a920f09f94a5
+END
+# why header-quoted: quoted header names are trimmed too
+CASE	header-quoted	read	2261222c22206220222c630a312c322c330a
+ROWS	1
+ROW	0	3	61:31	62:32	63:33
+END
+CASE	header-quoted	readStrict	2261222c22206220222c630a312c322c330a
+ROWS	1
+ROW	0	3	61:31	62:32	63:33
+END
+# why crlf-inside-quotes-impossible: there are NO multi-line quoted fields: the reader works line by line, so this is two lines
+CASE	crlf-inside-quotes-impossible	read	612c620a22780d0a79222c7a0a
+ROWS	2
+ROW	0	2	61:78	62:
+ROW	1	2	61:792c7a	62:
+END
+CASE	crlf-inside-quotes-impossible	readStrict	612c620a22780d0a79222c7a0a
+THROW	java.lang.IllegalStateException	2446494c45243a206c696e652032206861732031206669656c6473206275742074686520686561646572206465636c6172657320322028616e20756e71756f74656420636f6d6d6120696e20612070726f7365206669656c642069732074686520757375616c20636175736529
+END
+# summary cases=68 rows=60 throws=10

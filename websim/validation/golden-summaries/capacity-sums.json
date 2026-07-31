@@ -1,0 +1,881 @@
+{
+  "schema": "reu-wildfire-shelter-abm/golden-summary/v1/capacity-sums",
+  "about": "U-03 bed-sum inputs: the designed system capacity each archived configuration ran with. verify_2026_runs.py asserts A == 2234 and B/C == 6842 (plan §5.1, §5.2).",
+  "method": "Sums the `capacity` column of shelters.csv over all rows. A BLANK capacity cell means UNLIMITED, never zero (PORT_MAP §4.3), so blanks are excluded from the sum and counted separately in `unlimited_capacity_sites`.",
+  "provenance": {
+    "source_index": "sources.json",
+    "note": "Every key of `values` is (or names) a run directory. Resolve it in sources.json for the SHA-256 and byte length of the archive files the numbers were derived from."
+  },
+  "values": {
+    "phase-e/E0null-A-n6842-seed*": {
+      "preset_family": "E0",
+      "capacity_sums_seen": [
+        2234
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "phase-e/E0null-A-n6842-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 2060
+        }
+      }
+    },
+    "phase-e/E0null-B-n6842-seed*": {
+      "preset_family": "E0",
+      "capacity_sums_seen": [
+        6842
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "phase-e/E0null-B-n6842-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6264
+        }
+      }
+    },
+    "phase-e/E0null-C-n6842-seed*": {
+      "preset_family": "E0",
+      "capacity_sums_seen": [
+        6842
+      ],
+      "shelter_site_counts_seen": [
+        46
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "phase-e/E0null-C-n6842-seed42": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6570
+        }
+      }
+    },
+    "phase-e/ER-A-n6842-seed*": {
+      "preset_family": "ER",
+      "capacity_sums_seen": [
+        2234
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "phase-e/ER-A-n6842-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1215
+        },
+        "phase-e/ER-A-n6842-seed43": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1168
+        },
+        "phase-e/ER-A-n6842-seed44": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1205
+        }
+      }
+    },
+    "phase-e/ER-C-n6842-seed*": {
+      "preset_family": "ER",
+      "capacity_sums_seen": [
+        6842
+      ],
+      "shelter_site_counts_seen": [
+        46
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "phase-e/ER-C-n6842-seed42": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1215
+        },
+        "phase-e/ER-C-n6842-seed43": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1168
+        },
+        "phase-e/ER-C-n6842-seed44": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1206
+        }
+      }
+    },
+    "phase-e/ER-D-n6842-seed*": {
+      "preset_family": "ER",
+      "capacity_sums_seen": [
+        6842
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "phase-e/ER-D-n6842-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1215
+        },
+        "phase-e/ER-D-n6842-seed43": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1168
+        },
+        "phase-e/ER-D-n6842-seed44": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1206
+        }
+      }
+    },
+    "present-day-three-arm/A-seed*": {
+      "preset_family": "A",
+      "capacity_sums_seen": [
+        2234
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "present-day-three-arm/A-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 2060
+        },
+        "present-day-three-arm/A-seed43": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 2055
+        },
+        "present-day-three-arm/A-seed44": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 2056
+        },
+        "present-day-three-arm/A-seed45": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 2055
+        },
+        "present-day-three-arm/A-seed46": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 2053
+        },
+        "present-day-three-arm/A-seed47": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 2053
+        },
+        "present-day-three-arm/A-seed48": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 2053
+        },
+        "present-day-three-arm/A-seed49": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 2064
+        },
+        "present-day-three-arm/A-seed50": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 2055
+        }
+      }
+    },
+    "present-day-three-arm/B-seed*": {
+      "preset_family": "B",
+      "capacity_sums_seen": [
+        6842
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "present-day-three-arm/B-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6264
+        },
+        "present-day-three-arm/B-seed43": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6259
+        },
+        "present-day-three-arm/B-seed44": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6260
+        },
+        "present-day-three-arm/B-seed45": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6259
+        },
+        "present-day-three-arm/B-seed46": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6257
+        },
+        "present-day-three-arm/B-seed47": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6257
+        },
+        "present-day-three-arm/B-seed48": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6257
+        },
+        "present-day-three-arm/B-seed49": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6268
+        },
+        "present-day-three-arm/B-seed50": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6259
+        }
+      }
+    },
+    "present-day-three-arm/C-seed*": {
+      "preset_family": "C",
+      "capacity_sums_seen": [
+        6842
+      ],
+      "shelter_site_counts_seen": [
+        46
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "present-day-three-arm/C-seed42": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6570
+        },
+        "present-day-three-arm/C-seed43": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6565
+        },
+        "present-day-three-arm/C-seed44": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6566
+        },
+        "present-day-three-arm/C-seed45": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6565
+        },
+        "present-day-three-arm/C-seed46": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6563
+        },
+        "present-day-three-arm/C-seed47": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6563
+        },
+        "present-day-three-arm/C-seed48": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6563
+        },
+        "present-day-three-arm/C-seed49": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6574
+        },
+        "present-day-three-arm/C-seed50": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6565
+        }
+      }
+    },
+    "scenario-e-v2/E0null-A-seed*": {
+      "preset_family": "E0",
+      "capacity_sums_seen": [
+        2234
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e-v2/E0null-A-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 2060
+        }
+      }
+    },
+    "scenario-e-v2/E0null-B-seed*": {
+      "preset_family": "E0",
+      "capacity_sums_seen": [
+        6842
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e-v2/E0null-B-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6264
+        }
+      }
+    },
+    "scenario-e-v2/E0null-C-seed*": {
+      "preset_family": "E0",
+      "capacity_sums_seen": [
+        6842
+      ],
+      "shelter_site_counts_seen": [
+        46
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e-v2/E0null-C-seed42": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6570
+        }
+      }
+    },
+    "scenario-e-v2/SE2-E18-d1-seed*": {
+      "preset_family": "SE2",
+      "capacity_sums_seen": [
+        2234
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e-v2/SE2-E18-d1-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1307
+        },
+        "scenario-e-v2/SE2-E18-d1-seed43": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1272
+        },
+        "scenario-e-v2/SE2-E18-d1-seed44": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1301
+        }
+      }
+    },
+    "scenario-e-v2/SE2-E18-d2-seed*": {
+      "preset_family": "SE2",
+      "capacity_sums_seen": [
+        2234
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e-v2/SE2-E18-d2-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1307
+        },
+        "scenario-e-v2/SE2-E18-d2-seed43": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1271
+        },
+        "scenario-e-v2/SE2-E18-d2-seed44": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1302
+        }
+      }
+    },
+    "scenario-e-v2/SE2-E18-d3-seed*": {
+      "preset_family": "SE2",
+      "capacity_sums_seen": [
+        2234
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e-v2/SE2-E18-d3-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1309
+        },
+        "scenario-e-v2/SE2-E18-d3-seed43": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1271
+        },
+        "scenario-e-v2/SE2-E18-d3-seed44": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1301
+        }
+      }
+    },
+    "scenario-e-v2/SE2-E19-d1-seed*": {
+      "preset_family": "SE2",
+      "capacity_sums_seen": [
+        6842
+      ],
+      "shelter_site_counts_seen": [
+        46
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e-v2/SE2-E19-d1-seed42": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1312
+        },
+        "scenario-e-v2/SE2-E19-d1-seed43": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1273
+        },
+        "scenario-e-v2/SE2-E19-d1-seed44": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1305
+        }
+      }
+    },
+    "scenario-e-v2/SE2-E20-d1-seed*": {
+      "preset_family": "SE2",
+      "capacity_sums_seen": [
+        6842
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e-v2/SE2-E20-d1-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1312
+        },
+        "scenario-e-v2/SE2-E20-d1-seed43": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1273
+        },
+        "scenario-e-v2/SE2-E20-d1-seed44": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1306
+        }
+      }
+    },
+    "scenario-e-v2/SE2nc-E18-seed*": {
+      "preset_family": "SE2nc",
+      "capacity_sums_seen": [
+        2234
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e-v2/SE2nc-E18-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1308
+        },
+        "scenario-e-v2/SE2nc-E18-seed43": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1272
+        },
+        "scenario-e-v2/SE2nc-E18-seed44": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1302
+        }
+      }
+    },
+    "scenario-e-v2/SE2nc-E19-seed*": {
+      "preset_family": "SE2nc",
+      "capacity_sums_seen": [
+        6842
+      ],
+      "shelter_site_counts_seen": [
+        46
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e-v2/SE2nc-E19-seed42": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1312
+        },
+        "scenario-e-v2/SE2nc-E19-seed43": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1273
+        },
+        "scenario-e-v2/SE2nc-E19-seed44": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1305
+        }
+      }
+    },
+    "scenario-e-v2/SE2nc-E20-seed*": {
+      "preset_family": "SE2nc",
+      "capacity_sums_seen": [
+        6842
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e-v2/SE2nc-E20-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1312
+        },
+        "scenario-e-v2/SE2nc-E20-seed43": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1273
+        },
+        "scenario-e-v2/SE2nc-E20-seed44": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1306
+        }
+      }
+    },
+    "scenario-e/E0null-A-seed*": {
+      "preset_family": "E0",
+      "capacity_sums_seen": [
+        2234
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e/E0null-A-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 2060
+        }
+      }
+    },
+    "scenario-e/E0null-B-seed*": {
+      "preset_family": "E0",
+      "capacity_sums_seen": [
+        6842
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e/E0null-B-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6264
+        }
+      }
+    },
+    "scenario-e/E0null-C-seed*": {
+      "preset_family": "E0",
+      "capacity_sums_seen": [
+        6842
+      ],
+      "shelter_site_counts_seen": [
+        46
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e/E0null-C-seed42": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 6570
+        }
+      }
+    },
+    "scenario-e/SE-E18-seed*": {
+      "preset_family": "SE",
+      "capacity_sums_seen": [
+        2234
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e/SE-E18-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1252
+        },
+        "scenario-e/SE-E18-seed43": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1223
+        },
+        "scenario-e/SE-E18-seed44": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1247
+        }
+      }
+    },
+    "scenario-e/SE-E19-seed*": {
+      "preset_family": "SE",
+      "capacity_sums_seen": [
+        6842
+      ],
+      "shelter_site_counts_seen": [
+        46
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e/SE-E19-seed42": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1257
+        },
+        "scenario-e/SE-E19-seed43": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1226
+        },
+        "scenario-e/SE-E19-seed44": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1252
+        }
+      }
+    },
+    "scenario-e/SE-E20-seed*": {
+      "preset_family": "SE",
+      "capacity_sums_seen": [
+        6842
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e/SE-E20-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1257
+        },
+        "scenario-e/SE-E20-seed43": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1225
+        },
+        "scenario-e/SE-E20-seed44": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1252
+        }
+      }
+    },
+    "scenario-e/SEnc-E18-seed*": {
+      "preset_family": "SEnc",
+      "capacity_sums_seen": [
+        2234
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e/SEnc-E18-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1253
+        },
+        "scenario-e/SEnc-E18-seed43": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1224
+        },
+        "scenario-e/SEnc-E18-seed44": {
+          "shelter_sites": 36,
+          "capacity_sum": 2234,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1248
+        }
+      }
+    },
+    "scenario-e/SEnc-E19-seed*": {
+      "preset_family": "SEnc",
+      "capacity_sums_seen": [
+        6842
+      ],
+      "shelter_site_counts_seen": [
+        46
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e/SEnc-E19-seed42": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1257
+        },
+        "scenario-e/SEnc-E19-seed43": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1225
+        },
+        "scenario-e/SEnc-E19-seed44": {
+          "shelter_sites": 46,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1251
+        }
+      }
+    },
+    "scenario-e/SEnc-E20-seed*": {
+      "preset_family": "SEnc",
+      "capacity_sums_seen": [
+        6842
+      ],
+      "shelter_site_counts_seen": [
+        36
+      ],
+      "constant_within_config": true,
+      "runs": {
+        "scenario-e/SEnc-E20-seed42": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1257
+        },
+        "scenario-e/SEnc-E20-seed43": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1225
+        },
+        "scenario-e/SEnc-E20-seed44": {
+          "shelter_sites": 36,
+          "capacity_sum": 6842,
+          "unlimited_capacity_sites": 0,
+          "final_occupancy_sum": 1252
+        }
+      }
+    }
+  }
+}

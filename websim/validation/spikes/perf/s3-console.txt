@@ -1,0 +1,56 @@
+=== SPIKE S3 — stage: load ===
+  nodes 88100  edges 109434  directed records 218868
+  polyline vertices 659576
+  parse ms: nodes 116 edges 110 adj 78 poly 175 segGeom 510  TOTAL 989
+  CSR + geometry retained: 31.27 MB (text read 44.24 MB)
+  decimal-vs-hex mismatches: node coords 0, edge lengths 0
+  segment-sum vs Java edge length: bit-exact 5848/109434, <=1e-9 m 81560/109434, max |diff| 2.598e-8 m
+  CSR census gate: components 171/171, largest 59725/59725 -> PASS
+  component sizes (top 5): 59725, 27543, 237, 55, 19
+    component 59725 nodes: bbox lon[-123.4625, -121.6496] lat[44.8855, 45.8121] centroid -122.6808, 45.4321
+    component 27543 nodes: bbox lon[-122.8365, -122.4726] lat[45.4325, 45.6499] centroid -122.6379, 45.5208
+  shelter sources: 46 rows -> 44 DISTINCT nodes (max degree-space snap gap 3.033e-3 deg)
+  benchmark sources: 46 distinct (collided rows nudged to next-nearest node)
+  shelter placement by component size: 43 in a 27543-node component; 3 in a 59725-node component
+
+=== SPIKE S3 — stage: sssp (single-threaded, 46 full-graph trees) ===
+  per-tree ms: min 2.18 p50 2.37 mean 2.55 p95 5.22 max 5.71
+  46-tree TOTAL single-threaded: 117.2 ms
+  settled nodes/tree: min 27543 mean 29642 max 59725 (largest component 59,725); stale pops mean 3761
+  retained trees: 46.38 MB (plan estimate ~49 MB)
+  POST-WAVE (443 blocked features, flag test per relaxation): mean 2.63 ms/tree, 46-tree TOTAL 121.1 ms
+  mem after retaining 46 trees: rss 315.08 MB
+  PESSIMISTIC (46 sources in the 59,725-node component): mean 5.56 ms/tree, 46-tree TOTAL 256.0 ms
+  PROJECTED pool-of-4 wall (perfect split): 29.3 ms legacy / 30.3 ms post-wave
+
+=== SPIKE S3 — stage: pool (4 workers, SharedArrayBuffer CSR, zero copy) ===
+   1 workers: wall 244.0 ms (busiest worker 126.1 ms, spawn+transfer overhead 117.9 ms)
+   2 workers: wall 194.3 ms (busiest worker 67.8 ms, spawn+transfer overhead 126.5 ms)
+   4 workers: wall 182.1 ms (busiest worker 41.6 ms, spawn+transfer overhead 140.5 ms)
+   8 workers: wall 209.3 ms (busiest worker 32.7 ms, spawn+transfer overhead 176.6 ms)
+
+=== SPIKE S3 — stage: tick (SoA agent loop on real routed paths) ===
+  routed 7000 real paths in 40 ms: 1779948 vertices (54.35 MB), mean 254.3 verts / 11.64 km, max 742 verts
+  reference 7000 x 600 [LITERAL Java movement]   13.01 s  0.323 M agent-ticks/s  (4,200,000 agent-ticks, 4,160,788 Direct, 70,000 logistics, agents SoA 1.02 MB)
+  calibration 7000 x 3000 [Direct STANDARD]      16.82 s  1.249 M agent-ticks/s  (21,000,000 agent-ticks, 20,790,723 Direct, 350,000 logistics, agents SoA 1.02 MB)
+  calibration 7000 x 3000 [Direct lat/lon only]  15.77 s  1.332 M agent-ticks/s  (21,000,000 agent-ticks, 20,790,723 Direct, 350,000 logistics, agents SoA 1.02 MB)
+  calibration 7000 x 3000 [Direct every 30 ticks] 1.38 s  15.267 M agent-ticks/s  (21,000,000 agent-ticks, 698,119 Direct, 350,000 logistics, agents SoA 1.02 MB)
+  calibration 7000 x 3000 [Direct every 60 ticks] 1.07 s  19.713 M agent-ticks/s  (21,000,000 agent-ticks, 348,977 Direct, 350,000 logistics, agents SoA 1.02 MB)
+  calibration 7000 x 3000 [no geodesic]          0.79 s  26.683 M agent-ticks/s  (21,000,000 agent-ticks, 0 Direct, 350,000 logistics, agents SoA 1.02 MB)
+  BUDGET default 2037 x 312 h                    28.50 s  1.338 M agent-ticks/s  (38,132,640 agent-ticks, 37,747,081 Direct, 635,544 logistics, agents SoA 0.30 MB)
+  BUDGET worst-case 6842 x 455 h                 150.45 s  1.241 M agent-ticks/s  (186,786,600 agent-ticks, 184,911,499 Direct, 3,113,110 logistics, agents SoA 1.00 MB)
+  TUNED default 2037 x 312 h [Direct/60]         1.85 s  20.627 M agent-ticks/s  (38,132,640 agent-ticks, 633,859 Direct, 635,544 logistics, agents SoA 0.30 MB)
+  TUNED worst-case 6842 x 455 h [Direct/60]      9.77 s  19.121 M agent-ticks/s  (186,786,600 agent-ticks, 3,105,089 Direct, 3,113,110 logistics, agents SoA 1.00 MB)
+  geodesic Direct is 95.3% of tick-loop wall (STANDARD mask); lat/lon-only mask saves 6.2%
+  §3.6 cumulative-length graft buys 3.87x over the literal Java movement loop (2.60 Inverse + 0.99 Direct per agent-tick literal, vs 0.99 Direct grafted); default preset would be 118 s literal
+
+=== SPIKE S3 — verdict vs plan §3.6 budgets ===
+  closure wave (46 SSSPs, post-wave, 1 thread)         0.12 s vs 5 s (2% here; 5% at 2x derate) -> MET
+  default 2,037 x 312 h (38,132,640 at)                28.50 s vs 60 s (47% here; 95% at 2x derate) -> MET (tight)
+  worst case 6,842 x 455 h + 6 waves                   151.18 s vs 480 s (31% here; 63% at 2x derate) -> MET
+  default 2,037 x 312 h [TUNED: Direct/60]             1.85 s vs 60 s (3% here; 6% at 2x derate) -> MET
+  worst case 6,842 x 455 h + 6 waves [TUNED]           10.50 s vs 480 s (2% here; 4% at 2x derate) -> MET
+
+  ESCALATION: untuned any-at-risk=false; tuned clears every budget=true -> open WASM decision record? NO
+
+wrote C:\Users\Chick\OneDrive\Desktop\reu\websim\validation\spikes\perf\s3-results.json

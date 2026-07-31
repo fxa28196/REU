@@ -1,0 +1,245 @@
+{
+  "schema": "reu-wildfire-shelter-abm/golden-summary/v1/cross-arm-hashes",
+  "about": "verify_2026_runs.py's two cross-arm identities: within a seed the sampled population and the UNREACHABLE id set must be identical across arms A, B and C, because both are properties of the world build and the graph, not of shelter capacity (plan §5.1).",
+  "method": "population_column_sha256 = SHA-256 of the POP_COLS projection as RAW TEXT: the header line `agent_id,starting_encampment,start_lon,start_lat,age_years,sex,mobility_limited,asthma_flag,copd_flag,chronic_physical,walking_speed_mps`, then one line per row with raw cells in that order, rows sorted by the raw agent_id string, LF terminators including a trailing newline. unreachable_id_set_sha256 = SHA-256 of the lexicographically sorted UNREACHABLE agent_id values joined by commas, with no trailing separator. NOTE: verify_2026_runs.py hashes a pandas re-serialisation instead, so its digest values differ from these by construction; the invariant under test is the same.",
+  "provenance": {
+    "source_index": "sources.json",
+    "note": "Every key of `values` is (or names) a run directory. Resolve it in sources.json for the SHA-256 and byte length of the archive files the numbers were derived from."
+  },
+  "values": {
+    "42": {
+      "arms": {
+        "A": {
+          "source": "present-day-three-arm/A-seed42",
+          "population_column_sha256": "4a40973809acb28f3499e01831cff997207a290ecff3bd300d31559785f2ebbd",
+          "unreachable_id_set_sha256": "9563f257fa839bccef7c35935f8de4fd61a7d940e986492ed27ebaa4d89b87b2",
+          "unreachable_count": 28
+        },
+        "B": {
+          "source": "present-day-three-arm/B-seed42",
+          "population_column_sha256": "4a40973809acb28f3499e01831cff997207a290ecff3bd300d31559785f2ebbd",
+          "unreachable_id_set_sha256": "9563f257fa839bccef7c35935f8de4fd61a7d940e986492ed27ebaa4d89b87b2",
+          "unreachable_count": 28
+        },
+        "C": {
+          "source": "present-day-three-arm/C-seed42",
+          "population_column_sha256": "4a40973809acb28f3499e01831cff997207a290ecff3bd300d31559785f2ebbd",
+          "unreachable_id_set_sha256": "9563f257fa839bccef7c35935f8de4fd61a7d940e986492ed27ebaa4d89b87b2",
+          "unreachable_count": 28
+        }
+      },
+      "population_identical_across_arms": true,
+      "unreachable_identical_across_arms": true,
+      "population_column_sha256": "4a40973809acb28f3499e01831cff997207a290ecff3bd300d31559785f2ebbd",
+      "unreachable_id_set_sha256": "9563f257fa839bccef7c35935f8de4fd61a7d940e986492ed27ebaa4d89b87b2"
+    },
+    "43": {
+      "arms": {
+        "A": {
+          "source": "present-day-three-arm/A-seed43",
+          "population_column_sha256": "65be6ba9d987d86bac923435ea3b0fd857e5381788ea8de50a977f8399739593",
+          "unreachable_id_set_sha256": "6b25be90525e952d1bc56e87b08bea8194dd58f002aa29bbfd5fdf6d476eccff",
+          "unreachable_count": 36
+        },
+        "B": {
+          "source": "present-day-three-arm/B-seed43",
+          "population_column_sha256": "65be6ba9d987d86bac923435ea3b0fd857e5381788ea8de50a977f8399739593",
+          "unreachable_id_set_sha256": "6b25be90525e952d1bc56e87b08bea8194dd58f002aa29bbfd5fdf6d476eccff",
+          "unreachable_count": 36
+        },
+        "C": {
+          "source": "present-day-three-arm/C-seed43",
+          "population_column_sha256": "65be6ba9d987d86bac923435ea3b0fd857e5381788ea8de50a977f8399739593",
+          "unreachable_id_set_sha256": "6b25be90525e952d1bc56e87b08bea8194dd58f002aa29bbfd5fdf6d476eccff",
+          "unreachable_count": 36
+        }
+      },
+      "population_identical_across_arms": true,
+      "unreachable_identical_across_arms": true,
+      "population_column_sha256": "65be6ba9d987d86bac923435ea3b0fd857e5381788ea8de50a977f8399739593",
+      "unreachable_id_set_sha256": "6b25be90525e952d1bc56e87b08bea8194dd58f002aa29bbfd5fdf6d476eccff"
+    },
+    "44": {
+      "arms": {
+        "A": {
+          "source": "present-day-three-arm/A-seed44",
+          "population_column_sha256": "b4a09673bc4a4824d38cd787df2bfa7e9e5d98c01da34039fb45d258c779f5c7",
+          "unreachable_id_set_sha256": "6e209a394201daabddb1949400ba4588afc6c786fc5195468169f26d3f188007",
+          "unreachable_count": 36
+        },
+        "B": {
+          "source": "present-day-three-arm/B-seed44",
+          "population_column_sha256": "b4a09673bc4a4824d38cd787df2bfa7e9e5d98c01da34039fb45d258c779f5c7",
+          "unreachable_id_set_sha256": "6e209a394201daabddb1949400ba4588afc6c786fc5195468169f26d3f188007",
+          "unreachable_count": 36
+        },
+        "C": {
+          "source": "present-day-three-arm/C-seed44",
+          "population_column_sha256": "b4a09673bc4a4824d38cd787df2bfa7e9e5d98c01da34039fb45d258c779f5c7",
+          "unreachable_id_set_sha256": "6e209a394201daabddb1949400ba4588afc6c786fc5195468169f26d3f188007",
+          "unreachable_count": 36
+        }
+      },
+      "population_identical_across_arms": true,
+      "unreachable_identical_across_arms": true,
+      "population_column_sha256": "b4a09673bc4a4824d38cd787df2bfa7e9e5d98c01da34039fb45d258c779f5c7",
+      "unreachable_id_set_sha256": "6e209a394201daabddb1949400ba4588afc6c786fc5195468169f26d3f188007"
+    },
+    "45": {
+      "arms": {
+        "A": {
+          "source": "present-day-three-arm/A-seed45",
+          "population_column_sha256": "bb5e7e97f3c1b0487577835a8c563bc31ae0cd24c7e8171a821195e6678cadca",
+          "unreachable_id_set_sha256": "5dbe440cb23a976165d99ad668908884ff0322f48d64596ef99e72bf347a909d",
+          "unreachable_count": 27
+        },
+        "B": {
+          "source": "present-day-three-arm/B-seed45",
+          "population_column_sha256": "bb5e7e97f3c1b0487577835a8c563bc31ae0cd24c7e8171a821195e6678cadca",
+          "unreachable_id_set_sha256": "5dbe440cb23a976165d99ad668908884ff0322f48d64596ef99e72bf347a909d",
+          "unreachable_count": 27
+        },
+        "C": {
+          "source": "present-day-three-arm/C-seed45",
+          "population_column_sha256": "bb5e7e97f3c1b0487577835a8c563bc31ae0cd24c7e8171a821195e6678cadca",
+          "unreachable_id_set_sha256": "5dbe440cb23a976165d99ad668908884ff0322f48d64596ef99e72bf347a909d",
+          "unreachable_count": 27
+        }
+      },
+      "population_identical_across_arms": true,
+      "unreachable_identical_across_arms": true,
+      "population_column_sha256": "bb5e7e97f3c1b0487577835a8c563bc31ae0cd24c7e8171a821195e6678cadca",
+      "unreachable_id_set_sha256": "5dbe440cb23a976165d99ad668908884ff0322f48d64596ef99e72bf347a909d"
+    },
+    "46": {
+      "arms": {
+        "A": {
+          "source": "present-day-three-arm/A-seed46",
+          "population_column_sha256": "6b8224004cc6a3f2cdf600ea01526cefd92e75d0a5fba75edf5580bd4c7cd516",
+          "unreachable_id_set_sha256": "3bc3131ebbb5eba15c2fbe6ece0237a98f4c113a25e78b1578b9be703114467f",
+          "unreachable_count": 26
+        },
+        "B": {
+          "source": "present-day-three-arm/B-seed46",
+          "population_column_sha256": "6b8224004cc6a3f2cdf600ea01526cefd92e75d0a5fba75edf5580bd4c7cd516",
+          "unreachable_id_set_sha256": "3bc3131ebbb5eba15c2fbe6ece0237a98f4c113a25e78b1578b9be703114467f",
+          "unreachable_count": 26
+        },
+        "C": {
+          "source": "present-day-three-arm/C-seed46",
+          "population_column_sha256": "6b8224004cc6a3f2cdf600ea01526cefd92e75d0a5fba75edf5580bd4c7cd516",
+          "unreachable_id_set_sha256": "3bc3131ebbb5eba15c2fbe6ece0237a98f4c113a25e78b1578b9be703114467f",
+          "unreachable_count": 26
+        }
+      },
+      "population_identical_across_arms": true,
+      "unreachable_identical_across_arms": true,
+      "population_column_sha256": "6b8224004cc6a3f2cdf600ea01526cefd92e75d0a5fba75edf5580bd4c7cd516",
+      "unreachable_id_set_sha256": "3bc3131ebbb5eba15c2fbe6ece0237a98f4c113a25e78b1578b9be703114467f"
+    },
+    "47": {
+      "arms": {
+        "A": {
+          "source": "present-day-three-arm/A-seed47",
+          "population_column_sha256": "38f55499aa6e8bf47dcfa8d489c29c24eb2601aeb4f39df4f3c78083fcc2c0cd",
+          "unreachable_id_set_sha256": "cbf7c8940e3e819a08ad5f64c8534ab92a3876b19c021f76d6f663f9f554f75d",
+          "unreachable_count": 26
+        },
+        "B": {
+          "source": "present-day-three-arm/B-seed47",
+          "population_column_sha256": "38f55499aa6e8bf47dcfa8d489c29c24eb2601aeb4f39df4f3c78083fcc2c0cd",
+          "unreachable_id_set_sha256": "cbf7c8940e3e819a08ad5f64c8534ab92a3876b19c021f76d6f663f9f554f75d",
+          "unreachable_count": 26
+        },
+        "C": {
+          "source": "present-day-three-arm/C-seed47",
+          "population_column_sha256": "38f55499aa6e8bf47dcfa8d489c29c24eb2601aeb4f39df4f3c78083fcc2c0cd",
+          "unreachable_id_set_sha256": "cbf7c8940e3e819a08ad5f64c8534ab92a3876b19c021f76d6f663f9f554f75d",
+          "unreachable_count": 26
+        }
+      },
+      "population_identical_across_arms": true,
+      "unreachable_identical_across_arms": true,
+      "population_column_sha256": "38f55499aa6e8bf47dcfa8d489c29c24eb2601aeb4f39df4f3c78083fcc2c0cd",
+      "unreachable_id_set_sha256": "cbf7c8940e3e819a08ad5f64c8534ab92a3876b19c021f76d6f663f9f554f75d"
+    },
+    "48": {
+      "arms": {
+        "A": {
+          "source": "present-day-three-arm/A-seed48",
+          "population_column_sha256": "4b45b1ef45cd126e977c82611bcbc8db68c554c8767a80f263d57f28f786c526",
+          "unreachable_id_set_sha256": "e5b0e857263cb341922e21504efecba704249ebf91e1c53c94e3b928d1bd0846",
+          "unreachable_count": 36
+        },
+        "B": {
+          "source": "present-day-three-arm/B-seed48",
+          "population_column_sha256": "4b45b1ef45cd126e977c82611bcbc8db68c554c8767a80f263d57f28f786c526",
+          "unreachable_id_set_sha256": "e5b0e857263cb341922e21504efecba704249ebf91e1c53c94e3b928d1bd0846",
+          "unreachable_count": 36
+        },
+        "C": {
+          "source": "present-day-three-arm/C-seed48",
+          "population_column_sha256": "4b45b1ef45cd126e977c82611bcbc8db68c554c8767a80f263d57f28f786c526",
+          "unreachable_id_set_sha256": "e5b0e857263cb341922e21504efecba704249ebf91e1c53c94e3b928d1bd0846",
+          "unreachable_count": 36
+        }
+      },
+      "population_identical_across_arms": true,
+      "unreachable_identical_across_arms": true,
+      "population_column_sha256": "4b45b1ef45cd126e977c82611bcbc8db68c554c8767a80f263d57f28f786c526",
+      "unreachable_id_set_sha256": "e5b0e857263cb341922e21504efecba704249ebf91e1c53c94e3b928d1bd0846"
+    },
+    "49": {
+      "arms": {
+        "A": {
+          "source": "present-day-three-arm/A-seed49",
+          "population_column_sha256": "a3a9211e936bccefb89bf710ded55faa2a54c8904193f2defac3b555ec30f895",
+          "unreachable_id_set_sha256": "e50f032c3193a7556e7edd58dc72c525bfea8e01b71d0ba7a76792b83d2a1bd8",
+          "unreachable_count": 26
+        },
+        "B": {
+          "source": "present-day-three-arm/B-seed49",
+          "population_column_sha256": "a3a9211e936bccefb89bf710ded55faa2a54c8904193f2defac3b555ec30f895",
+          "unreachable_id_set_sha256": "e50f032c3193a7556e7edd58dc72c525bfea8e01b71d0ba7a76792b83d2a1bd8",
+          "unreachable_count": 26
+        },
+        "C": {
+          "source": "present-day-three-arm/C-seed49",
+          "population_column_sha256": "a3a9211e936bccefb89bf710ded55faa2a54c8904193f2defac3b555ec30f895",
+          "unreachable_id_set_sha256": "e50f032c3193a7556e7edd58dc72c525bfea8e01b71d0ba7a76792b83d2a1bd8",
+          "unreachable_count": 26
+        }
+      },
+      "population_identical_across_arms": true,
+      "unreachable_identical_across_arms": true,
+      "population_column_sha256": "a3a9211e936bccefb89bf710ded55faa2a54c8904193f2defac3b555ec30f895",
+      "unreachable_id_set_sha256": "e50f032c3193a7556e7edd58dc72c525bfea8e01b71d0ba7a76792b83d2a1bd8"
+    },
+    "50": {
+      "arms": {
+        "A": {
+          "source": "present-day-three-arm/A-seed50",
+          "population_column_sha256": "0c9a4fda3e50c43493e201a4ed38dfd70863efa0c37b558556ad6202a07a9a2d",
+          "unreachable_id_set_sha256": "d9a7e615025c2a1df3d388d072602099813054ae276be3f9d6aac6177ba59923",
+          "unreachable_count": 30
+        },
+        "B": {
+          "source": "present-day-three-arm/B-seed50",
+          "population_column_sha256": "0c9a4fda3e50c43493e201a4ed38dfd70863efa0c37b558556ad6202a07a9a2d",
+          "unreachable_id_set_sha256": "d9a7e615025c2a1df3d388d072602099813054ae276be3f9d6aac6177ba59923",
+          "unreachable_count": 30
+        },
+        "C": {
+          "source": "present-day-three-arm/C-seed50",
+          "population_column_sha256": "0c9a4fda3e50c43493e201a4ed38dfd70863efa0c37b558556ad6202a07a9a2d",
+          "unreachable_id_set_sha256": "d9a7e615025c2a1df3d388d072602099813054ae276be3f9d6aac6177ba59923",
+          "unreachable_count": 30
+        }
+      },
+      "population_identical_across_arms": true,
+      "unreachable_identical_across_arms": true,
+      "population_column_sha256": "0c9a4fda3e50c43493e201a4ed38dfd70863efa0c37b558556ad6202a07a9a2d",
+      "unreachable_id_set_sha256": "d9a7e615025c2a1df3d388d072602099813054ae276be3f9d6aac6177ba59923"
+    }
+  }
+}

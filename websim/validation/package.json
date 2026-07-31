@@ -1,0 +1,21 @@
+{
+  "name": "@websim/validation",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "The conscience of the project: gate ports, replay harness, Tier-4 divergence report, mutation test.",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@websim/engine": "*",
+    "@websim/pipeline": "*",
+    "@websim/shared": "*",
+    "geographiclib-geodesic": "2.2.0"
+  }
+}

@@ -1,0 +1,459 @@
+{
+  "schema": "reu-wildfire-shelter-abm/validation-working-set/v1",
+  "about": "The curated subset of the read-only Java archive that hosted CI runs Tiers 1-3 against (plan §5.3, risk W18). This file is a MANIFEST ONLY: the payload is not committed, no git-lfs is configured, and materialising a local copy needs the user's sign-off on repo size (plan §10 item 3).",
+  "how_to_use": [
+    "npx tsx pipeline/scripts/verify-working-set.ts --fetch   # copy from a local archive",
+    "npx tsx pipeline/scripts/verify-working-set.ts           # verify SHAs of a local copy",
+    "WEBSIM_ARCHIVE_ROOT=<dir> points every archive-reading tool at the copy instead",
+    "of docs/runs/, which is how a CI runner consumes the working set."
+  ],
+  "budget": {
+    "plan_target_bytes": 41943040,
+    "plan_target_note": "plan §5.3 sizes the working set at roughly 40 MB",
+    "actual_bytes": 40599206,
+    "actual_mib": 38.72,
+    "run_count": 14,
+    "file_count": 42
+  },
+  "coverage": {
+    "gate_classes": {
+      "a-r3-identity": "R3 null identity: E0-null run vs its no-layer counterpart, shared-column projection",
+      "b-bed-sum": "U-03 four-way bed sum",
+      "c-asthma-negative-control": "asthma stratum speed/dose negative control (U-19)",
+      "d-terminal-conservation": "closed terminal-state vocabulary, counts sum to n and numAgents",
+      "e-unaware-immobility": "UNAWARE agents never travel and never get a start tick",
+      "f-wachinger-acceptance": "at least one high-barrier resident still UNAWARE/PRE_EVAC at end",
+      "g-e-census-plausibility": "realised vs configured decision-layer census within 3 binomial SE",
+      "h-manifest-21-e-params": "all 21 Phase-E parameters present in the manifest",
+      "i-manifest-7-se-params": "all 7 Scenario-E parameters present; closureDraw only at code 3",
+      "j-severe-series-provenance": "456-slice severe series, peak scaling, out_of_range_lookups == 0",
+      "k-closure-census": "closure block agrees with the schedule CSV; code 0 => block == {code}",
+      "l-counter-identities": "blockages == push_throughs + reroutes; stuck_events <= push_throughs",
+      "cap-sums": "capacity sums per arm (A 2234, B/C 6842)",
+      "pop-cross-arm-hash": "population byte-identical across arms within a seed",
+      "unreachable-id-hash": "UNREACHABLE id set identical across arms within a seed",
+      "data-version-constancy": "data_version_tag constant across seeds within an arm",
+      "exposure-identity": "never-sheltered exposure identity and vwe == dose",
+      "analyze-run-recompute": "recomputed statistics vs manifest (atol 0.51, gini 5e-3)",
+      "tier1-initial-world": "world-build identity fixtures (camp vector, demographics, seeds)",
+      "closure-free-baseline": "no-closure control for the severe families"
+    },
+    "uncovered_gate_classes": [],
+    "note": "The nine-seed statistical envelope is deliberately NOT a membership driver: all 27 three-arm runs would cost roughly 73 MB alone. It ships as a committed digest in validation/golden-summaries/sheltered-envelopes.json instead. The working set carries two seeds per arm so cross-seed invariants still have real data."
+  },
+  "entries": [
+    {
+      "run_dir": "present-day-three-arm/A-seed42",
+      "preset_family": "A",
+      "seed": 42,
+      "why": "The flagship configuration. Capacity binds hard here (2,234 beds, 6,842 residents), so arm A is the only arm where the within-tick order channel can move an outcome — it is the Tier-4 attribution target and the Compare-screen validation demo.",
+      "gate_classes": [
+        "b-bed-sum",
+        "c-asthma-negative-control",
+        "d-terminal-conservation",
+        "cap-sums",
+        "pop-cross-arm-hash",
+        "unreachable-id-hash",
+        "exposure-identity",
+        "analyze-run-recompute",
+        "tier1-initial-world"
+      ],
+      "bytes": 2735218,
+      "files": [
+        {
+          "file": "simulation.json",
+          "bytes": 18557,
+          "sha256": "f77374cc25b771baed3f5ddcdefc8594850ac119a1713c584cb984bd465309a7"
+        },
+        {
+          "file": "shelters.csv",
+          "bytes": 3722,
+          "sha256": "32451215888c63cd2ceeedaffb8c42349655a0eb211aafa5be66e0577ede62b4"
+        },
+        {
+          "file": "agents.csv",
+          "bytes": 2712939,
+          "sha256": "5f3fefd9646918834c57cc6d4bae068d9f6710bbb9cbda7e6ce78d313aed22f8"
+        }
+      ]
+    },
+    {
+      "run_dir": "present-day-three-arm/B-seed42",
+      "preset_family": "B",
+      "seed": 42,
+      "why": "Capacity == population, so admission never binds: the arm where a port should reproduce per-agent rows structurally, and the control that isolates capacity from placement against arm A.",
+      "gate_classes": [
+        "b-bed-sum",
+        "cap-sums",
+        "pop-cross-arm-hash",
+        "unreachable-id-hash"
+      ],
+      "bytes": 2938110,
+      "files": [
+        {
+          "file": "simulation.json",
+          "bytes": 18580,
+          "sha256": "eb69f3225a5e10e03dcb6a049f2e859fab6f20700e8e2b711e44ca2779302301"
+        },
+        {
+          "file": "shelters.csv",
+          "bytes": 3787,
+          "sha256": "041d36cb98835e3c90d55d64ac2ef8defc72bc34c8d39d50b35cbd60b4223924"
+        },
+        {
+          "file": "agents.csv",
+          "bytes": 2915743,
+          "sha256": "bba1e7e6e365b618c37af97260221314d74cb589a48c628ab8a8a8cd0e457eeb"
+        }
+      ]
+    },
+    {
+      "run_dir": "present-day-three-arm/C-seed42",
+      "preset_family": "C",
+      "seed": 42,
+      "why": "46 doors instead of 36 at the same bed count — the placement arm, and the only three-arm run with the larger shelter table (a different CSV load order for the closure-wave recompute).",
+      "gate_classes": [
+        "b-bed-sum",
+        "cap-sums",
+        "pop-cross-arm-hash",
+        "unreachable-id-hash"
+      ],
+      "bytes": 2992343,
+      "files": [
+        {
+          "file": "simulation.json",
+          "bytes": 19915,
+          "sha256": "b51934c94a586a87757a5b5fbc10a9b631787cc42b75ec7b443053bffe87aac7"
+        },
+        {
+          "file": "shelters.csv",
+          "bytes": 5048,
+          "sha256": "6d458751b9d15a43cb56d26ca33dd944cde4c4a17d81b025cea7413dbb0a8387"
+        },
+        {
+          "file": "agents.csv",
+          "bytes": 2967380,
+          "sha256": "9658b7cd7e20931e7f039545af592e1de07d95d2eec0bea26ed3a5542a692e44"
+        }
+      ]
+    },
+    {
+      "run_dir": "present-day-three-arm/A-seed43",
+      "preset_family": "A",
+      "seed": 43,
+      "why": "Second seed for arm A: makes data_version_tag constancy and the pooled negative controls testable, and gives the unreachable id set a different value to prove the hash is seed-sensitive rather than constant.",
+      "gate_classes": [
+        "data-version-constancy",
+        "unreachable-id-hash",
+        "c-asthma-negative-control"
+      ],
+      "bytes": 2734981,
+      "files": [
+        {
+          "file": "simulation.json",
+          "bytes": 18557,
+          "sha256": "96c2410f7bfeca7fb29a71673ca170799851d43750c330334fc4ac155f4222de"
+        },
+        {
+          "file": "shelters.csv",
+          "bytes": 3721,
+          "sha256": "94edc3eeadb4e026c2647e392a28e3ac3ea9ed2a0bf499fb8d0b532d4e037f0f"
+        },
+        {
+          "file": "agents.csv",
+          "bytes": 2712703,
+          "sha256": "39a38c1d327c8be4ded841004aedef1e1b33b63e4cbb1cf51bc2a326bc5294db"
+        }
+      ]
+    },
+    {
+      "run_dir": "present-day-three-arm/B-seed43",
+      "preset_family": "B",
+      "seed": 43,
+      "why": "Arm B at the second seed, so the cross-arm population hash is checked at more than one seed.",
+      "gate_classes": [
+        "data-version-constancy",
+        "pop-cross-arm-hash"
+      ],
+      "bytes": 2938195,
+      "files": [
+        {
+          "file": "simulation.json",
+          "bytes": 18583,
+          "sha256": "06d38ce30130ce5c3405fda9dde45a296146dfbb8294dbd243767ff5fdd5b650"
+        },
+        {
+          "file": "shelters.csv",
+          "bytes": 3789,
+          "sha256": "427933c2c07141fce8a32d99dd3009d15c59a0b704d06a0faedb6dcc7e60c028"
+        },
+        {
+          "file": "agents.csv",
+          "bytes": 2915823,
+          "sha256": "375607ce240fe048866985f99e9172f44b7b5c428c192bdd95c7b7f3d2c07528"
+        }
+      ]
+    },
+    {
+      "run_dir": "present-day-three-arm/C-seed43",
+      "preset_family": "C",
+      "seed": 43,
+      "why": "Arm C at the second seed, completing the three-arm cross-arm identity at seed 43.",
+      "gate_classes": [
+        "data-version-constancy",
+        "pop-cross-arm-hash"
+      ],
+      "bytes": 2991783,
+      "files": [
+        {
+          "file": "simulation.json",
+          "bytes": 19914,
+          "sha256": "c93fa626a2cbd96c0a97774962fe48ad659ddfa090e2e08e56afacc850c4f144"
+        },
+        {
+          "file": "shelters.csv",
+          "bytes": 5047,
+          "sha256": "8860d90f83f5e966db1f5c67ad9938d681137a26e75fbf32f1bf5fc8b63144a1"
+        },
+        {
+          "file": "agents.csv",
+          "bytes": 2966822,
+          "sha256": "1115d1a6a9a2531d9d454ed99641d944c6ecb0ca35dd5392580b4c79bd1c9e80"
+        }
+      ]
+    },
+    {
+      "run_dir": "scenario-e/E0null-A-seed42",
+      "preset_family": "E0",
+      "seed": 42,
+      "why": "The R3 null for arm A: the decision layer switched ON with every mechanism degenerate, which must reproduce A-seed42 exactly. Paired with A-seed42 above, this is the (a) gate. Taken from scenario-e/ rather than phase-e/ because it carries the full 59-column schema, so the closure counters are present and provably zero.",
+      "gate_classes": [
+        "a-r3-identity",
+        "d-terminal-conservation",
+        "k-closure-census",
+        "l-counter-identities"
+      ],
+      "bytes": 2924781,
+      "files": [
+        {
+          "file": "simulation.json",
+          "bytes": 19685,
+          "sha256": "e475d7c34c300b823afbc50175d601beb9ded94f79bcd3c2ec7f219ef0e24eb5"
+        },
+        {
+          "file": "shelters.csv",
+          "bytes": 3809,
+          "sha256": "425b6eab11fe15f271a53460f53d1b524bda3285a56b1ac0f40f1f2775339218"
+        },
+        {
+          "file": "agents.csv",
+          "bytes": 2901287,
+          "sha256": "486106aa2d0dea1ab0a735be9c2f5881e5538d1659874842706a2bf0f3da4432"
+        }
+      ]
+    },
+    {
+      "run_dir": "scenario-e/E0null-B-seed42",
+      "preset_family": "E0",
+      "seed": 42,
+      "why": "R3 null for arm B — proves the identity is not an arm-A coincidence.",
+      "gate_classes": [
+        "a-r3-identity",
+        "k-closure-census"
+      ],
+      "bytes": 3127673,
+      "files": [
+        {
+          "file": "simulation.json",
+          "bytes": 19708,
+          "sha256": "a653879058c78f95f8470cdf0ae89dfdd116f9b5cb3e786988dcc0324685eabf"
+        },
+        {
+          "file": "shelters.csv",
+          "bytes": 3874,
+          "sha256": "01f7021230c796888a5e045c22ce81a852b44e668c947aed76efb66f155618b1"
+        },
+        {
+          "file": "agents.csv",
+          "bytes": 3104091,
+          "sha256": "20f8efbd628ad0046c67829443525ec620df2977f2fe4eb27729844efe7bacb3"
+        }
+      ]
+    },
+    {
+      "run_dir": "scenario-e/E0null-C-seed42",
+      "preset_family": "E0",
+      "seed": 42,
+      "why": "R3 null for arm C — the third and last geometry the null must reproduce.",
+      "gate_classes": [
+        "a-r3-identity",
+        "k-closure-census"
+      ],
+      "bytes": 3181926,
+      "files": [
+        {
+          "file": "simulation.json",
+          "bytes": 21043,
+          "sha256": "8d80611fe4cbc67c92e00e95ba91c7d00de30e5081756c8c3c6a9b76d23f5a21"
+        },
+        {
+          "file": "shelters.csv",
+          "bytes": 5155,
+          "sha256": "403ceff35c45b947d507df1d285e33bf2773676f4c7b373f2c85267ab0dff2b2"
+        },
+        {
+          "file": "agents.csv",
+          "bytes": 3155728,
+          "sha256": "81b785893ba19e3f2f8de165cefb3ccfa56f5dd07a881bd1b9a60c853ca0fd6c"
+        }
+      ]
+    },
+    {
+      "run_dir": "phase-e/ER-A-n6842-seed42",
+      "preset_family": "ER",
+      "seed": 42,
+      "why": "Baseline-real decision layer: the only family with UNAWARE and PRE_EVAC survivors at end of run, so it is the sole source of the (e) immobility and (f) Wachinger acceptance gates and the 21-parameter manifest completeness check.",
+      "gate_classes": [
+        "e-unaware-immobility",
+        "f-wachinger-acceptance",
+        "g-e-census-plausibility",
+        "h-manifest-21-e-params"
+      ],
+      "bytes": 2613677,
+      "files": [
+        {
+          "file": "simulation.json",
+          "bytes": 19433,
+          "sha256": "03c75b1cb8375c875c65090b4f7a24aa3adaec19252b8e270998363504908b6a"
+        },
+        {
+          "file": "shelters.csv",
+          "bytes": 3760,
+          "sha256": "e10a4d99d80fd1e8ea8263ec7e4069f3caad181574f4493dc61ce48ec4c36976"
+        },
+        {
+          "file": "agents.csv",
+          "bytes": 2590484,
+          "sha256": "e49e29c5da3a9f74e6caaa33cc0f68670a62bbe26a58b9aabc87224a98a98a42"
+        }
+      ]
+    },
+    {
+      "run_dir": "scenario-e/SE-E18-seed42",
+      "preset_family": "SE",
+      "seed": 42,
+      "why": "Severe v1: 456-slice constructed series over a 455-hour window — the configuration the simulationHours <= slices-1 gotcha was found on — plus closuresCode 1 (one wave, 18 edges) for the closure census and counter identities.",
+      "gate_classes": [
+        "i-manifest-7-se-params",
+        "j-severe-series-provenance",
+        "k-closure-census",
+        "l-counter-identities"
+      ],
+      "bytes": 2842563,
+      "files": [
+        {
+          "file": "simulation.json",
+          "bytes": 20002,
+          "sha256": "15dfaa87a13f116a6d8e71c107503c45473e615ed82cb21fa7da194af68c6dc9"
+        },
+        {
+          "file": "shelters.csv",
+          "bytes": 3754,
+          "sha256": "95a1f4331372801e563a20574b9c47d307f6479ded8c049c35b9b6fb59cb37f7"
+        },
+        {
+          "file": "agents.csv",
+          "bytes": 2818807,
+          "sha256": "33d4d82235ac6058fad8df510f44c621e857aa5d0109397baf60b2a4827f7497"
+        }
+      ]
+    },
+    {
+      "run_dir": "scenario-e/SEnc-E18-seed42",
+      "preset_family": "SEnc",
+      "seed": 42,
+      "why": "The no-closure control for SE-E18: identical severe smoke with closuresCode 0, so any SE-vs-SEnc difference is attributable to closures alone. Also the code-0 case of the (k) gate, where the closure block must reduce to {code}.",
+      "gate_classes": [
+        "closure-free-baseline",
+        "k-closure-census",
+        "l-counter-identities"
+      ],
+      "bytes": 2842568,
+      "files": [
+        {
+          "file": "simulation.json",
+          "bytes": 19652,
+          "sha256": "647b7db1a8f860eda03cb22ff8512aa15bf7f129560a0aa80eb91d301371111a"
+        },
+        {
+          "file": "shelters.csv",
+          "bytes": 3763,
+          "sha256": "53f6c49fdef2e9a1d09dc4e1589ecc7b5f462e2ea476909c4ea5df5135cdbad1"
+        },
+        {
+          "file": "agents.csv",
+          "bytes": 2819153,
+          "sha256": "667034af4ece0fd1af42d6183bb4b175b34c6d03e1900917c32463203987fcf6"
+        }
+      ]
+    },
+    {
+      "run_dir": "scenario-e-v2/SE2-E18-d1-seed42",
+      "preset_family": "SE2",
+      "seed": 42,
+      "why": "Worst-plausible v2 at pre-committed draw 1: the highest-severity configuration the app ships, closuresCode 3 (6 waves, 72 edges) so closureDraw is present and the (i) gate's draw-only-at-code-3 rule has a positive case. Its manifest also records the executed pushThetaThreshold = 0.0 that the honesty note is about.",
+      "gate_classes": [
+        "i-manifest-7-se-params",
+        "j-severe-series-provenance",
+        "k-closure-census",
+        "l-counter-identities"
+      ],
+      "bytes": 2867883,
+      "files": [
+        {
+          "file": "simulation.json",
+          "bytes": 20063,
+          "sha256": "938469f1942dc7d701aac0bdb2b142d6039559be76be75d6c7cdf2081b925ac9"
+        },
+        {
+          "file": "shelters.csv",
+          "bytes": 3770,
+          "sha256": "a2bac6b34a24ad2d6c463691dbbc8711b08561c316feed391c98472a7d03c334"
+        },
+        {
+          "file": "agents.csv",
+          "bytes": 2844050,
+          "sha256": "80db8b0220fa2f2bace63fab64ce4dd8004a02360d77184d4f669388e3b21c5d"
+        }
+      ]
+    },
+    {
+      "run_dir": "scenario-e-v2/SE2nc-E18-seed42",
+      "preset_family": "SE2nc",
+      "seed": 42,
+      "why": "No-closure control for the v2 severity, completing the 2x2 (severity x closures) design.",
+      "gate_classes": [
+        "closure-free-baseline",
+        "k-closure-census"
+      ],
+      "bytes": 2867505,
+      "files": [
+        {
+          "file": "simulation.json",
+          "bytes": 19677,
+          "sha256": "9be5169dc98089f8d565d7cd26f4c35db91ffc39a9b5d3cfe94734cd549e7403"
+        },
+        {
+          "file": "shelters.csv",
+          "bytes": 3767,
+          "sha256": "95a1b469d8c7a1bf81ad5941eb78b4ff2080799e563181641da3e71804ce8cc2"
+        },
+        {
+          "file": "agents.csv",
+          "bytes": 2844061,
+          "sha256": "08bb68b37c0c53943eec1b5095451e77c9ecc7e9786cfd980575fa68e3003ce9"
+        }
+      ]
+    }
+  ]
+}

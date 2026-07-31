@@ -1,0 +1,5986 @@
+{
+  "schema": "reu-wildfire-shelter-abm/order-permutation-census/v1",
+  "about": {
+    "schema": "reu-wildfire-shelter-abm/order-permutation-census/v1",
+    "run": "present-day-three-arm/A-seed42",
+    "config": {
+      "numAgents": 6842,
+      "randomSeed": 42,
+      "simulationHours": 312
+    },
+    "preset": "A_present_day",
+    "streamsRequested": 200,
+    "shards": 8,
+    "shard": "merged",
+    "generatedBy": "validation/scripts/order-permutation-census.ts"
+  },
+  "method": "One arm-A run per permutation stream, identical config and identical world build (the build digest is asserted constant across every run), varying ONLY the colt default stream's state between the last build-time draw and tick 1. Every run is compared against the archived Java agents.csv/shelters.csv on raw text.",
+  "final_state_divergence": {
+    "streams": 200,
+    "observed": 114,
+    "observed_percentile": 31,
+    "observed_z": -0.3366929274733166,
+    "two_sided_empirical_p": 0.7761194029850746,
+    "identity_order": 106,
+    "n": 200,
+    "min": 94,
+    "max": 144,
+    "mean": 116.89,
+    "sd": 8.58348888314275,
+    "p01": 97.98,
+    "p05": 102,
+    "p25": 111.5,
+    "median": 118,
+    "p75": 122,
+    "p95": 130,
+    "p99": 134.01999999999998
+  },
+  "swap_structure": {
+    "observed_lost": 57,
+    "observed_gained": 57,
+    "observed_non_shelter_flips": 0,
+    "streams_with_balanced_swaps": 200,
+    "streams_with_zero_non_shelter_flips": 200,
+    "sheltered_values": [
+      2060
+    ],
+    "unreachable_values": [
+      28
+    ]
+  },
+  "shelters_csv_site_agreement": {
+    "name": {
+      "observed": 36,
+      "min": 36,
+      "median": 36,
+      "max": 36,
+      "of_sites": 36
+    },
+    "lon": {
+      "observed": 36,
+      "min": 36,
+      "median": 36,
+      "max": 36,
+      "of_sites": 36
+    },
+    "lat": {
+      "observed": 36,
+      "min": 36,
+      "median": 36,
+      "max": 36,
+      "of_sites": 36
+    },
+    "capacity": {
+      "observed": 36,
+      "min": 36,
+      "median": 36,
+      "max": 36,
+      "of_sites": 36
+    },
+    "operating": {
+      "observed": 36,
+      "min": 36,
+      "median": 36,
+      "max": 36,
+      "of_sites": 36
+    },
+    "peak_occupancy": {
+      "observed": 36,
+      "min": 36,
+      "median": 36,
+      "max": 36,
+      "of_sites": 36
+    },
+    "final_occupancy": {
+      "observed": 36,
+      "min": 36,
+      "median": 36,
+      "max": 36,
+      "of_sites": 36
+    },
+    "refused_count": {
+      "observed": 19,
+      "min": 15,
+      "median": 17,
+      "max": 22,
+      "of_sites": 36
+    },
+    "utilization": {
+      "observed": 36,
+      "min": 36,
+      "median": 36,
+      "max": 36,
+      "of_sites": 36
+    },
+    "mean_travel_dist_m_admitted": {
+      "observed": 10,
+      "min": 7,
+      "median": 10,
+      "max": 15,
+      "of_sites": 36
+    }
+  },
+  "build_digests": [
+    "77249a23b42721f2"
+  ],
+  "results": [
+    {
+      "shuffleSeed": null,
+      "label": "CERTIFIED-FAITHFUL (shuffle-mt, stream as the build left it)",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 114,
+      "shelteredLost": 57,
+      "shelteredGained": 57,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:57",
+        "SHELTERED->REFUSED_ALL_FULL:57"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 19,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": null,
+      "label": "IDENTITY ORDER (no shuffle at all)",
+      "agentOrder": "identity",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 106,
+      "shelteredLost": 53,
+      "shelteredGained": 53,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:53",
+        "SHELTERED->REFUSED_ALL_FULL:53"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 12
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1107666780,
+      "label": "stream 1107666780",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 116,
+      "shelteredLost": 58,
+      "shelteredGained": 58,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:58",
+        "SHELTERED->REFUSED_ALL_FULL:58"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -825232764,
+      "label": "stream -825232764",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 116,
+      "shelteredLost": 58,
+      "shelteredGained": 58,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:58",
+        "SHELTERED->REFUSED_ALL_FULL:58"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 7
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1119116628,
+      "label": "stream -1119116628",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 124,
+      "shelteredLost": 62,
+      "shelteredGained": 62,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:62",
+        "SHELTERED->REFUSED_ALL_FULL:62"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 19,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1353013204,
+      "label": "stream 1353013204",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 124,
+      "shelteredLost": 62,
+      "shelteredGained": 62,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:62",
+        "SHELTERED->REFUSED_ALL_FULL:62"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -778194436,
+      "label": "stream -778194436",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 102,
+      "shelteredLost": 51,
+      "shelteredGained": 51,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:51",
+        "SHELTERED->REFUSED_ALL_FULL:51"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1091129636,
+      "label": "stream 1091129636",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 114,
+      "shelteredLost": 57,
+      "shelteredGained": 57,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:57",
+        "SHELTERED->REFUSED_ALL_FULL:57"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1515246924,
+      "label": "stream 1515246924",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 100,
+      "shelteredLost": 50,
+      "shelteredGained": 50,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:50",
+        "SHELTERED->REFUSED_ALL_FULL:50"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 12
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -437199244,
+      "label": "stream -437199244",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 122,
+      "shelteredLost": 61,
+      "shelteredGained": 61,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:61",
+        "SHELTERED->REFUSED_ALL_FULL:61"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1543113884,
+      "label": "stream 1543113884",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 132,
+      "shelteredLost": 66,
+      "shelteredGained": 66,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:66",
+        "SHELTERED->REFUSED_ALL_FULL:66"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -695140412,
+      "label": "stream -695140412",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 112,
+      "shelteredLost": 56,
+      "shelteredGained": 56,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:56",
+        "SHELTERED->REFUSED_ALL_FULL:56"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1416517612,
+      "label": "stream 1416517612",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 112,
+      "shelteredLost": 56,
+      "shelteredGained": 56,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:56",
+        "SHELTERED->REFUSED_ALL_FULL:56"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1264497940,
+      "label": "stream 1264497940",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 116,
+      "shelteredLost": 58,
+      "shelteredGained": 58,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:58",
+        "SHELTERED->REFUSED_ALL_FULL:58"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1966950596,
+      "label": "stream -1966950596",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1846476388,
+      "label": "stream 1846476388",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 114,
+      "shelteredLost": 57,
+      "shelteredGained": 57,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:57",
+        "SHELTERED->REFUSED_ALL_FULL:57"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1598827148,
+      "label": "stream 1598827148",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 112,
+      "shelteredLost": 56,
+      "shelteredGained": 56,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:56",
+        "SHELTERED->REFUSED_ALL_FULL:56"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 19,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1449731148,
+      "label": "stream -1449731148",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 126,
+      "shelteredLost": 63,
+      "shelteredGained": 63,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:63",
+        "SHELTERED->REFUSED_ALL_FULL:63"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 13
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1684033060,
+      "label": "stream -1684033060",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 102,
+      "shelteredLost": 51,
+      "shelteredGained": 51,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:51",
+        "SHELTERED->REFUSED_ALL_FULL:51"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -97825532,
+      "label": "stream -97825532",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 118,
+      "shelteredLost": 59,
+      "shelteredGained": 59,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:59",
+        "SHELTERED->REFUSED_ALL_FULL:59"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1030599380,
+      "label": "stream -1030599380",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 124,
+      "shelteredLost": 62,
+      "shelteredGained": 62,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:62",
+        "SHELTERED->REFUSED_ALL_FULL:62"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1027691092,
+      "label": "stream 1027691092",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 15,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1614347388,
+      "label": "stream 1614347388",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 112,
+      "shelteredLost": 56,
+      "shelteredGained": 56,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:56",
+        "SHELTERED->REFUSED_ALL_FULL:56"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -2121405532,
+      "label": "stream -2121405532",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1508425676,
+      "label": "stream 1508425676",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 112,
+      "shelteredLost": 56,
+      "shelteredGained": 56,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:56",
+        "SHELTERED->REFUSED_ALL_FULL:56"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1460017396,
+      "label": "stream 1460017396",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 132,
+      "shelteredLost": 66,
+      "shelteredGained": 66,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:66",
+        "SHELTERED->REFUSED_ALL_FULL:66"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1043765020,
+      "label": "stream 1043765020",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 112,
+      "shelteredLost": 56,
+      "shelteredGained": 56,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:56",
+        "SHELTERED->REFUSED_ALL_FULL:56"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 19,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 795024139,
+      "label": "stream 795024139",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 124,
+      "shelteredLost": 62,
+      "shelteredGained": 62,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:62",
+        "SHELTERED->REFUSED_ALL_FULL:62"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1182981139,
+      "label": "stream 1182981139",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 124,
+      "shelteredLost": 62,
+      "shelteredGained": 62,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:62",
+        "SHELTERED->REFUSED_ALL_FULL:62"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -555565541,
+      "label": "stream -555565541",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 124,
+      "shelteredLost": 62,
+      "shelteredGained": 62,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:62",
+        "SHELTERED->REFUSED_ALL_FULL:62"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 20,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -913907421,
+      "label": "stream -913907421",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 98,
+      "shelteredLost": 49,
+      "shelteredGained": 49,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:49",
+        "SHELTERED->REFUSED_ALL_FULL:49"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 15,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 15
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 402089259,
+      "label": "stream 402089259",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 116,
+      "shelteredLost": 58,
+      "shelteredGained": 58,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:58",
+        "SHELTERED->REFUSED_ALL_FULL:58"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 7
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 750807603,
+      "label": "stream 750807603",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 94,
+      "shelteredLost": 47,
+      "shelteredGained": 47,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:47",
+        "SHELTERED->REFUSED_ALL_FULL:47"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -604893125,
+      "label": "stream -604893125",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 126,
+      "shelteredLost": 63,
+      "shelteredGained": 63,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:63",
+        "SHELTERED->REFUSED_ALL_FULL:63"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1683982525,
+      "label": "stream -1683982525",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1000095925,
+      "label": "stream -1000095925",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 112,
+      "shelteredLost": 56,
+      "shelteredGained": 56,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:56",
+        "SHELTERED->REFUSED_ALL_FULL:56"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -505935789,
+      "label": "stream -505935789",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 132,
+      "shelteredLost": 66,
+      "shelteredGained": 66,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:66",
+        "SHELTERED->REFUSED_ALL_FULL:66"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 21,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 320696923,
+      "label": "stream 320696923",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 108,
+      "shelteredLost": 54,
+      "shelteredGained": 54,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:54",
+        "SHELTERED->REFUSED_ALL_FULL:54"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 12
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 2069372259,
+      "label": "stream 2069372259",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 118,
+      "shelteredLost": 59,
+      "shelteredGained": 59,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:59",
+        "SHELTERED->REFUSED_ALL_FULL:59"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1037031061,
+      "label": "stream -1037031061",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 19,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1538148749,
+      "label": "stream -1538148749",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 126,
+      "shelteredLost": 63,
+      "shelteredGained": 63,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:63",
+        "SHELTERED->REFUSED_ALL_FULL:63"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1813191557,
+      "label": "stream -1813191557",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 118,
+      "shelteredLost": 59,
+      "shelteredGained": 59,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:59",
+        "SHELTERED->REFUSED_ALL_FULL:59"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1765135235,
+      "label": "stream 1765135235",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 106,
+      "shelteredLost": 53,
+      "shelteredGained": 53,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:53",
+        "SHELTERED->REFUSED_ALL_FULL:53"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 585409419,
+      "label": "stream 585409419",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 126,
+      "shelteredLost": 63,
+      "shelteredGained": 63,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:63",
+        "SHELTERED->REFUSED_ALL_FULL:63"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1229622125,
+      "label": "stream -1229622125",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 104,
+      "shelteredLost": 52,
+      "shelteredGained": 52,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:52",
+        "SHELTERED->REFUSED_ALL_FULL:52"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -236427621,
+      "label": "stream -236427621",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 124,
+      "shelteredLost": 62,
+      "shelteredGained": 62,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:62",
+        "SHELTERED->REFUSED_ALL_FULL:62"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1774295459,
+      "label": "stream 1774295459",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 114,
+      "shelteredLost": 57,
+      "shelteredGained": 57,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:57",
+        "SHELTERED->REFUSED_ALL_FULL:57"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 2080976299,
+      "label": "stream 2080976299",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 110,
+      "shelteredLost": 55,
+      "shelteredGained": 55,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:55",
+        "SHELTERED->REFUSED_ALL_FULL:55"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1602962099,
+      "label": "stream 1602962099",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 104,
+      "shelteredLost": 52,
+      "shelteredGained": 52,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:52",
+        "SHELTERED->REFUSED_ALL_FULL:52"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1150810299,
+      "label": "stream 1150810299",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 118,
+      "shelteredLost": 59,
+      "shelteredGained": 59,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:59",
+        "SHELTERED->REFUSED_ALL_FULL:59"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -2054983741,
+      "label": "stream -2054983741",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 128,
+      "shelteredLost": 64,
+      "shelteredGained": 64,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:64",
+        "SHELTERED->REFUSED_ALL_FULL:64"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -416954421,
+      "label": "stream -416954421",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 118,
+      "shelteredLost": 59,
+      "shelteredGained": 59,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:59",
+        "SHELTERED->REFUSED_ALL_FULL:59"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -984566546,
+      "label": "stream -984566546",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 122,
+      "shelteredLost": 61,
+      "shelteredGained": 61,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:61",
+        "SHELTERED->REFUSED_ALL_FULL:61"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1923002966,
+      "label": "stream 1923002966",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1985240254,
+      "label": "stream 1985240254",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 845632550,
+      "label": "stream 845632550",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 104,
+      "shelteredLost": 52,
+      "shelteredGained": 52,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:52",
+        "SHELTERED->REFUSED_ALL_FULL:52"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -410961778,
+      "label": "stream -410961778",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 108,
+      "shelteredLost": 54,
+      "shelteredGained": 54,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:54",
+        "SHELTERED->REFUSED_ALL_FULL:54"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 19,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1954567690,
+      "label": "stream -1954567690",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 114,
+      "shelteredLost": 57,
+      "shelteredGained": 57,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:57",
+        "SHELTERED->REFUSED_ALL_FULL:57"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1878280286,
+      "label": "stream 1878280286",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 104,
+      "shelteredLost": 52,
+      "shelteredGained": 52,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:52",
+        "SHELTERED->REFUSED_ALL_FULL:52"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1197165626,
+      "label": "stream -1197165626",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 110,
+      "shelteredLost": 55,
+      "shelteredGained": 55,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:55",
+        "SHELTERED->REFUSED_ALL_FULL:55"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1576367058,
+      "label": "stream -1576367058",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 100,
+      "shelteredLost": 50,
+      "shelteredGained": 50,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:50",
+        "SHELTERED->REFUSED_ALL_FULL:50"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 13
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1747750506,
+      "label": "stream -1747750506",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 118,
+      "shelteredLost": 59,
+      "shelteredGained": 59,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:59",
+        "SHELTERED->REFUSED_ALL_FULL:59"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 459342846,
+      "label": "stream 459342846",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 2051597158,
+      "label": "stream 2051597158",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 124,
+      "shelteredLost": 62,
+      "shelteredGained": 62,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:62",
+        "SHELTERED->REFUSED_ALL_FULL:62"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1423224782,
+      "label": "stream 1423224782",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 132,
+      "shelteredLost": 66,
+      "shelteredGained": 66,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:66",
+        "SHELTERED->REFUSED_ALL_FULL:66"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -192804554,
+      "label": "stream -192804554",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 122,
+      "shelteredLost": 61,
+      "shelteredGained": 61,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:61",
+        "SHELTERED->REFUSED_ALL_FULL:61"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1921159070,
+      "label": "stream 1921159070",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 104,
+      "shelteredLost": 52,
+      "shelteredGained": 52,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:52",
+        "SHELTERED->REFUSED_ALL_FULL:52"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 19,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1371806970,
+      "label": "stream -1371806970",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 104,
+      "shelteredLost": 52,
+      "shelteredGained": 52,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:52",
+        "SHELTERED->REFUSED_ALL_FULL:52"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 331850606,
+      "label": "stream 331850606",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 118,
+      "shelteredLost": 59,
+      "shelteredGained": 59,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:59",
+        "SHELTERED->REFUSED_ALL_FULL:59"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 846426326,
+      "label": "stream 846426326",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 106,
+      "shelteredLost": 53,
+      "shelteredGained": 53,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:53",
+        "SHELTERED->REFUSED_ALL_FULL:53"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 591457086,
+      "label": "stream 591457086",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 122,
+      "shelteredLost": 61,
+      "shelteredGained": 61,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:61",
+        "SHELTERED->REFUSED_ALL_FULL:61"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1083854170,
+      "label": "stream -1083854170",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 102,
+      "shelteredLost": 51,
+      "shelteredGained": 51,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:51",
+        "SHELTERED->REFUSED_ALL_FULL:51"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1496619250,
+      "label": "stream -1496619250",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 108,
+      "shelteredLost": 54,
+      "shelteredGained": 54,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:54",
+        "SHELTERED->REFUSED_ALL_FULL:54"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 19,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 12
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 378513526,
+      "label": "stream 378513526",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1887168802,
+      "label": "stream -1887168802",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 124,
+      "shelteredLost": 62,
+      "shelteredGained": 62,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:62",
+        "SHELTERED->REFUSED_ALL_FULL:62"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1286492742,
+      "label": "stream 1286492742",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 114,
+      "shelteredLost": 57,
+      "shelteredGained": 57,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:57",
+        "SHELTERED->REFUSED_ALL_FULL:57"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1983382866,
+      "label": "stream -1983382866",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 126,
+      "shelteredLost": 63,
+      "shelteredGained": 63,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:63",
+        "SHELTERED->REFUSED_ALL_FULL:63"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 15,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 350025589,
+      "label": "stream 350025589",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 110,
+      "shelteredLost": 55,
+      "shelteredGained": 55,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:55",
+        "SHELTERED->REFUSED_ALL_FULL:55"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1275968067,
+      "label": "stream -1275968067",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -365339387,
+      "label": "stream -365339387",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 122,
+      "shelteredLost": 61,
+      "shelteredGained": 61,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:61",
+        "SHELTERED->REFUSED_ALL_FULL:61"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 787176781,
+      "label": "stream 787176781",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 15,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 6645397,
+      "label": "stream 6645397",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 110,
+      "shelteredLost": 55,
+      "shelteredGained": 55,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:55",
+        "SHELTERED->REFUSED_ALL_FULL:55"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -928474915,
+      "label": "stream -928474915",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 114,
+      "shelteredLost": 57,
+      "shelteredGained": 57,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:57",
+        "SHELTERED->REFUSED_ALL_FULL:57"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1373246501,
+      "label": "stream 1373246501",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 116,
+      "shelteredLost": 58,
+      "shelteredGained": 58,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:58",
+        "SHELTERED->REFUSED_ALL_FULL:58"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 13
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -893192083,
+      "label": "stream -893192083",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 118,
+      "shelteredLost": 59,
+      "shelteredGained": 59,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:59",
+        "SHELTERED->REFUSED_ALL_FULL:59"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1531995573,
+      "label": "stream 1531995573",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 15,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1226013693,
+      "label": "stream 1226013693",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 20,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1413391547,
+      "label": "stream -1413391547",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1313660019,
+      "label": "stream -1313660019",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 112,
+      "shelteredLost": 56,
+      "shelteredGained": 56,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:56",
+        "SHELTERED->REFUSED_ALL_FULL:56"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 7
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1952838869,
+      "label": "stream 1952838869",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 110,
+      "shelteredLost": 55,
+      "shelteredGained": 55,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:55",
+        "SHELTERED->REFUSED_ALL_FULL:55"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 15,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 13
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1559949085,
+      "label": "stream 1559949085",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 110,
+      "shelteredLost": 55,
+      "shelteredGained": 55,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:55",
+        "SHELTERED->REFUSED_ALL_FULL:55"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 7
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 414659173,
+      "label": "stream 414659173",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 130,
+      "shelteredLost": 65,
+      "shelteredGained": 65,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:65",
+        "SHELTERED->REFUSED_ALL_FULL:65"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 495181485,
+      "label": "stream 495181485",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 128,
+      "shelteredLost": 64,
+      "shelteredGained": 64,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:64",
+        "SHELTERED->REFUSED_ALL_FULL:64"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 12
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1100082187,
+      "label": "stream -1100082187",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 122,
+      "shelteredLost": 61,
+      "shelteredGained": 61,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:61",
+        "SHELTERED->REFUSED_ALL_FULL:61"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -802753987,
+      "label": "stream -802753987",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 126,
+      "shelteredLost": 63,
+      "shelteredGained": 63,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:63",
+        "SHELTERED->REFUSED_ALL_FULL:63"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -578578043,
+      "label": "stream -578578043",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 110,
+      "shelteredLost": 55,
+      "shelteredGained": 55,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:55",
+        "SHELTERED->REFUSED_ALL_FULL:55"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 12
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -335730227,
+      "label": "stream -335730227",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 114,
+      "shelteredLost": 57,
+      "shelteredGained": 57,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:57",
+        "SHELTERED->REFUSED_ALL_FULL:57"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -802110699,
+      "label": "stream -802110699",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 108,
+      "shelteredLost": 54,
+      "shelteredGained": 54,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:54",
+        "SHELTERED->REFUSED_ALL_FULL:54"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 308249949,
+      "label": "stream 308249949",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 126,
+      "shelteredLost": 63,
+      "shelteredGained": 63,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:63",
+        "SHELTERED->REFUSED_ALL_FULL:63"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1659801765,
+      "label": "stream 1659801765",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1629027091,
+      "label": "stream -1629027091",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 130,
+      "shelteredLost": 65,
+      "shelteredGained": 65,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:65",
+        "SHELTERED->REFUSED_ALL_FULL:65"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1685455413,
+      "label": "stream 1685455413",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 134,
+      "shelteredLost": 67,
+      "shelteredGained": 67,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:67",
+        "SHELTERED->REFUSED_ALL_FULL:67"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -2136137136,
+      "label": "stream -2136137136",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 130,
+      "shelteredLost": 65,
+      "shelteredGained": 65,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:65",
+        "SHELTERED->REFUSED_ALL_FULL:65"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1225077768,
+      "label": "stream -1225077768",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 102,
+      "shelteredLost": 51,
+      "shelteredGained": 51,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:51",
+        "SHELTERED->REFUSED_ALL_FULL:51"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 19,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 12
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 300264096,
+      "label": "stream 300264096",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 15,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -2112594360,
+      "label": "stream -2112594360",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 114,
+      "shelteredLost": 57,
+      "shelteredGained": 57,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:57",
+        "SHELTERED->REFUSED_ALL_FULL:57"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1392408848,
+      "label": "stream -1392408848",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 136,
+      "shelteredLost": 68,
+      "shelteredGained": 68,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:68",
+        "SHELTERED->REFUSED_ALL_FULL:68"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -2021931880,
+      "label": "stream -2021931880",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 144,
+      "shelteredLost": 72,
+      "shelteredGained": 72,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:72",
+        "SHELTERED->REFUSED_ALL_FULL:72"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1076213568,
+      "label": "stream 1076213568",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 114,
+      "shelteredLost": 57,
+      "shelteredGained": 57,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:57",
+        "SHELTERED->REFUSED_ALL_FULL:57"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 2046164712,
+      "label": "stream 2046164712",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 116,
+      "shelteredLost": 58,
+      "shelteredGained": 58,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:58",
+        "SHELTERED->REFUSED_ALL_FULL:58"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -692634736,
+      "label": "stream -692634736",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 100,
+      "shelteredLost": 50,
+      "shelteredGained": 50,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:50",
+        "SHELTERED->REFUSED_ALL_FULL:50"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 15,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -779612872,
+      "label": "stream -779612872",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 118,
+      "shelteredLost": 59,
+      "shelteredGained": 59,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:59",
+        "SHELTERED->REFUSED_ALL_FULL:59"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 15,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -379907104,
+      "label": "stream -379907104",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 110,
+      "shelteredLost": 55,
+      "shelteredGained": 55,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:55",
+        "SHELTERED->REFUSED_ALL_FULL:55"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 460779400,
+      "label": "stream 460779400",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 126,
+      "shelteredLost": 63,
+      "shelteredGained": 63,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:63",
+        "SHELTERED->REFUSED_ALL_FULL:63"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1376370640,
+      "label": "stream -1376370640",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 110,
+      "shelteredLost": 55,
+      "shelteredGained": 55,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:55",
+        "SHELTERED->REFUSED_ALL_FULL:55"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1246209496,
+      "label": "stream 1246209496",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 116,
+      "shelteredLost": 58,
+      "shelteredGained": 58,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:58",
+        "SHELTERED->REFUSED_ALL_FULL:58"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1739440256,
+      "label": "stream 1739440256",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 124,
+      "shelteredLost": 62,
+      "shelteredGained": 62,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:62",
+        "SHELTERED->REFUSED_ALL_FULL:62"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 15,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 96415784,
+      "label": "stream 96415784",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 126,
+      "shelteredLost": 63,
+      "shelteredGained": 63,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:63",
+        "SHELTERED->REFUSED_ALL_FULL:63"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 20,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1226402608,
+      "label": "stream -1226402608",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 116,
+      "shelteredLost": 58,
+      "shelteredGained": 58,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:58",
+        "SHELTERED->REFUSED_ALL_FULL:58"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -85815688,
+      "label": "stream -85815688",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -381305568,
+      "label": "stream -381305568",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 116,
+      "shelteredLost": 58,
+      "shelteredGained": 58,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:58",
+        "SHELTERED->REFUSED_ALL_FULL:58"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 737591496,
+      "label": "stream 737591496",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 110,
+      "shelteredLost": 55,
+      "shelteredGained": 55,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:55",
+        "SHELTERED->REFUSED_ALL_FULL:55"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1236285808,
+      "label": "stream 1236285808",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 116,
+      "shelteredLost": 58,
+      "shelteredGained": 58,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:58",
+        "SHELTERED->REFUSED_ALL_FULL:58"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1082181400,
+      "label": "stream 1082181400",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 106,
+      "shelteredLost": 53,
+      "shelteredGained": 53,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:53",
+        "SHELTERED->REFUSED_ALL_FULL:53"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1883965888,
+      "label": "stream 1883965888",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 104,
+      "shelteredLost": 52,
+      "shelteredGained": 52,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:52",
+        "SHELTERED->REFUSED_ALL_FULL:52"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -716856984,
+      "label": "stream -716856984",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 110,
+      "shelteredLost": 55,
+      "shelteredGained": 55,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:55",
+        "SHELTERED->REFUSED_ALL_FULL:55"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1837421040,
+      "label": "stream -1837421040",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 128,
+      "shelteredLost": 64,
+      "shelteredGained": 64,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:64",
+        "SHELTERED->REFUSED_ALL_FULL:64"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 448106863,
+      "label": "stream 448106863",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 116,
+      "shelteredLost": 58,
+      "shelteredGained": 58,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:58",
+        "SHELTERED->REFUSED_ALL_FULL:58"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1604853495,
+      "label": "stream 1604853495",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 20,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1353997695,
+      "label": "stream 1353997695",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 130,
+      "shelteredLost": 65,
+      "shelteredGained": 65,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:65",
+        "SHELTERED->REFUSED_ALL_FULL:65"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 705719559,
+      "label": "stream 705719559",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 108,
+      "shelteredLost": 54,
+      "shelteredGained": 54,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:54",
+        "SHELTERED->REFUSED_ALL_FULL:54"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -826905201,
+      "label": "stream -826905201",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 124,
+      "shelteredLost": 62,
+      "shelteredGained": 62,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:62",
+        "SHELTERED->REFUSED_ALL_FULL:62"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1595637993,
+      "label": "stream -1595637993",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 98,
+      "shelteredLost": 49,
+      "shelteredGained": 49,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:49",
+        "SHELTERED->REFUSED_ALL_FULL:49"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1788658079,
+      "label": "stream 1788658079",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 104,
+      "shelteredLost": 52,
+      "shelteredGained": 52,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:52",
+        "SHELTERED->REFUSED_ALL_FULL:52"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1445287207,
+      "label": "stream 1445287207",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 128,
+      "shelteredLost": 64,
+      "shelteredGained": 64,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:64",
+        "SHELTERED->REFUSED_ALL_FULL:64"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -158836305,
+      "label": "stream -158836305",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 19,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1611919159,
+      "label": "stream 1611919159",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 116,
+      "shelteredLost": 58,
+      "shelteredGained": 58,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:58",
+        "SHELTERED->REFUSED_ALL_FULL:58"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1356477887,
+      "label": "stream 1356477887",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 116,
+      "shelteredLost": 58,
+      "shelteredGained": 58,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:58",
+        "SHELTERED->REFUSED_ALL_FULL:58"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1764838727,
+      "label": "stream 1764838727",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 118,
+      "shelteredLost": 59,
+      "shelteredGained": 59,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:59",
+        "SHELTERED->REFUSED_ALL_FULL:59"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1949521359,
+      "label": "stream 1949521359",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 116,
+      "shelteredLost": 58,
+      "shelteredGained": 58,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:58",
+        "SHELTERED->REFUSED_ALL_FULL:58"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1069650089,
+      "label": "stream -1069650089",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 100,
+      "shelteredLost": 50,
+      "shelteredGained": 50,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:50",
+        "SHELTERED->REFUSED_ALL_FULL:50"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 12
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -2022393377,
+      "label": "stream -2022393377",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 134,
+      "shelteredLost": 67,
+      "shelteredGained": 67,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:67",
+        "SHELTERED->REFUSED_ALL_FULL:67"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1748784487,
+      "label": "stream 1748784487",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -306224657,
+      "label": "stream -306224657",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 114,
+      "shelteredLost": 57,
+      "shelteredGained": 57,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:57",
+        "SHELTERED->REFUSED_ALL_FULL:57"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 678166391,
+      "label": "stream 678166391",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 112,
+      "shelteredLost": 56,
+      "shelteredGained": 56,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:56",
+        "SHELTERED->REFUSED_ALL_FULL:56"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1450462719,
+      "label": "stream 1450462719",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 116,
+      "shelteredLost": 58,
+      "shelteredGained": 58,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:58",
+        "SHELTERED->REFUSED_ALL_FULL:58"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1672581753,
+      "label": "stream -1672581753",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 114,
+      "shelteredLost": 57,
+      "shelteredGained": 57,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:57",
+        "SHELTERED->REFUSED_ALL_FULL:57"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -852197873,
+      "label": "stream -852197873",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 128,
+      "shelteredLost": 64,
+      "shelteredGained": 64,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:64",
+        "SHELTERED->REFUSED_ALL_FULL:64"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 19,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1134862231,
+      "label": "stream 1134862231",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 126,
+      "shelteredLost": 63,
+      "shelteredGained": 63,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:63",
+        "SHELTERED->REFUSED_ALL_FULL:63"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 19,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -908004833,
+      "label": "stream -908004833",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 118,
+      "shelteredLost": 59,
+      "shelteredGained": 59,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:59",
+        "SHELTERED->REFUSED_ALL_FULL:59"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 7
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1838180953,
+      "label": "stream -1838180953",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1083877935,
+      "label": "stream 1083877935",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 128,
+      "shelteredLost": 64,
+      "shelteredGained": 64,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:64",
+        "SHELTERED->REFUSED_ALL_FULL:64"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 19,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 594579458,
+      "label": "stream 594579458",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 130,
+      "shelteredLost": 65,
+      "shelteredGained": 65,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:65",
+        "SHELTERED->REFUSED_ALL_FULL:65"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 7
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 443412458,
+      "label": "stream 443412458",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 122,
+      "shelteredLost": 61,
+      "shelteredGained": 61,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:61",
+        "SHELTERED->REFUSED_ALL_FULL:61"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 12
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1413434578,
+      "label": "stream 1413434578",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 122,
+      "shelteredLost": 61,
+      "shelteredGained": 61,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:61",
+        "SHELTERED->REFUSED_ALL_FULL:61"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1872476486,
+      "label": "stream -1872476486",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 122,
+      "shelteredLost": 61,
+      "shelteredGained": 61,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:61",
+        "SHELTERED->REFUSED_ALL_FULL:61"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 508591522,
+      "label": "stream 508591522",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 124,
+      "shelteredLost": 62,
+      "shelteredGained": 62,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:62",
+        "SHELTERED->REFUSED_ALL_FULL:62"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -605318774,
+      "label": "stream -605318774",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 122,
+      "shelteredLost": 61,
+      "shelteredGained": 61,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:61",
+        "SHELTERED->REFUSED_ALL_FULL:61"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 68231794,
+      "label": "stream 68231794",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 96,
+      "shelteredLost": 48,
+      "shelteredGained": 48,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:48",
+        "SHELTERED->REFUSED_ALL_FULL:48"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -854536102,
+      "label": "stream -854536102",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 112,
+      "shelteredLost": 56,
+      "shelteredGained": 56,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:56",
+        "SHELTERED->REFUSED_ALL_FULL:56"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 19,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -684836030,
+      "label": "stream -684836030",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 118,
+      "shelteredLost": 59,
+      "shelteredGained": 59,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:59",
+        "SHELTERED->REFUSED_ALL_FULL:59"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1797325610,
+      "label": "stream 1797325610",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -2003515374,
+      "label": "stream -2003515374",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 15,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -995546630,
+      "label": "stream -995546630",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 126,
+      "shelteredLost": 63,
+      "shelteredGained": 63,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:63",
+        "SHELTERED->REFUSED_ALL_FULL:63"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -126760734,
+      "label": "stream -126760734",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 122,
+      "shelteredLost": 61,
+      "shelteredGained": 61,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:61",
+        "SHELTERED->REFUSED_ALL_FULL:61"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1082768182,
+      "label": "stream -1082768182",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 128,
+      "shelteredLost": 64,
+      "shelteredGained": 64,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:64",
+        "SHELTERED->REFUSED_ALL_FULL:64"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 13
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -969785934,
+      "label": "stream -969785934",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 124,
+      "shelteredLost": 62,
+      "shelteredGained": 62,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:62",
+        "SHELTERED->REFUSED_ALL_FULL:62"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 13
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -392866918,
+      "label": "stream -392866918",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 106,
+      "shelteredLost": 53,
+      "shelteredGained": 53,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:53",
+        "SHELTERED->REFUSED_ALL_FULL:53"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 545465986,
+      "label": "stream 545465986",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 118,
+      "shelteredLost": 59,
+      "shelteredGained": 59,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:59",
+        "SHELTERED->REFUSED_ALL_FULL:59"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 14
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1146312298,
+      "label": "stream 1146312298",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 112,
+      "shelteredLost": 56,
+      "shelteredGained": 56,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:56",
+        "SHELTERED->REFUSED_ALL_FULL:56"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 19,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1789820078,
+      "label": "stream -1789820078",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 507333946,
+      "label": "stream 507333946",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 106,
+      "shelteredLost": 53,
+      "shelteredGained": 53,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:53",
+        "SHELTERED->REFUSED_ALL_FULL:53"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -506833886,
+      "label": "stream -506833886",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 124,
+      "shelteredLost": 62,
+      "shelteredGained": 62,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:62",
+        "SHELTERED->REFUSED_ALL_FULL:62"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -652199926,
+      "label": "stream -652199926",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 122,
+      "shelteredLost": 61,
+      "shelteredGained": 61,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:61",
+        "SHELTERED->REFUSED_ALL_FULL:61"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 12
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1034249998,
+      "label": "stream -1034249998",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 104,
+      "shelteredLost": 52,
+      "shelteredGained": 52,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:52",
+        "SHELTERED->REFUSED_ALL_FULL:52"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1089923366,
+      "label": "stream -1089923366",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 106,
+      "shelteredLost": 53,
+      "shelteredGained": 53,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:53",
+        "SHELTERED->REFUSED_ALL_FULL:53"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 19,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 13
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1028697662,
+      "label": "stream -1028697662",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 110,
+      "shelteredLost": 55,
+      "shelteredGained": 55,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:55",
+        "SHELTERED->REFUSED_ALL_FULL:55"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -222752903,
+      "label": "stream -222752903",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 124,
+      "shelteredLost": 62,
+      "shelteredGained": 62,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:62",
+        "SHELTERED->REFUSED_ALL_FULL:62"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -814391743,
+      "label": "stream -814391743",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 114,
+      "shelteredLost": 57,
+      "shelteredGained": 57,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:57",
+        "SHELTERED->REFUSED_ALL_FULL:57"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1019446793,
+      "label": "stream 1019446793",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1843308241,
+      "label": "stream 1843308241",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 128,
+      "shelteredLost": 64,
+      "shelteredGained": 64,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:64",
+        "SHELTERED->REFUSED_ALL_FULL:64"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 493215897,
+      "label": "stream 493215897",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 114,
+      "shelteredLost": 57,
+      "shelteredGained": 57,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:57",
+        "SHELTERED->REFUSED_ALL_FULL:57"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 2044482401,
+      "label": "stream 2044482401",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 118,
+      "shelteredLost": 59,
+      "shelteredGained": 59,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:59",
+        "SHELTERED->REFUSED_ALL_FULL:59"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1574363351,
+      "label": "stream -1574363351",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 8
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1307089935,
+      "label": "stream -1307089935",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 112,
+      "shelteredLost": 56,
+      "shelteredGained": 56,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:56",
+        "SHELTERED->REFUSED_ALL_FULL:56"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1591099833,
+      "label": "stream 1591099833",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 114,
+      "shelteredLost": 57,
+      "shelteredGained": 57,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:57",
+        "SHELTERED->REFUSED_ALL_FULL:57"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 13
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 595122305,
+      "label": "stream 595122305",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -42579895,
+      "label": "stream -42579895",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 106,
+      "shelteredLost": 53,
+      "shelteredGained": 53,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:53",
+        "SHELTERED->REFUSED_ALL_FULL:53"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 19,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1188450031,
+      "label": "stream -1188450031",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 116,
+      "shelteredLost": 58,
+      "shelteredGained": 58,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:58",
+        "SHELTERED->REFUSED_ALL_FULL:58"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 11
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -833473831,
+      "label": "stream -833473831",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 114,
+      "shelteredLost": 57,
+      "shelteredGained": 57,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:57",
+        "SHELTERED->REFUSED_ALL_FULL:57"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 12
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -862786143,
+      "label": "stream -862786143",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 104,
+      "shelteredLost": 52,
+      "shelteredGained": 52,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:52",
+        "SHELTERED->REFUSED_ALL_FULL:52"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1475543401,
+      "label": "stream 1475543401",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 118,
+      "shelteredLost": 59,
+      "shelteredGained": 59,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:59",
+        "SHELTERED->REFUSED_ALL_FULL:59"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 15,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 13
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1252159951,
+      "label": "stream -1252159951",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 122,
+      "shelteredLost": 61,
+      "shelteredGained": 61,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:61",
+        "SHELTERED->REFUSED_ALL_FULL:61"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -417221639,
+      "label": "stream -417221639",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 110,
+      "shelteredLost": 55,
+      "shelteredGained": 55,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:55",
+        "SHELTERED->REFUSED_ALL_FULL:55"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 18,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 1500680897,
+      "label": "stream 1500680897",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 118,
+      "shelteredLost": 59,
+      "shelteredGained": 59,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:59",
+        "SHELTERED->REFUSED_ALL_FULL:59"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 17,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 518474377,
+      "label": "stream 518474377",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 120,
+      "shelteredLost": 60,
+      "shelteredGained": 60,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:60",
+        "SHELTERED->REFUSED_ALL_FULL:60"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1124402351,
+      "label": "stream -1124402351",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 110,
+      "shelteredLost": 55,
+      "shelteredGained": 55,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:55",
+        "SHELTERED->REFUSED_ALL_FULL:55"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -2004040423,
+      "label": "stream -2004040423",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 122,
+      "shelteredLost": 61,
+      "shelteredGained": 61,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:61",
+        "SHELTERED->REFUSED_ALL_FULL:61"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -1839216671,
+      "label": "stream -1839216671",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 108,
+      "shelteredLost": 54,
+      "shelteredGained": 54,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:54",
+        "SHELTERED->REFUSED_ALL_FULL:54"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 15,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": 597369769,
+      "label": "stream 597369769",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 126,
+      "shelteredLost": 63,
+      "shelteredGained": 63,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:63",
+        "SHELTERED->REFUSED_ALL_FULL:63"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 9
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -901121935,
+      "label": "stream -901121935",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 110,
+      "shelteredLost": 55,
+      "shelteredGained": 55,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:55",
+        "SHELTERED->REFUSED_ALL_FULL:55"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 16,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    },
+    {
+      "shuffleSeed": -170170823,
+      "label": "stream -170170823",
+      "agentOrder": "shuffle-mt",
+      "sheltered": 2060,
+      "refusedAllFull": 4754,
+      "unreachable": 28,
+      "finalStateDiff": 116,
+      "shelteredLost": 58,
+      "shelteredGained": 58,
+      "nonShelterFlips": 0,
+      "transitions": [
+        "REFUSED_ALL_FULL->SHELTERED:58",
+        "SHELTERED->REFUSED_ALL_FULL:58"
+      ],
+      "shelterColumnMatches": {
+        "name": 36,
+        "lon": 36,
+        "lat": 36,
+        "capacity": 36,
+        "operating": 36,
+        "peak_occupancy": 36,
+        "final_occupancy": 36,
+        "refused_count": 22,
+        "utilization": 36,
+        "mean_travel_dist_m_admitted": 10
+      },
+      "buildDigest": "77249a23b42721f2"
+    }
+  ]
+}

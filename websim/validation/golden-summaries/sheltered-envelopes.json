@@ -1,0 +1,1780 @@
+{
+  "schema": "reu-wildfire-shelter-abm/golden-summary/v1/sheltered-envelopes",
+  "about": "Per archived configuration, the seed-to-seed envelope of the headline population outcomes. Tier 3 requires a live sheltered count to land inside the archived range for the same configuration (plan §5.1).",
+  "method": "Values are copied verbatim from each run's simulation.json `population` block; min/max are taken over the seeds present. A configuration key is the run directory name with its seed digits replaced by `*`, so all seeds of one config group together.",
+  "provenance": {
+    "source_index": "sources.json",
+    "note": "Every key of `values` is (or names) a run directory. Resolve it in sources.json for the SHA-256 and byte length of the archive files the numbers were derived from."
+  },
+  "values": {
+    "phase-e/E0null-A-n6842-seed*": {
+      "preset_family": "E0",
+      "seeds": [
+        42
+      ],
+      "sheltered": {
+        "min": 2060,
+        "max": 2060,
+        "n_seeds": 1
+      },
+      "refused_all_full": {
+        "min": 4754,
+        "max": 4754,
+        "n_seeds": 1
+      },
+      "unreachable": {
+        "min": 28,
+        "max": 28,
+        "n_seeds": 1
+      },
+      "by_seed": {
+        "42": {
+          "source": "phase-e/E0null-A-n6842-seed42",
+          "sheltered": 2060,
+          "refused_all_full": 4754,
+          "unreachable": 28,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 928917.85,
+          "mean_exposure_ugm3h": 37801.8764,
+          "mean_travel_m": 18244.41
+        }
+      }
+    },
+    "phase-e/E0null-B-n6842-seed*": {
+      "preset_family": "E0",
+      "seeds": [
+        42
+      ],
+      "sheltered": {
+        "min": 6264,
+        "max": 6264,
+        "n_seeds": 1
+      },
+      "refused_all_full": {
+        "min": 550,
+        "max": 550,
+        "n_seeds": 1
+      },
+      "unreachable": {
+        "min": 28,
+        "max": 28,
+        "n_seeds": 1
+      },
+      "by_seed": {
+        "42": {
+          "source": "phase-e/E0null-B-n6842-seed42",
+          "sheltered": 6264,
+          "refused_all_full": 550,
+          "unreachable": 28,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 119973.1,
+          "mean_exposure_ugm3h": 4789.3639,
+          "mean_travel_m": 7895.81
+        }
+      }
+    },
+    "phase-e/E0null-C-n6842-seed*": {
+      "preset_family": "E0",
+      "seeds": [
+        42
+      ],
+      "sheltered": {
+        "min": 6570,
+        "max": 6570,
+        "n_seeds": 1
+      },
+      "refused_all_full": {
+        "min": 244,
+        "max": 244,
+        "n_seeds": 1
+      },
+      "unreachable": {
+        "min": 28,
+        "max": 28,
+        "n_seeds": 1
+      },
+      "by_seed": {
+        "42": {
+          "source": "phase-e/E0null-C-n6842-seed42",
+          "sheltered": 6570,
+          "refused_all_full": 244,
+          "unreachable": 28,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 59200.15,
+          "mean_exposure_ugm3h": 2363.0894,
+          "mean_travel_m": 5903.91
+        }
+      }
+    },
+    "phase-e/ER-A-n6842-seed*": {
+      "preset_family": "ER",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "sheltered": {
+        "min": 1168,
+        "max": 1215,
+        "n_seeds": 3
+      },
+      "refused_all_full": {
+        "min": 0,
+        "max": 1,
+        "n_seeds": 3
+      },
+      "unreachable": {
+        "min": 3,
+        "max": 6,
+        "n_seeds": 3
+      },
+      "by_seed": {
+        "42": {
+          "source": "phase-e/ER-A-n6842-seed42",
+          "sheltered": 1215,
+          "refused_all_full": 1,
+          "unreachable": 4,
+          "pre_evac": 1208,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1195065,
+          "mean_exposure_ugm3h": 48629.8794,
+          "mean_travel_m": 614.41
+        },
+        "43": {
+          "source": "phase-e/ER-A-n6842-seed43",
+          "sheltered": 1168,
+          "refused_all_full": 0,
+          "unreachable": 3,
+          "pre_evac": 1280,
+          "en_route": 2,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1202619.08,
+          "mean_exposure_ugm3h": 48954.7045,
+          "mean_travel_m": 577.68
+        },
+        "44": {
+          "source": "phase-e/ER-A-n6842-seed44",
+          "sheltered": 1205,
+          "refused_all_full": 0,
+          "unreachable": 6,
+          "pre_evac": 1285,
+          "en_route": 1,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1203364.65,
+          "mean_exposure_ugm3h": 49007.1016,
+          "mean_travel_m": 610.16
+        }
+      }
+    },
+    "phase-e/ER-C-n6842-seed*": {
+      "preset_family": "ER",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "sheltered": {
+        "min": 1168,
+        "max": 1215,
+        "n_seeds": 3
+      },
+      "refused_all_full": {
+        "min": 0,
+        "max": 1,
+        "n_seeds": 3
+      },
+      "unreachable": {
+        "min": 3,
+        "max": 6,
+        "n_seeds": 3
+      },
+      "by_seed": {
+        "42": {
+          "source": "phase-e/ER-C-n6842-seed42",
+          "sheltered": 1215,
+          "refused_all_full": 1,
+          "unreachable": 4,
+          "pre_evac": 1208,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1194882.15,
+          "mean_exposure_ugm3h": 48622.0906,
+          "mean_travel_m": 475.97
+        },
+        "43": {
+          "source": "phase-e/ER-C-n6842-seed43",
+          "sheltered": 1168,
+          "refused_all_full": 0,
+          "unreachable": 3,
+          "pre_evac": 1280,
+          "en_route": 2,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1202476.92,
+          "mean_exposure_ugm3h": 48949.7371,
+          "mean_travel_m": 451.18
+        },
+        "44": {
+          "source": "phase-e/ER-C-n6842-seed44",
+          "sheltered": 1206,
+          "refused_all_full": 0,
+          "unreachable": 6,
+          "pre_evac": 1285,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1203196.82,
+          "mean_exposure_ugm3h": 49001.1111,
+          "mean_travel_m": 479.21
+        }
+      }
+    },
+    "phase-e/ER-D-n6842-seed*": {
+      "preset_family": "ER",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "sheltered": {
+        "min": 1168,
+        "max": 1215,
+        "n_seeds": 3
+      },
+      "refused_all_full": {
+        "min": 0,
+        "max": 1,
+        "n_seeds": 3
+      },
+      "unreachable": {
+        "min": 3,
+        "max": 6,
+        "n_seeds": 3
+      },
+      "by_seed": {
+        "42": {
+          "source": "phase-e/ER-D-n6842-seed42",
+          "sheltered": 1215,
+          "refused_all_full": 1,
+          "unreachable": 4,
+          "pre_evac": 1208,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1194888.35,
+          "mean_exposure_ugm3h": 48622.5386,
+          "mean_travel_m": 466.34
+        },
+        "43": {
+          "source": "phase-e/ER-D-n6842-seed43",
+          "sheltered": 1168,
+          "refused_all_full": 0,
+          "unreachable": 3,
+          "pre_evac": 1280,
+          "en_route": 2,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1202462.32,
+          "mean_exposure_ugm3h": 48949.4771,
+          "mean_travel_m": 443.75
+        },
+        "44": {
+          "source": "phase-e/ER-D-n6842-seed44",
+          "sheltered": 1206,
+          "refused_all_full": 0,
+          "unreachable": 6,
+          "pre_evac": 1285,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1203217.32,
+          "mean_exposure_ugm3h": 49001.6767,
+          "mean_travel_m": 482.34
+        }
+      }
+    },
+    "present-day-three-arm/A-seed*": {
+      "preset_family": "A",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50
+      ],
+      "sheltered": {
+        "min": 2053,
+        "max": 2064,
+        "n_seeds": 9
+      },
+      "refused_all_full": {
+        "min": 4750,
+        "max": 4763,
+        "n_seeds": 9
+      },
+      "unreachable": {
+        "min": 26,
+        "max": 36,
+        "n_seeds": 9
+      },
+      "by_seed": {
+        "42": {
+          "source": "present-day-three-arm/A-seed42",
+          "sheltered": 2060,
+          "refused_all_full": 4754,
+          "unreachable": 28,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 928917.85,
+          "mean_exposure_ugm3h": 37801.8764,
+          "mean_travel_m": 18244.41
+        },
+        "43": {
+          "source": "present-day-three-arm/A-seed43",
+          "sheltered": 2055,
+          "refused_all_full": 4751,
+          "unreachable": 36,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 929909.28,
+          "mean_exposure_ugm3h": 37841.4424,
+          "mean_travel_m": 18393.49
+        },
+        "44": {
+          "source": "present-day-three-arm/A-seed44",
+          "sheltered": 2056,
+          "refused_all_full": 4750,
+          "unreachable": 36,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 929754.43,
+          "mean_exposure_ugm3h": 37834.0086,
+          "mean_travel_m": 18376.02
+        },
+        "45": {
+          "source": "present-day-three-arm/A-seed45",
+          "sheltered": 2055,
+          "refused_all_full": 4760,
+          "unreachable": 27,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 929911.98,
+          "mean_exposure_ugm3h": 37841.4509,
+          "mean_travel_m": 18312.53
+        },
+        "46": {
+          "source": "present-day-three-arm/A-seed46",
+          "sheltered": 2053,
+          "refused_all_full": 4763,
+          "unreachable": 26,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 930192.67,
+          "mean_exposure_ugm3h": 37856.0899,
+          "mean_travel_m": 18043.63
+        },
+        "47": {
+          "source": "present-day-three-arm/A-seed47",
+          "sheltered": 2053,
+          "refused_all_full": 4763,
+          "unreachable": 26,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 930346.33,
+          "mean_exposure_ugm3h": 37857.7215,
+          "mean_travel_m": 18457.32
+        },
+        "48": {
+          "source": "present-day-three-arm/A-seed48",
+          "sheltered": 2053,
+          "refused_all_full": 4753,
+          "unreachable": 36,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 930300.33,
+          "mean_exposure_ugm3h": 37857.2502,
+          "mean_travel_m": 18468.64
+        },
+        "49": {
+          "source": "present-day-three-arm/A-seed49",
+          "sheltered": 2064,
+          "refused_all_full": 4752,
+          "unreachable": 26,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 928245.77,
+          "mean_exposure_ugm3h": 37771.5148,
+          "mean_travel_m": 18303.76
+        },
+        "50": {
+          "source": "present-day-three-arm/A-seed50",
+          "sheltered": 2055,
+          "refused_all_full": 4757,
+          "unreachable": 30,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 929953.1,
+          "mean_exposure_ugm3h": 37841.9079,
+          "mean_travel_m": 18501.99
+        }
+      }
+    },
+    "present-day-three-arm/B-seed*": {
+      "preset_family": "B",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50
+      ],
+      "sheltered": {
+        "min": 6257,
+        "max": 6268,
+        "n_seeds": 9
+      },
+      "refused_all_full": {
+        "min": 546,
+        "max": 559,
+        "n_seeds": 9
+      },
+      "unreachable": {
+        "min": 26,
+        "max": 36,
+        "n_seeds": 9
+      },
+      "by_seed": {
+        "42": {
+          "source": "present-day-three-arm/B-seed42",
+          "sheltered": 6264,
+          "refused_all_full": 550,
+          "unreachable": 28,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 119973.1,
+          "mean_exposure_ugm3h": 4789.3639,
+          "mean_travel_m": 7895.81
+        },
+        "43": {
+          "source": "present-day-three-arm/B-seed43",
+          "sheltered": 6259,
+          "refused_all_full": 547,
+          "unreachable": 36,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 120945.08,
+          "mean_exposure_ugm3h": 4828.8748,
+          "mean_travel_m": 7907.01
+        },
+        "44": {
+          "source": "present-day-three-arm/B-seed44",
+          "sheltered": 6260,
+          "refused_all_full": 546,
+          "unreachable": 36,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 120870.65,
+          "mean_exposure_ugm3h": 4822.375,
+          "mean_travel_m": 8067.29
+        },
+        "45": {
+          "source": "present-day-three-arm/B-seed45",
+          "sheltered": 6259,
+          "refused_all_full": 556,
+          "unreachable": 27,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 120999.13,
+          "mean_exposure_ugm3h": 4829.8637,
+          "mean_travel_m": 8189.11
+        },
+        "46": {
+          "source": "present-day-three-arm/B-seed46",
+          "sheltered": 6257,
+          "refused_all_full": 559,
+          "unreachable": 26,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 121256.55,
+          "mean_exposure_ugm3h": 4843.8886,
+          "mean_travel_m": 7926.08
+        },
+        "47": {
+          "source": "present-day-three-arm/B-seed47",
+          "sheltered": 6257,
+          "refused_all_full": 559,
+          "unreachable": 26,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 121218.73,
+          "mean_exposure_ugm3h": 4843.3151,
+          "mean_travel_m": 7848.37
+        },
+        "48": {
+          "source": "present-day-three-arm/B-seed48",
+          "sheltered": 6257,
+          "refused_all_full": 549,
+          "unreachable": 36,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 121328.55,
+          "mean_exposure_ugm3h": 4844.4262,
+          "mean_travel_m": 7945.81
+        },
+        "49": {
+          "source": "present-day-three-arm/B-seed49",
+          "sheltered": 6268,
+          "refused_all_full": 548,
+          "unreachable": 26,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 119223.98,
+          "mean_exposure_ugm3h": 4759.2602,
+          "mean_travel_m": 8557.29
+        },
+        "50": {
+          "source": "present-day-three-arm/B-seed50",
+          "sheltered": 6259,
+          "refused_all_full": 553,
+          "unreachable": 30,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 120925.02,
+          "mean_exposure_ugm3h": 4828.916,
+          "mean_travel_m": 7961.13
+        }
+      }
+    },
+    "present-day-three-arm/C-seed*": {
+      "preset_family": "C",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50
+      ],
+      "sheltered": {
+        "min": 6563,
+        "max": 6574,
+        "n_seeds": 9
+      },
+      "refused_all_full": {
+        "min": 240,
+        "max": 253,
+        "n_seeds": 9
+      },
+      "unreachable": {
+        "min": 26,
+        "max": 36,
+        "n_seeds": 9
+      },
+      "by_seed": {
+        "42": {
+          "source": "present-day-three-arm/C-seed42",
+          "sheltered": 6570,
+          "refused_all_full": 244,
+          "unreachable": 28,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 59200.15,
+          "mean_exposure_ugm3h": 2363.0894,
+          "mean_travel_m": 5903.91
+        },
+        "43": {
+          "source": "present-day-three-arm/C-seed43",
+          "sheltered": 6565,
+          "refused_all_full": 241,
+          "unreachable": 36,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 59776.18,
+          "mean_exposure_ugm3h": 2398.1306,
+          "mean_travel_m": 5231.87
+        },
+        "44": {
+          "source": "present-day-three-arm/C-seed44",
+          "sheltered": 6566,
+          "refused_all_full": 240,
+          "unreachable": 36,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 59893.28,
+          "mean_exposure_ugm3h": 2393.6397,
+          "mean_travel_m": 5473.91
+        },
+        "45": {
+          "source": "present-day-three-arm/C-seed45",
+          "sheltered": 6565,
+          "refused_all_full": 250,
+          "unreachable": 27,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 60191.33,
+          "mean_exposure_ugm3h": 2402.5124,
+          "mean_travel_m": 5669.8
+        },
+        "46": {
+          "source": "present-day-three-arm/C-seed46",
+          "sheltered": 6563,
+          "refused_all_full": 253,
+          "unreachable": 26,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 60327,
+          "mean_exposure_ugm3h": 2415.482,
+          "mean_travel_m": 5440.17
+        },
+        "47": {
+          "source": "present-day-three-arm/C-seed47",
+          "sheltered": 6563,
+          "refused_all_full": 253,
+          "unreachable": 26,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 60236.25,
+          "mean_exposure_ugm3h": 2414.5569,
+          "mean_travel_m": 5427.32
+        },
+        "48": {
+          "source": "present-day-three-arm/C-seed48",
+          "sheltered": 6563,
+          "refused_all_full": 243,
+          "unreachable": 36,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 60521.68,
+          "mean_exposure_ugm3h": 2417.7822,
+          "mean_travel_m": 5875.52
+        },
+        "49": {
+          "source": "present-day-three-arm/C-seed49",
+          "sheltered": 6574,
+          "refused_all_full": 242,
+          "unreachable": 26,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 58263.32,
+          "mean_exposure_ugm3h": 2329.696,
+          "mean_travel_m": 5419.41
+        },
+        "50": {
+          "source": "present-day-three-arm/C-seed50",
+          "sheltered": 6565,
+          "refused_all_full": 247,
+          "unreachable": 30,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 60134.18,
+          "mean_exposure_ugm3h": 2401.9411,
+          "mean_travel_m": 5654.39
+        }
+      }
+    },
+    "scenario-e-v2/E0null-A-seed*": {
+      "preset_family": "E0",
+      "seeds": [
+        42
+      ],
+      "sheltered": {
+        "min": 2060,
+        "max": 2060,
+        "n_seeds": 1
+      },
+      "refused_all_full": {
+        "min": 4754,
+        "max": 4754,
+        "n_seeds": 1
+      },
+      "unreachable": {
+        "min": 28,
+        "max": 28,
+        "n_seeds": 1
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e-v2/E0null-A-seed42",
+          "sheltered": 2060,
+          "refused_all_full": 4754,
+          "unreachable": 28,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 928917.85,
+          "mean_exposure_ugm3h": 37801.8764,
+          "mean_travel_m": 18244.41
+        }
+      }
+    },
+    "scenario-e-v2/E0null-B-seed*": {
+      "preset_family": "E0",
+      "seeds": [
+        42
+      ],
+      "sheltered": {
+        "min": 6264,
+        "max": 6264,
+        "n_seeds": 1
+      },
+      "refused_all_full": {
+        "min": 550,
+        "max": 550,
+        "n_seeds": 1
+      },
+      "unreachable": {
+        "min": 28,
+        "max": 28,
+        "n_seeds": 1
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e-v2/E0null-B-seed42",
+          "sheltered": 6264,
+          "refused_all_full": 550,
+          "unreachable": 28,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 119973.1,
+          "mean_exposure_ugm3h": 4789.3639,
+          "mean_travel_m": 7895.81
+        }
+      }
+    },
+    "scenario-e-v2/E0null-C-seed*": {
+      "preset_family": "E0",
+      "seeds": [
+        42
+      ],
+      "sheltered": {
+        "min": 6570,
+        "max": 6570,
+        "n_seeds": 1
+      },
+      "refused_all_full": {
+        "min": 244,
+        "max": 244,
+        "n_seeds": 1
+      },
+      "unreachable": {
+        "min": 28,
+        "max": 28,
+        "n_seeds": 1
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e-v2/E0null-C-seed42",
+          "sheltered": 6570,
+          "refused_all_full": 244,
+          "unreachable": 28,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 59200.15,
+          "mean_exposure_ugm3h": 2363.0894,
+          "mean_travel_m": 5903.91
+        }
+      }
+    },
+    "scenario-e-v2/SE2-E18-d1-seed*": {
+      "preset_family": "SE2",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "sheltered": {
+        "min": 1272,
+        "max": 1307,
+        "n_seeds": 3
+      },
+      "refused_all_full": {
+        "min": 0,
+        "max": 1,
+        "n_seeds": 3
+      },
+      "unreachable": {
+        "min": 7,
+        "max": 12,
+        "n_seeds": 3
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e-v2/SE2-E18-d1-seed42",
+          "sheltered": 1307,
+          "refused_all_full": 1,
+          "unreachable": 9,
+          "pre_evac": 1111,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2037017.37,
+          "mean_exposure_ugm3h": 334940.5274,
+          "mean_travel_m": 742.22
+        },
+        "43": {
+          "source": "scenario-e-v2/SE2-E18-d1-seed43",
+          "sheltered": 1272,
+          "refused_all_full": 0,
+          "unreachable": 7,
+          "pre_evac": 1174,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2048821.92,
+          "mean_exposure_ugm3h": 337399.7621,
+          "mean_travel_m": 641.26
+        },
+        "44": {
+          "source": "scenario-e-v2/SE2-E18-d1-seed44",
+          "sheltered": 1301,
+          "refused_all_full": 0,
+          "unreachable": 12,
+          "pre_evac": 1184,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2046132.03,
+          "mean_exposure_ugm3h": 336766.7116,
+          "mean_travel_m": 712.19
+        }
+      }
+    },
+    "scenario-e-v2/SE2-E18-d2-seed*": {
+      "preset_family": "SE2",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "sheltered": {
+        "min": 1271,
+        "max": 1307,
+        "n_seeds": 3
+      },
+      "refused_all_full": {
+        "min": 0,
+        "max": 1,
+        "n_seeds": 3
+      },
+      "unreachable": {
+        "min": 8,
+        "max": 11,
+        "n_seeds": 3
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e-v2/SE2-E18-d2-seed42",
+          "sheltered": 1307,
+          "refused_all_full": 1,
+          "unreachable": 9,
+          "pre_evac": 1111,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2036951.58,
+          "mean_exposure_ugm3h": 334924.1811,
+          "mean_travel_m": 703.33
+        },
+        "43": {
+          "source": "scenario-e-v2/SE2-E18-d2-seed43",
+          "sheltered": 1271,
+          "refused_all_full": 0,
+          "unreachable": 8,
+          "pre_evac": 1174,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2048880,
+          "mean_exposure_ugm3h": 337404.7825,
+          "mean_travel_m": 632.1
+        },
+        "44": {
+          "source": "scenario-e-v2/SE2-E18-d2-seed44",
+          "sheltered": 1302,
+          "refused_all_full": 0,
+          "unreachable": 11,
+          "pre_evac": 1184,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2046018.48,
+          "mean_exposure_ugm3h": 336755.009,
+          "mean_travel_m": 687.85
+        }
+      }
+    },
+    "scenario-e-v2/SE2-E18-d3-seed*": {
+      "preset_family": "SE2",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "sheltered": {
+        "min": 1271,
+        "max": 1309,
+        "n_seeds": 3
+      },
+      "refused_all_full": {
+        "min": 0,
+        "max": 1,
+        "n_seeds": 3
+      },
+      "unreachable": {
+        "min": 7,
+        "max": 12,
+        "n_seeds": 3
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e-v2/SE2-E18-d3-seed42",
+          "sheltered": 1309,
+          "refused_all_full": 1,
+          "unreachable": 7,
+          "pre_evac": 1111,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2036736.92,
+          "mean_exposure_ugm3h": 334896.9861,
+          "mean_travel_m": 658.65
+        },
+        "43": {
+          "source": "scenario-e-v2/SE2-E18-d3-seed43",
+          "sheltered": 1271,
+          "refused_all_full": 0,
+          "unreachable": 8,
+          "pre_evac": 1174,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2048796.32,
+          "mean_exposure_ugm3h": 337390.0144,
+          "mean_travel_m": 585.12
+        },
+        "44": {
+          "source": "scenario-e-v2/SE2-E18-d3-seed44",
+          "sheltered": 1301,
+          "refused_all_full": 0,
+          "unreachable": 12,
+          "pre_evac": 1184,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2046014.68,
+          "mean_exposure_ugm3h": 336744.9697,
+          "mean_travel_m": 641.01
+        }
+      }
+    },
+    "scenario-e-v2/SE2-E19-d1-seed*": {
+      "preset_family": "SE2",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "sheltered": {
+        "min": 1273,
+        "max": 1312,
+        "n_seeds": 3
+      },
+      "refused_all_full": {
+        "min": 0,
+        "max": 1,
+        "n_seeds": 3
+      },
+      "unreachable": {
+        "min": 4,
+        "max": 8,
+        "n_seeds": 3
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e-v2/SE2-E19-d1-seed42",
+          "sheltered": 1312,
+          "refused_all_full": 1,
+          "unreachable": 4,
+          "pre_evac": 1111,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2036261.12,
+          "mean_exposure_ugm3h": 334818.1141,
+          "mean_travel_m": 506.18
+        },
+        "43": {
+          "source": "scenario-e-v2/SE2-E19-d1-seed43",
+          "sheltered": 1273,
+          "refused_all_full": 0,
+          "unreachable": 6,
+          "pre_evac": 1174,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2048485.95,
+          "mean_exposure_ugm3h": 337334.6487,
+          "mean_travel_m": 485.05
+        },
+        "44": {
+          "source": "scenario-e-v2/SE2-E19-d1-seed44",
+          "sheltered": 1305,
+          "refused_all_full": 0,
+          "unreachable": 8,
+          "pre_evac": 1184,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2045505.43,
+          "mean_exposure_ugm3h": 336671.9656,
+          "mean_travel_m": 512.3
+        }
+      }
+    },
+    "scenario-e-v2/SE2-E20-d1-seed*": {
+      "preset_family": "SE2",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "sheltered": {
+        "min": 1273,
+        "max": 1312,
+        "n_seeds": 3
+      },
+      "refused_all_full": {
+        "min": 0,
+        "max": 1,
+        "n_seeds": 3
+      },
+      "unreachable": {
+        "min": 4,
+        "max": 7,
+        "n_seeds": 3
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e-v2/SE2-E20-d1-seed42",
+          "sheltered": 1312,
+          "refused_all_full": 1,
+          "unreachable": 4,
+          "pre_evac": 1111,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2036273.98,
+          "mean_exposure_ugm3h": 334823.236,
+          "mean_travel_m": 506.55
+        },
+        "43": {
+          "source": "scenario-e-v2/SE2-E20-d1-seed43",
+          "sheltered": 1273,
+          "refused_all_full": 0,
+          "unreachable": 6,
+          "pre_evac": 1174,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2048482.87,
+          "mean_exposure_ugm3h": 337336.6002,
+          "mean_travel_m": 479.75
+        },
+        "44": {
+          "source": "scenario-e-v2/SE2-E20-d1-seed44",
+          "sheltered": 1306,
+          "refused_all_full": 0,
+          "unreachable": 7,
+          "pre_evac": 1184,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2045445.72,
+          "mean_exposure_ugm3h": 336667.2241,
+          "mean_travel_m": 518.08
+        }
+      }
+    },
+    "scenario-e-v2/SE2nc-E18-seed*": {
+      "preset_family": "SE2nc",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "sheltered": {
+        "min": 1272,
+        "max": 1308,
+        "n_seeds": 3
+      },
+      "refused_all_full": {
+        "min": 0,
+        "max": 1,
+        "n_seeds": 3
+      },
+      "unreachable": {
+        "min": 7,
+        "max": 11,
+        "n_seeds": 3
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e-v2/SE2nc-E18-seed42",
+          "sheltered": 1308,
+          "refused_all_full": 1,
+          "unreachable": 8,
+          "pre_evac": 1111,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2036906.77,
+          "mean_exposure_ugm3h": 334925.1188,
+          "mean_travel_m": 717.24
+        },
+        "43": {
+          "source": "scenario-e-v2/SE2nc-E18-seed43",
+          "sheltered": 1272,
+          "refused_all_full": 0,
+          "unreachable": 7,
+          "pre_evac": 1174,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2048817.82,
+          "mean_exposure_ugm3h": 337399.1194,
+          "mean_travel_m": 638.34
+        },
+        "44": {
+          "source": "scenario-e-v2/SE2nc-E18-seed44",
+          "sheltered": 1302,
+          "refused_all_full": 0,
+          "unreachable": 11,
+          "pre_evac": 1184,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2046027.82,
+          "mean_exposure_ugm3h": 336753.8841,
+          "mean_travel_m": 689.78
+        }
+      }
+    },
+    "scenario-e-v2/SE2nc-E19-seed*": {
+      "preset_family": "SE2nc",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "sheltered": {
+        "min": 1273,
+        "max": 1312,
+        "n_seeds": 3
+      },
+      "refused_all_full": {
+        "min": 0,
+        "max": 1,
+        "n_seeds": 3
+      },
+      "unreachable": {
+        "min": 4,
+        "max": 8,
+        "n_seeds": 3
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e-v2/SE2nc-E19-seed42",
+          "sheltered": 1312,
+          "refused_all_full": 1,
+          "unreachable": 4,
+          "pre_evac": 1111,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2036266.92,
+          "mean_exposure_ugm3h": 334819.5464,
+          "mean_travel_m": 510.36
+        },
+        "43": {
+          "source": "scenario-e-v2/SE2nc-E19-seed43",
+          "sheltered": 1273,
+          "refused_all_full": 0,
+          "unreachable": 6,
+          "pre_evac": 1174,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2048492.22,
+          "mean_exposure_ugm3h": 337335.9802,
+          "mean_travel_m": 489.03
+        },
+        "44": {
+          "source": "scenario-e-v2/SE2nc-E19-seed44",
+          "sheltered": 1305,
+          "refused_all_full": 0,
+          "unreachable": 8,
+          "pre_evac": 1184,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2045507.82,
+          "mean_exposure_ugm3h": 336672.1784,
+          "mean_travel_m": 515.32
+        }
+      }
+    },
+    "scenario-e-v2/SE2nc-E20-seed*": {
+      "preset_family": "SE2nc",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "sheltered": {
+        "min": 1273,
+        "max": 1312,
+        "n_seeds": 3
+      },
+      "refused_all_full": {
+        "min": 0,
+        "max": 1,
+        "n_seeds": 3
+      },
+      "unreachable": {
+        "min": 4,
+        "max": 7,
+        "n_seeds": 3
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e-v2/SE2nc-E20-seed42",
+          "sheltered": 1312,
+          "refused_all_full": 1,
+          "unreachable": 4,
+          "pre_evac": 1111,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2036268.27,
+          "mean_exposure_ugm3h": 334821.99,
+          "mean_travel_m": 502.73
+        },
+        "43": {
+          "source": "scenario-e-v2/SE2nc-E20-seed43",
+          "sheltered": 1273,
+          "refused_all_full": 0,
+          "unreachable": 6,
+          "pre_evac": 1174,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2048477.63,
+          "mean_exposure_ugm3h": 337335.8633,
+          "mean_travel_m": 476.02
+        },
+        "44": {
+          "source": "scenario-e-v2/SE2nc-E20-seed44",
+          "sheltered": 1306,
+          "refused_all_full": 0,
+          "unreachable": 7,
+          "pre_evac": 1184,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 2045437.18,
+          "mean_exposure_ugm3h": 336665.5427,
+          "mean_travel_m": 511.6
+        }
+      }
+    },
+    "scenario-e/E0null-A-seed*": {
+      "preset_family": "E0",
+      "seeds": [
+        42
+      ],
+      "sheltered": {
+        "min": 2060,
+        "max": 2060,
+        "n_seeds": 1
+      },
+      "refused_all_full": {
+        "min": 4754,
+        "max": 4754,
+        "n_seeds": 1
+      },
+      "unreachable": {
+        "min": 28,
+        "max": 28,
+        "n_seeds": 1
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e/E0null-A-seed42",
+          "sheltered": 2060,
+          "refused_all_full": 4754,
+          "unreachable": 28,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 928917.85,
+          "mean_exposure_ugm3h": 37801.8764,
+          "mean_travel_m": 18244.41
+        }
+      }
+    },
+    "scenario-e/E0null-B-seed*": {
+      "preset_family": "E0",
+      "seeds": [
+        42
+      ],
+      "sheltered": {
+        "min": 6264,
+        "max": 6264,
+        "n_seeds": 1
+      },
+      "refused_all_full": {
+        "min": 550,
+        "max": 550,
+        "n_seeds": 1
+      },
+      "unreachable": {
+        "min": 28,
+        "max": 28,
+        "n_seeds": 1
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e/E0null-B-seed42",
+          "sheltered": 6264,
+          "refused_all_full": 550,
+          "unreachable": 28,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 119973.1,
+          "mean_exposure_ugm3h": 4789.3639,
+          "mean_travel_m": 7895.81
+        }
+      }
+    },
+    "scenario-e/E0null-C-seed*": {
+      "preset_family": "E0",
+      "seeds": [
+        42
+      ],
+      "sheltered": {
+        "min": 6570,
+        "max": 6570,
+        "n_seeds": 1
+      },
+      "refused_all_full": {
+        "min": 244,
+        "max": 244,
+        "n_seeds": 1
+      },
+      "unreachable": {
+        "min": 28,
+        "max": 28,
+        "n_seeds": 1
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e/E0null-C-seed42",
+          "sheltered": 6570,
+          "refused_all_full": 244,
+          "unreachable": 28,
+          "pre_evac": 0,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 59200.15,
+          "mean_exposure_ugm3h": 2363.0894,
+          "mean_travel_m": 5903.91
+        }
+      }
+    },
+    "scenario-e/SE-E18-seed*": {
+      "preset_family": "SE",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "sheltered": {
+        "min": 1223,
+        "max": 1252,
+        "n_seeds": 3
+      },
+      "refused_all_full": {
+        "min": 0,
+        "max": 1,
+        "n_seeds": 3
+      },
+      "unreachable": {
+        "min": 8,
+        "max": 12,
+        "n_seeds": 3
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e/SE-E18-seed42",
+          "sheltered": 1252,
+          "refused_all_full": 1,
+          "unreachable": 9,
+          "pre_evac": 1166,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1825926.02,
+          "mean_exposure_ugm3h": 133570.2951,
+          "mean_travel_m": 641.23
+        },
+        "43": {
+          "source": "scenario-e/SE-E18-seed43",
+          "sheltered": 1223,
+          "refused_all_full": 0,
+          "unreachable": 8,
+          "pre_evac": 1222,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1836804.85,
+          "mean_exposure_ugm3h": 134455.1435,
+          "mean_travel_m": 590.26
+        },
+        "44": {
+          "source": "scenario-e/SE-E18-seed44",
+          "sheltered": 1247,
+          "refused_all_full": 0,
+          "unreachable": 12,
+          "pre_evac": 1238,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1834472.22,
+          "mean_exposure_ugm3h": 134279.0967,
+          "mean_travel_m": 621.91
+        }
+      }
+    },
+    "scenario-e/SE-E19-seed*": {
+      "preset_family": "SE",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "sheltered": {
+        "min": 1226,
+        "max": 1257,
+        "n_seeds": 3
+      },
+      "refused_all_full": {
+        "min": 0,
+        "max": 1,
+        "n_seeds": 3
+      },
+      "unreachable": {
+        "min": 4,
+        "max": 7,
+        "n_seeds": 3
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e/SE-E19-seed42",
+          "sheltered": 1257,
+          "refused_all_full": 1,
+          "unreachable": 4,
+          "pre_evac": 1166,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1825358.67,
+          "mean_exposure_ugm3h": 133534.2354,
+          "mean_travel_m": 500.21
+        },
+        "43": {
+          "source": "scenario-e/SE-E19-seed43",
+          "sheltered": 1226,
+          "refused_all_full": 0,
+          "unreachable": 5,
+          "pre_evac": 1222,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1836412.65,
+          "mean_exposure_ugm3h": 134429.0268,
+          "mean_travel_m": 470.13
+        },
+        "44": {
+          "source": "scenario-e/SE-E19-seed44",
+          "sheltered": 1252,
+          "refused_all_full": 0,
+          "unreachable": 7,
+          "pre_evac": 1238,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1833947.75,
+          "mean_exposure_ugm3h": 134247.2455,
+          "mean_travel_m": 503.68
+        }
+      }
+    },
+    "scenario-e/SE-E20-seed*": {
+      "preset_family": "SE",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "sheltered": {
+        "min": 1225,
+        "max": 1257,
+        "n_seeds": 3
+      },
+      "refused_all_full": {
+        "min": 0,
+        "max": 1,
+        "n_seeds": 3
+      },
+      "unreachable": {
+        "min": 4,
+        "max": 7,
+        "n_seeds": 3
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e/SE-E20-seed42",
+          "sheltered": 1257,
+          "refused_all_full": 1,
+          "unreachable": 4,
+          "pre_evac": 1166,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1825339.58,
+          "mean_exposure_ugm3h": 133533.5974,
+          "mean_travel_m": 483.35
+        },
+        "43": {
+          "source": "scenario-e/SE-E20-seed43",
+          "sheltered": 1225,
+          "refused_all_full": 0,
+          "unreachable": 6,
+          "pre_evac": 1222,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1836466.47,
+          "mean_exposure_ugm3h": 134432.2394,
+          "mean_travel_m": 461.97
+        },
+        "44": {
+          "source": "scenario-e/SE-E20-seed44",
+          "sheltered": 1252,
+          "refused_all_full": 0,
+          "unreachable": 7,
+          "pre_evac": 1238,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1833937,
+          "mean_exposure_ugm3h": 134246.9932,
+          "mean_travel_m": 495.5
+        }
+      }
+    },
+    "scenario-e/SEnc-E18-seed*": {
+      "preset_family": "SEnc",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "sheltered": {
+        "min": 1224,
+        "max": 1253,
+        "n_seeds": 3
+      },
+      "refused_all_full": {
+        "min": 0,
+        "max": 1,
+        "n_seeds": 3
+      },
+      "unreachable": {
+        "min": 7,
+        "max": 11,
+        "n_seeds": 3
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e/SEnc-E18-seed42",
+          "sheltered": 1253,
+          "refused_all_full": 1,
+          "unreachable": 8,
+          "pre_evac": 1166,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1825882.28,
+          "mean_exposure_ugm3h": 133569.2662,
+          "mean_travel_m": 657.97
+        },
+        "43": {
+          "source": "scenario-e/SEnc-E18-seed43",
+          "sheltered": 1224,
+          "refused_all_full": 0,
+          "unreachable": 7,
+          "pre_evac": 1222,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1836788.72,
+          "mean_exposure_ugm3h": 134455.5007,
+          "mean_travel_m": 617.21
+        },
+        "44": {
+          "source": "scenario-e/SEnc-E18-seed44",
+          "sheltered": 1248,
+          "refused_all_full": 0,
+          "unreachable": 11,
+          "pre_evac": 1238,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1834445.08,
+          "mean_exposure_ugm3h": 134278.1574,
+          "mean_travel_m": 640.5
+        }
+      }
+    },
+    "scenario-e/SEnc-E19-seed*": {
+      "preset_family": "SEnc",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "sheltered": {
+        "min": 1225,
+        "max": 1257,
+        "n_seeds": 3
+      },
+      "refused_all_full": {
+        "min": 0,
+        "max": 1,
+        "n_seeds": 3
+      },
+      "unreachable": {
+        "min": 4,
+        "max": 8,
+        "n_seeds": 3
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e/SEnc-E19-seed42",
+          "sheltered": 1257,
+          "refused_all_full": 1,
+          "unreachable": 4,
+          "pre_evac": 1166,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1825340.55,
+          "mean_exposure_ugm3h": 133532.7426,
+          "mean_travel_m": 491.92
+        },
+        "43": {
+          "source": "scenario-e/SEnc-E19-seed43",
+          "sheltered": 1225,
+          "refused_all_full": 0,
+          "unreachable": 6,
+          "pre_evac": 1222,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1836478.52,
+          "mean_exposure_ugm3h": 134432.1765,
+          "mean_travel_m": 472.6
+        },
+        "44": {
+          "source": "scenario-e/SEnc-E19-seed44",
+          "sheltered": 1251,
+          "refused_all_full": 0,
+          "unreachable": 8,
+          "pre_evac": 1238,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1833994.33,
+          "mean_exposure_ugm3h": 134249.2117,
+          "mean_travel_m": 494.81
+        }
+      }
+    },
+    "scenario-e/SEnc-E20-seed*": {
+      "preset_family": "SEnc",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "sheltered": {
+        "min": 1225,
+        "max": 1257,
+        "n_seeds": 3
+      },
+      "refused_all_full": {
+        "min": 0,
+        "max": 1,
+        "n_seeds": 3
+      },
+      "unreachable": {
+        "min": 4,
+        "max": 7,
+        "n_seeds": 3
+      },
+      "by_seed": {
+        "42": {
+          "source": "scenario-e/SEnc-E20-seed42",
+          "sheltered": 1257,
+          "refused_all_full": 1,
+          "unreachable": 4,
+          "pre_evac": 1166,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1825340.45,
+          "mean_exposure_ugm3h": 133533.6742,
+          "mean_travel_m": 483.84
+        },
+        "43": {
+          "source": "scenario-e/SEnc-E20-seed43",
+          "sheltered": 1225,
+          "refused_all_full": 0,
+          "unreachable": 6,
+          "pre_evac": 1222,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1836469.97,
+          "mean_exposure_ugm3h": 134432.5272,
+          "mean_travel_m": 463.41
+        },
+        "44": {
+          "source": "scenario-e/SEnc-E20-seed44",
+          "sheltered": 1252,
+          "refused_all_full": 0,
+          "unreachable": 7,
+          "pre_evac": 1238,
+          "en_route": 0,
+          "n_agents": 6842,
+          "total_person_hours_above_unhealthy": 1833936.65,
+          "mean_exposure_ugm3h": 134247.0119,
+          "mean_travel_m": 495.1
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "name": "@websim/pipeline",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Offline asset builds (Node + read-only Java 17 exporter). Never runs in the browser; outputs land in pipeline/out.",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./archive": "./src/archive/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build:graph": "tsx scripts/pack-graph.ts",
+    "build:encampments": "tsx scripts/build-encampments.ts",
+    "check:deploy": "tsx scripts/deploy-check.ts",
+    "build:presets": "tsx scripts/build-presets.ts",
+    "check:presets": "tsx scripts/build-presets.ts --check",
+    "build:smoke": "tsx scripts/build-smoke.ts",
+    "build:shelters": "tsx scripts/build-shelters.ts",
+    "build:registry": "tsx scripts/build-registry.ts",
+    "build:checksums": "tsx scripts/checksums.ts",
+    "build:data": "npm run build:smoke && npm run build:shelters && npm run build:registry && npm run build:checksums",
+    "check:data": "tsx scripts/build-smoke.ts --check && tsx scripts/build-shelters.ts --check && tsx scripts/build-registry.ts --check && tsx scripts/checksums.ts --check",
+    "build:committed-slice": "tsx scripts/build-committed-slice.ts",
+    "check:committed-slice": "tsx scripts/build-committed-slice.ts --check",
+    "build:archive-bundles": "tsx scripts/build-archive-bundles.ts",
+    "report:archive-bundles": "tsx scripts/build-archive-bundles.ts --report",
+    "build:golden": "tsx scripts/build-golden-summaries.ts",
+    "check:golden": "tsx scripts/build-golden-summaries.ts --check",
+    "build:working-set": "tsx scripts/build-working-set-manifest.ts",
+    "check:working-set": "tsx scripts/build-working-set-manifest.ts --check",
+    "verify:working-set": "tsx scripts/verify-working-set.ts"
+  },
+  "dependencies": {
+    "@websim/engine": "*",
+    "@websim/shared": "*"
+  }
+}
