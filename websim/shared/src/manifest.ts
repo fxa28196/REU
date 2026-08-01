@@ -19,7 +19,13 @@ import { assetDigestList } from "./assets.js";
 import type { RunConfig, RunConfigDelta } from "./config.js";
 import { diffRunConfigs, orderRunConfig } from "./config.js";
 import type { ParamName } from "./schema.js";
-import { PARAM_NAMES } from "./schema.js";
+import {
+  CLOSURE_DRAW_PARAM,
+  E_PARAM_NAMES,
+  PARAM_NAMES,
+  SE_PARAM_NAMES,
+  WORST_FAMILY_CLOSURES_CODE,
+} from "./schema.js";
 
 // ---------------------------------------------------------------------------
 // Schema ids
@@ -196,6 +202,63 @@ export function checkManifestParameterCompleteness(
   return { ok: missing.length === 0 && unexpected.length === 0, missing, unexpected };
 }
 
+/**
+ * Gate (h) — manifest completeness for the 21 Phase-E parameters.
+ *
+ * `scripts/verify_E_runs.py:615-621`, transcribed:
+ *
+ * ```python
+ * missing = [p for p in E_PARAMS if p not in run.params]
+ * PASS iff not missing
+ * ```
+ *
+ * Gate (h)'s second half (`git_working_tree_dirty is False`, identity not
+ * truthiness) is a property of the *emitting* build, not of the parameter
+ * surface, so it belongs to the harness rather than here — see
+ * {@link EngineIdentity.websim_dirty}, the port's equivalent field.
+ *
+ * @param parameters the parameter names the manifest actually carries
+ */
+export function checkPhaseEParameterCompleteness(
+  parameters: readonly string[],
+): ManifestCompleteness {
+  const present = new Set(parameters);
+  const missing = E_PARAM_NAMES.filter((name) => !present.has(name));
+  return { ok: missing.length === 0, missing, unexpected: [] };
+}
+
+/**
+ * Gate (i) — manifest completeness for the 7 Scenario-E parameters, plus
+ * `closureDraw` when and only when the run is in the worst family.
+ *
+ * `scripts/verify_E_runs.py:630-641`, transcribed:
+ *
+ * ```python
+ * missing = [p for p in SE_PARAMS if p not in run.params]
+ * PASS iff not missing
+ * code = int(float(run.params.get("closuresCode", 0)))
+ * if code == 3:
+ *     PASS iff "closureDraw" in run.params
+ * ```
+ *
+ * The `closuresCode` default of `0` in the Python's `.get` is reproduced by the
+ * optional parameter here: a caller that cannot read the code is treated as
+ * "not the worst family", which is what the Python does. A web-emitted manifest
+ * always carries all 41 parameters, so this gate is satisfied by construction —
+ * running it anyway is what proves that claim instead of assuming it.
+ */
+export function checkScenarioEParameterCompleteness(
+  parameters: readonly string[],
+  closuresCode = 0,
+): ManifestCompleteness {
+  const present = new Set(parameters);
+  const missing: ParamName[] = SE_PARAM_NAMES.filter((name) => !present.has(name));
+  if (closuresCode === WORST_FAMILY_CLOSURES_CODE && !present.has(CLOSURE_DRAW_PARAM)) {
+    missing.push(CLOSURE_DRAW_PARAM);
+  }
+  return { ok: missing.length === 0, missing, unexpected: [] };
+}
+
 /** Configured-vs-executed diff, in manifest order. */
 export function configuredVsExecuted(
   configured: RunConfig,
@@ -345,6 +408,85 @@ export const ENGINE_SEMANTICS_QUIRKS: readonly EngineSemanticsQuirk[] = [
     reproducedIn: "both",
   },
 ];
+
+/**
+ * The ledger's third kind (README §7, "Provenance note" row).
+ *
+ * Not a formatting quirk and not engine semantics: a fact about how an *archived
+ * run was configured* that a live-vs-archived comparison would otherwise
+ * misattribute to the port. There is nothing to reproduce and nothing to fix —
+ * there is something to **say**, in the manifest and in preset copy, every time
+ * the affected presets are used.
+ */
+export interface ProvenanceQuirk {
+  /** Stable id; referenced by `PresetDefinition.quirkNotes`. */
+  readonly id: string;
+  /** The parameter the note is about. */
+  readonly param: ParamName;
+  /** What the archived manifests record as EXECUTED. */
+  readonly archivedExecutedValue: number;
+  /** What the web presets carry (the registered, corrected value). */
+  readonly presetValue: number;
+  /**
+   * The note, quoted verbatim. Any UI surface that shows one of the affected
+   * presets must render this string; `test/manifest.test.ts` pins it character
+   * for character against `docs/IMPLEMENTATION_PLAN.md` §6.4 so a paraphrase
+   * cannot creep in.
+   */
+  readonly note: string;
+  /** Why the difference changes no archived number. */
+  readonly impact: string;
+  /** Repo-relative sources, so a reader can check the quote. */
+  readonly sources: readonly string[];
+}
+
+/**
+ * Provenance notes. Exactly one today: the `pushThetaThreshold` honesty note
+ * (plan §6.4, §9.2 divergence 6; `WP8-SPEC-archive-gates.md` §5).
+ *
+ * The shape of the problem: the SE/SE2 batch files were authored with
+ * `pushThetaThreshold = -0.25` (the registered, band-anchored value) but every
+ * archived SE/SE2 manifest records the EXECUTED value as `0.0`. The manifests
+ * were truthful throughout — which is how the pre-push audit caught it — and the
+ * port's own executed-manifest mechanism (this file) is the transfer of that
+ * lesson. The web presets carry `-0.25`, so a live SE run and an archived SE run
+ * differ on this parameter *by design*, and every surface that puts them side by
+ * side has to say so.
+ */
+export const PROVENANCE_QUIRKS: readonly ProvenanceQuirk[] = [
+  {
+    id: "pushtheta-batch-zeroing",
+    param: "pushThetaThreshold",
+    archivedExecutedValue: 0,
+    presetValue: -0.25,
+    // Verbatim, docs/IMPLEMENTATION_PLAN.md §6.4 lines 548-551 (line wrapping
+    // removed, no other change). Quoted in WP8-SPEC-archive-gates.md §5.2.
+    note:
+      "the SE/SE2 preset UI and quirk ledger state that archived runs *executed* " +
+      "`pushThetaThreshold = 0.0` (Repast negative-\"number\" parser defect, inert — zero " +
+      "blockage events) while web presets carry the corrected −0.25, so live-vs-archived " +
+      "closure comparisons are framed correctly.",
+    impact:
+      "None on any archived number. The parameter is consulted only at a blockage encounter " +
+      "and all 24 closure runs (9 severe-v1 + 15 worst-v2) recorded zero blockage events, so " +
+      "the V51 decision rule never executed in any run. The registered band-anchored " +
+      "derivation of -0.25 stands for future sweeps; the executed-config record stands as 0.0. " +
+      "When an archived SE/SE2 bundle is replayed for byte-comparison the engine must be " +
+      "driven from the archived EXECUTED manifest (0.0), not from the preset (-0.25).",
+    sources: [
+      "docs/critique-response/13-PHASE-E-PREDICTIONS.md (correction note, 2026-07-30)",
+      "websim/docs/IMPLEMENTATION_PLAN.md §6.3, §6.4, §9.2 item 6",
+      "websim/docs/PORT_MAP.md §2.7, §2.8, §6.4 item 4",
+      "scripts/make_batch_params_E.py:113-122",
+      "websim/docs/WP8-SPEC-archive-gates.md §5",
+    ],
+  },
+];
+
+/** Look up a provenance note by id. */
+export function provenanceQuirk(id: string): ProvenanceQuirk | undefined {
+  return PROVENANCE_QUIRKS.find((q) => q.id === id);
+}
 
 /** Look up a field mapping by id. */
 export function fieldMapping(id: string): SimulationFieldMapping | undefined {

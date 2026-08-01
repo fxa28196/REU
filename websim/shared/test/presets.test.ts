@@ -17,7 +17,19 @@ import {
   PRESETS,
   serialisePreset,
 } from "../src/presets/index.js";
-import { PARAM_COUNT, PARAM_META, PARAM_NAMES, RunConfigSchema } from "../src/schema.js";
+import {
+  E_PARAM_COUNT,
+  E_PARAM_NAMES,
+  PARAM_COUNT,
+  PARAM_META,
+  PARAM_NAMES,
+  repastConstantType,
+  RunConfigSchema,
+  SE_PARAM_COUNT,
+  SE_PARAM_NAMES,
+  negativeValuedParams,
+} from "../src/schema.js";
+import { PROVENANCE_QUIRKS } from "../src/manifest.js";
 
 const PRESET_DIR = join(dirname(fileURLToPath(import.meta.url)), "..", "src", "presets");
 
@@ -53,6 +65,18 @@ const BATCH_FILE_EXPECTATIONS = {
     betaCapacityPrior: 0.2,
     shelterPolicyVariant: 1,
   },
+  ER_baseline_real_C: {
+    scenarioCode: 2,
+    simulationHours: 312,
+    enableDecisionLayer: 1,
+    pAwareInit: 0.356,
+    informationRegime: 1,
+    enableHazardDeparture: 1,
+    shelterPolicyVariant: 1,
+    triageReserveFraction: 0,
+  },
+  E0_null_B: { scenarioCode: 1, enableDecisionLayer: 1, pAwareInit: 1, sigmaTheta: 0 },
+  E0_null_C: { scenarioCode: 2, enableDecisionLayer: 1, pAwareInit: 1, sigmaTheta: 0 },
   SE_severe_v1_E18: {
     scenarioCode: 18,
     simulationHours: 455,
@@ -65,6 +89,15 @@ const BATCH_FILE_EXPECTATIONS = {
     pushThetaThreshold: -0.25,
     kPush: 1,
   },
+  SE_severe_v1_E19: {
+    scenarioCode: 19,
+    simulationHours: 455,
+    smokeSeriesCode: 1,
+    smokeScale: 1,
+    closuresCode: 1,
+    closureDraw: 1,
+    pushThetaThreshold: -0.25,
+  },
   SE2_worst_plausible_E18_d1: {
     scenarioCode: 18,
     simulationHours: 455,
@@ -72,6 +105,15 @@ const BATCH_FILE_EXPECTATIONS = {
     smokeScale: 1,
     closuresCode: 3,
     closureDraw: 1,
+    pushThetaThreshold: -0.25,
+  },
+  SE2_worst_plausible_E18_d2: {
+    scenarioCode: 18,
+    simulationHours: 455,
+    smokeSeriesCode: 2,
+    smokeScale: 1,
+    closuresCode: 3,
+    closureDraw: 2,
     pushThetaThreshold: -0.25,
   },
 } as const;
@@ -90,6 +132,25 @@ describe("preset inventory", () => {
     ]) {
       expect(PRESET_IDS).toContain(required);
     }
+  });
+
+  it("ships the bundles WP8 adds", () => {
+    // WP8 config surface: ER arms A and C, SE-E18, SE-E19, SE2-E18-d1,
+    // SE2-E18-d2 and the E0 nulls for arms A/B/C.
+    for (const required of [
+      "E0_null_A",
+      "E0_null_B",
+      "E0_null_C",
+      "ER_baseline_real_A",
+      "ER_baseline_real_C",
+      "SE_severe_v1_E18",
+      "SE_severe_v1_E19",
+      "SE2_worst_plausible_E18_d1",
+      "SE2_worst_plausible_E18_d2",
+    ]) {
+      expect(PRESET_IDS).toContain(required);
+    }
+    expect(PRESET_IDS).toHaveLength(13);
   });
 
   it("has one definition, one JSON file and one loaded config per id", () => {
@@ -140,6 +201,32 @@ describe("preset completeness", () => {
           `${id} without ${name} was accepted`,
         ).toBe(false);
       }
+    }
+  });
+
+  it("fails validation when any of the 21 E or 7 SE parameters is stripped", () => {
+    // The same invariant as the test above, restated over the WP8 surface
+    // specifically. It is deliberately NOT a replacement: the loop above covers
+    // all 41 and must keep doing so. This one names the 28 the archive gates
+    // (h) and (i) care about, so a future "make it optional" change to one of
+    // them fails a test whose title says why it matters.
+    const wp8Surface = [...E_PARAM_NAMES, ...SE_PARAM_NAMES];
+    expect(wp8Surface).toHaveLength(E_PARAM_COUNT + SE_PARAM_COUNT);
+    expect(new Set(wp8Surface).size).toBe(28);
+    for (const id of PRESET_IDS) {
+      for (const name of wp8Surface) {
+        const stripped: Record<string, unknown> = { ...(PRESET_JSON[id] as object) };
+        delete stripped[name];
+        expect(
+          RunConfigSchema.safeParse(stripped).success,
+          `${id} without WP8 parameter ${name} was accepted`,
+        ).toBe(false);
+      }
+      // closureDraw is gate (i)'s conditional extra and is outside SE_PARAM_NAMES;
+      // the web schema still requires it unconditionally.
+      const withoutDraw: Record<string, unknown> = { ...(PRESET_JSON[id] as object) };
+      delete withoutDraw["closureDraw"];
+      expect(RunConfigSchema.safeParse(withoutDraw).success).toBe(false);
     }
   });
 
@@ -222,7 +309,62 @@ describe("preset values match the read-only batch files", () => {
 
   it("keeps the Scenario-E window at 455 hours, not the 456 its comment claims", () => {
     expect(PRESETS.SE_severe_v1_E18.simulationHours).toBe(455);
+    expect(PRESETS.SE_severe_v1_E19.simulationHours).toBe(455);
     expect(PRESETS.SE2_worst_plausible_E18_d1.simulationHours).toBe(455);
+    expect(PRESETS.SE2_worst_plausible_E18_d2.simulationHours).toBe(455);
+  });
+
+  it("types every negative preset value as a Repast 'double', never a 'number'", () => {
+    // Never-regress gotcha 4: Repast's batch loader silently zeroes negative
+    // constant_type="number" constants (scripts/make_batch_params_E.py:113-122).
+    // Two of the 28 WP8 parameters are negative by construction, so the rule
+    // applies to this surface and is checked here rather than assumed.
+    const negatives = new Set<string>();
+    for (const id of PRESET_IDS) {
+      const config = PRESETS[id];
+      for (const name of negativeValuedParams(config)) {
+        negatives.add(name);
+        expect(repastConstantType(name, config[name]), `${id}.${name}`).toBe("double");
+        expect(PARAM_META[name].negativeCapable, `${name} is negative but not flagged`).toBe(true);
+      }
+      // ... and no positive double is ever promoted, or the rule would be
+      // vacuously satisfiable by typing everything "double".
+      for (const name of PARAM_NAMES) {
+        if (config[name] >= 0 && PARAM_META[name].kind === "double") {
+          expect(repastConstantType(name, config[name]), `${id}.${name}`).toBe("number");
+        }
+      }
+    }
+    expect([...negatives].sort()).toEqual(["alphaHazard", "pushThetaThreshold"]);
+    // Both live inside the WP8 surface: alphaHazard is one of the 21 E
+    // parameters, pushThetaThreshold one of the 7 SE parameters.
+    expect(E_PARAM_NAMES as readonly string[]).toContain("alphaHazard");
+    expect(SE_PARAM_NAMES as readonly string[]).toContain("pushThetaThreshold");
+  });
+
+  it("records provenance metadata and quirk notes on every WP8 preset", () => {
+    const ledgerIds = PROVENANCE_QUIRKS.map((q) => q.id);
+    for (const definition of PRESET_DEFINITIONS) {
+      if (definition.archiveFamily === null) {
+        expect(definition.archivedManifests).toEqual([]);
+      } else {
+        expect(definition.archivedManifests[0], `${definition.id} primary archive`).toBe(
+          definition.archiveFamily,
+        );
+        for (const runDir of definition.archivedManifests) {
+          expect(runDir, `${definition.id} archive path`).toMatch(
+            /^(?:present-day-three-arm|phase-e|scenario-e|scenario-e-v2)\/[A-Za-z0-9-]+$/u,
+          );
+        }
+      }
+      for (const id of definition.quirkNotes) {
+        expect(ledgerIds, `${definition.id} cites unknown quirk ${id}`).toContain(id);
+      }
+      for (const e of definition.archiveExceptions) {
+        expect(ledgerIds).toContain(e.quirkNote);
+        expect(PARAM_NAMES as readonly string[]).toContain(e.param);
+      }
+    }
   });
 
   it("records provenance for every archived preset", () => {

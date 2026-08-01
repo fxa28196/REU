@@ -58,6 +58,11 @@ import {
   type DecisionMarginals,
 } from "../agents/eLayerSampler.js";
 import {
+  decisionConfigPositional,
+  petPolicyAdmitDefaultFrom,
+  type DecisionConfig,
+} from "../decision/config.js";
+import {
   PopulationSampler,
   type PopulationAttributes,
   type PopulationMarginals,
@@ -102,6 +107,41 @@ export interface WorldBuildConfig {
   readonly smokeSeriesCode: number;
   readonly closuresCode: number;
   readonly closureDraw: number;
+
+  // --- the 19 `GisAgent.DecisionConfig` coefficients -----------------------
+  //
+  // `ContextCreator.build()` reads every one of these and passes them, in this
+  // order, to the positional `DecisionConfig` constructor at step 11
+  // (`ContextCreator.java:781-788`). They are declared here rather than on
+  // `SimulationOptions` because that is where the certified model reads them:
+  // the config is a *build product*, constructed once, before any resident is
+  // armed, and shared by reference with all of them.
+  //
+  // They are **required**, not optional-with-a-default. An optional coefficient
+  // that silently fell back would be exactly the failure mode that let the
+  // decision layer sit unreached for a whole work package: `RunConfig` names all
+  // 41 parameters explicitly (plan Q2 / R7), so a caller that has a `RunConfig`
+  // already satisfies this and a caller that does not must say what it means.
+  readonly lambdaOutreachPerDay: number;
+  readonly informationRegime: number;
+  readonly enableHazardDeparture: number;
+  readonly sigmaTheta: number;
+  readonly alphaHazard: number;
+  readonly bRisk: number;
+  readonly wOfficial: number;
+  readonly gammaVuln: number;
+  readonly riskHalfLifeH: number;
+  readonly barrierBelongings: number;
+  readonly barrierPet: number;
+  readonly barrierDependents: number;
+  /** `int`, tested `== 1` at the call site — `2` means *refuse* (QUIRK 22). */
+  readonly petPolicyDefault: number;
+  readonly betaTravelTime: number;
+  readonly betaCapacityPrior: number;
+  readonly pushThetaThreshold: number;
+  readonly kPush: number;
+  readonly pStuck: number;
+  readonly stuckDelayH: number;
 }
 
 /** Synchronous access to the data files, relative to the Geography data root. */
@@ -168,6 +208,18 @@ export interface WorldBuildResult {
   /** The load-time census: how many of them carry `status == "operating"`. */
   readonly operatingShelters: number;
   readonly residents: readonly WorldResident[];
+  /**
+   * The ONE run-wide `GisAgent.DecisionConfig`, or `null` when
+   * `enableDecisionLayer !== 1`.
+   *
+   * Constructed at step 11, before the arming loop, exactly as
+   * `ContextCreator.java:781-788` does — outside the per-resident loop, so every
+   * resident shares one instance by reference. `Simulation`'s constructor
+   * completes step 11 by handing this to `armResident` for each resident in
+   * creation order; `null` here is what keeps a legacy arm byte-identical,
+   * because it is the value `Resident.decisionConfig` retains.
+   */
+  readonly decisionConfig: DecisionConfig | null;
   /** Camps kept after the silent malformed-row skip, in CSV order. */
   readonly camps: readonly CampSite[];
   readonly campRowsRead: number;
@@ -447,7 +499,22 @@ export function buildWorld(config: WorldBuildConfig, input: WorldBuildInput): Wo
   }
 
   // --- Step 11: Phase-E second pass, in CREATION order -------------------
+  //
+  // `ContextCreator.java:772-804`, in its order: the sampler is constructed
+  // first, then the ONE shared `DecisionConfig`, then the loop that samples and
+  // arms each resident. Neither construction consumes randomness, so their
+  // relative order cannot move a number — they are kept in the certified order
+  // anyway, because "identical output today" is not a licence to restructure.
+  //
+  // The port splits the loop across a build/run seam the certified model does
+  // not have: `GisAgent`s exist by step 11 in Java, whereas here the `Resident`
+  // objects are constructed by `Simulation`. So this loop does the sampling half
+  // (which is what positions the E stream) and `Simulation`'s constructor does
+  // the `setDecisionLayer` half, over the same list in the same creation order,
+  // before tick 1. `armResident` consumes no randomness, so the split is
+  // stream-neutral by construction.
   let eSampler: ELayerSampler | null = null;
+  let decisionCfg: DecisionConfig | null = null;
   if (config.enableDecisionLayer === 1) {
     eSampler = new ELayerSampler(streams.eLayerSampler!, {
       runSeed: seed,
@@ -457,6 +524,31 @@ export function buildWorld(config: WorldBuildConfig, input: WorldBuildInput): Wo
       pDependents: config.pHasDependents,
       groupSpeedDeltaMps: config.groupSpeedDeltaMps,
     });
+    // The 19 arguments in `GisAgent.DecisionConfig`'s declaration order. The
+    // positional form is used deliberately: it is the shape of the certified
+    // call site, so a transcription error is a compile error rather than a
+    // silently rewired model.
+    decisionCfg = decisionConfigPositional(
+      config.informationRegime,
+      config.enableHazardDeparture,
+      config.alphaHazard,
+      config.bRisk,
+      config.wOfficial,
+      config.gammaVuln,
+      config.sigmaTheta,
+      config.riskHalfLifeH,
+      config.lambdaOutreachPerDay,
+      config.barrierBelongings,
+      config.barrierPet,
+      config.barrierDependents,
+      petPolicyAdmitDefaultFrom(config.petPolicyDefault),
+      config.betaTravelTime,
+      config.betaCapacityPrior,
+      config.pushThetaThreshold,
+      config.kPush,
+      config.pStuck,
+      config.stuckDelayH,
+    );
     for (let i = 0; i < residents.length; i++) {
       const r = residents[i]!;
       residents[i] = { ...r, decision: eSampler.sample() };
@@ -470,6 +562,7 @@ export function buildWorld(config: WorldBuildConfig, input: WorldBuildInput): Wo
     shelters,
     operatingShelters: operatingCount,
     residents,
+    decisionConfig: decisionCfg,
     camps,
     campRowsRead: campRows.length,
     closures,

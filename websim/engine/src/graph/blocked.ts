@@ -29,6 +29,17 @@ export class BlockedEdges {
   private readonly flags: Uint8Array;
   /** Canonical `min:max` node-index pair keys, mirroring `blockedAdj`. */
   private readonly pairs = new Set<string>();
+  /**
+   * The same pairs, flat and in insertion order: `[minA, maxA, minB, maxB, …]`.
+   *
+   * Java's `blockedAdj` is a `HashMap<Long, Set<Long>>` and is never iterated by
+   * the model — `blockedEdgeCount()` only sums sizes. This array exists for the
+   * WP8 oracle comparison (`blocked-pairs.tsv` is the cumulative pair set read
+   * out of `blockedAdj` after each wave) and for provenance/UI read-out. It is
+   * written only by {@link blockPair} and it cannot drift from {@link pairs}:
+   * both are appended in the same branch.
+   */
+  private readonly pairEndpoints: number[] = [];
 
   public constructor(graph: RoutingGraph) {
     this.graph = graph;
@@ -66,6 +77,7 @@ export class BlockedEdges {
       return false;
     }
     this.pairs.add(k);
+    this.pairEndpoints.push(a < b ? a : b, a < b ? b : a);
     let touched = false;
     touched = this.flagHalf(a, b) || touched;
     touched = this.flagHalf(b, a) || touched;
@@ -95,6 +107,18 @@ export class BlockedEdges {
       return false;
     }
     return this.pairs.has(BlockedEdges.key(a, b));
+  }
+
+  /**
+   * The blocked pairs as canonical `[min, max]` node **indices**, in the order
+   * they were first blocked. Cold path — provenance and the WP8 wave oracle.
+   */
+  public blockedPairs(): readonly (readonly [number, number])[] {
+    const out: (readonly [number, number])[] = [];
+    for (let i = 0; i < this.pairEndpoints.length; i += 2) {
+      out.push([this.pairEndpoints[i]!, this.pairEndpoints[i + 1]!]);
+    }
+    return out;
   }
 
   /** Canonical `min:max` key over node **ids**, as `pushedBlockages` records them. */

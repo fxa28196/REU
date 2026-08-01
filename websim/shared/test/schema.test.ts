@@ -1,15 +1,22 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  CLOSURE_DRAW_PARAM,
+  E_PARAM_COUNT,
+  E_PARAM_NAMES,
   MAX_SIMULATION_HOURS_BY_SERIES,
   NEGATIVE_CAPABLE_PARAMS,
   PARAM_COUNT,
   PARAM_META,
   PARAM_NAMES,
   RunConfigSchema,
+  SE_PARAM_COUNT,
+  SE_PARAM_NAMES,
+  WORST_FAMILY_CLOSURES_CODE,
   isParamName,
   maxSimulationHours,
   paramsInGroup,
+  repastConstantType,
 } from "../src/schema.js";
 import { PRESETS } from "../src/presets/index.js";
 import type { ParamName } from "../src/schema.js";
@@ -230,6 +237,105 @@ describe("smoke-window cross-field rule (simulationHours ≤ slices − 1)", () 
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.issues[0]?.path).toEqual(["simulationHours"]);
+    }
+  });
+});
+
+describe("WP8 gate (h)/(i) groupings", () => {
+  it("names the 21 Phase-E parameters in verify_E_runs.py's order", () => {
+    // Transcribed from scripts/verify_E_runs.py:85-92 (E_PARAMS). Restated here
+    // in full so a reordering or a rename fails a test that shows both lists,
+    // rather than failing somewhere downstream in a gate port.
+    expect([...E_PARAM_NAMES]).toEqual([
+      "enableDecisionLayer",
+      "pAwareInit",
+      "pHeavyBelongings",
+      "pHasPet",
+      "pHasDependents",
+      "groupSpeedDeltaMps",
+      "lambdaOutreachPerDay",
+      "informationRegime",
+      "enableHazardDeparture",
+      "sigmaTheta",
+      "alphaHazard",
+      "bRisk",
+      "wOfficial",
+      "gammaVuln",
+      "riskHalfLifeH",
+      "barrierBelongings",
+      "barrierPet",
+      "barrierDependents",
+      "petPolicyDefault",
+      "betaTravelTime",
+      "betaCapacityPrior",
+    ]);
+    expect(E_PARAM_NAMES).toHaveLength(E_PARAM_COUNT);
+    expect(E_PARAM_COUNT).toBe(21);
+  });
+
+  it("names the 7 Scenario-E parameters in verify_E_runs.py's order", () => {
+    // scripts/verify_E_runs.py:97-100 (SE_PARAMS).
+    expect([...SE_PARAM_NAMES]).toEqual([
+      "smokeSeriesCode",
+      "smokeScale",
+      "closuresCode",
+      "pStuck",
+      "stuckDelayH",
+      "pushThetaThreshold",
+      "kPush",
+    ]);
+    expect(SE_PARAM_NAMES).toHaveLength(SE_PARAM_COUNT);
+    expect(SE_PARAM_COUNT).toBe(7);
+  });
+
+  it("keeps closureDraw out of SE_PARAM_NAMES but inside the schema", () => {
+    // The Python's own comment: closureDraw "entered the manifest with the
+    // worst-case family, so the archived v1 SE runs legitimately lack it".
+    expect(SE_PARAM_NAMES as readonly string[]).not.toContain(CLOSURE_DRAW_PARAM);
+    expect(PARAM_NAMES as readonly string[]).toContain(CLOSURE_DRAW_PARAM);
+    expect(WORST_FAMILY_CLOSURES_CODE).toBe(3);
+  });
+
+  it("draws both gate lists from the 41-parameter surface, without overlap", () => {
+    for (const name of [...E_PARAM_NAMES, ...SE_PARAM_NAMES]) {
+      expect(PARAM_NAMES as readonly string[], `${name} is not a schema parameter`).toContain(name);
+    }
+    const overlap = E_PARAM_NAMES.filter((n) =>
+      (SE_PARAM_NAMES as readonly string[]).includes(n),
+    );
+    expect(overlap).toEqual([]);
+    // 21 + 7 + closureDraw = 29 of the 41; the other 12 are the pre-E core plus
+    // shelterPolicyVariant, which the Python groups with neither.
+    expect(E_PARAM_COUNT + SE_PARAM_COUNT + 1).toBe(29);
+    expect(PARAM_NAMES as readonly string[]).toContain("shelterPolicyVariant");
+    expect(E_PARAM_NAMES as readonly string[]).not.toContain("shelterPolicyVariant");
+    expect(SE_PARAM_NAMES as readonly string[]).not.toContain("shelterPolicyVariant");
+  });
+});
+
+describe("Repast batch constant typing (the negative-zeroing gotcha)", () => {
+  it("promotes a negative double to 'double' and leaves the positive a 'number'", () => {
+    expect(repastConstantType("pushThetaThreshold", -0.25)).toBe("double");
+    expect(repastConstantType("pushThetaThreshold", 0)).toBe("number");
+    expect(repastConstantType("pushThetaThreshold", 0.5)).toBe("number");
+    expect(repastConstantType("alphaHazard", -8)).toBe("double");
+    expect(repastConstantType("bRisk", 0.4)).toBe("number");
+  });
+
+  it("types ints and flags as 'int' regardless of sign", () => {
+    // The generator promotes only constant_type="number"; nothing in the archive
+    // demonstrates the defect for ints, and WP8-SPEC-archive-gates.md §6.1 warns
+    // against stating the root cause more confidently than the evidence allows.
+    expect(repastConstantType("numAgents", 6842)).toBe("int");
+    expect(repastConstantType("randomSeed", 42)).toBe("int");
+    expect(repastConstantType("randomSeed", -1)).toBe("int");
+    expect(repastConstantType("enableDecisionLayer", 0)).toBe("int");
+    expect(repastConstantType("closureDraw", 3)).toBe("int");
+  });
+
+  it("never emits 'number' for a negative value of any parameter", () => {
+    for (const name of PARAM_NAMES) {
+      expect(repastConstantType(name, -1), `${name} at -1`).not.toBe("number");
     }
   });
 });

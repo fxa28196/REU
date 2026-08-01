@@ -22,10 +22,17 @@
  * ## Ordering
  *
  * Waves come out in ascending hour (`TreeMap`), and the edges inside a wave stay
- * in **file order** (`ArrayList` append). Both matter: the wave order decides
- * when the graph changes, and the within-wave order is the order edges are
- * blocked, which — via Dijkstra's strict-`<` relaxation — can decide path
- * geometry after the recompute.
+ * in **file order** (`ArrayList` append).
+ *
+ * The wave order is observable: it decides when the graph changes. The
+ * **within-wave order is NOT** — an earlier revision of this comment claimed it
+ * "can decide path geometry after the recompute", and that is wrong
+ * (WP8-SPEC-closures.md QUIRK 38). `ClosureWave.apply()` blocks every edge of a
+ * wave *before* `bumpClosureVersion()` and before the first `computeTree`, and
+ * the blocked set is a set, so no tree can observe a partial wave. File order is
+ * kept because it is free and because it is the certified order the recompute
+ * log is written in — not because an outcome depends on it, and a test asserting
+ * an order-dependent outcome here would pass vacuously and mislead.
  *
  * ## The phantom guard
  *

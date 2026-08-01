@@ -43,11 +43,38 @@ function announce(gate: ArtifactGate): void {
  * Register an artifact-gated `describe`.
  *
  * - satisfied  → `describe(suite, fn)`
- * - degraded   → banner + `describe.skip(suite, fn)`; vitest counts the bodies
- *                as SKIPPED, so the run reports them rather than swallowing them
- * - strict     → banner + a single real failing test; the original body is NOT
- *                collected, because collecting a body whose fixtures are absent
- *                would report a file-read error instead of the policy violation
+ * - degraded   → banner + a SKIPPED placeholder suite; `fn` is NOT collected
+ * - strict     → banner + a single real failing test; `fn` is NOT collected
+ *
+ * ## Why the degraded branch drops the body instead of `describe.skip(suite, fn)`
+ *
+ * Because vitest **executes a skipped suite's body anyway**. `describe.skip`
+ * marks the suite's mode, but the collector still calls the factory — it has to,
+ * to learn which tests exist in order to report them as skipped. So anything the
+ * body does *outside* an `it` runs regardless of the gate's verdict, and the
+ * idiom every oracle suite reaches for first — read the manifest once at the top
+ * of the describe, then generate cases from it — throws ENOENT straight past the
+ * gate on precisely the run the gate exists for: a clean clone, where
+ * `pipeline/out/` is git-ignored and absent.
+ *
+ * The failure was not confined to the offending suite either. A throw during
+ * collection kills the whole FILE, so sibling gates that were satisfied never
+ * ran and vitest reported `no tests` — a gate that silently took working
+ * evidence down with it.
+ *
+ * Dropping the body costs the per-test skip granularity (the run reports one
+ * skipped placeholder naming the gate, not N skipped cases) and buys the
+ * guarantee that the gate's verdict cannot be pre-empted by what the body
+ * happens to touch. That is the right trade: the policy's promise is "reported,
+ * never silently swallowed", and one attributed SKIPPED entry carrying the gate
+ * id keeps that promise, whereas the old shape only kept it for suites that
+ * happened to confine every read to an `it`. A guarantee that depends on how the
+ * caller wrote its body is not a guarantee.
+ *
+ * `tools/test/fixtures/artifact-gate-proof.spec.ts`'s `proof:collect-read` gate
+ * pins this: its body reads a missing file at collection time, and the child
+ * vitest run in `tools/test/artifact-gate.test.ts` requires that to skip cleanly
+ * with the var off and fail with the POLICY banner (not ENOENT) with it on.
  */
 export function describeGated(gate: ArtifactGate, fn: () => void): void {
   announce(gate);
@@ -56,7 +83,14 @@ export function describeGated(gate: ArtifactGate, fn: () => void): void {
     return;
   }
   if (gate.action === "skip-loudly") {
-    describe.skip(gate.spec.suite, fn);
+    describe.skip(gate.spec.suite, () => {
+      // A placeholder, so the run still REPORTS a skip attributed to this gate.
+      // Its body never executes (vitest runs suite factories at collection, but
+      // never a skipped test's callback), and it touches nothing regardless.
+      it(`artifacts absent — suite not collected (${gate.spec.gate})`, () => {
+        /* unreachable: registered skipped */
+      });
+    });
     return;
   }
   describe(gate.spec.suite, () => {

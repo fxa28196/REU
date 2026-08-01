@@ -1,11 +1,11 @@
 /**
- * `engine/src/agents` — the samplers (WP6) and the tick step (WP7).
+ * `engine/src/agents` — the samplers (WP6) and the tick step (WP7/WP8).
  *
  * The samplers' draw orders are the strongest determinism contract in the
  * model: get one draw wrong and every later resident's whole attribute vector
  * shifts, silently and plausibly. `step.ts` is the other half — the §1.5 order,
- * verbatim, in its LEGACY-LATCH form; the Phase-E branches are WP8 and
- * `stepResident` throws rather than half-executing one.
+ * verbatim, with the Phase-E branches (WP8) gated on the layer being armed. The
+ * decision layer itself lives in `engine/src/decision`.
  */
 
 export {
@@ -42,9 +42,12 @@ export { stepResident, materialisePosition, type StepWorld } from "./step.js";
 
 export {
   buildRouteLeg,
+  buildRouteNodes,
   legVertexAt,
+  pathIndexFor,
   positionAlongApproach,
   positionAlongLeg,
   type PositionLonLat,
   type RouteLeg,
+  type RouteNodes,
 } from "./route.js";

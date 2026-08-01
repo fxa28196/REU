@@ -200,7 +200,105 @@ describe("the artifact catalogue", () => {
       expect(typeof source.external, key).toBe("boolean");
     }
   });
+
+  /**
+   * The banner's ONLY job, beyond naming what is missing, is to tell the reader
+   * the command that materialises it. The WP8 oracles shipped without catalogue
+   * entries, so their gates declared `source: "world-fixtures"` and every banner
+   * told a developer missing the 477 MB decision dump to run
+   * `dump-world-fixtures.ps1` — a command that produces a different artifact
+   * entirely and leaves the gate exactly as unsatisfied as before. A banner that
+   * confidently prints the wrong remedy is worse than no banner.
+   */
+  it("names the real producer for each WP8 oracle, not a borrowed one", () => {
+    expect(ARTIFACT_SOURCES["decision-fixtures"].produce).toContain("dump-decision-trace.ps1");
+    expect(ARTIFACT_SOURCES["closure-fixtures"].produce).toContain("dump-closure-fixtures.ps1");
+    // …and they are genuinely distinct from the source they used to borrow.
+    for (const id of ["decision-fixtures", "closure-fixtures"] as const) {
+      expect(ARTIFACT_SOURCES[id].produce, id).not.toBe(
+        ARTIFACT_SOURCES["world-fixtures"].produce,
+      );
+    }
+  });
+
+  it("renders that producer into the banner a missing decision dump prints", () => {
+    const missing = path.join(WEBSIM_ROOT, "pipeline", "out", "decision-fixtures", "hour.tsv");
+    const text = artifactGateReport(
+      spec({
+        gate: "engine:wp8-decision-oracle",
+        artifacts: [{ source: "decision-fixtures", path: missing }],
+      }),
+      [{ source: "decision-fixtures", path: missing, present: false }],
+      false,
+    );
+    expect(text).toContain("produce: powershell -File websim/pipeline/java-exporter/dump-decision-trace.ps1");
+    expect(text).not.toContain("dump-world-fixtures.ps1");
+  });
 });
+
+/**
+ * A ref may not declare one source while pointing into another's directory.
+ * That is how the wrong-command banner arose: the ref carried the right *path*
+ * and the wrong *source*, and nothing connected the two. The types cannot catch
+ * it — every source id is a valid `ArtifactSourceId` for every path — so it is
+ * caught here, over the tree's own text.
+ */
+describe("no gate borrows a source it does not point at", () => {
+  /** Directory under `pipeline/out/` → the source id a ref into it must use. */
+  const OWNED_DIRS: ReadonlyMap<string, string> = new Map([
+    ["decision-fixtures", "decision-fixtures"],
+    ["closure-fixtures", "closure-fixtures"],
+  ]);
+  /** `source: "x"` followed, within one object literal, by the path field. */
+  const REF_LITERAL = /source:\s*"([a-z0-9-]+)"[\s\S]{0,240}?path:\s*([^\n,]+)/gu;
+
+  it("matches every ref's declared source to the directory its path names", () => {
+    const offenders: string[] = [];
+    let refs = 0;
+    let owned = 0;
+    for (const rel of collectFiles(WEBSIM_ROOT)) {
+      if (!rel.endsWith(".ts") || rel.startsWith("tools/")) {
+        continue;
+      }
+      const text = readFileSync(path.join(WEBSIM_ROOT, rel), "utf8");
+      for (const m of text.matchAll(REF_LITERAL)) {
+        refs += 1;
+        const declared = m[1] ?? "";
+        const pathExpr = m[2] ?? "";
+        for (const [dir, required] of OWNED_DIRS) {
+          // Matches both the literal directory name and the SCREAMING_CASE
+          // constant the helpers build their paths from.
+          const names = pathExpr.includes(dir) || pathExpr.includes(constantFor(dir));
+          if (!names) {
+            continue;
+          }
+          owned += 1;
+          if (declared !== required) {
+            offenders.push(`${rel}: path names ${dir}/ but declares source "${declared}"`);
+          }
+        }
+      }
+    }
+    expect(offenders, "the banner would print the wrong produce: command").toEqual([]);
+    // Anti-vacuity: the scan really did visit refs, and really did reach the
+    // WP8 oracle refs rather than passing because it matched nothing.
+    expect(refs, "the ref scan matched no artifact refs at all").toBeGreaterThan(10);
+    expect(owned, "the ref scan never reached a WP8 oracle ref").toBeGreaterThan(0);
+  });
+
+  it("is able to fail — the same scan flags the borrow that was there", () => {
+    const seeded = 'x = { source: "world-fixtures", label: n, path: `${DECISION_FIXTURE_DIR}/${n}` }';
+    const m = [...seeded.matchAll(REF_LITERAL)];
+    expect(m).toHaveLength(1);
+    expect(m[0]?.[1]).toBe("world-fixtures");
+    expect(m[0]?.[2]).toContain(constantFor("decision-fixtures"));
+  });
+});
+
+/** `decision-fixtures` → `DECISION_FIXTURE_DIR`, the helpers' naming convention. */
+function constantFor(dir: string): string {
+  return `${dir.replace(/-fixtures$/u, "").toUpperCase()}_FIXTURE_DIR`;
+}
 
 describe("per-fixture probes inside a satisfied gate", () => {
   const gate = (strict: boolean) =>
@@ -327,17 +425,32 @@ function runProof(strict: boolean): ChildRun {
   return { status: child.status, output: `${child.stdout ?? ""}\n${child.stderr ?? ""}` };
 }
 
+/**
+ * Each mode is spawned once and shared. Three tests assert on the same two child
+ * runs, and a vitest boot is ~350 ms of the budget that could otherwise go to
+ * the oracle suites.
+ */
+const runCache = new Map<boolean, ChildRun>();
+function proof(strict: boolean): ChildRun {
+  let run = runCache.get(strict);
+  if (run === undefined) {
+    run = runProof(strict);
+    runCache.set(strict, run);
+  }
+  return run;
+}
+
 describe("end-to-end: the policy is provably able to fail", () => {
   it(
     "skips loudly and stays green when the artifact is absent and the var is off",
     () => {
-      const run = runProof(false);
+      const run = proof(false);
       expect(run.status, run.output).toBe(0);
       // the gate whose artifact exists still ran and passed
       expect(run.output).toMatch(/1 passed/u);
-      // the gate whose artifact is hidden was SKIPPED, not passed
-      expect(run.output).toMatch(/skipped/iu);
-      // and it said so, loudly, naming the artifact and the forgone evidence
+      // both hidden gates were SKIPPED, not passed
+      expect(run.output).toMatch(/2 skipped/u);
+      // and they said so, loudly, naming the artifact and the forgone evidence
       expect(run.output).toContain("ARTIFACT-GATED SUITE SKIPPED");
       expect(run.output).toContain("proof:absent");
       expect(run.output).toContain("deliberately-absent.tsv");
@@ -350,14 +463,66 @@ describe("end-to-end: the policy is provably able to fail", () => {
   it(
     "turns the very same state red once the var is on",
     () => {
-      const run = runProof(true);
+      const run = proof(true);
       expect(run.status, run.output).not.toBe(0);
       expect(run.output).toContain(`CANNOT RUN and ${REQUIRE_ARTIFACTS_ENV} is set`);
       expect(run.output).toContain("proof:absent");
       expect(run.output).toContain("deliberately-absent.tsv");
-      expect(run.output).toMatch(/1 failed/u);
+      expect(run.output).toMatch(/2 failed/u);
       // and the satisfied gate is unaffected — strict mode is not fail-everything
       expect(run.output).toMatch(/1 passed/u);
+    },
+    180_000,
+  );
+
+  /**
+   * The regression that motivated dropping the body in the skip branch.
+   *
+   * `describe.skip(suite, fn)` does not stop vitest executing `fn`: the
+   * collector must walk it to learn which tests to report as skipped. So a
+   * gated suite that read its fixture at collection time — the shape every
+   * oracle suite reaches for first — threw ENOENT past the gate and killed the
+   * FILE, taking the satisfied sibling gate down with it (`Tests no tests`)
+   * on exactly the run the gate exists for: a clean clone.
+   *
+   * Measured before the fix, with the var OFF, on `proof:collect-read`:
+   *
+   *     FAIL artifact-gate-proof.spec.ts [ artifact-gate-proof.spec.ts ]
+   *     Error: ENOENT: no such file or directory, open '...collection-time-absent.tsv'
+   *     Test Files  1 failed (1)
+   *          Tests  no tests
+   *
+   * A gate that only holds when the caller confines every read to an `it` is
+   * not a gate, so the guarantee is pinned here rather than left to convention.
+   */
+  it(
+    "does not execute a skipped gate's body — a collection-time read still skips cleanly",
+    () => {
+      const run = proof(false);
+      expect(run.status, run.output).toBe(0);
+      expect(run.output).toContain("proof:collect-read");
+      expect(run.output).toContain("collection-time-absent.tsv");
+      // The body never ran, so the read never happened.
+      expect(run.output, "the skipped body executed and read the missing file").not.toContain(
+        "ENOENT",
+      );
+      // …and the collapse mode is gone: the file was collected, and the
+      // satisfied sibling gate still ran rather than dying with it.
+      expect(run.output).not.toMatch(/no tests/u);
+      expect(run.output).toMatch(/1 passed/u);
+    },
+    180_000,
+  );
+
+  it(
+    "reports the POLICY violation, not a file-read error, when the var is on",
+    () => {
+      const run = proof(true);
+      expect(run.status, run.output).not.toBe(0);
+      // Strict mode must name the gate that has no artifacts, not surface an
+      // incidental ENOENT from a body that should never have been collected.
+      expect(run.output).toContain("REQUIRES artifacts (proof:collect-read)");
+      expect(run.output, "strict mode leaked a file-read error").not.toContain("ENOENT");
     },
     180_000,
   );

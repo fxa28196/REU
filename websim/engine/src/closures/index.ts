@@ -1,12 +1,27 @@
 /**
- * `engine/src/closures` — WP6 ships **schedule parsing and its fail-fasts only**.
+ * `engine/src/closures` — the Scenario-E closure layer, both halves.
  *
- * `ClosureWave.apply()` (block edges, bump the version, recompute every shelter
- * tree in shelter-CSV load order) and `reactToClosureWave` (push-vs-reroute,
- * grandfathering) are run-time behaviour and belong to WP8. What is here is the
- * part that runs at build: turning a CSV into an ordered wave map, throwing
- * where Java throws, and counting the phantom pairs.
+ * * **Build (WP6, `schedule.ts`).** Turn the CSV into an ascending-hour wave map
+ *   with file order preserved inside each hour, throw where Java throws, and
+ *   count the phantom pairs the manifest census reports.
+ * * **Run (WP8, `runtime.ts`).** `ClosureWave.apply()`: block the wave's edges
+ *   in file order, bump the closure version once, recompute every shelter tree
+ *   in shelter-CSV load order.
+ *
+ * The third piece — one resident's *reaction* to finding a blocked edge ahead of
+ * it — is not here: it reads three `DecisionConfig` fields and the per-agent
+ * decision stream, so it lives with the decision layer as
+ * `decision/closureReaction.ts`. The two meet at `ClosureNetworkView`, which
+ * `Simulation` satisfies from {@link ClosureRuntime}.
  */
+
+export {
+  ClosureRuntime,
+  ClosureRuntimeError,
+  assertIntegralWaveTicks,
+  type ClosureRuntimeOptions,
+  type ClosureWaveReport,
+} from "./runtime.js";
 
 export {
   parseClosureSchedule,

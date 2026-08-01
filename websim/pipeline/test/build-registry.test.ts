@@ -1,8 +1,8 @@
 import { execFileSync } from "node:child_process";
-import { copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, rmdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it, onTestFinished } from "vitest";
 
 import {
   ASSUMPTIONS_FILE,
@@ -21,17 +21,81 @@ import { RegistryValidationError } from "../src/registry.js";
  * at all. A gate nobody has watched fail is not a gate, so these tests feed the
  * builder deliberately corrupted COPIES and require it to refuse each one.
  *
- * Corruption always happens inside `pipeline/out/.tmp-registry-gate-*`, which is
- * git-ignored and inside websim. The real registry under `Geography/` is opened
- * read-only, and the last test re-checksums it to prove that.
+ * Corruption always happens inside {@link TEMP_ROOT}, which is git-ignored and
+ * inside websim. The real registry under `Geography/` is opened read-only, and
+ * the last test re-checksums it to prove that.
  */
 const REAL_VARIABLES = geographyPath(join(REGISTRY_DIR, VARIABLES_FILE));
 const REAL_ASSUMPTIONS = geographyPath(join(REGISTRY_DIR, ASSUMPTIONS_FILE));
 const REAL_VARIABLES_SHA = sha256File(REAL_VARIABLES);
 const REAL_ASSUMPTIONS_SHA = sha256File(REAL_ASSUMPTIONS);
 
-mkdirSync(OUT_DIR, { recursive: true });
-const TEMP_ROOT = mkdtempSync(join(OUT_DIR, ".tmp-registry-gate-"));
+/**
+ * This file's scratch directory — a **fixed name under the sanctioned scratch
+ * root**, created on demand and gone again the moment the last case that needed
+ * it finishes.
+ *
+ * Every clause of that sentence is load-bearing, because the previous shape
+ * (`mkdtempSync(join(OUT_DIR, ".tmp-registry-gate-"))` at module scope, freed in
+ * `afterAll`) leaked, and `tools/check-scratch.ts` correctly reddened on the
+ * leftovers:
+ *
+ *  - **On demand, not at module scope.** Module scope runs whenever the file is
+ *    *loaded*, and loading is not running: `vitest list`, a collect-only pass and
+ *    any `-t` filter that selects no case in this file all evaluated the old
+ *    `mkdtempSync` and then ran no `afterAll` to undo it. Creating the directory
+ *    inside {@link corruptedCopy} means a run that corrupts nothing writes
+ *    nothing.
+ *  - **Fixed name, not `mkdtemp`.** A random suffix makes every leak a *new*,
+ *    permanent directory, so leftovers accumulate one per interrupted run. One
+ *    fixed path is self-healing instead: {@link sweepStaleTempRoot} clears
+ *    whatever a killed run left behind before the first case of the next run
+ *    uses it, so the worst case is bounded at one directory rather than growing.
+ *  - **Under `test-tmp/`.** `check-scratch.ts` permits the shared scratch root
+ *    to survive as an EMPTY directory precisely so parallel workers do not race
+ *    to delete each other's parent; a direct child of `pipeline/out/` is a
+ *    violation on sight. `graph-asset.test.ts` and `deploy-check.test.ts`
+ *    already put their scratch in the same place.
+ *  - **Released per case, not in `afterAll`.** `onTestFinished` fires whether
+ *    the case passed, failed or threw, and {@link releaseCaseDir} drops the root
+ *    as soon as it is empty — so between two cases there is no directory to
+ *    leak, and an interrupt lands in that gap rather than inside a window that
+ *    stays open for the whole file. `afterAll` stays on as a cheap backstop.
+ *
+ * What survives a `kill -9` in the middle of a case is one known, fixed path,
+ * which the next run sweeps. Nothing accumulates, and no directory at all
+ * survives a run that was interrupted anywhere else.
+ */
+const TEMP_ROOT = join(OUT_DIR, "test-tmp", "build-registry");
+
+let sweptStaleTempRoot = false;
+
+/** Clear anything a killed run left in {@link TEMP_ROOT}, once per file. */
+function sweepStaleTempRoot(): void {
+  if (!sweptStaleTempRoot) {
+    sweptStaleTempRoot = true;
+    rmSync(TEMP_ROOT, { recursive: true, force: true });
+  }
+}
+
+/**
+ * Drop one case's directory, and the shared root too once it is empty.
+ *
+ * `rmdirSync` rather than a recursive `rmSync` on the root on purpose: it fails
+ * with ENOTEMPTY when a case that asked for two corrupted copies still holds
+ * one, and with ENOENT when a sibling already tidied up. Both mean "not mine to
+ * remove yet", so both are swallowed; anything that is *not* a directory-still-
+ * in-use error would be swallowed too, which is acceptable for a cleanup path
+ * that `check-scratch.ts` independently audits after the run.
+ */
+function releaseCaseDir(dir: string): void {
+  rmSync(dir, { recursive: true, force: true });
+  try {
+    rmdirSync(TEMP_ROOT);
+  } catch {
+    /* still in use by this case, or already gone */
+  }
+}
 
 afterAll(() => {
   rmSync(TEMP_ROOT, { recursive: true, force: true });
@@ -43,9 +107,13 @@ let caseCounter = 0;
 function corruptedCopy(
   mutate: { variables?: (text: string) => string; assumptions?: (text: string) => string } = {},
 ): string {
+  sweepStaleTempRoot();
   caseCounter += 1;
   const dir = join(TEMP_ROOT, `case-${caseCounter}`);
   mkdirSync(dir, { recursive: true });
+  onTestFinished(() => {
+    releaseCaseDir(dir);
+  });
   for (const [file, source, fn] of [
     [VARIABLES_FILE, REAL_VARIABLES, mutate.variables],
     [ASSUMPTIONS_FILE, REAL_ASSUMPTIONS, mutate.assumptions],
