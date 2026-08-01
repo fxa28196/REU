@@ -24,8 +24,46 @@ const CORE = {
   respectShelterOpeningDates: 1,
 } as const;
 
+/**
+ * The 19 `DecisionConfig` coefficients at their `ContextCreator` batch
+ * fallbacks (PORT_MAP §2.6; the same values `shared`'s `BASE_CONFIG` carries).
+ *
+ * They are **inert for every assertion in this directory**: a Tier-1 world dump
+ * is placement, demographics, E attributes, shelter tables and closure
+ * schedules, and none of those reads a hazard coefficient. They are stated
+ * because `buildWorld` constructs the run's `DecisionConfig` from them at step
+ * 11, and the build refuses to invent a coefficient it was not given.
+ *
+ * `pushThetaThreshold` is the registered −0.25. The archived Scenario-E runs
+ * *executed* 0.0 — Repast's batch reader zeroes negative `"number"` constants
+ * (QUIRK 23, never-regress gotcha 4) — but that is a property of those runs, not
+ * of the parameter, and nothing here reads it either way.
+ */
+const DECISION_FALLBACKS = {
+  lambdaOutreachPerDay: 0,
+  informationRegime: 0,
+  enableHazardDeparture: 0,
+  sigmaTheta: 0,
+  alphaHazard: -8,
+  bRisk: 0.4,
+  wOfficial: 1.1,
+  gammaVuln: 0,
+  riskHalfLifeH: 48,
+  barrierBelongings: 0,
+  barrierPet: 0,
+  barrierDependents: 0,
+  petPolicyDefault: 1,
+  betaTravelTime: 1,
+  betaCapacityPrior: 0,
+  pStuck: 0.3,
+  stuckDelayH: 3,
+  pushThetaThreshold: -0.25,
+  kPush: 1,
+} as const;
+
 /** Decision layer OFF — the legacy arms. E params are inert but must be stated. */
 const LAYER_OFF = {
+  ...DECISION_FALLBACKS,
   enableDecisionLayer: 0,
   pAwareInit: 1,
   pHeavyBelongings: 0.284,
@@ -37,6 +75,7 @@ const LAYER_OFF = {
 
 /** E0 null: layer ON, every knob degenerate (the R3 vehicle). */
 const E0 = {
+  ...DECISION_FALLBACKS,
   enableDecisionLayer: 1,
   pAwareInit: 1,
   pHeavyBelongings: 0.284,
@@ -48,6 +87,7 @@ const E0 = {
 
 /** E_REAL: baseline-real. `pAwareInit` 0.356, group pace 0.06, `_elayer` file. */
 const E_REAL = {
+  ...DECISION_FALLBACKS,
   enableDecisionLayer: 1,
   pAwareInit: 0.356,
   pHeavyBelongings: 0.284,
@@ -55,6 +95,16 @@ const E_REAL = {
   pHasDependents: 0.0044,
   groupSpeedDeltaMps: 0.06,
   shelterPolicyVariant: 1,
+  // The twelve sourced values (shared/src/presets/definitions.ts, E_REAL_BLOCK).
+  informationRegime: 1,
+  enableHazardDeparture: 1,
+  sigmaTheta: 1,
+  gammaVuln: 0.25,
+  barrierBelongings: 0.26,
+  barrierPet: 0.26,
+  barrierDependents: 0.26,
+  petPolicyDefault: 0,
+  betaCapacityPrior: 0.2,
 } as const;
 
 /** No closures, observed smoke, 312 h. */

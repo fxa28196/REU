@@ -11,11 +11,15 @@ import {
 import {
   canonicalExecutedParameters,
   checkManifestParameterCompleteness,
+  checkPhaseEParameterCompleteness,
+  checkScenarioEParameterCompleteness,
   configuredVsExecuted,
   ENGINE_SEMANTICS_QUIRKS,
   fieldMapping,
   FORMATTER_MODES,
   MANIFEST_PARAMETER_ORDER,
+  PROVENANCE_QUIRKS,
+  provenanceQuirk,
   SIMULATION_FIELD_MAP,
   SIMULATION_SCHEMA_PARITY,
   SIMULATION_SCHEMA_V2,
@@ -23,7 +27,7 @@ import {
   simIdPreimageString,
 } from "../src/manifest.js";
 import { PRESETS } from "../src/presets/index.js";
-import { PARAM_COUNT, PARAM_NAMES } from "../src/schema.js";
+import { E_PARAM_NAMES, PARAM_COUNT, PARAM_NAMES, SE_PARAM_NAMES } from "../src/schema.js";
 
 const A = PRESETS.A_present_day;
 
@@ -222,5 +226,102 @@ describe("Q6 field maps", () => {
 
   it("returns undefined for an unknown mapping id", () => {
     expect(fieldMapping("no-such-quirk")).toBeUndefined();
+  });
+});
+
+describe("archive gates (h) and (i) — manifest completeness", () => {
+  const full = Object.keys(PRESETS.SE2_worst_plausible_E18_d1);
+
+  it("(h) passes on a complete parameter list and names what is missing", () => {
+    expect(checkPhaseEParameterCompleteness(full)).toEqual({
+      ok: true,
+      missing: [],
+      unexpected: [],
+    });
+    const without = full.filter((n) => n !== "gammaVuln" && n !== "sigmaTheta");
+    const result = checkPhaseEParameterCompleteness(without);
+    expect(result.ok).toBe(false);
+    // Reported in E_PARAMS order, not in the caller's order.
+    expect(result.missing).toEqual(["sigmaTheta", "gammaVuln"]);
+  });
+
+  it("(h) ignores parameters outside the 21, including shelterPolicyVariant", () => {
+    // Gate (h) is a presence check over E_PARAMS only; a manifest carrying extra
+    // parameters (every archived one does) must still pass.
+    expect(checkPhaseEParameterCompleteness([...E_PARAM_NAMES]).ok).toBe(true);
+    expect(
+      checkPhaseEParameterCompleteness([...E_PARAM_NAMES, "shelterPolicyVariant", "wat"]).ok,
+    ).toBe(true);
+  });
+
+  it("(i) requires closureDraw only for the worst family", () => {
+    const withoutDraw = full.filter((n) => n !== "closureDraw");
+    expect(checkScenarioEParameterCompleteness(withoutDraw, 3).missing).toEqual(["closureDraw"]);
+    for (const code of [0, 1, 2]) {
+      expect(checkScenarioEParameterCompleteness(withoutDraw, code).ok, `code ${code}`).toBe(true);
+    }
+    // The Python defaults a missing closuresCode to 0; so does this.
+    expect(checkScenarioEParameterCompleteness(withoutDraw).ok).toBe(true);
+  });
+
+  it("(i) reports the missing Scenario-E parameters in SE_PARAMS order", () => {
+    const result = checkScenarioEParameterCompleteness(["smokeScale", "closuresCode"], 0);
+    expect(result.ok).toBe(false);
+    expect(result.missing).toEqual([
+      "smokeSeriesCode",
+      "pStuck",
+      "stuckDelayH",
+      "pushThetaThreshold",
+      "kPush",
+    ]);
+    expect(SE_PARAM_NAMES).toHaveLength(7);
+  });
+
+  it("passes both gates for every shipped preset", () => {
+    for (const [id, config] of Object.entries(PRESETS)) {
+      const names = Object.keys(config);
+      expect(checkPhaseEParameterCompleteness(names).ok, `${id} gate (h)`).toBe(true);
+      expect(
+        checkScenarioEParameterCompleteness(names, config.closuresCode).ok,
+        `${id} gate (i)`,
+      ).toBe(true);
+    }
+  });
+});
+
+describe("provenance ledger", () => {
+  it("carries the pushThetaThreshold honesty note verbatim", () => {
+    // Quoted from docs/IMPLEMENTATION_PLAN.md §6.4 (lines 548-551), which
+    // WP8-SPEC-archive-gates.md §5.2 reproduces. Line wrapping removed; every
+    // other character, including the typographic minus in -0.25 and the em dash,
+    // is the source's. A paraphrase here would defeat the point of the note.
+    const quirk = provenanceQuirk("pushtheta-batch-zeroing");
+    expect(quirk).toBeDefined();
+    expect(quirk?.note).toBe(
+      "the SE/SE2 preset UI and quirk ledger state that archived runs *executed* " +
+        "`pushThetaThreshold = 0.0` (Repast negative-\"number\" parser defect, inert — zero " +
+        "blockage events) while web presets carry the corrected −0.25, so live-vs-archived " +
+        "closure comparisons are framed correctly.",
+    );
+    expect(quirk?.param).toBe("pushThetaThreshold");
+    expect(quirk?.archivedExecutedValue).toBe(0);
+    expect(quirk?.presetValue).toBe(-0.25);
+  });
+
+  it("states the impact and cites checkable sources", () => {
+    for (const quirk of PROVENANCE_QUIRKS) {
+      expect(PARAM_NAMES as readonly string[]).toContain(quirk.param);
+      expect(quirk.impact.length).toBeGreaterThan(0);
+      expect(quirk.sources.length).toBeGreaterThan(0);
+      // A provenance note is neither a formatting quirk nor engine semantics; it
+      // must not appear in either of the other two ledgers.
+      expect(SIMULATION_FIELD_MAP.map((m) => m.id)).not.toContain(quirk.id);
+      expect(ENGINE_SEMANTICS_QUIRKS.map((q) => q.id)).not.toContain(quirk.id);
+    }
+    expect(PROVENANCE_QUIRKS.map((q) => q.id)).toEqual(["pushtheta-batch-zeroing"]);
+  });
+
+  it("returns undefined for an unknown provenance id", () => {
+    expect(provenanceQuirk("no-such-note")).toBeUndefined();
   });
 });

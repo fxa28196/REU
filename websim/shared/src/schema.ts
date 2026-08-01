@@ -27,6 +27,16 @@
  *     deliberately wider than the certified range — this schema must never be
  *     the thing that makes EXPLORATORY unreachable.
  *
+ * WP8 (Phase E + Scenario E) ADDS NO PARAMETER. The 21 decision-layer names and
+ * the 7 Scenario-E names the archive gates check for were already in the WP0
+ * surface — verified name for name against `scripts/verify_E_runs.py`'s
+ * `E_PARAMS` / `SE_PARAMS`. What WP8 adds here is the *grouping*
+ * ({@link E_PARAM_NAMES}, {@link SE_PARAM_NAMES}, {@link CLOSURE_DRAW_PARAM}), so
+ * manifest-completeness gates (h) and (i) can be run from the same single source
+ * instead of a second, drifting copy of "which 21", plus the batch constant-type
+ * rule ({@link repastConstantType}) that keeps a negative from being emitted as a
+ * `"number"` Repast would zero.
+ *
  * NEGATIVE VALUES: every parameter here is a plain TypeScript `number`. Repast's
  * batch loader zeroes negative `constant_type="number"` values (PORT_MAP §2.8,
  * §6.7.4) — the defect that made archived Scenario-E runs execute
@@ -105,6 +115,123 @@ export type ParamName = (typeof PARAM_NAMES)[number];
  * never grow or shrink silently.
  */
 export const PARAM_COUNT = 41 as const;
+
+// ---------------------------------------------------------------------------
+// WP8 gate (h)/(i) groupings — the exact name lists the archive gates check
+// ---------------------------------------------------------------------------
+
+/**
+ * The 21 Phase-E decision-layer parameters, gate (h)'s subject.
+ *
+ * Transcribed **verbatim and in order** from `scripts/verify_E_runs.py:85-92`
+ * (`E_PARAMS`), which is the authority for manifest-completeness gate (h)
+ * (`verify_E_runs.py:615-624`; `WP8-SPEC-archive-gates.md` §3.3):
+ *
+ * ```python
+ * missing = [p for p in E_PARAMS if p not in run.params]     # 21 entries
+ * PASS iff not missing
+ * ```
+ *
+ * These names are a *subset* of {@link PARAM_NAMES} and carry no independent
+ * definition — {@link E_PARAM_NAMES_ARE_PARAMS} below is the compile-time proof,
+ * and `test/schema.test.ts` re-asserts membership at runtime. The list exists so
+ * the port can run gate (h) without re-deriving "which 21", which is precisely
+ * the kind of re-derivation that silently drifts.
+ *
+ * Note what is NOT here: `shelterPolicyVariant` is V45/Phase-E but sits outside
+ * `E_PARAMS` in the Python, and `triageReserveFraction` is an arm-D lever, not a
+ * decision-layer parameter. Both are still required by the 41-parameter schema;
+ * they are simply not part of gate (h)'s 21.
+ */
+export const E_PARAM_NAMES = [
+  "enableDecisionLayer",
+  "pAwareInit",
+  "pHeavyBelongings",
+  "pHasPet",
+  "pHasDependents",
+  "groupSpeedDeltaMps",
+  "lambdaOutreachPerDay",
+  "informationRegime",
+  "enableHazardDeparture",
+  "sigmaTheta",
+  "alphaHazard",
+  "bRisk",
+  "wOfficial",
+  "gammaVuln",
+  "riskHalfLifeH",
+  "barrierBelongings",
+  "barrierPet",
+  "barrierDependents",
+  "petPolicyDefault",
+  "betaTravelTime",
+  "betaCapacityPrior",
+] as const satisfies readonly ParamName[];
+
+/** Asserted in `test/schema.test.ts`; gate (h)'s message hardcodes "all 21". */
+export const E_PARAM_COUNT = 21 as const;
+
+/**
+ * The 7 core Scenario-E parameters, gate (i)'s subject.
+ *
+ * Transcribed verbatim from `scripts/verify_E_runs.py:97-100` (`SE_PARAMS`),
+ * checked by `verify_E_runs.py:630-641` (`WP8-SPEC-archive-gates.md` §3.3).
+ *
+ * `closureDraw` is deliberately absent — see {@link CLOSURE_DRAW_PARAM}.
+ */
+export const SE_PARAM_NAMES = [
+  "smokeSeriesCode",
+  "smokeScale",
+  "closuresCode",
+  "pStuck",
+  "stuckDelayH",
+  "pushThetaThreshold",
+  "kPush",
+] as const satisfies readonly ParamName[];
+
+/** Asserted in `test/schema.test.ts`. */
+export const SE_PARAM_COUNT = 7 as const;
+
+/**
+ * The conditional half of gate (i).
+ *
+ * `closureDraw` is **not** in {@link SE_PARAM_NAMES}. The Python's own comment
+ * (`verify_E_runs.py:94-96`) says why: *"it entered the manifest with the
+ * worst-case family, so the archived v1 SE runs legitimately lack it."* Gate (i)
+ * therefore asserts its presence only when `closuresCode == 3`:
+ *
+ * ```python
+ * code = int(float(run.params.get("closuresCode", 0)))
+ * if code == 3:
+ *     PASS iff "closureDraw" in run.params
+ * ```
+ *
+ * The web schema requires it unconditionally — every `RunConfig` is 41/41 — so a
+ * shipped preset satisfies the conditional trivially. The constant exists so the
+ * gate port reads the same name the Python does.
+ */
+export const CLOSURE_DRAW_PARAM = "closureDraw" as const satisfies ParamName;
+
+/** The closure family for which gate (i) requires `closureDraw`. */
+export const WORST_FAMILY_CLOSURES_CODE = 3 as const;
+
+/** The 21 gate-(h) names as a type. */
+export type EParamName = (typeof E_PARAM_NAMES)[number];
+/** The 7 gate-(i) names as a type. */
+export type SeParamName = (typeof SE_PARAM_NAMES)[number];
+
+/**
+ * Compile-time proof that both gate lists name only real parameters. The
+ * `satisfies` clauses above already enforce it; these assignments state the
+ * relationship in the direction a reader cares about (subset of `ParamName`) and
+ * fail loudly if a future refactor loosens the constants. Same pattern as
+ * `config.ts#_ParamKeysMatch`.
+ */
+type _EParamsAreParams = EParamName extends ParamName ? true : never;
+type _SeParamsAreParams = SeParamName extends ParamName ? true : never;
+const _eParamsAreParams: _EParamsAreParams = true;
+const _seParamsAreParams: _SeParamsAreParams = true;
+void _eParamsAreParams;
+void _seParamsAreParams;
 
 // ---------------------------------------------------------------------------
 // Smoke series ↔ maximum run window (gotcha: simulationHours ≤ slices − 1)
@@ -1184,4 +1311,61 @@ export function isParamName(value: string): value is ParamName {
 /** Parameter names in a slider-taxonomy group, in manifest order. */
 export function paramsInGroup(group: ParamGroup): readonly ParamName[] {
   return PARAM_NAMES.filter((name) => PARAM_META[name].group === group);
+}
+
+// ---------------------------------------------------------------------------
+// Repast batch constant typing — the negative-"number" zeroing gotcha, encoded
+// ---------------------------------------------------------------------------
+
+/** `constant_type` values a Repast batch parameter file may carry. */
+export type RepastConstantType = "int" | "number" | "double";
+
+/**
+ * The `constant_type` a Repast batch file must declare for `name = value`.
+ *
+ * The browser never *runs* a batch file, so why is this here? Because the rule
+ * is a property of the parameter surface, and encoding it once — beside the
+ * parameter it constrains — is what stops it being re-derived (wrongly) at the
+ * three places that care: the preset→batch export a mentor re-run would use, the
+ * standing audit of the instrument's own files in
+ * `validation/test/preset-batch-parity.test.ts`, and any future sweep generator.
+ *
+ * The rule, transcribed from `scripts/make_batch_params_E.py:113-122`:
+ *
+ * ```python
+ * # Repast's batch parser silently zeroes NEGATIVE constant_type="number"
+ * # values (probe-verified 2026-07-30: value="-0.25" executed as 0.0
+ * # while every positive came through; constant_type="double" executes
+ * # -0.25 correctly).
+ * if ptype == "number" and str(pval).lstrip().startswith("-"):
+ *     ptype = "double"
+ * ```
+ *
+ * Base type follows the generator's own tables (`make_batch_params_E.py:44-104`)
+ * and therefore {@link ParamMeta.kind}: `int`/`flag` → `"int"`, `double` →
+ * `"number"`, with negatives promoted to `"double"`.
+ *
+ * **Scope discipline (`WP8-SPEC-archive-gates.md` §6.1).** The promotion is
+ * applied only to `"number"`, exactly as the generator does. The documented root
+ * cause ("Repast zeroes negative `number` constants") does not fully explain the
+ * archive: `alphaHazard = -8.0` and `pushThetaThreshold = -0.25` were *both*
+ * negative `"number"` in the batch files the runs executed from, yet every
+ * archived manifest records `alphaHazard: -8.0` and every archived SE/SE2
+ * manifest records `pushThetaThreshold: 0.0`. Something about the two cases
+ * differs and the repo carries no probe artefact to settle it, so this function
+ * implements the **safe** rule rather than a confident model of the defect, and
+ * makes no claim about negative `"int"` values (`randomSeed` is the only one, and
+ * the archive contains no negative-seed batch run to learn from).
+ */
+export function repastConstantType(name: ParamName, value: number): RepastConstantType {
+  const base: RepastConstantType = PARAM_META[name].kind === "double" ? "number" : "int";
+  return base === "number" && value < 0 ? "double" : base;
+}
+
+/**
+ * Parameter names a config drives negative. Used by the preset tests to prove
+ * the gotcha's precondition is real for the WP8 surface rather than assumed.
+ */
+export function negativeValuedParams(config: Readonly<Record<ParamName, number>>): ParamName[] {
+  return PARAM_NAMES.filter((name) => config[name] < 0);
 }

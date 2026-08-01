@@ -12,6 +12,16 @@ import { describe, expect, it } from "vitest";
 import type { GraphGeometry } from "@websim/shared/graph-asset";
 
 import { Resident } from "../../src/agents/resident.js";
+import type { DecisionAttributes } from "../../src/agents/eLayerSampler.js";
+import { armResident } from "../../src/decision/arm.js";
+import {
+  DECISION_PARAM_FALLBACKS,
+  decisionConfig,
+  isE0NullConfig,
+} from "../../src/decision/config.js";
+import { assertNoLayerTransition } from "../../src/decision/invariants.js";
+import { BR, CountingDecisionProbe, setDecisionProbe } from "../../src/decision/probe.js";
+import { JavaRandom } from "../../src/rng/JavaRandom.js";
 import { stepResident, type StepWorld } from "../../src/agents/step.js";
 import { buildRouteLeg } from "../../src/agents/route.js";
 import { buildRoutingGraph, type RoutingGraph } from "../../src/graph/csr.js";
@@ -93,12 +103,24 @@ function harness(options: {
     anyShelterOpen(tick) {
       return this.shelters.some((s) => s.operating && s.isOpenAt(tick));
     },
-    anyShelterAvailable(tick, fromNode, isPriority) {
+    anyShelterAvailable(tick, fromNode, isPriority, believedFull) {
       return this.shelters.some(
         (s) =>
           s.isAvailableAt(tick, isPriority) &&
           s.routeTree !== null &&
-          Number.isFinite(s.routeTree.dist[fromNode]!),
+          Number.isFinite(s.routeTree.dist[fromNode]!) &&
+          !(believedFull !== null && believedFull !== undefined && believedFull.has(s.id)),
+      );
+    },
+    anyUntriedReachableShelter(tick, fromNode, believedFull) {
+      // Deliberately NOT filtered on hasSpaceFor — see WP8-SPEC-decision §10.
+      return this.shelters.some(
+        (s) =>
+          s.operating &&
+          s.isOpenAt(tick) &&
+          s.routeTree !== null &&
+          Number.isFinite(s.routeTree.dist[fromNode]!) &&
+          !believedFull.has(s.id),
       );
     },
     onAdmission() {
@@ -299,19 +321,121 @@ describe("route legs measure the polyline, not the routed distance", () => {
   });
 });
 
-describe("the legacy step refuses to execute a Phase-E transition", () => {
-  it("throws when a resident carries decision attributes", () => {
-    const w = harness({ hourly: [600], shelterCapacity: 10 });
+/**
+ * WP7 guarded the unfinished layer with a throw at the top of `stepResident`.
+ * WP8 removed the throw — the branches are real now — and replaced it with the
+ * invariant the throw was standing in for: an **E0-null** configuration, the R3
+ * vehicle, must never take a decision-layer transition. That invariant is live
+ * in the engine (`assertNotE0Null`, `armResident`) rather than asserted about
+ * it, and these are the tests that prove the assertion can actually fire.
+ */
+describe("the E0-null invariant is an active assertion, not a comment", () => {
+  const E0_NULL = decisionConfig({
+    ...DECISION_PARAM_FALLBACKS,
+    pushThetaThreshold: 0, // the archive's EXECUTED value (QUIRK 23)
+  });
+
+  const attrs = (over: Partial<DecisionAttributes> = {}): DecisionAttributes => ({
+    awareInitial: true,
+    heavyBelongings: false,
+    hasPet: false,
+    hasDependents: false,
+    thetaZ: 0,
+    groupSpeedDeltaMps: 0,
+    decisionSeed: 1n,
+    ...over,
+  });
+
+  it("classifies the archived E0 parameter block as E0-null", () => {
+    expect(isE0NullConfig(E0_NULL)).toBe(true);
+    // Any single mechanism switched on takes it out of the class.
+    expect(isE0NullConfig({ ...E0_NULL, enableHazardDeparture: 1 })).toBe(false);
+    expect(isE0NullConfig({ ...E0_NULL, lambdaOutreachPerDay: 1 })).toBe(false);
+    expect(isE0NullConfig({ ...E0_NULL, informationRegime: 1 })).toBe(false);
+    expect(isE0NullConfig({ ...E0_NULL, sigmaTheta: 1 })).toBe(false);
+    expect(isE0NullConfig({ ...E0_NULL, barrierPet: 0.26 })).toBe(false);
+    expect(isE0NullConfig({ ...E0_NULL, petPolicyAdmitDefault: false })).toBe(false);
+  });
+
+  it("refuses to arm an UNAWARE resident under an E0-null config", () => {
     const a = resident();
-    a.decision = {
-      awareInitial: true,
-      heavyBelongings: false,
-      hasPet: false,
-      hasDependents: false,
-      thetaZ: 0,
-      groupSpeedDeltaMps: 0,
-      decisionSeed: 0n,
-    } as never;
-    expect(() => stepResident(a, w, 1)).toThrow(/WP8/);
+    expect(() => armResident(a, E0_NULL, attrs({ awareInitial: false }))).toThrow(/E0-null/u);
+  });
+
+  it("takes ZERO decision-layer transitions over a full E0-null episode", () => {
+    const probe = new CountingDecisionProbe();
+    setDecisionProbe(probe);
+    try {
+      const w = harness({ hourly: Array.from({ length: 24 }, () => 600), shelterCapacity: 10 });
+      const a = resident();
+      armResident(a, E0_NULL, attrs());
+      for (let t = 1; t <= 200 && a.state !== "SHELTERED"; t++) {
+        stepResident(a, w, t);
+      }
+      expect(a.state).toBe("SHELTERED");
+      // The three `layer: true` rows of TRANSITIONS, and the draws behind them.
+      expect(probe.count(BR.UNAWARE_INIT)).toBe(0);
+      expect(probe.count(BR.UNAWARE_BLOCK)).toBe(0);
+      expect(probe.count(BR.D1)).toBe(0);
+      expect(probe.count(BR.CONVERTED)).toBe(0);
+      expect(probe.count(BR.HAZARD_BRANCH)).toBe(0);
+      expect(probe.count(BR.D2)).toBe(0);
+      expect(probe.count(BR.HAZARD_FIRED)).toBe(0);
+      // It went through latch site A — the layer is on, the hazard is off.
+      expect(probe.count(BR.LATCH_A_FIRE)).toBe(1);
+      expect(probe.count(BR.LATCH_B_FIRE)).toBe(0);
+      // And it consumed no randomness at all: z_R costs none, and that is what
+      // lets the E0 null execute block 6 and stay byte-identical to a layer-off
+      // run (the R3 vehicle).
+      expect(a.decisionRng!.getState()).toEqual(new JavaRandom(1n).getState());
+    } finally {
+      setDecisionProbe(null);
+    }
+  });
+
+  it("the guard itself is provably able to fail", () => {
+    // Under a genuinely E0-null config the two transitions are STRUCTURALLY
+    // unreachable — hazard departure is off and λ is zero, which is part of the
+    // definition of the class. That is the point, and it is also why the guard
+    // cannot be tripped through `stepResident` without lying about the config.
+    // So the guard body is exercised directly (plan §5.2: every gate must be
+    // shown able to fail) and its WIRING is what the zero-counter case above
+    // proves.
+    expect(() => assertNoLayerTransition("Site 0", E0_NULL, "hazard departure")).toThrow(
+      /E0-null/u,
+    );
+    // ...and it stays out of the way of a real Phase-E run.
+    expect(() =>
+      assertNoLayerTransition("Site 0", { ...E0_NULL, enableHazardDeparture: 1 }, "hazard"),
+    ).not.toThrow();
+  });
+});
+
+describe("the layer is an overlay: a resident with attributes but no config is legacy", () => {
+  it("executes latch site B when `decisionConfig` is null", () => {
+    const probe = new CountingDecisionProbe();
+    setDecisionProbe(probe);
+    try {
+      const w = harness({ hourly: [600], shelterCapacity: 10 });
+      const a = resident();
+      // Attributes without a config is the WP6 world-build shape; the certified
+      // guard is `decisionConfig != null && decisionAttributes != null`.
+      a.decision = {
+        awareInitial: true,
+        heavyBelongings: true,
+        hasPet: true,
+        hasDependents: true,
+        thetaZ: 1,
+        groupSpeedDeltaMps: 0.06,
+        decisionSeed: 7n,
+      };
+      stepResident(a, w, 1);
+      expect(a.state).toBe("EN_ROUTE");
+      expect(probe.count(BR.LATCH_B_FIRE)).toBe(1);
+      expect(probe.count(BR.LATCH_A_FIRE)).toBe(0);
+      expect(probe.count(BR.PACE_ON)).toBe(0); // block 3 is gated on the config too
+    } finally {
+      setDecisionProbe(null);
+    }
   });
 });

@@ -173,7 +173,47 @@ export interface HeadlessOptions {
    * and the only one any gate runs on.
    */
   readonly shuffleStreamSeed?: number;
-  /** Substitutes for the environment fields; defaults are explicit placeholders. */
+  /**
+   * Substitutes the world data source. Defaults to {@link geographyDataSource},
+   * i.e. the read-only `Geography/` tree.
+   *
+   * The only current caller is the R3 closures-inert proof
+   * (`harness/r3-own-engine.ts`), which needs a closure schedule whose every
+   * activation hour lands at or after the run end so that
+   * `hasClosureSchedule()` is true, `ClosureRuntime` is built and `routeNodes`
+   * is allocated while **no wave ever fires**. `Geography/` holds no such file
+   * and is read-only, so the schedule is derived from a certified one and
+   * overlaid here rather than written into the instrument tree.
+   */
+  readonly data?: WorldDataSource;
+  /**
+   * Runs after the world build and `Simulation` construction and **before tick
+   * 1** — the moment `ContextCreator` finishes and Repast starts the schedule.
+   *
+   * This is a harness seam, not a model seam, and it is **optional in both
+   * directions**. `Simulation`'s constructor performs `ContextCreator.java`'s
+   * step 11 (`setDecisionLayer` over `createdResidents`) itself, so a run that
+   * passes no `beforeRun` still gets a fully armed decision layer whenever
+   * `enableDecisionLayer` says so — that is the shipped path, and it is what
+   * `validation/test/wp8-r3-own-engine.test.ts`'s `SHIPPED` cases measure by
+   * leaving this hook `undefined`.
+   *
+   * It exists because that call site once did not: for most of WP8 `armResident`
+   * was exported and unit-tested while `engine/src/sim.ts` invoked it nowhere,
+   * so every full-engine run executed the WP7 legacy path whatever
+   * `enableDecisionLayer` said, and the R3 flagship could only be measured
+   * against a live layer by arming the residents from outside.
+   *
+   * It is kept, wired engine and all, because "the layer is armed" is a claim a
+   * *caller* should be able to make, count and cross-check rather than inherit:
+   * `harness/r3-own-engine.ts#armFromWorld` re-applies step 11 from the same
+   * sampled attributes, asserts its `DecisionConfig` field-for-field against
+   * `world.decisionConfig` first, and returns a count the suite asserts on. This
+   * is the only place a caller can reach the world and the simulation together
+   * at the exact moment `ContextCreator` finishes. Every use is labelled;
+   * nothing outside the validation harness calls it.
+   */
+  readonly beforeRun?: ((sim: Simulation, world: WorldBuildResult) => void) | undefined;
   readonly env?: Partial<OutputEnvironment>;
   readonly onHour?: ((hour: number, tick: number) => void) | undefined;
 }
@@ -194,6 +234,61 @@ export interface HeadlessResult {
 }
 
 export function runHeadless(options: HeadlessOptions): HeadlessResult {
+  const built = buildHeadless(options);
+  const tRun = performance.now();
+  built.sim.run();
+  return finishHeadless(built, options, performance.now() - tRun);
+}
+
+/**
+ * {@link runHeadless}, driving the tick loop in slices and yielding to the
+ * event loop between them.
+ *
+ * **Bit-identical to the synchronous form.** `Simulation.runUntil` resumes from
+ * its own `tick` counter and nothing in the model observes where a call
+ * boundary fell, so `runUntil(600); runUntil(1200)` executes exactly the ticks
+ * `run()` would, in exactly the same order, with exactly the same RNG draws.
+ * The suite asserts that rather than asserting it in prose
+ * (`test/wp8-r3-own-engine.test.ts`, "slicing the tick loop is bit-identical").
+ *
+ * It exists because a 6,842 x 312 h run is one uninterrupted synchronous block
+ * of 15-60 s, and vitest's worker answers a heartbeat RPC on the same thread:
+ * a file that chains twenty of them reports `Timeout calling "onTaskUpdate"` as
+ * an unhandled error and exits non-zero even with every assertion green.
+ * Observed on this tree at 175 s and again at 520 s. Yielding once per
+ * simulated day keeps the longest block near a second.
+ */
+export async function runHeadlessAsync(
+  options: HeadlessOptions & { readonly sliceTicks?: number },
+): Promise<HeadlessResult> {
+  const built = buildHeadless(options);
+  const slice = options.sliceTicks ?? built.world.ticksPerHour * 24;
+  if (!Number.isInteger(slice) || slice < 1) {
+    throw new RangeError(`sliceTicks must be a positive integer, got ${String(slice)}`);
+  }
+  const tRun = performance.now();
+  for (let stop = slice; ; stop += slice) {
+    built.sim.runUntil(stop);
+    if (built.sim.tick >= built.world.endTick) {
+      break;
+    }
+    await new Promise<void>((resolve) => {
+      setImmediate(resolve);
+    });
+  }
+  return finishHeadless(built, options, performance.now() - tRun);
+}
+
+interface BuiltRun {
+  readonly world: WorldBuildResult;
+  readonly sim: Simulation;
+  readonly smoke: SmokeField;
+  readonly assetsMs: number;
+  readonly buildMs: number;
+}
+
+/** Everything up to (and not including) the first tick. */
+function buildHeadless(options: HeadlessOptions): BuiltRun {
   const { config } = options;
 
   const tAssets = performance.now();
@@ -206,7 +301,7 @@ export function runHeadless(options: HeadlessOptions): HeadlessResult {
   const tBuild = performance.now();
   const world = buildWorld(config, {
     graph: assets.graph,
-    data: geographyDataSource(),
+    data: options.data ?? geographyDataSource(),
     smokeHours: smoke.hours(),
     snapIndex: assets.snapIndex,
     // The governance gate runs at asset-build time (`build-registry.ts` fails
@@ -233,9 +328,21 @@ export function runHeadless(options: HeadlessOptions): HeadlessResult {
     onHour: options.onHour,
   });
 
-  const tRun = performance.now();
-  sim.run();
-  const runMs = performance.now() - tRun;
+  // ContextCreator finishes here; Repast's schedule has not started. See
+  // `HeadlessOptions.beforeRun` for why this seam exists at all.
+  options.beforeRun?.(sim, world);
+
+  return { world, sim, smoke, assetsMs, buildMs };
+}
+
+/** Everything after the last tick: the manifest, both output flavours. */
+function finishHeadless(
+  built: BuiltRun,
+  options: HeadlessOptions,
+  runMs: number,
+): HeadlessResult {
+  const { config } = options;
+  const { world, sim, smoke, assetsMs, buildMs } = built;
 
   const env: OutputEnvironment = {
     simId: "sim-headless",

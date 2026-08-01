@@ -15,3 +15,24 @@ export {
   policyRefusedAt,
   type DoorOutcome,
 } from "./admit.js";
+
+export {
+  ARCHIVED_TRIAGE_FRACTIONS,
+  applyTriageReserve,
+  blockedOnlyByReserve,
+  releaseRule,
+  triageCensus,
+  triageLoadMessage,
+  triageReserveFor,
+  type TriageCensus,
+} from "./triage.js";
+
+export {
+  applyPolicyColumns,
+  parseAdultsOnly,
+  parsePetIntake,
+  petAdmittedAt,
+  petPolicyAdmitDefaultFromInt,
+  petPolicyCensus,
+  type PetPolicyCensus,
+} from "./policy.js";

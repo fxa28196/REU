@@ -1,11 +1,17 @@
 /**
- * Validation plane — placeholder surface for WP0 part 1 (scaffold).
+ * Validation plane — the tier vocabulary plus the ported gate harness.
  *
- * WP9 fills this package with the ports of verify_E_runs (a)–(l), verify_2026,
- * analyze_run, the replay runner over the LFS working set, the Tier-4
- * divergence-attribution report and the harness mutation test. Until then it
- * only fixes the tier vocabulary the badge and the README depend on.
+ * WP8 lands the first real tenants: `harness/` holds the transcribed
+ * `verify_E_runs.py` gates (f)(g)(h)(i)(k)(l) and the Tier-2 R3 identity
+ * comparator, all of which read raw-text frames and therefore run equally over
+ * an archived run directory and over the TS engine's own output. WP9 adds the
+ * remaining gates ((b)(c)(d)(e)(j)), verify_2026, analyze_run, the replay
+ * runner over the LFS working set, the Tier-4 divergence-attribution report and
+ * the harness mutation test.
  */
+
+export * from "./harness/index.js";
+export * from "./provenance.js";
 
 export interface TierSpec {
   readonly tier: 0 | 1 | 2 | 3 | 4;

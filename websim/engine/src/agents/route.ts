@@ -165,6 +165,115 @@ export function buildRouteLeg(
   return { vertexCount: n, xy, cumM, totalM: cumM[n - 1]! };
 }
 
+/**
+ * `StreetNetwork.NodePath` — the node chain of a planned leg plus, for each
+ * node, the index of its coordinate inside the leg's vertex array.
+ *
+ * Allocated **only** when a closure schedule is active
+ * (`GisAgent.java:644-645`, `:735-736`), which is why every run without closures
+ * carries `routeNodes === null` and `reactToClosureWave` is dead code there even
+ * if the version counter somehow moved.
+ *
+ * `coordOffset` is what the grandfathering test `off[k] >= pathIndex` reads: it
+ * is non-decreasing, `coordOffset[0] === 0` (the walker's own node), and
+ * `coordOffset[nodes.length - 1] === vertexCount - 1` (the shelter's node).
+ */
+export interface RouteNodes {
+  /** Node **indices**, `fromNode` first, tree source last. */
+  readonly nodes: Int32Array;
+  /** Certified node **ids** of {@link nodes} — what `isBlocked`/`pairKey` read. */
+  readonly nodeIds: Int32Array;
+  /** Vertex index of each node's coordinate in the leg (`RouteLeg.xy`). */
+  readonly coordOffset: Int32Array;
+}
+
+/**
+ * Build the {@link RouteNodes} for the same walk {@link buildRouteLeg} builds.
+ *
+ * Deliberately a **second pass over the same predecessor chain** rather than an
+ * extra output of `buildRouteLeg`: it evaluates no geodesic and is only ever
+ * called when a closure schedule exists, so the no-closures path — every
+ * archived arm but the SE family — pays nothing at all for it. The offsets are
+ * derived from the identical vertex accounting: each predecessor edge
+ * contributes `hi - lo - 1` vertices and the LAST of them is the predecessor
+ * node's own coordinate, so that vertex index is the next node's offset.
+ *
+ * Returns `null` under exactly the conditions `buildRouteLeg` returns `null`.
+ */
+export function buildRouteNodes(
+  graph: RoutingGraph,
+  geometry: GraphGeometry,
+  tree: ShortestPathTree,
+  fromNode: number,
+): RouteNodes | null {
+  const { polyOffset } = geometry;
+  const nodes: number[] = [fromNode];
+  const coordOffset: number[] = [0];
+  let w = 1;
+  let node = fromNode;
+  let guard = 0;
+  while (node !== tree.sourceNode) {
+    const de = tree.predEdge[node]!;
+    if (de < 0) {
+      return null;
+    }
+    const e = de >>> 1;
+    w += polyOffset[e + 1]! - polyOffset[e]! - 1;
+    node = directedTail(graph, de);
+    nodes.push(node);
+    coordOffset.push(w - 1);
+    if (++guard > graph.nodeCount) {
+      return null; // a cycle in a shortest-path tree is a corrupt tree
+    }
+  }
+  const nodeIds = new Int32Array(nodes.length);
+  for (let i = 0; i < nodes.length; i++) {
+    nodeIds[i] = graph.nodeId[nodes[i]!]!;
+  }
+  return {
+    nodes: Int32Array.from(nodes),
+    nodeIds,
+    coordOffset: Int32Array.from(coordOffset),
+  };
+}
+
+/**
+ * `pathIndex` reconstructed from the port's scalar `legTravelM` (QUIRK 26).
+ *
+ * Java carries `pathIndex` as a vertex counter and advances it with
+ * `if (dM <= remainingM) { current = next; pathIndex++; }` — note the **`<=`**,
+ * which consumes a vertex the walker lands on *exactly*. WP7's movement graft
+ * replaced the counter with metres, so the index is
+ * `#{ i : legApproachM + cumM[i] <= legTravelM }`.
+ *
+ * **The tolerance decision, made explicitly rather than by accident.** The
+ * port's `cumM` and Java's per-tick geodesic re-measurement differ by the
+ * documented ~1e-9 m residual (DR-S3 A3), so a walker standing exactly on a
+ * junction is a knife edge. This function uses the **exact** `<=` with no
+ * epsilon: an epsilon would be a second, undocumented model parameter, and the
+ * only observable that reads `pathIndex` is the closure grandfathering test,
+ * where being one vertex out changes whether one resident of a few hundred
+ * pushes or reroutes at one wave. That is a real but bounded exposure and it is
+ * recorded here rather than hidden behind a fudge factor.
+ */
+export function pathIndexFor(leg: RouteLeg, legApproachM: number, legTravelM: number): number {
+  let lo = 0;
+  let hi = leg.vertexCount - 1;
+  // Monotone `cumM`, so binary-search the last index satisfying the predicate.
+  if (legApproachM + leg.cumM[0]! > legTravelM) {
+    return 0;
+  }
+  while (lo < hi) {
+    const mid = (lo + hi + 1) >>> 1;
+    if (legApproachM + leg.cumM[mid]! <= legTravelM) {
+      lo = mid;
+    } else {
+      hi = mid - 1;
+    }
+  }
+  return lo + 1;
+}
+
 /** Largest vertex index `j` with `cumM[j] <= s`, clamped to the last segment start. */
 export function legVertexAt(leg: RouteLeg, s: number): number {
   let a = 0;

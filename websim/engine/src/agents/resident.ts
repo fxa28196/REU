@@ -11,9 +11,11 @@
  * empty cell and a `0` default would silently become a real reading.
  */
 
-import type { RouteLeg } from "./route.js";
+import type { RouteLeg, RouteNodes } from "./route.js";
 import type { PopulationAttributes } from "./populationSampler.js";
 import type { DecisionAttributes } from "./eLayerSampler.js";
+import type { DecisionConfig } from "../decision/config.js";
+import type { JavaRandom } from "../rng/JavaRandom.js";
 import type { Shelter } from "../shelters/shelter.js";
 import type { State } from "./stateMachine.js";
 
@@ -113,10 +115,43 @@ export class Resident {
 
   readonly attributes: PopulationAttributes | null;
 
-  // --- Phase E / Scenario E (WP8). Declared so the output layer has one -----
-  // shape to read and so WP8 cannot invent a second one; inert in WP7.
+  // --- Phase E / Scenario E (WP8) -------------------------------------------
+  //
+  // Every field below is `null`/`NaN`/`0`/`-1` exactly as the Java field is, and
+  // the layer is a **strictly opt-in overlay**: with `decisionConfig === null`
+  // and `decision === null`, `step()` executes the legacy path statement for
+  // statement. `armResident` (`decision/arm.ts`) is the only writer of the first
+  // five, and it is the port of `setDecisionLayer`.
+
+  /** The ONE run-wide config instance, shared by reference with every resident. */
+  decisionConfig: DecisionConfig | null = null;
   decision: DecisionAttributes | null = null;
+  /**
+   * The private in-run stream, constructed **once** at arming (QUIRK 25).
+   * `StreamRegistry.agentStream` is a factory; calling it per tick would restart
+   * the sequence at draw 0 and make every hour's Bernoulli identical.
+   */
+  decisionRng: JavaRandom | null = null;
+  /** `sigmaTheta * thetaZ`, precomputed; constant over the run. */
+  thetaScaled = 0;
+  /** `c_i`, precomputed belongings → pet → dependents (order is the arithmetic). */
+  barrierCost = 0;
+
   awareTick = Number.NaN;
+  /** Cumulative unhealthy-exposure DAYS (V36). Init `0.0`. */
+  zR = 0;
+  /** **Init −1**, not 0 — so hour 0 is a new hour. */
+  lastDecisionHour = -1;
+  /** Allocated in BOTH regimes when the layer is armed; `null` when it is not. */
+  believedFull: Set<string> | null = null;
+
+  /** The planned leg's node chain; `null` unless a closure schedule is active. */
+  routeNodes: RouteNodes | null = null;
+  /** `network.getClosureVersion()` as of the last plan or scan. Init `0`. */
+  seenClosureVersion = 0;
+  /** Edges this resident has already gambled on; lazily allocated on first push. */
+  pushedBlockages: Set<string> | null = null;
+
   blockagesEncountered = 0;
   pushThroughs = 0;
   reroutes = 0;

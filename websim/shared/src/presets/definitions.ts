@@ -47,10 +47,38 @@
  *    `simulationHours` value is 455. 455 is correct and is what the file
  *    executes: the window must be ≤ the series' slice count − 1. The comment is
  *    the error the smoke-window gate exists to catch.
+ *
+ * ── WP8 additions ──────────────────────────────────────────────────────────
+ *
+ * The WP8 set adds ER arm C, SE-E19, SE2-E18-d2 and the E0 nulls for arms B and
+ * C, taking the shipped set to 13. Each archived preset now names the exact
+ * archived run directories its parameter block must diff clean against
+ * (`archivedManifests`), and `shared/test/preset-archive-parity.test.ts` reads
+ * those `simulation.json` files as the expected value. That is a stronger check
+ * than the batch-file comparison in `validation/test/preset-batch-parity.test.ts`
+ * and a *different* one: the batch file says what was asked for, the manifest
+ * says what executed. Both are run, because the whole point of the
+ * `pushThetaThreshold` episode is that the two can disagree.
+ *
+ * 7. **The E0-null presets diff clean against all three archives at once.** The
+ *    same 41-parameter config matches `phase-e/` (33 parameters, no Scenario-E
+ *    block), `scenario-e/` (40, block present, no `closureDraw`) and
+ *    `scenario-e-v2/` (41). The Scenario-E parameters the older manifests omit
+ *    take exactly the code fallbacks the preset already carries, and the v2 null
+ *    records `pushThetaThreshold: -0.25` — the code fallback — because those
+ *    batch files omit the Scenario-E block entirely. So the nulls are the one
+ *    family with no archive exception at all.
+ *
+ * 8. **Every SE / SE2 preset carries one documented archive exception**:
+ *    `pushThetaThreshold`, preset −0.25 vs archived executed 0.0. See
+ *    `archiveExceptions` and the `pushtheta-batch-zeroing` entry in the
+ *    provenance ledger (`manifest.ts#PROVENANCE_QUIRKS`), which every UI surface
+ *    showing these presets must render.
  */
 
 import type { RunConfig, RunConfigPatch } from "../config.js";
 import { orderRunConfig, parseRunConfig } from "../config.js";
+import type { ParamName } from "../schema.js";
 
 /** Ids of the shipped presets. Stable — they appear in permalinks. */
 export const PRESET_IDS = [
@@ -59,23 +87,82 @@ export const PRESET_IDS = [
   "B_capacity_meets_demand",
   "C_expanded_plus_new_sites",
   "E0_null_A",
+  "E0_null_B",
+  "E0_null_C",
   "ER_baseline_real_A",
+  "ER_baseline_real_C",
   "SE_severe_v1_E18",
+  "SE_severe_v1_E19",
   "SE2_worst_plausible_E18_d1",
+  "SE2_worst_plausible_E18_d2",
 ] as const;
 
 export type PresetId = (typeof PRESET_IDS)[number];
 
+/**
+ * A parameter on which a preset deliberately differs from the archived manifest
+ * it otherwise reproduces.
+ *
+ * There is exactly one such parameter in the whole shipped set. The type exists
+ * so the exception has to be *declared and explained* — pointing at a ledger
+ * entry — rather than discovered as a diff nobody can account for.
+ */
+export interface ArchivedManifestException {
+  readonly param: ParamName;
+  /** What this preset carries. */
+  readonly presetValue: number;
+  /** What every listed archived manifest records as the EXECUTED value. */
+  readonly archivedExecutedValue: number;
+  /** Id of the `PROVENANCE_QUIRKS` entry that explains the difference. */
+  readonly quirkNote: string;
+}
+
 export interface PresetDefinition {
   readonly id: PresetId;
   readonly label: string;
-  /** Archive family this preset reproduces, or `null` for a fresh-run default. */
+  /**
+   * Primary archived run this preset reproduces (repo-relative under
+   * `docs/runs/`), or `null` for a fresh-run default. Always the first entry of
+   * {@link archivedManifests}.
+   */
   readonly archiveFamily: string | null;
+  /**
+   * Every archived run directory whose `reproducibility.parameters` block this
+   * preset must reproduce, repo-relative under `docs/runs/`. Empty for a
+   * non-archived preset. An archived manifest may carry FEWER parameters than
+   * the preset (33 / 40 / 41 across the three E archives); the contract is that
+   * the preset agrees on every parameter the manifest names, modulo
+   * {@link archiveExceptions}.
+   */
+  readonly archivedManifests: readonly string[];
+  /** Declared, ledger-backed differences from those manifests. Usually empty. */
+  readonly archiveExceptions: readonly ArchivedManifestException[];
+  /**
+   * `PROVENANCE_QUIRKS` ids that must be surfaced wherever this preset is used
+   * — preset picker, compare view, export annotation.
+   */
+  readonly quirkNotes: readonly string[];
   /** Batch file the values came from, relative to the repo root. */
   readonly sourceBatchFile: string | null;
   readonly notes: string;
   readonly overrides: RunConfigPatch;
 }
+
+/**
+ * The `pushThetaThreshold` exception, shared by every SE and SE2 preset.
+ *
+ * Archived SE/SE2 batch files were authored with −0.25 and every archived SE/SE2
+ * manifest records the executed value as 0.0. The web presets carry the
+ * registered −0.25 (plan §6.4 / `WP8-SPEC-archive-gates.md` §5.6 item 1), so
+ * this is a deliberate, ledger-backed difference from the archive — not a
+ * transcription error, and not something a diff-clean test may silently absorb.
+ */
+const PUSH_THETA_ARCHIVE_EXCEPTION: ArchivedManifestException = {
+  param: "pushThetaThreshold",
+  presetValue: -0.25,
+  archivedExecutedValue: 0,
+  quirkNote: "pushtheta-batch-zeroing",
+};
 
 /**
  * The behaviour-preserving base: PORT_MAP §3.2 common core plus every §2.6/§2.7
@@ -186,11 +273,27 @@ const SCENARIO_E_BLOCK: RunConfigPatch = {
   kPush: 1.0,
 };
 
+/**
+ * The three E0-null archives every null preset must reproduce, parameterised by
+ * arm. Note the directory-naming inconsistency in the archive itself: the
+ * `phase-e/` runs carry the `-n6842-` infix and the two Scenario-E archives do
+ * not. These strings are the real directory names, checked against the
+ * filesystem by `preset-archive-parity.test.ts`.
+ */
+const e0NullArchives = (arm: "A" | "B" | "C"): readonly string[] => [
+  `phase-e/E0null-${arm}-n6842-seed42`,
+  `scenario-e/E0null-${arm}-seed42`,
+  `scenario-e-v2/E0null-${arm}-seed42`,
+];
+
 export const PRESET_DEFINITIONS: readonly PresetDefinition[] = [
   {
     id: "default_fresh_run",
     label: "Default — fresh run (study configuration)",
     archiveFamily: null,
+    archivedManifests: [],
+    archiveExceptions: [],
+    quirkNotes: [],
     sourceBatchFile: null,
     notes:
       "Plan Q2: a fresh UI run mirrors the Repast GUI schema / final study configuration " +
@@ -204,6 +307,9 @@ export const PRESET_DEFINITIONS: readonly PresetDefinition[] = [
     id: "A_present_day",
     label: "Arm A — present-day reality (36 sites, 2,234 beds)",
     archiveFamily: "present-day-three-arm/A-seed42",
+    archivedManifests: ["present-day-three-arm/A-seed42"],
+    archiveExceptions: [],
+    quirkNotes: [],
     sourceBatchFile: "Geography/batch/batch_params_2026_A_seed42.xml",
     notes:
       "Every clean-air-capable facility the county actually operates today, at its real " +
@@ -215,6 +321,9 @@ export const PRESET_DEFINITIONS: readonly PresetDefinition[] = [
     id: "B_capacity_meets_demand",
     label: "Arm B — capacity meets demand at real locations (36 sites, 6,842 beds)",
     archiveFamily: "present-day-three-arm/B-seed42",
+    archivedManifests: ["present-day-three-arm/B-seed42"],
+    archiveExceptions: [],
+    quirkNotes: [],
     sourceBatchFile: "Geography/batch/batch_params_2026_B_seed42.xml",
     notes:
       "Placement identical to arm A, capacity scaled to the population, so an A→B " +
@@ -225,6 +334,9 @@ export const PRESET_DEFINITIONS: readonly PresetDefinition[] = [
     id: "C_expanded_plus_new_sites",
     label: "Arm C — expanded capacity plus new sites (46 sites, 6,842 beds)",
     archiveFamily: "present-day-three-arm/C-seed42",
+    archivedManifests: ["present-day-three-arm/C-seed42"],
+    archiveExceptions: [],
+    quirkNotes: [],
     sourceBatchFile: "Geography/batch/batch_params_2026_C_seed42.xml",
     notes:
       "Arm B's capacity redistributed across more doors. Facility count and per-facility " +
@@ -234,19 +346,55 @@ export const PRESET_DEFINITIONS: readonly PresetDefinition[] = [
   {
     id: "E0_null_A",
     label: "E0 null — decision layer on, every mechanism degenerate (arm A geometry)",
-    archiveFamily: "phase-e/E0null-A-seed42",
+    archiveFamily: "phase-e/E0null-A-n6842-seed42",
+    archivedManifests: e0NullArchives("A"),
+    archiveExceptions: [],
+    quirkNotes: [],
     sourceBatchFile: "Geography/batch/batch_params_2026_E0null_A_seed42.xml",
     notes:
       "The R3 vehicle: the decision layer runs with awareness at 1.0, L0 information, latch " +
       "departure, zero trait spread and zero barriers, so it must reproduce the archived " +
       "arm-A seed-42 run on every outcome column. Any divergence is a defect in the layer, " +
-      "not a finding.",
+      "not a finding. One config, three archives: the same 41 parameters diff clean against " +
+      "the phase-e null (33 recorded parameters), the scenario-e null (40) and the " +
+      "scenario-e-v2 null (41).",
     overrides: { scenarioCode: 0, ...E0_NULL_BLOCK },
+  },
+  {
+    id: "E0_null_B",
+    label: "E0 null — decision layer on, every mechanism degenerate (arm B geometry)",
+    archiveFamily: "phase-e/E0null-B-n6842-seed42",
+    archivedManifests: e0NullArchives("B"),
+    archiveExceptions: [],
+    quirkNotes: [],
+    sourceBatchFile: "Geography/batch/batch_params_2026_E0null_B_seed42.xml",
+    notes:
+      "The arm-B R3 vehicle. Same degenerate decision block as the arm-A null, arm B's " +
+      "shelter file (36 sites, 6,842 beds) via scenarioCode 1. Reproduces " +
+      "present-day-three-arm/B-seed42 (sheltered 6,264, unreachable 28, refused-all-full 550).",
+    overrides: { scenarioCode: 1, ...E0_NULL_BLOCK },
+  },
+  {
+    id: "E0_null_C",
+    label: "E0 null — decision layer on, every mechanism degenerate (arm C geometry)",
+    archiveFamily: "phase-e/E0null-C-n6842-seed42",
+    archivedManifests: e0NullArchives("C"),
+    archiveExceptions: [],
+    quirkNotes: [],
+    sourceBatchFile: "Geography/batch/batch_params_2026_E0null_C_seed42.xml",
+    notes:
+      "The arm-C R3 vehicle. Same degenerate decision block, arm C's shelter file (46 sites, " +
+      "6,842 beds) via scenarioCode 2. Reproduces present-day-three-arm/C-seed42 " +
+      "(sheltered 6,570, unreachable 28, refused-all-full 244).",
+    overrides: { scenarioCode: 2, ...E0_NULL_BLOCK },
   },
   {
     id: "ER_baseline_real_A",
     label: "ER baseline-real — sourced decision layer (arm A geometry)",
-    archiveFamily: "phase-e/ER-A-seed42",
+    archiveFamily: "phase-e/ER-A-n6842-seed42",
+    archivedManifests: ["phase-e/ER-A-n6842-seed42"],
+    archiveExceptions: [],
+    quirkNotes: [],
     sourceBatchFile: "Geography/batch/batch_params_2026_ER_A_seed42.xml",
     notes:
       "Awareness 0.356 measured for this event, L1 locations-only information, logistic " +
@@ -255,9 +403,28 @@ export const PRESET_DEFINITIONS: readonly PresetDefinition[] = [
     overrides: { scenarioCode: 0, ...E_REAL_BLOCK },
   },
   {
+    id: "ER_baseline_real_C",
+    label: "ER baseline-real — sourced decision layer (arm C geometry)",
+    archiveFamily: "phase-e/ER-C-n6842-seed42",
+    archivedManifests: ["phase-e/ER-C-n6842-seed42"],
+    archiveExceptions: [],
+    quirkNotes: [],
+    sourceBatchFile: "Geography/batch/batch_params_2026_ER_C_seed42.xml",
+    notes:
+      "The arm-A baseline-real decision block verbatim over arm C's geometry (46 sites, " +
+      "6,842 beds, scenarioCode 2), so an ER-A vs ER-C difference is attributable to the " +
+      "shelter network alone. Arm D (scenarioCode 7 + triageReserveFraction 0.10) is " +
+      "archived too but is not shipped as a preset: it is a triage-lever arm, not a " +
+      "geometry arm.",
+    overrides: { scenarioCode: 2, ...E_REAL_BLOCK },
+  },
+  {
     id: "SE_severe_v1_E18",
     label: "SE severe v1 (E18) — CONSTRUCTED COUNTERFACTUAL, arm A geometry",
     archiveFamily: "scenario-e/SE-E18-seed42",
+    archivedManifests: ["scenario-e/SE-E18-seed42"],
+    archiveExceptions: [PUSH_THETA_ARCHIVE_EXCEPTION],
+    quirkNotes: ["pushtheta-batch-zeroing"],
     sourceBatchFile: "Geography/batch/batch_params_2026_SE_E18_seed42.xml",
     notes:
       "ER baseline-real verbatim plus the severe v1 smoke series (embedded 1.75x, peak " +
@@ -274,9 +441,34 @@ export const PRESET_DEFINITIONS: readonly PresetDefinition[] = [
     },
   },
   {
+    id: "SE_severe_v1_E19",
+    label: "SE severe v1 (E19) — CONSTRUCTED COUNTERFACTUAL, arm C geometry",
+    archiveFamily: "scenario-e/SE-E19-seed42",
+    archivedManifests: ["scenario-e/SE-E19-seed42"],
+    archiveExceptions: [PUSH_THETA_ARCHIVE_EXCEPTION],
+    quirkNotes: ["pushtheta-batch-zeroing"],
+    sourceBatchFile: "Geography/batch/batch_params_2026_SE_E19_seed42.xml",
+    notes:
+      "SE-E18's configuration over arm C's geometry (scenarioCode 19 → 46 sites, 6,842 " +
+      "beds), same severe v1 series and same 18-edge closure schedule. Capacity refusals are " +
+      "NOT identically zero in this arm — SE-E19-seed44 records 2 — so a gate written for " +
+      "E20's exact zeros would be wrong here.",
+    overrides: {
+      scenarioCode: 19,
+      ...E_REAL_BLOCK,
+      ...SCENARIO_E_BLOCK,
+      smokeSeriesCode: 1,
+      closuresCode: 1,
+      closureDraw: 1,
+    },
+  },
+  {
     id: "SE2_worst_plausible_E18_d1",
     label: "SE2 worst-plausible v2, draw 1 (E18) — CONSTRUCTED COUNTERFACTUAL, arm A geometry",
     archiveFamily: "scenario-e-v2/SE2-E18-d1-seed42",
+    archivedManifests: ["scenario-e-v2/SE2-E18-d1-seed42"],
+    archiveExceptions: [PUSH_THETA_ARCHIVE_EXCEPTION],
+    quirkNotes: ["pushtheta-batch-zeroing"],
     sourceBatchFile: "Geography/batch/batch_params_2026_SE2_E18_d1_seed42.xml",
     notes:
       "Smoke anchored to the worst verified hourly PM2.5 over an intact non-evacuated city " +
@@ -291,6 +483,30 @@ export const PRESET_DEFINITIONS: readonly PresetDefinition[] = [
       smokeSeriesCode: 2,
       closuresCode: 3,
       closureDraw: 1,
+    },
+  },
+  {
+    id: "SE2_worst_plausible_E18_d2",
+    label: "SE2 worst-plausible v2, draw 2 (E18) — CONSTRUCTED COUNTERFACTUAL, arm A geometry",
+    archiveFamily: "scenario-e-v2/SE2-E18-d2-seed42",
+    archivedManifests: ["scenario-e-v2/SE2-E18-d2-seed42"],
+    archiveExceptions: [PUSH_THETA_ARCHIVE_EXCEPTION],
+    quirkNotes: ["pushtheta-batch-zeroing"],
+    sourceBatchFile: "Geography/batch/batch_params_2026_SE2_E18_d2_seed42.xml",
+    notes:
+      "Draw 1's configuration with the second pre-committed worst schedule " +
+      "(closures_E_r2_worst.csv: waves at hours 5, 92, 130, 163, 214, 263 rather than 3, 44, " +
+      "72, 142, 265, 303). closureDraw selects a committed FILE — no runtime RNG is involved " +
+      "— and it is the only parameter that differs from draw 1. Shipping two draws is what " +
+      "makes A-34's range presentation possible in the UI; draw 3 is archived and can be " +
+      "added the same way.",
+    overrides: {
+      scenarioCode: 18,
+      ...E_REAL_BLOCK,
+      ...SCENARIO_E_BLOCK,
+      smokeSeriesCode: 2,
+      closuresCode: 3,
+      closureDraw: 2,
     },
   },
 ];

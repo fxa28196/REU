@@ -116,6 +116,23 @@ export const ARTIFACT_SOURCES = {
     produce: "pipeline/java-exporter/build-and-dump.ps1 then dump-world-fixtures.ps1",
     external: false,
   },
+  "decision-fixtures": {
+    id: "decision-fixtures",
+    what:
+      "the WP8 decision-layer trace oracle under pipeline/out/decision-fixtures — 20 instrumented " +
+      "Java runs, 3.78 M sampled agent-hours, every float as raw %016x bits",
+    produce: "powershell -File websim/pipeline/java-exporter/dump-decision-trace.ps1 (JDK 17 + Repast 2.11.0)",
+    external: false,
+  },
+  "closure-fixtures": {
+    id: "closure-fixtures",
+    what:
+      "the WP8 closure-wave oracle under pipeline/out/closure-fixtures — per-wave blocked edge " +
+      "sets, shelter-tree digests, the certified reaction trace and the connectivity comparison",
+    produce:
+      "powershell -File websim/pipeline/java-exporter/dump-closure-fixtures.ps1 (JDK 17 + Repast 2.11.0)",
+    external: false,
+  },
   "archive-bundles": {
     id: "archive-bundles",
     what: "the archive bundle digests under pipeline/out/archive-bundles",

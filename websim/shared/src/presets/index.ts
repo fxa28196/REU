@@ -22,9 +22,14 @@ import armA from "./A_present_day.json" with { type: "json" };
 import armB from "./B_capacity_meets_demand.json" with { type: "json" };
 import armC from "./C_expanded_plus_new_sites.json" with { type: "json" };
 import e0NullA from "./E0_null_A.json" with { type: "json" };
+import e0NullB from "./E0_null_B.json" with { type: "json" };
+import e0NullC from "./E0_null_C.json" with { type: "json" };
 import erBaselineRealA from "./ER_baseline_real_A.json" with { type: "json" };
+import erBaselineRealC from "./ER_baseline_real_C.json" with { type: "json" };
 import seSevereV1E18 from "./SE_severe_v1_E18.json" with { type: "json" };
+import seSevereV1E19 from "./SE_severe_v1_E19.json" with { type: "json" };
 import se2WorstPlausibleE18D1 from "./SE2_worst_plausible_E18_d1.json" with { type: "json" };
+import se2WorstPlausibleE18D2 from "./SE2_worst_plausible_E18_d2.json" with { type: "json" };
 
 export * from "./definitions.js";
 
@@ -35,9 +40,14 @@ export const PRESET_JSON: Readonly<Record<PresetId, unknown>> = {
   B_capacity_meets_demand: armB,
   C_expanded_plus_new_sites: armC,
   E0_null_A: e0NullA,
+  E0_null_B: e0NullB,
+  E0_null_C: e0NullC,
   ER_baseline_real_A: erBaselineRealA,
+  ER_baseline_real_C: erBaselineRealC,
   SE_severe_v1_E18: seSevereV1E18,
+  SE_severe_v1_E19: seSevereV1E19,
   SE2_worst_plausible_E18_d1: se2WorstPlausibleE18D1,
+  SE2_worst_plausible_E18_d2: se2WorstPlausibleE18D2,
 };
 
 function loadPresets(): Readonly<Record<PresetId, RunConfig>> {

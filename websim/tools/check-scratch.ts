@@ -92,6 +92,13 @@ export const PRODUCED_ENTRIES: ReadonlyMap<string, string> = new Map([
   ["rng-full", "pipeline/java-exporter/dump-rng-volume.ps1"],
   ["wire", "node pipeline/scripts/measure-graph-wire.mjs"],
   ["world-fixtures", "pipeline/java-exporter/dump-world-fixtures.ps1"],
+  ["closure-fixtures", "pipeline/java-exporter/dump-closure-fixtures.ps1 (WP8 closure-wave oracle)"],
+  [
+    "decision-fixtures",
+    "pipeline/java-exporter/dump-decision-trace.ps1 (WP8 decision-layer oracle)",
+  ],
+  ["smoke-severe", "npx tsx pipeline/scripts/build-smoke-severe.ts (the 19-check severe series)"],
+  ["wp8-replay", "npx tsx validation/scripts/wp8-archive-replay.ts (WP8 ER/SE/SE2 replay)"],
 ]);
 
 /** The one directory tests may write into. Must be empty when a run ends. */
