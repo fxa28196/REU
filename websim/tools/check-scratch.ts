@@ -99,6 +99,10 @@ export const PRODUCED_ENTRIES: ReadonlyMap<string, string> = new Map([
   ],
   ["smoke-severe", "npx tsx pipeline/scripts/build-smoke-severe.ts (the 19-check severe series)"],
   ["wp8-replay", "npx tsx validation/scripts/wp8-archive-replay.ts (WP8 ER/SE/SE2 replay)"],
+  [
+    "wp9-validation",
+    "npx tsx validation/scripts/wp9-validation-report.ts (WP9 working-set replay + VALIDATION_REPORT.json)",
+  ],
 ]);
 
 /** The one directory tests may write into. Must be empty when a run ends. */

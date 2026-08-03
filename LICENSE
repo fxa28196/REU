@@ -63,21 +63,31 @@ here grants you any right to any of them.
    chapter. Not relicensed.
 
 
-3. THE STREET CENTERLINE DATA  --  REDISTRIBUTION TERMS UNVERIFIED
+3. THE STREET CENTERLINE DATA  --  REDISTRIBUTED WITH THE PROVIDER'S APPROVAL
    Geography/data/Streets.shp, .dbf, .shx, .prj, .cpg
    Streets.zip
 
-   Portland Metro Regional Land Information System (RLIS) street centerlines,
-   inferred from the attribute schema. This file was supplied with the
-   inherited project and predates version control here: its original download
-   date, RLIS release version, and redistribution license could NOT be
-   recovered. This is documented as a known provenance gap in
-   Geography/data/README.md and docs/science/DATA_SOURCES.md (source D0), and
-   is stated in the published chapter.
+   Street centerlines from the Regional Land Information System (RLIS),
+   Oregon Metro (inferred from the attribute schema). Please credit the source
+   as: Regional Land Information System (RLIS), Oregon Metro.
 
-   Treat its redistribution as unconfirmed. If you need this layer, obtain it
-   directly from Metro / gis-pdx.opendata.arcgis.com under their terms rather
-   than relying on the copy here.
+   Redistribution of the RLIS-derived products in this repository is with the
+   provider's approval, recorded as follows and no more strongly: THE
+   RESEARCHER REPORTS THAT OREGON METRO APPROVED THE REDISTRIBUTION (relayed
+   2026-08-02). No written determination from Oregon Metro is on file anywhere
+   in this repository; the record of the approval is the researcher's report
+   of it. No reference number, contact name, approval date, license name,
+   license version, or license URL is asserted here, because none has been
+   recorded.
+
+   A separate provenance gap remains and is NOT closed by that approval: this
+   file was supplied with the inherited project and predates version control
+   here, so its original download date and RLIS release version could not be
+   recovered. That gap is documented in Geography/data/README.md and
+   docs/science/DATA_SOURCES.md (source D0), and is stated in the published
+   chapter. If you need a citable release version, obtain the layer directly
+   from Metro / gis-pdx.opendata.arcgis.com under their terms rather than
+   relying on the copy here.
 
 
 4. PUBLIC-SECTOR DATA (redistributed, not owned)
@@ -87,8 +97,18 @@ here grants you any right to any of them.
        that AQS be acknowledged as the source.
 
    Geography/data/encampments/irp_campsite_reports_sample.csv
-       City of Portland open data (Impact Reduction Program campsite reports).
-       Subject to the City of Portland's open-data terms.
+       City of Portland (Impact Reduction Program campsite reports, obtained
+       from the City's open-data ArcGIS service). Please credit the source as:
+       City of Portland, Impact Reduction Program campsite reports.
+
+       The campsite-report-derived products in this repository are
+       redistributed with the provider's approval, recorded as follows and no
+       more strongly: THE RESEARCHER REPORTS THAT THE CITY OF PORTLAND
+       APPROVED THE REDISTRIBUTION (relayed 2026-08-02). No written
+       determination from the City is on file anywhere in this repository; the
+       record of the approval is the researcher's report of it. No reference
+       number, contact name, approval date, license name, license version, or
+       license URL is asserted here, because none has been recorded.
 
    Both are reproducible from their original sources by the fetch scripts in
    scripts/, and every file carries a SHA-256 checksum in

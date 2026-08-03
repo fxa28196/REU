@@ -298,10 +298,17 @@ and predates websim.
 over the *websim* subtree only. It does not remove the raw feed from this
 repository's history, and it does not remove it from anywhere the repository has
 been pushed. The remote is `https://github.com/fxa28196/REU.git`
-(`git remote -v`). **I could not determine whether that repository is public or
-private** — that requires a network call I am not permitted to make, and no file
-in the tree records its visibility. This is the single most important thing for
-the user to check personally before any correspondence goes out.
+(`git remote -v`).
+
+**RESOLVED 2026-07-31 — the repository is PUBLIC.** This paragraph previously
+said "I could not determine whether that repository is public or private" and
+called it the single most important thing for the user to check. It was checked:
+the remote was retrieved on 2026-07-31 and rendered a full public file listing
+and project description. **So the raw campsite feed, all 3,400 rows with all
+five fields, is already published by this project**, and every downstream
+statement in this document that was conditioned on "if public" should be read in
+its "public" branch. *Not established:* the date the remote became publicly
+visible — git records commit dates, not visibility changes.
 
 ### 3.2 What is and is not in the built asset directory
 
@@ -375,9 +382,10 @@ document adds two facts to it rather than deciding it:
 There is **no deployed site**. `websim/app/` is a scaffold: `app/src/index.ts`
 declares screen names, badge states and provenance labels and nothing more; there
 is no map, no layer, no export UI. So the honest answer to "what can the public
-see today" is **nothing from websim** — subject to §3.1's unresolved question
-about the repository's visibility, which is a separate and larger exposure than
-anything websim would add.
+see today" is **nothing from websim** — but §3.1's visibility question is no
+longer unresolved, and its answer is the larger exposure: **the repository is
+PUBLIC (verified 2026-07-31), so the raw feed is already published**, entirely
+independently of anything websim would add.
 
 The rest of this section is therefore about what the **currently built assets
 would disclose if deployed as they stand**, which is the question WP1 has to
@@ -600,8 +608,10 @@ would republish raw coordinates, raw identifiers and per-report snap gaps.
 
 ### Also open, outside Q4 but coupled to it
 
-- **Repository visibility** (§3.1) — must be established before anything else is
-  reasoned about; a public repository already publishes the raw feed.
+- ~~**Repository visibility** (§3.1) — must be established before anything else is
+  reasoned about; a public repository already publishes the raw feed.~~
+  **ESTABLISHED 2026-07-31: PUBLIC.** The raw feed is already published. This is
+  no longer an open item; it is a fact the rest of the analysis sits on (§3.1).
 - **Hosting/visibility of the deploy** — plan §10 item 3: public URL only after
   the ethics and licensing items clear; unlisted preview until then.
 
@@ -611,27 +621,52 @@ would republish raw coordinates, raw identifiers and per-report snap gaps.
 
 Listed exhaustively, in descending order of importance.
 
-1. **Whether `https://github.com/fxa28196/REU.git` is public or private.**
+1. ~~**Whether `https://github.com/fxa28196/REU.git` is public or private.**
    Requires a network call I am not permitted to make. Nothing in the tree
    records it. If public, the raw feed with all five fields is already published
    by this project, and the entire websim disclosure discussion is downstream of
-   a larger exposure. **The user must check this personally, first.**
-2. **Whether the City's licence permits redistribution of a derived product.**
+   a larger exposure. **The user must check this personally, first.**~~
+   **DETERMINED 2026-07-31: the repository is PUBLIC.** Retrieved on that date;
+   it rendered a full public file listing and project description. The raw feed
+   with all five fields **is** already published by this project, and the websim
+   disclosure discussion **is** downstream of that larger exposure. The *date*
+   the remote became public remains unknown and must not be asserted.
+2. ~~**Whether the City's licence permits redistribution of a derived product.**
    The tree records the licence only as "City of Portland open data (public)"
    (`Geography/data/README.md:166`). No licence text, no terms URL, no written
    determination exists in the repository. By contrast the RLIS street data has an
    explicit written-determination workstream (plan Q3, W1); the encampment feed
    has no equivalent. Whether "open data" here permits republishing a derived
-   density layer, a node-level binary, or the raw rows is **unestablished**.
+   density layer, a node-level binary, or the raw rows is **unestablished**.~~
+   **ANSWERED 2026-08-02.** The researcher reports that **the City of Portland
+   approved** redistribution of the campsite-report-derived products, relayed
+   2026-08-02, asking only that the source be credited formally. What has *not*
+   changed: the tree still records the licence only as the free-text phrase
+   "City of Portland open data (public)" (`Geography/data/README.md:166`), there
+   is still no licence text and no terms URL, and **no written determination from
+   the City is filed anywhere in this repository** — no correspondence, no
+   reference number, no named contact. Anything that needs documentary evidence
+   must obtain it. Operative record: `DR-WP1-data-rights.md`. Note also that this
+   answers the *rights* question only; it says nothing about whether the
+   published granularity is appropriate, which is §2.4/§4.2's separate subject.
 3. **Whether the mentor or an IRB has reviewed any of this.** No sign-off
    artefact exists anywhere in `websim/docs/`. Plan §8 WP1 lists the memo as a
    deliverable; `DR-Q4:150-152` leaves the salt-custody line blank. I found no
    IRB protocol number, determination letter, or exemption record in the tree.
+   *(Update 2026-08-02: the mentor **has** reviewed it — see item 4. The rest of
+   this item is still exactly true: there is still no IRB protocol number,
+   determination letter, or exemption record anywhere in the tree.)*
 4. **Whether this study required IRB review at all.** The data is
    municipal-administrative and not human-subjects data collected by the project,
    which often changes the answer. Nothing in the tree states a determination
    either way. This is a question for the faculty mentor, not something the
    repository can answer.
+   *(**ANSWERED 2026-08-02: no IRB review is required.** The faculty mentor so
+   determined, on the reported grounds that the work does not involve human
+   subjects and is not yet a real-world application; relayed by the researcher
+   2026-08-02. It is a verbal determination with no written artefact, and it is
+   scoped to the current research use. Operative record:
+   `DR-WP1-irb-determination.md`.)*
 5. **The completeness of the sample relative to the City's full feed.** The fetch
    walks 17 OBJECTID windows of 200; the total number of records the service
    holds is not recorded anywhere in the tree, so "3,400" cannot be expressed as

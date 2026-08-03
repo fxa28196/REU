@@ -4,11 +4,13 @@ export default defineConfig({
   test: {
     name: "validation",
     include: ["test/**/*.test.ts"],
-    // 30 s, not vitest's 5 s default. Rationale and the measured
-    // reproduction live in websim/vitest.config.ts; the short version is that
-    // every heavy case here declares its own timeout, no case uses a timeout as
-    // an assertion, and a 5 s wall-clock budget makes a busy machine look like a
-    // broken port.
-    testTimeout: 30_000,
+    // 60 s, not vitest's 5 s default. The measured schedule, the isolated-vs-
+    // in-suite contention table it is derived from, and the reason a timeout is
+    // a budget rather than an assertion all live in websim/vitest.config.ts.
+    // Short version: every heavy case declares its own budget, nothing in this
+    // tree grades anything on time, and 60 s is 13.5x the slowest case that
+    // actually runs under this default (4.46 s idle) — past the 3.50x worst
+    // contention measured across the suite.
+    testTimeout: 60_000,
   },
 });

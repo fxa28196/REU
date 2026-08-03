@@ -5,6 +5,13 @@ routing tests pass.** This document records the highest-priority integrity
 defect found in the model to date, the correction, and the evidence that the
 corrected network is physically defensible.
 
+**Census figures below are the current post-U-27 production values** (freeway
+classes excluded before graph build), as recorded by 153 of the 154 archived
+run manifests. The original 2026-07-24 measurements were taken on the
+pre-U-27 unfiltered graph (27 corrupt IDs → 4 reattached / 23 split;
+89,322 → 89,345 nodes; 154 components, largest 60,444) and survive in
+`docs/runs/final-baseline/simulation.json`.
+
 ## 1. Problem discovered
 
 The results-analysis workflow (`scripts/analyze_run.py`) cross-checks each
@@ -28,8 +35,10 @@ sometimes changing which shelter was judged "nearest").
 ## 2. Evidence
 
 - Independent probe of `data/Streets.shp` (Web Mercator → WGS84, reproducing
-  the exact graph construction): **27 node IDs, all in the contiguous block
-  107657–107723, claimed at positions 9–18.5 km apart** across ~55 features —
+  the exact graph construction): **27 node IDs in the raw shapefile — 25 of
+  them once the U-27 freeway classes are excluded from the pedestrian graph —
+  all in the contiguous block 107657–107723, claimed at positions
+  9–18.5 km apart** across ~55 features —
   short "UNNAMED RD" stubs, I-5 freeway ramp pieces, and street ends
   (SE Harney St, SE Lambert St, SE 82nd Ave, NW Skyline Blvd, …).
 - The shapefile has **zero multi-part features** — geometry truncation ruled
@@ -69,9 +78,9 @@ at load time and are logged:
    impossible jump. **Post-fix count: 0.**
 4. **Connectivity census.** Components are recomputed and reported.
 
-Result on this dataset: **27 corrupt attribute IDs → 4 sites reattached by
-geometry, 23 split to synthetic nodes** (graph: 89,322 attribute IDs →
-89,345 final nodes; all 112,070 features retained as edges).
+Result on this dataset: **25 corrupt attribute IDs → 3 sites reattached by
+geometry, 22 split to synthetic nodes** (graph: 88,078 attribute IDs →
+88,100 final nodes; all 109,434 pedestrian-eligible features retained as edges).
 
 ## 4. Validation results
 
@@ -81,9 +90,12 @@ geometry, 23 split to synthetic nodes** (graph: 89,322 attribute IDs →
 |---|---|---|
 | Impossible-span edges | **50** | **0** |
 | Max endpoint gap | ~18,552 m | **11.9 m** |
-| Components (count / largest) | 154 / 60,444 | **154 / 60,444 — unchanged** |
+| Components (count / largest) | 171 / 59,725 | **171 / 59,725 — unchanged (measured pre-U-27)** |
 
-**The correction does not change connectivity**: the wormholes linked places
+**The correction does not change connectivity** — measured pre-U-27 and not
+re-measured on the freeway-filtered graph, so the "unchanged" verdict is
+carried over rather than re-derived; the archived manifests record only the
+corrected-graph census. The mechanism was: the wormholes linked places
 already inside the same component, and split/reattached stubs remain connected
 through their valid endpoints. It only removes physically impossible shortcuts.
 
@@ -127,7 +139,7 @@ against cheaper sheltered journeys — the correct equity signal.
 
 ## 5. Remaining limitations
 
-1. **Split stubs may dangle.** 23 sites became synthetic nodes; features whose
+1. **Split stubs may dangle.** 22 sites became synthetic nodes; features whose
    *both* endpoints are corrupt and non-coincident with any junction become
    short isolated spurs. They are real street pieces whose true connections are
    unknowable from the corrupt attributes; we do not invent connections.
@@ -143,8 +155,11 @@ against cheaper sheltered journeys — the correct equity signal.
    the corrected working tree immediately before the combined commit; the
    presence of the `street_network_validation` block in their manifests
    unambiguously identifies the corrected build.
-5. Freeway centerlines remain routable for pedestrians (tracked roadmap item);
-   encampment snap gaps up to ~213 m are walked as straight first legs.
+5. Freeway centerlines are **no longer routable for pedestrians**: U-27 excludes
+   2,636 features / 614 km carrying `TYPE` ∈ {1110, 1120, 1121, 1122, 1123}
+   (freeway mainlines and ramps, including the Marquam and Fremont bridge decks)
+   before the graph is built. Encampment snap gaps up to ~213 m are still walked
+   as straight first legs.
 
 ## 6. How to re-verify
 

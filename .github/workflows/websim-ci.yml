@@ -11,7 +11,7 @@ name: websim CI
 # git-ignored in full, so scratch a test leaves behind is invisible to `git
 # status` and can flip a later artifact gate's verdict.
 #
-# Two jobs, and the split is deliberate:
+# Four jobs, and the split is deliberate:
 #
 #   build          -- everything a clean clone can do with `npm ci` alone. This is
 #                     the job that must never depend on a local artefact.
@@ -26,11 +26,27 @@ name: websim CI
 #                     policy" section of websim/README.md). Plan section 5.3 requires
 #                     the harness to degrade LOUDLY and never skip silently; on a
 #                     runner that owns the data, "loudly" means red.
+#   artifact-coverage -- the bookkeeper. `strict-artifacts` is opt-in, so on a
+#                     repository with no artifact runner it is SKIPPED, and a skipped
+#                     job contributes a grey tick that reads like a green one. This
+#                     job runs with `if: always()`, records which of the three above
+#                     actually ran, and states on the run page exactly which evidence
+#                     this push therefore does NOT carry. It is the workflow-level
+#                     form of the same rule tools/artifact-gate.ts enforces inside the
+#                     suite: never disappear silently, always name what was forgone.
 #
 # The skip-vs-fail contract in one line: a job WITHOUT the artifacts leaves
 # WEBSIM_REQUIRE_ARTIFACTS off and gets loud, attributed, reported-as-skipped
 # suites; a job WITH the artifacts sets it to 1 and gets a failure the moment an
 # artifact stops being produced.
+#
+# Note what is NOT wrong here, and why this workflow needs a bookkeeper rather
+# than a rewrite. Unlike the nightly (see websim-nightly.yml, "the inert-nightly
+# defect"), this workflow cannot report success having run nothing: `build` and
+# `cross-engine` are unconditional and do real work on every push. The defect the
+# opt-in condition leaves behind is narrower -- a reader cannot tell, from a green
+# checks list, whether the artifact-gated half of the evidence was collected. That
+# is what artifact-coverage answers.
 
 # The read-only instrument inputs are trigger paths too: websim's contract plane
 # asserts that its presets equal Geography/batch/*.xml parameter for parameter,
@@ -99,8 +115,43 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      # `set -o pipefail` matters: without it the step's exit status would be
+      # tee's, and a failing suite would be reported as a passing step.
       - name: Test
-        run: npm test
+        shell: bash
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee "${RUNNER_TEMP}/build-test.log"
+
+      # The `!!` banners the artifact gate prints already name the gate id, the
+      # suite, the evidence forgone, the missing path and the command that
+      # produces it. Republishing them into the job summary means a reader can
+      # see what this clean-clone run did NOT prove without opening the log --
+      # and it is derived from the run, so it cannot go stale the way a hand
+      # maintained list in this file would.
+      #
+      # This is a REPORT and not a gate. The strict non-vacuity check ("zero
+      # banners on a clean clone means the gates stopped announcing themselves")
+      # lives in the nightly's degraded job instead, because this job gates every
+      # PR and a new failure mode here blocks merges.
+      - name: Which gates this clean clone could not run
+        if: always()
+        shell: bash
+        run: |
+          log="${RUNNER_TEMP}/build-test.log"
+          [ -f "$log" ] || { echo "no suite log at ${log}"; exit 0; }
+          gates=$(grep -c '^!! ARTIFACT-GATED SUITE SKIPPED' "$log" || true)
+          {
+            echo "## clean-clone run — ${gates} artifact gate(s) did not run"
+            echo
+            echo "\`pipeline/out/\`, \`pipeline/local-raw/\` and \`docs/runs/\` are absent on a hosted"
+            echo "runner, so the suites gated on them reported themselves skipped rather than"
+            echo "passed. The \`strict-artifacts\` job is where the same gates are REQUIRED to run."
+            echo
+            echo '```'
+            grep '^!!' "$log" || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       # Runs AFTER the suite, and cannot be a test itself: while vitest is still
       # running, other workers are still writing under pipeline/out, so the end
@@ -114,6 +165,86 @@ jobs:
 
       - name: Claim linter
         run: npm run lint:claims
+
+  artifact-coverage:
+    name: artifact coverage (what this push did and did not prove)
+    needs: [build, cross-engine, strict-artifacts]
+    # Without `always()` this job would itself be skipped the moment
+    # strict-artifacts is skipped, which is precisely the silence it exists to
+    # break.
+    if: always()
+    runs-on: ubuntu-latest
+    # Reads job results only; nothing is checked out, so the workflow-level
+    # `working-directory: websim` would point at a directory that does not exist.
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+    steps:
+      - name: Report
+        shell: bash
+        run: |
+          b='${{ needs.build.result }}'
+          x='${{ needs.cross-engine.result }}'
+          s='${{ needs.strict-artifacts.result }}'
+          echo "build=${b} cross-engine=${x} strict-artifacts=${s}"
+
+          {
+            echo "## websim CI — artifact coverage"
+            echo
+            echo "| job | result |"
+            echo "| --- | --- |"
+            echo "| build (clean clone) | \`${b}\` |"
+            echo "| cross-engine (Chromium / Firefox / WebKit) | \`${x}\` |"
+            echo "| strict-artifacts (WEBSIM_REQUIRE_ARTIFACTS=1) | \`${s}\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          fail=0
+
+          # build and cross-engine are unconditional. If either did not run, the
+          # workflow is not doing what this file says it does, and that is a
+          # defect in the workflow rather than a degraded environment.
+          for pair in "build:${b}" "cross-engine:${x}"; do
+            name="${pair%%:*}"; res="${pair##*:}"
+            if [ "$res" != "success" ]; then
+              echo "::error title=${name} did not pass::result=${res}. This job is unconditional; it must run and pass on every push."
+              fail=1
+            fi
+          done
+
+          if [ "$s" = "failure" ]; then
+            echo "::error title=strict-artifacts failed::An artifact-gated gate went red on the runner that holds the data. That is a real divergence, not a missing file."
+            fail=1
+          elif [ "$s" = "success" ]; then
+            {
+              echo
+              echo "Artifact-gated evidence **was** collected: \`strict-artifacts\` ran with"
+              echo "\`WEBSIM_REQUIRE_ARTIFACTS=1\`, so no gate was permitted to skip."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning title=Artifact-gated evidence NOT collected::strict-artifacts was ${s}; no runner holding pipeline/out and docs/runs is configured. The gates below were not exercised on this push."
+            {
+              echo
+              echo "### Not proven by this push"
+              echo
+              echo "\`strict-artifacts\` was \`${s}\`, so **no runner holding the oracle dumps ran**."
+              echo "The following are the checks only that runner can perform, and none of them"
+              echo "happened here:"
+              echo
+              echo "- every artifact-gated suite (they reported themselves *skipped*, with a \`!!\`"
+              echo "  banner each — the \`build\` job's summary lists them)"
+              echo "- \`check:committed-slice\` — that the committed clean-clone graph slice still"
+              echo "  matches the certified originals it was cut from"
+              echo "- \`check:deploy\` — the WP4 publication gate over the BUILT assets and the raw"
+              echo "  feed (no raw coordinates, ids, below-k cells or salt)"
+              echo "- the scratch guard against a fully populated \`pipeline/out\`, which is the only"
+              echo "  place a new un-allowlisted artifact directory can be caught"
+              echo
+              echo "Set \`vars.WEBSIM_ARTIFACT_RUNNER=true\` and \`vars.WEBSIM_ARTIFACT_RUNNER_LABEL\`"
+              echo "to enable it, or dispatch this workflow with **strict_artifacts** checked."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          exit "$fail"
 
   cross-engine:
     name: cross-engine determinism (Chromium / Firefox / WebKit)

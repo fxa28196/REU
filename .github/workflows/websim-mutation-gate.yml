@@ -1,0 +1,417 @@
+name: websim mutation gate
+
+# Plan section 5.2 (graft, CI-BLOCKING):
+#
+#   "A CI job injects a seed perturbation (and one formatter perturbation) into a
+#    replay and asserts the gate suite goes RED -- the gates are proven able to
+#    fail, never observed-green-by-vacuity."
+#
+# This is that job. It is the only workflow in this repository whose success
+# condition is a FAILING test run: it edits real port source to introduce a real
+# defect, runs a real vitest child process, and fails if the suite stays green.
+#
+# WHY IT IS A SEPARATE FILE.  websim-ci.yml answers "is the code right?".  This
+# answers "can the tests tell when it is wrong?", which is a different question
+# with a different failure meaning.  A red build job means somebody broke the
+# port.  A red mutation job means somebody broke the ability to notice -- a
+# widened tolerance, a deleted oracle row, a bit-comparison quietly replaced by
+# toBeCloseTo.  The port can be perfectly correct and this job still red, and
+# that is exactly the signal it exists to raise.
+#
+# WHY THIS PROJECT NEEDS IT MORE THAN MOST.  Every item below actually happened
+# here and is the reason the catalogue is nine injections and not the two the
+# plan names:
+#
+#   * a 10 % error in the movement step length passed all 1,084 tests (DR-FIXA);
+#   * a 0.012 % error in the walking ventilation rate (1.62 -> 1.6202 m3/h)
+#     passed the entire suite;
+#   * WP8 shipped a decision layer that was bit-verified against a live-Repast
+#     oracle and CALLED FROM NOWHERE, with 1,369 tests green;
+#   * the WP8 acceptance gate then deleted that layer's entire wiring and the
+#     repaired flagship test still passed 24/24.
+#
+# WHAT THE JOB ASSERTS, in the order it asserts it:
+#
+#   0. THE GATE CAN FAIL.  `--prove-can-fail` runs the gate against an
+#      "injection" that only edits a comment while claiming a detector.  The gate
+#      must report FAILURE; the step passes only when it does.  Without this step
+#      a green mutation job would be indistinguishable from a mutation job that
+#      cannot fail -- which is the precise failure this whole workflow is here to
+#      prevent, applied to itself.
+#   1. THE NEGATIVE CONTROL IS GREEN.  A comment-only edit must leave the suite
+#      passing.  If it does not, the tree is red for an unrelated reason, every
+#      "detected" verdict is unattributable, and the run is reported VOID (exit 2)
+#      rather than passed.
+#   2. EVERY INJECTION TURNS THE SUITE RED at the smallest magnitude the sweep
+#      measured it detectable at -- 1 ULP for the movement step length, 1 ULP for
+#      the walking ventilation rate, 1 ULP for the hazard coefficient, ties-only
+#      for the formatter, +1 for the seed.
+#   3. THE NAMED DETECTOR FIRED.  Exit code alone is not evidence: an injection
+#      that broke the TypeScript transform would also exit non-zero.  Each row
+#      names the test that owns the defect and the run fails if that test is not
+#      among the failures.
+#   4. THE SOURCE IS RESTORED, proven twice -- by the runner's own SHA-256
+#      manifest, and independently by `git diff --exit-code` in a step that runs
+#      even when the gate failed.
+#
+# The catalogue itself -- every injection, its magnitude ladder, the MEASURED
+# smallest magnitude the suite still detects, the test that catches it, and the
+# two blind spots the sweep found and closed -- lives in
+# websim/validation/test/mutation/catalogue.ts. It is TypeScript rather than
+# prose on purpose: `mutation-catalogue.test.ts` checks it against the tree on
+# every `npm test`, so it cannot quietly go out of date the way a note would.
+
+on:
+  push:
+    paths:
+      - "websim/**"
+      - ".github/workflows/websim-mutation-gate.yml"
+  pull_request:
+    paths:
+      - "websim/**"
+      - ".github/workflows/websim-mutation-gate.yml"
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: >-
+          fast = the catalogued per-injection file selection (minutes).
+          wide = every project except validation. full = the entire suite,
+          including the archive replays -- only meaningful on a runner that
+          holds pipeline/out and docs/runs.
+        type: choice
+        options: [fast, wide, full]
+        default: fast
+      force_artifact_runner:
+        description: >-
+          Also run mutation-gate-full even when WEBSIM_ARTIFACT_RUNNER is unset.
+          Only useful when a runner carrying WEBSIM_ARTIFACT_RUNNER_LABEL (default
+          `self-hosted`) is online and holds pipeline/out and docs/runs; otherwise
+          the job queues against a runner that does not exist and hangs -- and it
+          takes `mutation-coverage`, which depends on it, down with it.
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: websim-mutation-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: websim
+
+jobs:
+  mutation-gate:
+    name: injected defects must turn the suite RED (clean clone)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      # A hosted runner is a clean clone: pipeline/out and docs/runs are absent.
+      # Set explicitly rather than left unset so the honest reading is on the
+      # record -- this job proves the CLEAN-CLONE suite can fail, using detectors
+      # a clean clone can actually run: the committed movement oracle, the
+      # committed format fixtures, the committed cross-engine digests, and the
+      # committed decision-oracle slice WP9's sweep had to cut precisely because
+      # the 477 MB dump is git-ignored.
+      #
+      # HISTORY, because the comment that used to sit here was wrong for a while.
+      # `seed.replay-run-seed` (+1 on `buildWorld`'s seed) -- the injection plan
+      # section 5.2 names literally -- was marked `needsArtifacts` and DEFERRED
+      # from this job, because when it was measured its only detectors were
+      # artifact-gated world oracles. WP10 then landed
+      # `engine/test/worker/world.census.test.ts`, which is not gated and does
+      # catch it; the row was re-measured on 2026-08-03 and the deferral removed,
+      # so this job now proves the plan's named injection rather than a surrogate.
+      # Read the row's note before relying on it: the detector is a state-census
+      # assertion that catches a seed offset INCIDENTALLY, at a margin of one
+      # resident in 300. The designed clean-clone seed detector is still
+      # `seed.population-derivation`, a bit-level stream comparison.
+      #
+      # The "Plan-named injections were proved, not deferred" step below is what
+      # stops that deferral coming back unnoticed.
+      WEBSIM_REQUIRE_ARTIFACTS: "0"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: websim/package-lock.json
+
+      - name: Install (clean, from the lockfile)
+        run: npm ci
+
+      # Cheap, and it fails for a legible reason if a refactor moved an anchor
+      # out from under the catalogue. Running it before the gate means "stale
+      # catalogue" and "suite went green under a defect" cannot be confused.
+      - name: Catalogue is live (anchors, measured magnitudes, inert control)
+        run: npx vitest run validation/test/mutation/ --reporter=dot
+
+      # STEP 0 -- the gate's own can-fail proof. Inverted on purpose: this exits 0
+      # only when the gate reports FAILURE for an inert injection.
+      - name: The gate can fail (inert injection must NOT be reported as detected)
+        run: npx tsx validation/test/mutation/run-mutation-gate.ts --prove-can-fail --scope fast
+
+      # STEP 1-3 -- the gate itself.
+      - name: Mutation gate
+        id: gate
+        run: >-
+          npx tsx validation/test/mutation/run-mutation-gate.ts
+          --gate
+          --scope ${{ inputs.scope || 'fast' }}
+          --json ${{ runner.temp }}/mutation-report.json
+
+      # The gate DEFERS any catalogue row whose only measured detectors are
+      # artifact-gated, printing a `!!` banner rather than dropping it silently.
+      # That is the right behaviour, and it is also the behaviour that let the
+      # plan's own named seed injection sit un-proved on this runner for as long
+      # as nobody re-read the banner. So the deferral is now a reported fact and,
+      # for the two injections plan section 5.2 names by hand, a GATED one:
+      # deferring either of them fails this job with the row named.
+      #
+      # This is not a tolerance and not a duplicate of the gate. The gate asks
+      # "did the suite notice the defect?"; this asks "was the defect the plan
+      # named actually attempted here, or quietly swapped for a surrogate?".
+      - name: Plan-named injections were proved, not deferred
+        if: always()
+        shell: bash
+        run: |
+          report="${RUNNER_TEMP}/mutation-report.json"
+          gate='${{ steps.gate.outcome }}'
+
+          if [ "$gate" != "success" ] && [ "$gate" != "failure" ]; then
+            # The gate step never ran; an earlier step already failed and already
+            # said why. Do not stack a second, less informative error on it.
+            echo "the mutation gate did not run (outcome='${gate}'); an earlier step failed."
+            exit 0
+          fi
+
+          if [ ! -f "$report" ]; then
+            echo "::error title=No mutation report::the gate ran (outcome=${gate}) but ${report} was not written, so nothing can be said about which injections this run attempted."
+            exit 1
+          fi
+          node -e '
+            const fs = require("node:fs");
+            const r = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+            const deferred = r.deferredForMissingArtifacts ?? [];
+            // Plan section 5.2 names exactly these two. A hosted job that defers
+            // either of them is proving a surrogate for the thing it was told to
+            // prove, which is the difference between evidence and ceremony.
+            const planNamed = ["seed.replay-run-seed", "formatter.half-up"];
+            const lines = [
+              "## mutation gate — injections attempted on this clean clone",
+              "",
+              "| field | value |",
+              "| --- | --- |",
+              "| mode | `" + r.mode + "` |",
+              "| scope | `" + r.scope + "` |",
+              "| verdicts | " + (r.verdicts ?? []).length + " |",
+              "| deferred for missing artifacts | " + (deferred.length === 0 ? "none" : "`" + deferred.join("`, `") + "`") + " |",
+              "| sources restored | " + (r.restored === true ? "yes (SHA-256 verified)" : "**NO**") + " |",
+              "",
+            ];
+            for (const id of deferred) {
+              console.log("::warning title=Injection deferred::" + id + " was not attempted on this runner; its only measured detectors are artifact-gated. The mutation-gate-full job is where it is proved.");
+            }
+            const bad = planNamed.filter((id) => deferred.includes(id));
+            if (bad.length > 0) {
+              lines.push("**" + bad.join(", ") + "** " + (bad.length === 1 ? "is" : "are") + " named directly by plan section 5.2 and " + (bad.length === 1 ? "was" : "were") + " deferred rather than proved on this runner.");
+              console.log("::error title=Plan-named injection deferred::" + bad.join(", ") + " deferred on the clean-clone runner. Plan section 5.2 names these injections specifically; deferring one means the hosted job proves a surrogate instead. Either land an ungated detector and re-measure the row with --measure, or say plainly in the catalogue note that the plan clause is unmet here.");
+            }
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\n") + "\n");
+            process.exit(bad.length > 0 ? 1 : 0);
+          ' "$report"
+
+      # Retained on failure: a red mutation gate is exactly when somebody needs
+      # the per-injection census and the full failure list. Written to the
+      # runner's temp dir rather than under pipeline/out, because `check:scratch`
+      # requires pipeline/out/test-tmp to be EMPTY when a run ends and a report
+      # parked there would turn a passing gate into a failing scratch guard.
+      - name: Upload the mutation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-report-${{ github.run_id }}
+          path: ${{ runner.temp }}/mutation-report.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      # Independent of the runner's own SHA-256 verification, and deliberately
+      # so: the runner proving its own restoration is the runner marking its own
+      # homework. `git diff` is a second witness with a different mechanism, and
+      # it runs even when the gate failed -- a crashed injection is exactly the
+      # case where source is most likely to have been left mutated.
+      - name: Source restored (independent witness)
+        if: always()
+        run: |
+          git diff --exit-code -- \
+            engine/src/agents/step.ts \
+            engine/src/agents/stateMachine.ts \
+            engine/src/agents/eLayerSampler.ts \
+            engine/src/mathx/format.ts \
+            engine/src/rng/streams.ts \
+            engine/src/world/build.ts \
+            engine/src/smoke/field.ts \
+            engine/src/decision/hazard.ts
+
+      # The runner parks original bytes under pipeline/out/test-tmp while an
+      # injection is live and removes them on success. Anything left there means
+      # a run died mid-injection, which must be loud rather than tidy.
+      - name: Scratch guard (no backup survived the run)
+        if: always()
+        run: npm run check:scratch
+
+  mutation-coverage:
+    name: mutation coverage (which detectors this push exercised)
+    needs: [mutation-gate, mutation-gate-full]
+    # `mutation-gate-full` is opt-in, so without `always()` this job would be
+    # skipped alongside it -- and a silently skipped bookkeeper is the same
+    # defect the bookkeeper exists to report.
+    if: always()
+    runs-on: ubuntu-latest
+    # Reads job results only; nothing is checked out.
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+    steps:
+      - name: Report
+        shell: bash
+        run: |
+          c='${{ needs.mutation-gate.result }}'
+          f='${{ needs.mutation-gate-full.result }}'
+          echo "mutation-gate=${c} mutation-gate-full=${f}"
+
+          {
+            echo "## websim mutation gate — coverage"
+            echo
+            echo "| job | result |"
+            echo "| --- | --- |"
+            echo "| mutation-gate (clean clone) | \`${c}\` |"
+            echo "| mutation-gate-full (artifact runner) | \`${f}\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          fail=0
+          if [ "$c" != "success" ]; then
+            echo "::error title=Clean-clone mutation gate did not pass::result=${c}. This job is unconditional; it must run and pass on every push."
+            fail=1
+          fi
+
+          if [ "$f" = "failure" ]; then
+            echo "::error title=Full mutation gate failed::An artifact-gated detector did not catch its injected defect on the runner that holds the oracles."
+            fail=1
+          elif [ "$f" = "success" ]; then
+            {
+              echo
+              echo "Artifact-gated detectors **were** exercised."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning title=Artifact-gated detectors NOT exercised::mutation-gate-full was ${f}; no runner holding pipeline/out and docs/runs is configured."
+            {
+              echo
+              echo "### Not proven by this push"
+              echo
+              echo "\`mutation-gate-full\` was \`${f}\`, so the detectors a clean clone cannot run were"
+              echo "**never shown able to fail** on this push:"
+              echo
+              echo "- \`engine/test/decision/oracle.trace.test.ts\` against the 477 MB decision trace"
+              echo "- the closure-reaction oracle and the Tier-1 world dumps"
+              echo "- \`build-decision-hz-slice.mjs --check\`, the only check that the committed 424-row"
+              echo "  decision slice still matches the full dump it was cut from"
+              echo
+              echo "The clean-clone job above still proves the committed-fixture detectors can fail,"
+              echo "and its own summary lists every injection it attempted and every one it deferred."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          exit "$fail"
+
+  mutation-gate-full:
+    name: injected defects must turn the FULL suite RED (artifact runner)
+    # Opt-in exactly like websim-ci.yml's strict job and the nightly: without a
+    # runner that holds pipeline/out and the archive this must not queue against
+    # a runner that does not exist. The clean-clone job above is the one that
+    # gates every PR; this one additionally exercises the artifact-gated oracles
+    # (the 477 MB decision trace, the closure-reaction oracle, the Tier-1 dumps),
+    # which are the detectors a clean clone cannot run at all.
+    #
+    # The condition used to be `|| github.event_name == 'workflow_dispatch'`,
+    # which queued this job against a possibly-nonexistent self-hosted runner on
+    # EVERY dispatch -- including a dispatch whose only purpose was to run the
+    # clean-clone job at `--scope wide`. That was survivable while nothing waited
+    # on it; `mutation-coverage` now does, so the trigger is an explicit opt-in
+    # instead of a side effect of how the run was started.
+    if: ${{ vars.WEBSIM_ARTIFACT_RUNNER == 'true' || inputs.force_artifact_runner }}
+    runs-on: ${{ vars.WEBSIM_ARTIFACT_RUNNER_LABEL || 'self-hosted' }}
+    timeout-minutes: 240
+    env:
+      # Artifact-gated suites must RUN here. A detector that silently skipped
+      # would turn "the suite caught it" into "the suite did not have the file",
+      # which is the vacuity this whole workflow exists to refuse.
+      WEBSIM_REQUIRE_ARTIFACTS: "1"
+      WEBSIM_ARCHIVE_ROOT: ${{ vars.WEBSIM_ARCHIVE_ROOT }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: websim/package-lock.json
+
+      - name: Install (clean, from the lockfile)
+        run: npm ci
+
+      - name: Catalogue is live (anchors, measured magnitudes, inert control)
+        run: npx vitest run validation/test/mutation/ --reporter=dot
+
+      # The committed decision-oracle slice is cut from the 477 MB dump this
+      # runner holds. The clean-clone job proves the slice still binds the port;
+      # only a runner with the original can prove the slice still matches the
+      # ORIGINAL it claims to be cut from. Drift here means the committed slice
+      # has silently stopped representing the certified oracle.
+      - name: Committed decision-oracle slice still matches the full dump
+        run: node validation/test/mutation/fixtures/build-decision-hz-slice.mjs --check
+
+      - name: The gate can fail (inert injection must NOT be reported as detected)
+        run: >-
+          npx tsx validation/test/mutation/run-mutation-gate.ts
+          --prove-can-fail --scope fast --require-artifacts
+
+      - name: Mutation gate (full suite, artifact-gated detectors required to run)
+        run: >-
+          npx tsx validation/test/mutation/run-mutation-gate.ts
+          --gate --scope ${{ inputs.scope || 'full' }} --require-artifacts
+          --json ${{ runner.temp }}/mutation-report-full.json
+
+      - name: Upload the mutation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-report-full-${{ github.run_id }}
+          path: ${{ runner.temp }}/mutation-report-full.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Source restored (independent witness)
+        if: always()
+        run: |
+          git diff --exit-code -- \
+            engine/src/agents/step.ts \
+            engine/src/agents/stateMachine.ts \
+            engine/src/agents/eLayerSampler.ts \
+            engine/src/mathx/format.ts \
+            engine/src/rng/streams.ts \
+            engine/src/world/build.ts \
+            engine/src/smoke/field.ts \
+            engine/src/decision/hazard.ts
+
+      - name: Scratch guard (no backup survived the run)
+        if: always()
+        run: npm run check:scratch

@@ -240,8 +240,8 @@ labelled as such: **usable for modelling, not citable as provenanced data**.
 `ReprojectingFeatureCollection`; all in-model coordinates are lon/lat degrees.
 (2) Each `MultiLineString` reduced to its first component. (3) Length **recomputed
 geodesically** — the DBF `LENGTH` column is deliberately untrusted because its unit
-is undocumented. (4) Undirected graph from `PDX_F_NODE`/`PDX_T_NODE`: **89,322 nodes
-/ 112,070 edges**.
+is undocumented. (4) Undirected graph from `PDX_F_NODE`/`PDX_T_NODE`: **88,100 nodes
+/ 109,434 edges**.
 
 > **Why the `.dbf` is checksummed separately.** The routing graph is built from node-ID
 > *attributes* stored in `Streets.dbf`, not from the geometry in `Streets.shp`. A
@@ -707,7 +707,7 @@ The sampler's console output on every run:
 
 ### 6.1 The graph
 
-89,322 nodes / 112,070 edges, built from the `PDX_F_NODE`/`PDX_T_NODE` attributes.
+88,100 nodes / 109,434 edges, built from the `PDX_F_NODE`/`PDX_T_NODE` attributes.
 **Undirected** — pedestrians are not bound by one-way vehicle restrictions
 (assumption A-06, classified *literature* rather than *assumption* because it is
 standard practice).
@@ -744,6 +744,8 @@ documented because a reader must know it existed to trust the corrected numbers.
 **The symptom.** 27 node IDs (a contiguous block, 55 features: unnamed road stubs,
 I-5 ramps, SE Harney, SE Lambert, SE 82nd, NW Skyline) were claimed by different
 features' `PDX_F_NODE`/`PDX_T_NODE` attributes at locations **9–18.5 km apart**.
+Twenty-five of those 27 survive the U-27 freeway exclusion and are the ones
+corrected in the production graph (§13.7).
 
 **The diagnosis.** `Streets.shp` has **zero multi-part features** — so this was not
 a geometry problem. It was a pure **attribute defect** in the DBF.
@@ -803,16 +805,18 @@ scatter is **sub-metre**, and the smallest corrupt displacement observed is
 
 **Results of the fix** (`docs/validation/STREET_NETWORK_VALIDATION.md`):
 
+*Mixed vintage — read with care: the "Impossible edges 50", "Max endpoint gap 18.5 km" and "Seed-42 max travel 875 min / 68.3 km" figures below are the original 2026-07-24 measurements taken on the pre-U-27 unfiltered graph, and they sit beside post-U-27 component counts (171 / 59,725, as recorded by 153 of the 154 archived run manifests).*
+
 | Metric | Before | After |
 |---|---|---|
 | Impossible edges | 50 | **0** |
 | Max endpoint gap | 18.5 km | **11.9 m** |
-| Graph components | 154 / 60,444 | **unchanged** |
+| Graph components | 171 / 59,725 | **unchanged — measured pre-U-27, not re-measured on the freeway-filtered graph** |
 | Success rates | — | unchanged |
 | Seed-42 max travel | 875 min / 68.3 km | 212 min / 16.5 km |
 | Person-hours > Unhealthy | 326 / 294 | 259 / 137 |
-| Sites reattached ≤10 m | — | 4 |
-| Sites split to synthetic negative IDs | — | 23 |
+| Sites reattached ≤10 m | — | 3 |
+| Sites split to synthetic negative IDs | — | 22 |
 
 Nothing was deleted. Every correction is written to `simulation.json` under
 `street_network_validation`, so a reader can see exactly which nodes were touched.
@@ -1705,7 +1709,7 @@ before the next facility is placed.
     print(f"  {len(cands)} candidate sites (~{GRID_M:.0f} m grid)")
 ```
 
-The 89,322-node graph is thinned to at most 500 candidates by keeping one node per
+The 88,100-node graph is thinned to at most 500 candidates by keeping one node per
 ~600 m grid cell inside the demand bounding box, then a full Dijkstra runs from each.
 
 **Complexity and the guarantee that is NOT claimed.** Greedy selection over

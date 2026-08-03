@@ -1,10 +1,14 @@
 {
+  // The DOM-free program: `engine/src` plus the Node tests. `lib` comes from
+  // tsconfig.base.json and is `["ES2022"]` with no DOM, which is the portability
+  // boundary the engine's own package description claims ("pure TypeScript, zero
+  // DOM"). Keep it that way — a DOM global that compiles here would be a runtime
+  // failure under Node or a Worker.
+  //
+  // `test-browser/**` is deliberately NOT here: it runs in a page and needs
+  // `Worker` / `MessagePort.onmessage` / `MessageEvent<T>`, so it has its own
+  // project, `tsconfig.browser.json`, with `lib: [..., "DOM"]`. Both projects are
+  // run by the `typecheck` script; neither is optional.
   "extends": "../tsconfig.base.json",
-  "include": [
-    "src/**/*.ts",
-    "test/**/*.ts",
-    "test-browser/**/*.ts",
-    "vitest.config.ts",
-    "vitest.browser.config.ts"
-  ]
+  "include": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts", "vitest.browser.config.ts"]
 }

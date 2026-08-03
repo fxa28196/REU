@@ -14,7 +14,8 @@ strange shapes, and they disappear after around 1800 ticks. Is this
 
 **Update (same day):** the §3 routing defect was subsequently corrected and
 validated — see `STREET_NETWORK_VALIDATION.md` (node-site validation layer in
-`StreetNetwork`, 27 corrupt IDs corrected, 50→0 impossible edges, all routing
+`StreetNetwork`, 25 corrupt IDs corrected in the current post-U-27 graph
+(27 on the unfiltered graph measured that day), 50→0 impossible edges, all routing
 tests pass). The display styling (§1) and the co-location perception (§2)
 remain as described and are deliberately untouched.
 
@@ -99,7 +100,9 @@ node claims by location, reattaches or splits corrupted sites with full
 provenance, and audits every edge — `routing_anomaly.n_flagged` dropped to 0
 (the single residual flag is a 213 m encampment-snap first leg, verified).
 Method, evidence and before/after results: `STREET_NETWORK_VALIDATION.md`.
-`STRUC_TYPE`/`TYPE`-based freeway exclusion remains tracked as roadmap #6.
+`TYPE`-based freeway exclusion has since been implemented (U-27): 2,636
+features / 614 km carrying `TYPE` ∈ {1110, 1120, 1121, 1122, 1123} are excluded
+from the pedestrian graph before it is built.
 
 ## 4. How this was verified
 
