@@ -37,8 +37,9 @@ and refusal at full facilities. It contains 6,842 residents, the 2025
 Point-in-Time unsheltered count for Multnomah County, each starting at a real
 reported campsite and carrying a sampled age, sex, mobility status, and
 respiratory health. The smoke is measured, not modeled: hourly readings from the
-September 2020 event. Four siting and intake scenarios were compared across nine
-random seeds. The present 36-facility system shelters 30.1\% of residents.
+September 2020 event. Three siting scenarios were compared across nine random
+seeds, and a fourth, intake-rule scenario across three. The present 36-facility
+system shelters 30.1\% of residents.
 Raising capacity to match the population, without moving any facility, shelters
 91.6\%; because capacity then equals population exactly, the arithmetic is
 forced --- 578 spaces finish the event empty, equal to the 550 residents refused
@@ -212,7 +213,7 @@ exact bytes that produced it.}
 Dataset & Source & Retrieved & Content \\
 \noalign{\smallskip}\svhline\noalign{\smallskip}
 Hourly PM$_{2.5}$ & U.S. EPA Air Quality System, parameter 88502 \cite{epaaqs2020} & 2026-07-24 & 4,795 rows; 312 hourly slices, no gaps \\
-Street centerlines & Portland Metro RLIS & not recorded & 112,070 polylines; 89,322-node graph \\
+Street centerlines & Portland Metro RLIS & not recorded & 112,070 polylines; 88,100-node graph \\
 Encampment points & City of Portland campsite reports \cite{portlandcampsites} & 2026-07-24 & 3,400 points; 2,981 used \\
 Shelter inventory & Multnomah County HSD \cite{multcohsd}; City of Portland \cite{portlandsrv} & 2026-07-24 & 36 facilities, 2,234 spaces \\
 Population count & 2025 Tri-County Point-in-Time count \cite{psupit2025} & 2026-07-25 & 6,842 unsheltered \\
@@ -444,7 +445,7 @@ directly into the equity result in Sect.~\ref{sec:equity}.}
 \subsubsection{Movement and routing}
 \label{sec:movement}
 
-The street map becomes a network of 89,322 intersections and 112,070 segments,
+The street map becomes a network of 88,100 intersections and 109,434 segments,
 each carrying its true length along the curve of the earth \cite{karney2013}. The
 map file's own length field is deliberately ignored, because its units are
 undocumented.
@@ -459,7 +460,7 @@ far along their route, with partial segments finished by an exact geographic
 calculation, so movement follows the street network along its true curved length
 rather than cutting across in a straight line.
 
-\textbf{A defect in the street data.} During validation I found 27 intersection
+\textbf{A defect in the street data.} During validation I found 25 intersection
 identifiers each claimed by two or more different street features, at locations 9
 to 18.5 km apart. The map file contains no legitimately multi-part shapes, so
 this was an error in labeling rather than a feature of the geography, and the
@@ -476,8 +477,8 @@ scatter between the endpoints of connecting streets is under a meter, while the
 smallest corrupt displacement is about 1.65 km, and any separating distance
 chosen between those two regimes produces an identical corrected network. Every
 duplicate claim beyond the first was therefore either reattached to a genuinely
-coincident junction, covering 4 cases, or assigned a newly created intersection
-at its true location, covering the remaining 23. After correction, the number of
+coincident junction, covering 3 cases, or assigned a newly created intersection
+at its true location, covering the remaining 22. After correction, the number of
 segments whose stated length was inconsistent with the distance between their
 endpoints fell from 50 to zero, the largest endpoint gap fell from 18.5 km to
 11.9 m, and the connectivity of the network was unchanged. Every correction is
@@ -594,8 +595,9 @@ choice of ten sites are policy parameters I selected, not measured quantities.
 Everything except the shelter file is held identical across scenarios: the same
 6,842 residents with the same identifiers, start coordinates, ages, sexes,
 mobility statuses, respiratory conditions, and walking speeds; the same smoke
-measurements; the same street graph; the same parameters. Each scenario was run
-with nine random seeds, 42 through 50, giving 27 runs. Changing the seed changes
+measurements; the same street graph; the same parameters. Scenarios A, B and C
+were each run with nine random seeds, 42 through 50, giving 27 runs; scenario D
+was run at seeds 42 through 44. Changing the seed changes
 which residents receive which attributes while leaving the population
 distribution the same. Every result below is from seed 42, with the range across
 all nine seeds alongside.
@@ -647,12 +649,12 @@ Today's system shelters 2,060 of 6,842 residents, or 30.1\%. Capacity binds hard
 4,754 residents are turned away because every facility they can reach is full,
 and 33 of the 36 facilities finish the event at capacity. Raising capacity to
 meet demand at the same locations lifts this to 6,264, or 91.6\%, a factor of
-3.04. Total modeled exposure falls 87.3\% and mean walking distance falls 56.5\%.
+3.04. Total modeled exposure falls 87.3\% and mean walking distance falls 56.7\%.
 
 One caution about how these numbers should be read. This chapter reports four
 exposure measures --- total modeled exposure, mean hours above threshold, mean
 inhaled dose, and person-hours above threshold --- and they fall by 87.3\%,
-87.1\%, 87.1\%, and 86.9\%. These are not four independent confirmations of one
+87.1\%, 86.9\%, and 87.1\%. These are not four independent confirmations of one
 result. Because the PM$_{2.5}$ field is spatially uniform in this model, all four
 are time spent outdoors multiplied by a constant, so they must move together.
 They are reported separately because different audiences use different units, not
@@ -725,12 +727,13 @@ sites. Refusals fall from 550 to 244 and empty spaces from 578 to 272. Mean
 walking distance falls a further 25\%, total modeled exposure a further 50.7\%,
 and mean inhaled dose from 3,056 to 1,536 $\mu$g. Fig.~\ref{fig:map} shows the
 spatial arrangement. Measured against today's system, C shelters 3.19 times as
-many residents, reduces total modeled exposure by 93.8\%, and mean distance
+many residents, reduces total modeled exposure by 93.7\%, and mean distance
 walked by 68\%.
 
 The attribution matters, and a control settles it. Ten sites drawn uniformly at
 random from the same 498-node candidate pool the optimizer searched reproduce
-C's sheltered count exactly, in every seed. The headcount gain over B is
+C's sheltered count exactly, in every seed tested (42, 43 and 44). The
+headcount gain over B is
 therefore \emph{dispersion} --- the same total split across more doors --- and
 not the optimizer's choice of doors; siting optimization earns its credit on
 walking distance alone, and that credit is conditional on residents knowing
@@ -814,7 +817,7 @@ Their share of all left outside (\%) & 23 & 65 & 70 \\
 \end{tabular}
 \end{table}
 
-These measures disagree because of a ceiling effect. At 96.4\% access in scenario
+These measures disagree because of a ceiling effect. At 96.3\% access in scenario
 B, residents who walk without difficulty have almost no room left to improve, so
 a percentage-point difference is compressed on one side of the comparison and not
 the other. Reporting the percentage-point gap alone would present as widening
@@ -846,7 +849,7 @@ Two further results bound the finding, and both contradicted this study's own
 registered predictions, which is reported here deliberately. A capacity sweep
 at B's real sites shows the mobility gap is a property of the scarcity band
 where capacity approximately equals demand: $1.05\times$ demand (342 surplus
-spaces) already matches C's admissions --- without closing the gap (14.9 pp)
+spaces) already matches C's admissions --- without closing the gap (15.0 pp)
 --- and at $1.1\times$ (684 spaces) every reachable resident is admitted and
 the gap vanishes. We predicted the crossing would require $1.4$--$1.6\times$
 and that the gap would persist under surplus; both predictions were wrong, and

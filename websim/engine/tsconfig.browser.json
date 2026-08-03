@@ -1,0 +1,47 @@
+{
+  // Typecheck project for the browser-context sources ONLY: `engine/test-browser/**`,
+  // which runs inside a page (and a real `Worker`) under
+  // `engine/vitest.browser.config.ts`.
+  //
+  // ## Why this is a SEPARATE project rather than `lib: ["DOM"]` in the base
+  //
+  // `engine/package.json` describes the engine as "pure TypeScript, zero DOM"; that
+  // is a portability boundary, not a slogan — the same `engine/src` has to compile
+  // and run under Node, a Web Worker and (per `vitest.browser.config.ts`) three
+  // different JS engines. `tsconfig.base.json` therefore sets `lib: ["ES2022"]` with
+  // no DOM, so any accidental `document`/`window`/`Worker` reference inside
+  // `engine/src` is a compile error rather than a runtime surprise on the platform
+  // that lacks it.
+  //
+  // `engine/tsconfig.json` used to include `test-browser/**` in that DOM-free
+  // program. That could never have typechecked — the browser tests legitimately
+  // construct `new Worker(...)`, set `MessagePort.onmessage` and read
+  // `MessageEvent<T>.data` — and it did not: it produced 7 errors, which is why
+  // `npm run typecheck` (and therefore all of `npm run ci`) exited 2 at its first
+  // step. Adding DOM to the base would have silenced them by DELETING the boundary
+  // for every file in the tree, which is the opposite of the fix.
+  //
+  // Splitting the browser sources into their own project gives them exactly the
+  // globals their host has, and leaves `engine/tsconfig.json` — the program that
+  // covers `engine/src/**` and the Node tests — DOM-free. `engine/src` is compiled
+  // by BOTH projects (the browser tests import it), so the boundary is still
+  // enforced: a DOM reference added to `engine/src` stays an error in
+  // `engine/tsconfig.json`, and being permitted by this one changes nothing about
+  // that. `engine/test/no-dom.boundary.test.ts` asserts the arrangement so it cannot
+  // silently regress.
+  //
+  // Wired into CI via engine's `typecheck` script, which runs both projects.
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    // ES2022 stays; DOM + DOM.Iterable are what a page and a Worker actually have.
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    // No `["node"]`. @types/node redeclares `MessagePort`, `MessageEvent`, `Worker`
+    // and `performance` with worker_threads/undici shapes that do NOT match the web
+    // ones, so leaving it on would keep resolving `onmessage` and `MessageEvent<T>`
+    // against the Node declarations and reproduce the very errors this project
+    // exists to fix. Nothing under `test-browser/` imports a `node:` module — by
+    // construction, since it runs in a browser.
+    "types": []
+  },
+  "include": ["test-browser/**/*.ts"]
+}

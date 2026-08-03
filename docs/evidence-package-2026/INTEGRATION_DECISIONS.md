@@ -164,7 +164,7 @@ interchangeable — the package's own totals mix them).
 
 | Item | Reason |
 |---|---|
-| `03-BUILD-INPUTS/make_all_inputs.py` 60×60 fallback grid | The repo has the real validated RLIS street graph — 89,345 nodes, topology repaired. The package's own START_HERE says "yours is better once unzipped." It is unzipped |
+| `03-BUILD-INPUTS/make_all_inputs.py` 60×60 fallback grid | The repo has the real validated RLIS street graph — 88,100 nodes, topology repaired. The package's own START_HERE says "yours is better once unzipped." It is unzipped |
 | Reconstructed DEQ PM2.5 series | The repo uses real EPA AQS hourly data, externally validated to a ratio of 1.0000, with EPA's own wildfire qualifier confirming the event window. The package notes its series "is not AirNow" |
 | `05-REPAST-JAVA/src/wildfire/*.java` | Written against an earlier repo state ("GisAgent deletes agents on arrival"). No agent has been removable for many commits; capacity, persistence, exposure accumulation and file output all exist and are verified |
 | Haversine × 1.4 travel approximation | The repo does true Dijkstra shortest paths over the real network with geodesic edge weights |

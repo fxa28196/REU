@@ -54,6 +54,7 @@ import { PARAM_NAMES, PRESETS, parseRunConfig, type RunConfig } from "@websim/sh
 import { describeArchive } from "@websim/pipeline/archive";
 
 import { readFrame } from "./frame.js";
+import { JAVA_CODE_DEFAULTS } from "./java-defaults.js";
 
 // ---------------------------------------------------------------------------
 // The replay matrix
@@ -99,24 +100,22 @@ export const ARCHIVE_REPLAY_CASES: readonly ReplayCase[] = [
 ];
 
 /**
- * `ContextCreator.doubleParam(parm, name, fallback)` fallbacks for the eight
- * Scenario-E names a 33-parameter `phase-e/` manifest does not carry.
+ * `ContextCreator.{int,double}Param(parm, name, fallback)` fallbacks.
  *
- * These are the values the Java build actually executed in those runs — the
- * batch file omitted the block entirely, so the code default applied. The
- * archived E0-null manifests corroborate `pushThetaThreshold = -0.25`
+ * These are the values the Java build actually executed when a batch file
+ * omitted a name — the case that matters here is the eight Scenario-E names a
+ * 33-parameter `phase-e/` manifest does not carry. The archived E0-null
+ * manifests corroborate `pushThetaThreshold = -0.25`
  * (WP8-SPEC-archive-gates.md §1.8, §6.1 evidence table).
+ *
+ * WP9 needed the same mechanism for the 11-parameter `present-day-three-arm/`
+ * manifests, which are missing 30 names rather than 8, so the table now IS
+ * {@link JAVA_CODE_DEFAULTS} — one transcription of `ContextCreator.build()`
+ * instead of two that could disagree. Widening it changes nothing for the
+ * twelve WP8 cases: a name the manifest carries is never looked up here, and
+ * those manifests carry all 33 of the others.
  */
-export const CODE_FALLBACKS: Readonly<Record<string, number>> = {
-  smokeSeriesCode: 0,
-  smokeScale: 1.0,
-  closuresCode: 0,
-  pStuck: 0.3,
-  stuckDelayH: 3.0,
-  pushThetaThreshold: -0.25,
-  kPush: 1.0,
-  closureDraw: 1,
-};
+export const CODE_FALLBACKS: Readonly<Record<string, number>> = JAVA_CODE_DEFAULTS;
 
 export interface ArchivedManifest {
   readonly reproducibility: { readonly parameters: Record<string, number> };

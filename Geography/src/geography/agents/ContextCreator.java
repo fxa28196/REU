@@ -43,7 +43,7 @@ import repast.simphony.space.gis.GeographyParameters;
  * docs/science/DATA_SOURCES.md):
  * <ol>
  *   <li>WGS84 "Geography" projection + routable {@link StreetNetwork} from the
- *       real City-of-Portland RLIS street centerlines (D0).</li>
+ *       real Oregon Metro RLIS street centerlines (D0).</li>
  *   <li>{@link SmokeField} — hourly PM2.5 from EPA AQS (D3).</li>
  *   <li>Real September-2020 {@link Shelter}s from
  *       {@code data/shelters/shelters_2020-09.csv} (D1), snapped to graph nodes

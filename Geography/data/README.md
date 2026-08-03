@@ -24,10 +24,10 @@ Get-FileHash Geography\data\<file> -Algorithm SHA256
 | Field | Value |
 |---|---|
 | Files | `Streets.shp` (17,035,988 B), `Streets.dbf` (33,734,352 B), `Streets.shx` (896,660 B), `Streets.prj` (425 B), `Streets.cpg` (5 B) |
-| Source organisation | Portland Metro Regional Land Information System (RLIS) street centerlines — schema confirmed by the `PDX_F_NODE`/`PDX_T_NODE`, `LCITY`/`RCITY`, `CFCC`, `LEFTADD1` attribute set |
+| Source organisation | **Regional Land Information System (RLIS), Oregon Metro** — street centerlines; schema confirmed by the `PDX_F_NODE`/`PDX_T_NODE`, `LCITY`/`RCITY`, `CFCC`, `LEFTADD1` attribute set. (RLIS is an Oregon Metro programme, **not** a City of Portland one.) |
 | Provenance into this repo | Supplied with the inherited project as `Streets.zip` at the repo root (SHA-256 `DA0473722532FCA64877570B48284AE178DAC101214F32F0B14F80DC6401A7BE`, 16,219,928 B); extracted here without modification. **Original download date and RLIS release version are unknown** — the file predates this repository's version control. |
 | Publication/version | ⚠️ **UNVERIFIED.** `UPD_DATE`/`CREATE_DAT` columns exist per-feature and can date the vintage; a formal RLIS release identifier has not been recovered. Flagged in DATA_SOURCES.md as an open provenance gap. |
-| Licence | ⚠️ **UNVERIFIED for redistribution.** Metro RLIS data is commonly distributed under a Metro data licence; because the acquisition route is unknown, treat redistribution as unconfirmed until checked against Metro's current terms before any public release (roadmap commit 16). |
+| Attribution / redistribution | **Redistributed with the provider's approval.** Credit as: *Regional Land Information System (RLIS), Oregon Metro.* **The researcher reports that Oregon Metro approved redistribution of the RLIS-derived products in this repository (relayed 2026-08-02).** Recorded exactly that strongly and no more: **no written determination from Metro is on file anywhere in this repository** — what exists is the researcher's report of the approval. No licence name, licence version, licence URL, reference number, contact name or approval date is claimed, because none has been recorded. The *release-version* gap in the row above is a separate matter and is **not** closed by this approval. |
 | Geographic coverage | Portland metropolitan area (Multnomah and adjacent counties) |
 | Temporal coverage | Static snapshot (single vintage, no time dimension) |
 | CRS as stored | `WGS_1984_Web_Mercator_Auxiliary_Sphere` (EPSG:3857) |
@@ -44,10 +44,13 @@ Get-FileHash Geography\data\<file> -Algorithm SHA256
    recomputed length in metres** — the DBF `LENGTH` column is *not* trusted
    because its unit is undocumented in the file.
 4. Undirected routing graph built from `PDX_F_NODE`/`PDX_T_NODE`
-   (89,322 nodes / 112,070 edges), edge weight = geodesic polyline length.
+   (88,100 nodes / 109,434 edges), edge weight = geodesic polyline length.
 
-**Known limitations:** freeway/limited-access segments are **not yet filtered**
-from the pedestrian graph (CFCC codes are present and can drive this); no
+**Known limitations:** freeway/limited-access segments **are filtered** out of
+the pedestrian graph as of U-27 — 2,636 features / 614 km carrying `TYPE` ∈
+{1110, 1120, 1121, 1122, 1123} (freeway mainlines and ramps, including the
+Marquam and Fremont bridge decks) are excluded before the graph is built,
+leaving 109,434 of the 112,070 polylines routable; no
 sidewalk, crossing, or barrier modelling; dropping to `getGeometryN(0)` discards
 any multi-part geometry beyond the first part.
 
@@ -161,9 +164,9 @@ System (AQS) pre-generated hourly data files, parameter 88502, 2020.* Retrieved
 | Field | Value |
 |---|---|
 | File | `encampments/irp_campsite_reports_sample.csv` (SHA-256 `3e557de5db4668c5d30fd7a6fc13bcc38b5e37bab4b9becaf9b3dc35366285ca`; 3,400 points) |
-| Source | **City of Portland IRP Campsite Reports** (Impact Reduction Program / One Point of Contact, via 311 and pdxreporter.org), ArcGIS Feature Service `COP_OpenData_Miscellaneous/MapServer/1396`; DATA_SOURCES D2b |
+| Source | **City of Portland IRP Campsite Reports** (Impact Reduction Program / One Point of Contact, via 311 and pdxreporter.org), obtained from the City's open-data ArcGIS Feature Service `COP_OpenData_Miscellaneous/MapServer/1396`; DATA_SOURCES D2b |
 | Retrieved | 2026-07-24 via `scripts/fetch-encampments.ps1` (non-duplicate reports, systematic sample across the OBJECTID range) |
-| Licence | City of Portland open data (public) |
+| Attribution / redistribution | **Redistributed with the provider's approval.** Credit as: *City of Portland, Impact Reduction Program campsite reports* (obtained via the City's open-data ArcGIS service). **The researcher reports that the City of Portland approved redistribution of the campsite-report-derived products in this repository (relayed 2026-08-02).** Recorded exactly that strongly and no more: **no written determination from the City is on file anywhere in this repository** — what exists is the researcher's report of the approval. No licence name, licence version, licence URL, reference number, contact name or approval date is claimed, because none has been recorded. |
 | Geographic coverage | Portland (lon −122.79..−122.48, lat 45.44..45.65) |
 | Temporal coverage | **2025-01-08 .. 2026-07-23** |
 | ⚠️ CRITICAL limitation | The open-data feed retains only a rolling recent window — **there are ZERO records for 2020.** These are REAL reported Portland encampment locations but from 2025–26, used as a **spatial-distribution proxy** for the Sept-2020 population. This is a flagged assumption; `ContextCreator` prints a runtime warning. |

@@ -22,20 +22,34 @@ the model), [`VALIDATION_STRATEGY.md`](VALIDATION_STRATEGY.md),
 
 | Field | Value |
 |---|---|
-| Source organisation | Portland Metro RLIS (inferred from schema; acquisition route unknown) |
+| Source organisation | **Regional Land Information System (RLIS), Oregon Metro** (inferred from schema; acquisition route unknown). RLIS is an Oregon Metro programme, not a City of Portland one |
 | Publication date | ⚠️ Unknown — predates version control |
 | Geographic coverage | Portland metro / Multnomah County |
 | Temporal coverage | Static snapshot |
-| Licence | ⚠️ Unverified for redistribution |
+| Attribution / redistribution | Redistributed with the provider's approval — credit as *Regional Land Information System (RLIS), Oregon Metro*. See the attribution note below for exactly what form that approval takes |
 | Completeness | 112,070 features; 100% carry `PDX_F_NODE`/`PDX_T_NODE` |
 | Uncertainty | Centerline geometry, not sidewalk geometry; no pedestrian attributes |
-| Limitations | Freeway segments not yet excluded from the pedestrian graph; `getGeometryN(0)` discards multi-part remainders |
+| Limitations | Freeway segments **are** excluded from the pedestrian graph as of U-27 — 2,636 features / 614 km with `TYPE` ∈ {1110, 1120, 1121, 1122, 1123}, leaving 109,434 routable polylines; `getGeometryN(0)` discards multi-part remainders |
 | In use | Yes — routing graph + street layer (commit `5092fde`) |
 
-**Action required before publication:** re-acquire from Metro's official
-distribution (https://gis-pdx.opendata.arcgis.com / Metro RLIS) to establish a
-citable release version and explicit licence, then re-checksum. Until then the
-street layer is *usable for modelling* but **not citable as provenanced data**.
+**Attribution.** Street centerlines are credited to the **Regional Land
+Information System (RLIS), Oregon Metro**. The RLIS-derived products in this
+repository are redistributed with the provider's approval. That approval is
+recorded exactly this strongly and no more strongly: **the researcher reports
+that Oregon Metro approved the redistribution (relayed 2026-08-02)**. There is
+**no written determination from Oregon Metro on file anywhere in this
+repository**, and no reference number, contact name, approval date, licence
+name, licence version or licence URL is claimed here, because none has been
+recorded. A reader asking "where is the paperwork?" should be told: there is
+none in the repo — the approval was relayed by the researcher.
+
+**Action still required before publication (redistribution approval does *not*
+close this):** re-acquire from Metro's official distribution
+(https://gis-pdx.opendata.arcgis.com / Metro RLIS) to establish a **citable
+release version**, then re-checksum. Redistribution is now covered; the
+*vintage* is not. Until the release version is established, the street layer is
+*usable for modelling* and *redistributable*, but still **not citable as
+provenanced data**.
 
 ---
 
@@ -104,11 +118,22 @@ City parks facility dataset + OCC address; (3) commit as
 and the age/disability sub-tables should drive V1/V3 rather than any invented
 distribution.
 
-**Companion gap — encampment locations (D2b, GAP):** the City of Portland
-"One Point of Contact" campsite-report data is the usual candidate, but it is
-a *complaint-report* dataset (reporting bias toward visible, complained-about
-camps) and its public availability/licensing for 2020 has not been verified.
-Until resolved, agent start locations remain a documented placeholder.
+**Companion gap — encampment locations (D2b):** the City of Portland
+"One Point of Contact" / Impact Reduction Program campsite-report data is the
+usual candidate, but it is a *complaint-report* dataset (reporting bias toward
+visible, complained-about camps) and **no 2020 records exist in the public
+feed** — see the summary table and the acquired 2025–26 spatial proxy recorded
+in [`../../Geography/data/README.md`](../../Geography/data/README.md) §2c.
+
+**Attribution (D2b).** Credit as: **City of Portland**, Impact Reduction
+Program campsite reports, obtained via the City's open-data ArcGIS service. The
+campsite-report-derived products in this repository are redistributed with the
+provider's approval, recorded exactly this strongly and no more strongly: **the
+researcher reports that the City of Portland approved the redistribution
+(relayed 2026-08-02)**. There is **no written determination from the City on
+file anywhere in this repository**, and no reference number, contact name,
+approval date, licence name, licence version or licence URL is claimed here,
+because none has been recorded.
 
 ---
 

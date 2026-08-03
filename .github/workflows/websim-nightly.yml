@@ -1,0 +1,422 @@
+name: websim nightly full-archive validation
+
+# Plan section 5.3: "Nightly full-archive job on a self-hosted/local runner over
+# the 375 MB archive." This is that job, and it is deliberately a SEPARATE file
+# from websim-ci.yml rather than another job inside it.
+#
+# Why separate:
+#
+#   * different trigger. The per-push workflow runs on `push` and
+#     `pull_request` and must stay fast enough to gate a PR. This one runs on a
+#     schedule and replays seventeen 6,842-agent configurations end to end,
+#     which is roughly four minutes of engine on a warm runner and longer on a
+#     cold one -- and then scores every ported gate over the results.
+#   * different runner. The full-archive work cannot run on a hosted runner at
+#     all: the 375 MB `docs/runs/` archive lives outside the repository and is
+#     never committed (see websim/validation/working-set/README.md). A hosted
+#     runner asked to do it would produce a job that is red every night for a
+#     reason that is not a defect, which is how a nightly job stops being read.
+#     (This file DOES have a hosted job -- `degraded-clean-clone` -- but it is
+#     asked to do only what a clean clone can do, and it says so in its name.)
+#   * different failure meaning. A red build job means "this change broke
+#     something". A red nightly means "the port and the certified Java
+#     instrument have diverged", which is a release-blocking scientific finding
+#     and is escalated differently.
+#
+# The per-push `strict-artifacts` job in websim-ci.yml covers the same gates on
+# whatever archive that runner holds -- typically the curated ~40 MB working
+# set. This job is what covers the FULL archive: `wp9-archive-gates.test.ts`
+# alone walks all 60 Phase-E / Scenario-E run directories.
+#
+# ---------------------------------------------------------------------------
+# WHY THERE ARE THREE JOBS AND NOT ONE  (the inert-nightly defect, fixed)
+# ---------------------------------------------------------------------------
+#
+# This file used to contain exactly one job, guarded by
+#
+#     if: vars.WEBSIM_ARTIFACT_RUNNER == 'true' || github.event_name == 'workflow_dispatch'
+#
+# and nothing else. On the 07:10 schedule with that repository variable unset --
+# which is its state as far as anything in this tree records -- the single job
+# was SKIPPED and the workflow REPORTED SUCCESS having executed nothing at all.
+# A nightly badge that is green because no work was attempted is strictly worse
+# than having no nightly job: it manufactures the appearance of continuous
+# validation out of an unset variable.
+#
+# The fix is the same discipline `websim/tools/artifact-gate.ts` already enforces
+# INSIDE the test suite, lifted to the workflow level. That module's rule is:
+# never silently vanish; run what the artifacts allow, and say out loud, in the
+# run's own output, which gate did not run and what evidence was therefore not
+# collected. Three outcomes, never two. So:
+#
+#   full-archive        the real nightly. Runs only where the archive exists.
+#   degraded-clean-clone  the EXACT COMPLEMENT of that condition, on a hosted
+#                       runner. It runs every check a clean clone can run, then
+#                       republishes every `!!` banner the suite printed into the
+#                       job summary and into GitHub warning annotations, so the
+#                       forgone evidence is named on the run page rather than
+#                       buried in a log. It is titled DEGRADED, because a green
+#                       tick beside that name is not a claim about the archive.
+#   nightly-verdict     the structural guarantee. It runs with `if: always()`
+#                       and FAILS when neither of the two above did any work.
+#                       "The workflow reported success having run nothing" is
+#                       now impossible rather than merely unlikely.
+#
+# The two working jobs are conditioned on a boolean and its negation, so exactly
+# one of them runs on every trigger. Deleting the conditional outright was
+# considered and rejected: a hosted runner genuinely cannot reach the 375 MB
+# archive, so an unconditional job would be red every night for a reason that is
+# not a defect -- the failure mode the "different runner" note above warns about.
+# Making the degradation VISIBLE is the honest middle, and `nightly-verdict` is
+# what stops "visible" from decaying back into "silent".
+
+on:
+  schedule:
+    # 07:10 UTC daily. Offset off the hour because GitHub queues scheduled jobs
+    # in bursts on the hour and a self-hosted runner should not be waiting.
+    - cron: "10 7 * * *"
+  workflow_dispatch:
+    inputs:
+      force_artifact_runner:
+        description: >-
+          Run the full-archive job even when WEBSIM_ARTIFACT_RUNNER is unset.
+          Only useful when a runner carrying WEBSIM_ARTIFACT_RUNNER_LABEL (default
+          `self-hosted`) is actually online and holds docs/runs/ and
+          pipeline/out/ -- otherwise the job queues against a runner that does
+          not exist and waits until it is cancelled. Left off, a dispatch runs
+          the degraded clean-clone job instead, which is a real (smaller) run
+          rather than a skip.
+        type: boolean
+        default: false
+      archive_root:
+        description: >-
+          Override WEBSIM_ARCHIVE_ROOT for this run (defaults to the repository
+          variable, else docs/runs/). Point it at a materialised working set to
+          rehearse the job on a partial archive -- the harness will REFUSE and
+          name every missing run, which is the intended behaviour, not a bug.
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  # Never let two nightlies overlap on one runner: they write the same
+  # pipeline/out/wp9-validation tree.
+  group: websim-nightly
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: websim
+
+jobs:
+  full-archive:
+    name: full-archive replay (Tiers 1-4) + VALIDATION_REPORT.json
+    # Runs where the archive is. `degraded-clean-clone` below carries the exact
+    # negation of this expression, so on every trigger one of the two runs and
+    # the schedule can no longer produce a workflow that did nothing.
+    if: ${{ vars.WEBSIM_ARTIFACT_RUNNER == 'true' || inputs.force_artifact_runner }}
+    runs-on: ${{ vars.WEBSIM_ARTIFACT_RUNNER_LABEL || 'self-hosted' }}
+    timeout-minutes: 180
+    env:
+      # The whole point: no artifact-gated suite may skip on this runner. A
+      # suite that would have skipped is a hard failure, which is what stops the
+      # nightly from being green-by-vacuity (plan section 5.2).
+      WEBSIM_REQUIRE_ARTIFACTS: "1"
+      WEBSIM_ARCHIVE_ROOT: ${{ inputs.archive_root || vars.WEBSIM_ARCHIVE_ROOT }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: websim/package-lock.json
+
+      - name: Install (clean, from the lockfile)
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      # Fails loudly and names every absent run before an hour of engine time is
+      # spent. `--only` on a target the archive lacks exits 2 with the run named,
+      # so a partial archive cannot be mistaken for a passing nightly.
+      - name: Archive present and complete
+        run: npx tsx validation/scripts/wp9-validation-report.ts --only present-day-three-arm/A-seed42
+
+      # Everything, with artifact gates required. This is where the 60-run
+      # archive gate suite, the WP8 twelve-config replay, the Tier-4 attribution
+      # and the WP9 seventeen-config acceptance suite all actually execute.
+      - name: Full suite (artifact-gated suites REQUIRED to run)
+        run: npm run test:strict
+
+      # The shipped artifact, regenerated nightly against the full archive. The
+      # script exits non-zero when the report is not green or fails its own
+      # schema, so this step is a gate and not a dump.
+      - name: Replay the working set and emit VALIDATION_REPORT.json
+        run: npx tsx validation/scripts/wp9-validation-report.ts
+
+      # Retained even on failure: a red nightly is exactly when somebody needs
+      # the per-configuration census and the attribution of every divergence.
+      - name: Upload the validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-report-${{ github.run_id }}
+          path: |
+            websim/pipeline/out/wp9-validation/VALIDATION_REPORT.json
+            websim/pipeline/out/wp9-validation/full-run.log
+          if-no-files-found: warn
+          retention-days: 30
+
+      # The golden summaries and the working-set manifest are committed digests
+      # of the archive. Only a runner that HOLDS the archive can prove they still
+      # describe it; on every other runner they are just files that parse.
+      - name: Golden summaries still match the archive
+        run: npx tsx pipeline/scripts/build-golden-summaries.ts --check
+
+      - name: Working-set manifest still matches the archive
+        run: npx tsx pipeline/scripts/build-working-set-manifest.ts --check
+
+      # Same guard as the per-push jobs. This runner holds pipeline/out, so
+      # leftover scratch sits next to the artifacts an artifact gate probes for,
+      # and a new produced directory that nobody allowlisted turns the job red
+      # instead of drifting.
+      - name: Scratch guard (the suite left nothing behind under pipeline/out)
+        if: always()
+        run: npm run check:scratch
+
+      - name: Claim linter
+        run: npm run lint:claims
+
+      # Decoration only: it asserts nothing and writes no evidence, it just puts
+      # the run's provenance on the summary page. `continue-on-error` because the
+      # runner behind WEBSIM_ARTIFACT_RUNNER_LABEL is not described anywhere in
+      # this tree, and a cosmetic step must not be the thing that reddens a
+      # nightly that actually validated the archive. Every step above it is a real
+      # gate and none of them is tolerant.
+      - name: Record the verdict in the run summary
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: |
+          {
+            echo "## websim nightly — FULL ARCHIVE"
+            echo
+            echo "Ran on \`${{ runner.name }}\` with \`WEBSIM_REQUIRE_ARTIFACTS=1\`:"
+            echo "every artifact-gated suite was REQUIRED to execute, so a suite that"
+            echo "would have skipped failed this job instead."
+            echo
+            echo "Archive root: \`${WEBSIM_ARCHIVE_ROOT:-docs/runs/ (default)}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  degraded-clean-clone:
+    # The name is load-bearing. This job's green tick means "the clean-clone
+    # subset passed", never "the nightly validated the archive", and the name is
+    # the only part of it a reader sees on the checks list.
+    name: DEGRADED nightly — no artifact runner, clean-clone subset only
+    # The exact negation of `full-archive`'s condition. Exactly one of the two
+    # runs on every trigger; that is what removes the do-nothing-and-report-green
+    # outcome the schedule used to produce.
+    if: ${{ !(vars.WEBSIM_ARTIFACT_RUNNER == 'true' || inputs.force_artifact_runner) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      # Set to "0" EXPLICITLY rather than left unset, so the honest reading of
+      # this job is on the record: it knowingly runs degraded, and every gate it
+      # cannot run prints a `!!` banner naming the artifact and the evidence
+      # forgone. The step below republishes those banners where they can be read.
+      WEBSIM_REQUIRE_ARTIFACTS: "0"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: websim/package-lock.json
+
+      - name: Install (clean, from the lockfile)
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      # `set -o pipefail` matters: without it the step's exit status would be
+      # tee's, and a failing suite would be reported as a passing step.
+      - name: Clean-clone suite (artifact-gated suites skip, loudly)
+        id: suite
+        shell: bash
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee "${RUNNER_TEMP}/clean-clone-test.log"
+
+      # This is the step that makes the degradation legible, and it is derived
+      # from the run rather than written down here: the `!!` banners the artifact
+      # gate prints already name the gate id, the suite, the evidence forgone,
+      # the missing path and the command that produces it. Republishing them into
+      # the job summary means this file cannot go stale about which gates a
+      # hosted runner misses -- the suite says so, every night.
+      #
+      # It also enforces NON-VACUITY in the other direction. A clean clone has no
+      # pipeline/out and no docs/runs, so some gate MUST have reported itself
+      # absent. Zero banners on a hosted runner does not mean "nothing was
+      # forgone"; it means the gates stopped announcing themselves, which is the
+      # exact failure `tools/artifact-gate.ts` exists to prevent, and it fails
+      # this job.
+      - name: Degradation report — name every gate this runner could not run
+        if: always()
+        shell: bash
+        run: |
+          log="${RUNNER_TEMP}/clean-clone-test.log"
+          suite='${{ steps.suite.outcome }}'
+
+          if [ "$suite" != "success" ] && [ "$suite" != "failure" ]; then
+            # The suite step never ran -- an earlier step (install, typecheck)
+            # already failed and already said why. Do not pile a second, less
+            # informative error on top of it.
+            echo "the clean-clone suite did not run (outcome='${suite}'); an earlier step failed."
+            echo "The clean-clone suite did not run (outcome \`${suite}\`)." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          if [ ! -f "$log" ]; then
+            echo "::error title=No suite log::The clean-clone suite ran (outcome=${suite}) but produced no log at ${log}; nothing can be said about what this run did or did not prove."
+            exit 1
+          fi
+
+          # `|| true` because grep exits 1 on no match, which is a state this
+          # step has to REPORT rather than crash on.
+          gates=$(grep -c '^!! ARTIFACT-GATED SUITE SKIPPED' "$log" || true)
+          reduced=$(grep -c '^!! ARTIFACT-GATED FIXTURE ABSENT' "$log" || true)
+
+          {
+            echo "## websim nightly — DEGRADED (no artifact runner configured)"
+            echo
+            echo "This scheduled run did **not** touch the 375 MB \`docs/runs/\` archive or the"
+            echo "git-ignored \`pipeline/out/\` oracle dumps, because no runner holding them is"
+            echo "configured (\`vars.WEBSIM_ARTIFACT_RUNNER\` is not \`true\`). It ran the subset a"
+            echo "clean clone can run — typecheck, the committed-fixture suite, the scratch guard"
+            echo "and the claim linter. That covers the Tier-0 component parity and the committed"
+            echo "clean-clone oracle; it covers **no Tier-3 statistical gate and no Tier-4"
+            echo "attribution at all**, and only the committed slice of Tier 1."
+            echo
+            echo "**Evidence forgone by this run**, none of which a hosted runner can produce:"
+            echo
+            echo "- the 60-run Phase-E / Scenario-E archive gate suite (\`wp9-archive-gates.test.ts\`)"
+            echo "- the WP8 twelve-configuration archive replay and its divergence census"
+            echo "- the Tier-4 per-row attribution against the archived Java runs"
+            echo "- the WP9 seventeen-configuration acceptance replay and \`VALIDATION_REPORT.json\`"
+            echo "- \`build-golden-summaries.ts --check\` and \`build-working-set-manifest.ts --check\`,"
+            echo "  the only two checks that prove the committed digests still describe the archive"
+            echo
+            echo "**Artifact gates that announced themselves absent in this run:** ${gates}"
+            echo "(plus ${reduced} reduced-fixture-set warnings)."
+            echo
+            echo "To turn this into a real nightly, set the repository variable"
+            echo "\`WEBSIM_ARTIFACT_RUNNER=true\` and \`WEBSIM_ARTIFACT_RUNNER_LABEL\` to the label of"
+            echo "a runner that holds \`docs/runs/\` and \`pipeline/out/\`."
+            echo
+            echo "<details><summary>Every <code>!!</code> banner the suite printed</summary>"
+            echo
+            echo '```'
+            grep '^!!' "$log" || true
+            echo '```'
+            echo
+            echo "</details>"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          # One annotation per gate, so the run page names them without anyone
+          # opening the log. `|| true` on the pipeline because this step runs
+          # under `set -eo pipefail` and grep exits 1 on no match -- which is a
+          # state the check below reports, not one that should abort the report.
+          ids=$(grep '^!! gate:' "$log" | sed 's/^!! gate: *//' | sort -u || true)
+          if [ -n "$ids" ]; then
+            while read -r g; do
+              [ -n "$g" ] || continue
+              echo "::warning title=Artifact gate not run::${g} did not run on this hosted runner; its evidence was not collected tonight."
+            done <<< "$ids"
+          fi
+
+          echo "::warning title=Nightly ran DEGRADED::No artifact runner is configured, so this scheduled run validated the clean-clone subset only. It proves nothing about the 375 MB archive."
+
+          if [ "${{ steps.suite.outcome }}" = "success" ] && [ "$gates" -eq 0 ]; then
+            echo "::error title=Degraded run reported no degradation::A clean clone has neither pipeline/out nor docs/runs, so at least one artifact gate must have announced itself absent. Zero banners means the gates stopped reporting, not that nothing was forgone."
+            exit 1
+          fi
+
+      - name: Scratch guard (the suite left nothing behind under pipeline/out)
+        if: always()
+        run: npm run check:scratch
+
+      - name: Claim linter
+        run: npm run lint:claims
+
+  nightly-verdict:
+    # The structural guarantee, and the reason this file can no longer report a
+    # green nightly that ran nothing. It depends on both working jobs, runs even
+    # when they are skipped or failed, and turns "no work happened" into a
+    # failure with the remedy named.
+    name: nightly did real work (or says why it could not)
+    needs: [full-archive, degraded-clean-clone]
+    if: always()
+    runs-on: ubuntu-latest
+    # This job deliberately does NOT check out the repository -- it reads job
+    # results, nothing else -- so the workflow-level `working-directory: websim`
+    # would point at a directory that does not exist here.
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+    steps:
+      - name: Verdict
+        shell: bash
+        run: |
+          full='${{ needs.full-archive.result }}'
+          degraded='${{ needs.degraded-clean-clone.result }}'
+          echo "full-archive=${full}  degraded-clean-clone=${degraded}"
+
+          {
+            echo "## nightly verdict"
+            echo
+            echo "| job | result |"
+            echo "| --- | --- |"
+            echo "| full-archive | \`${full}\` |"
+            echo "| degraded-clean-clone | \`${degraded}\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$full" = "failure" ] || [ "$degraded" = "failure" ]; then
+            echo "::error title=Nightly failed::A nightly job failed; see the job above."
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "A nightly job **failed**." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          if [ "$full" = "success" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Full archive validated." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          if [ "$degraded" = "success" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Ran **degraded**: clean-clone subset only. The archive was not touched." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # Both skipped or cancelled. This is the state the old single-job file
+          # reported as SUCCESS, and it is the whole reason this job exists.
+          echo "::error title=Nightly ran nothing::Both nightly jobs were ${full}/${degraded}. A scheduled run that executes no checks must not report success. Check the job-level conditions and vars.WEBSIM_ARTIFACT_RUNNER."
+          {
+            echo
+            echo "**Neither nightly job ran.** A scheduled run that executes no checks must not"
+            echo "report success, so this job fails instead. Inspect the \`if:\` conditions on"
+            echo "\`full-archive\` and \`degraded-clean-clone\` — they are supposed to be exact"
+            echo "complements."
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 1

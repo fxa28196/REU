@@ -143,6 +143,26 @@ function armA(): RunConfig {
   };
 }
 
+/**
+ * Wall-clock budget for every case in this file. **Not** an assertion; nothing
+ * here is graded on time. See `websim/vitest.config.ts` for the measured
+ * schedule and the policy.
+ *
+ * Measured: this file runs in **19.8 s in isolation** (`npm test -w validation
+ * -- test/tier4-attribution.test.ts`, idle 16-core box) and **69.2 s** under
+ * `npm test` — a 3.50x contention factor, the highest of the six heavy
+ * validation files measured. It has been seen to exceed its old 120 s budget
+ * outright under a busier schedule, which is **>6.1x** isolated, and a timeout
+ * expiry here is reported identically to a Tier-4 divergence: the gate says the
+ * port diverges from the Java archive when what actually happened is that
+ * fifteen sibling forks were on the CPU.
+ *
+ * 300 s is **15.2x** the measured isolated runtime — above every contention
+ * factor this tree has ever produced — and still an order of magnitude short of
+ * the 900 s the real replay suites declare.
+ */
+const CASE_TIMEOUT_MS = 300_000;
+
 let cached: HeadlessResult | null = null;
 function run(): HeadlessResult {
   cached ??= runHeadless({ config: armA(), paramNames: PARAM_NAMES });
@@ -191,7 +211,7 @@ describeGated(gate, () => {
     for (const key of java().rows.keys()) {
       expect(ours().rows.has(key)).toBe(true);
     }
-  }, 120_000);
+  }, CASE_TIMEOUT_MS);
 
   it("(1) final_state flips are a BALANCED swap set with zero non-shelter flips", () => {
     const a = ours();
@@ -214,7 +234,7 @@ describeGated(gate, () => {
     expect(other).toBe(0);
     expect(lost).toBe(gained);
     expect(lost).toBeGreaterThan(0);
-  }, 120_000);
+  }, CASE_TIMEOUT_MS);
 
   it("(2) every site admits exactly as many residents as the archive did", () => {
     const mine = admittedSets(ours());
@@ -226,7 +246,7 @@ describeGated(gate, () => {
       expect((mine.get(site)?.size ?? 0)).toBe(theirs.get(site)?.size ?? 0);
     }
     expect(sites).toBe(36);
-  }, 120_000);
+  }, CASE_TIMEOUT_MS);
 
   it("(3) mean_travel_dist_m_admitted matches a site IFF its admitted set is identical", () => {
     const mine = admittedSets(ours());
@@ -262,7 +282,7 @@ describeGated(gate, () => {
     // if it ever fills, the "iff" in this file's name has become an "if".
     expect(setDiffColSame).toBe(0);
     expect(setSameColSame + setDiffColDiff).toBe(36);
-  }, 120_000);
+  }, CASE_TIMEOUT_MS);
 
   it("(4) residents admitted to the same shelter in both runs walked identical distances", () => {
     const a = ours();
@@ -283,7 +303,7 @@ describeGated(gate, () => {
     // Byte identity, not tolerance: these residents took the same route to the
     // same door, so any difference at all is ours.
     expect(textDiffers).toBe(0);
-  }, 120_000);
+  }, CASE_TIMEOUT_MS);
 
   it("(5) refused_count is self-consistent with the per-agent door counter, in BOTH runs", () => {
     const sumAgents = (t: Table): number => {
@@ -304,7 +324,7 @@ describeGated(gate, () => {
     console.log(
       `[tier4] door ledger: java ${sumSites(javaShelters())}  ours ${sumSites(oursShelters())}`,
     );
-  }, 120_000);
+  }, CASE_TIMEOUT_MS);
 
   it("(6) the observed divergence sits inside the committed permutation envelope", () => {
     const env = JSON.parse(
@@ -321,5 +341,5 @@ describeGated(gate, () => {
     expect(e.streams).toBeGreaterThanOrEqual(50);
     expect(flips).toBeGreaterThanOrEqual(e.min);
     expect(flips).toBeLessThanOrEqual(e.max);
-  }, 120_000);
+  }, CASE_TIMEOUT_MS);
 });

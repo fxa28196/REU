@@ -224,11 +224,20 @@ itself the central fact for the inquiry.
   carve-out only in a free-text `notes` field; `CITATION.cff` L36 carries a placeholder
   `doi: "10.5281/zenodo.XXXXXXX"`.
 
-I **cannot determine from the repo** whether that GitHub repository is public or private, or
-whether a Zenodo deposit has been made. If it is public, the complete source shapefile is
-already being redistributed today, and the honest framing of the inquiry is "we hold and
-have been distributing this; please tell us the terms" rather than "may we?". **Check the
-repository's visibility before sending anything** — see §6.
+**RESOLVED 2026-07-31 — the repository is PUBLIC.** This paragraph previously said "I cannot
+determine from the repo whether that GitHub repository is public or private" and told the
+reader to check before sending anything. It has been checked:
+`https://github.com/fxa28196/REU.git` was retrieved on 2026-07-31 and rendered a full public
+file listing and project description. **The complete source shapefile is therefore being
+redistributed today**, and the honest framing is "we hold and have been distributing this"
+rather than "may we?". *Not established:* the date the remote became publicly visible — git
+records commit dates, not visibility changes, so do not assert a start date for the
+redistribution. **Whether a Zenodo deposit has been made is still unresolved** (§6 item 7).
+
+*Rights outcome, added 2026-08-02:* the researcher reports that Oregon Metro approved
+redistribution, relayed 2026-08-02, asking only that the source be credited formally. No
+written determination from Metro is filed in this repository. See
+`DR-WP1-data-rights.md`, which is the operative record.
 
 ---
 
@@ -556,10 +565,17 @@ Listed exhaustively. Each is a real gap, not a hedge.
 2. **The download URL and the downloading party.** Unknown. `Geography/data/README.md` L28
    says only "Supplied with the inherited project as `Streets.zip`." Who supplied it, from
    where, and under what click-through or account, is unrecoverable from the repo.
-3. **The actual licence.** No licence text was shipped and I did not consult Metro's
+3. **The actual licence.** ~~No licence text was shipped and I did not consult Metro's
    published terms (no external sources were used, by design). `Geography/data/README.md`
    L30's "Metro RLIS data is commonly distributed under a Metro data licence" is a hedge in
-   the repo's own voice, not a finding. **Somebody must read Metro's current terms.**
+   the repo's own voice, not a finding. **Somebody must read Metro's current terms.**~~
+   **ANSWERED 2026-08-02, but not by reading the terms.** The researcher reports that
+   **Oregon Metro approved** redistribution, relayed 2026-08-02, asking only that the source
+   be credited formally. That resolves *may we redistribute*. It does **not** supply a
+   licence text, a terms URL, or a licence identifier — none was ever seen, and
+   **no written determination from Metro is filed anywhere in this repository.** Metro's
+   published terms still have not been read by anyone on this project. Anything that needs
+   documentary evidence must obtain it. Operative record: `DR-WP1-data-rights.md`.
 4. **Whether `Streets.zip`'s SHA-256 corresponds to any Metro-published artifact.** The repo
    records `DA0473722532FCA6…` for the zip and per-file hashes for the five members; there is
    no upstream hash to compare against.
@@ -572,9 +588,12 @@ Listed exhaustively. Each is a real gap, not a hedge.
 
 **About the publication surface**
 
-6. **Whether `https://github.com/fxa28196/REU.git` is public or private.** Determinable only
-   by looking; I did not access the network. This changes the framing of the inquiry
-   materially (§2.4).
+6. ~~**Whether `https://github.com/fxa28196/REU.git` is public or private.** Determinable
+   only by looking; I did not access the network. This changes the framing of the inquiry
+   materially (§2.4).~~ **DETERMINED 2026-07-31: the repository is PUBLIC.** Retrieved on
+   that date; it rendered a full public file listing and project description. The complete
+   source shapefile is being redistributed today. The *date* the remote became public
+   remains unknown and must not be asserted (§2.4).
 7. **Whether a Zenodo deposit exists.** `.zenodo.json` declares `"access_right": "open"`;
    `CITATION.cff` L36 still carries a placeholder DOI. Unresolved.
 8. **Whether the chapter/proceedings submission redistributes any of this data**, and what it

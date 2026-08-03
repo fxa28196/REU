@@ -1,3 +1,35 @@
+> # ⛔ SUPERSEDED — 2026-08-02 — THIS LETTER WAS NEVER SENT
+>
+> **Outcome: the researcher reports that Oregon Metro approved redistribution of the
+> RLIS-derived street data, relayed 2026-08-02, asking only that the source be credited
+> formally.** The question this letter was drafted to ask has therefore been answered by
+> other means, and the letter was never sent to Metro or to anyone else.
+>
+> **The decision record is `websim/docs/DR-WP1-data-rights.md`. Read that first.** It is the
+> operative record; this file is not.
+>
+> **What the outcome is, stated at its true strength:** what exists is the *researcher's
+> report* of approval. **No written determination from Oregon Metro is filed anywhere in this
+> repository** — no letter, no email, no reference number, no named contact, no date of
+> approval, no licence URL. Any future publication that needs documentary evidence must
+> obtain it. If that becomes necessary, **this draft is the template to use** — its figures
+> were independently re-derived on 2026-07-31 and are the reason it is retained rather than
+> deleted.
+>
+> **Why this file is kept:** it is the reasoning record. Its §0.1a corrections, §0.1b
+> visibility findings and the measured description of the derived product in the letter body
+> remain the most complete account of what this project actually publishes from RLIS, and
+> §6.1 of the decision record carries the load-bearing part forward.
+>
+> **Do not act on the instructions in the body below.** §0.1's fill-in table, §0.2's
+> "where to find the contact", §0.3's pre-send checks and §0.4's "what to do with the answer"
+> are all instructions for sending a letter that will not be sent. Two of them are also now
+> stale: the repository-visibility question in §0.3 is answered (PUBLIC, verified 2026-07-31)
+> and §0.4's "if the answer is no (c)" branch — rebuild from OpenStreetMap — is not being
+> exercised.
+
+---
+
 # WP1 — Metro RLIS redistribution inquiry (DRAFT, not sent)
 
 **Status:** draft for the user to review, fill in, and send personally. Nothing here has
@@ -7,6 +39,9 @@ where that document could not establish something, this draft says so rather tha
 visibility (§6 item 6) and the RLIS content of the archived run outputs (§6 item 9) — and are
 now stated here as fact. See §0.1b. `WP1-GROUND-rlis.md` §2.4, §6 item 6 and §6 item 9 still
 carry the old "cannot determine" wording and are now stale; they were not edited by this pass.
+*(Update 2026-08-02: §2.4 and §6 item 6 have since been corrected in place. **§6 item 9 has
+not** — it still wrongly guesses that the archived `agents.csv` coordinates are RLIS graph
+positions. §0.1b item 3 below is the correct account.)*
 
 ---
 

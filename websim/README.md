@@ -5,15 +5,25 @@ static site. The Java/Repast model remains **the certified instrument**; this tr
 a second implementation that must earn every claim it makes, against the archived
 Java runs, in public.
 
-**Status: WP0–WP7 built. The engine runs arm A end to end, and its residual against
+**Status: WP0–WP10 built. The engine runs arm A end to end, and its residual against
 the archive is bounded and attributed rather than declared.** The RNG plane, the
 `StrictMath`/formatter plane, the asset pipeline, the graph runtime, the world
 build, the agent step, the tick loop and the `OutcomeLogger` are ported and gated
 against fixtures dumped from the certified instrument. A full arm-A run reproduces
 the archived terminal census — `unreachable` exact, realised marginals equal rather
 than close — and the 114-row `final_state` residual is measured against a 200-stream
-permutation census (§2.1, [`DR-WP7`](docs/DR-WP7-order-attribution.md)). The worker
-runtime and the entire UI are **not built**. §2.1 below states exactly what is
+permutation census (§2.1, [`DR-WP7`](docs/DR-WP7-order-attribution.md)). Since WP7 the
+**WP8 decision and closure layers**, the **WP9 validation-report / archive-gate /
+mutation-gate layer** and the **WP10 worker runtime** (streaming, snapshots, replay)
+have all landed. **The entire UI — WP11 onwards — is still not built.**
+
+**"Built" is not "accepted", and this README does not conflate them.** WP9 and WP10
+have been independently gated and the gate returned **NO-GO on both**, on mechanical
+defects rather than on the science; the same review independently re-derived the
+Tier-4 attribution from raw bytes and reproduced the shipped census cell for cell.
+The findings, their severities and what is still open are in
+[`DR-WP9-WP10-verification.md`](docs/DR-WP9-WP10-verification.md), which is the
+authority on that question — not this paragraph. §2.1 below states exactly what is
 proven and how; §2.2 states what is not, in both directions.
 
 The work packages, decisions and acceptance criteria live in
@@ -42,6 +52,12 @@ npm run lint:claims
 npm run check:scratch # pipeline/out holds no leftover test scratch (§8.2)
 npm run ci        # all four, in that order — the gate
 npm run test:strict  # same suite, but artifact-gated skips become failures (§8.1)
+
+# Not in `npm run ci`, because each needs something a bare `npm ci` does not give you:
+npm run test:browser  # Tier-2 three-engine matrix; needs `npx playwright install` (~400 MB)
+npx tsx validation/test/mutation/run-mutation-gate.ts --gate --scope fast
+                      # WP9 mutation gate: edits real source, requires the suite to go RED,
+                      # restores every byte and proves it by SHA-256. Minutes, not seconds.
 ```
 
 Workspaces: `shared` (contracts), `engine` (deterministic core), `pipeline` (offline
@@ -68,10 +84,17 @@ or any published asset.
 ## 1. Fidelity contract
 
 What this port promises, and what it does not. These are **commitments, not
-completion claims**: items 1–3 have code and gates behind them today; items 4–8
-constrain work packages that are not built yet (§2.2) and are enforced so far only
-by the claim linter and by the shape of the contracts in `shared/`. §2 is the part
-of this document that reports measurements.
+completion claims**, and the split between them has moved since WP7. Items **1–5
+and 8** have code and gates behind them today: 1–3 in the engine and the asset
+pipeline, 4 in `engine/src/output/logger.ts` (both header sets, parity reproductions
+in `logger.units.test.ts`), 5 in `SimHost.exportOutputs` plus the parameter-list
+drift gate in `engine/test/worker/manifest-params.test.ts`, and 8 in
+`npm run check:deploy`, which runs in CI against the built assets. Items **6 and 7**
+are *rendering* commitments — a number's provenance class and a constructed series'
+label have to be visible on screen — and there is no screen (§2.2), so they are
+enforced so far only by the claim linter and by the shape of the contracts in
+`shared/` and `app/src/index.ts`. §2 is the part of this document that reports
+measurements.
 
 1. **Determinism is the product.** Same `RunConfig` plus the same asset hashes
    produce byte-identical outputs on every browser and in Node. The engine reads no
@@ -168,34 +191,86 @@ different configuration with a different oracle. The `present-day-three-arm`
 manifest predates the decision layer entirely, which is why `A_present_day` is the
 right preset for this row.
 
+**What this table does NOT yet cover.** Every row above was written at or before WP7.
+The WP8 decision and closure layers, the WP9 gate ports and validation report, and the
+WP10 worker runtime all have measured evidence of their own, and none of it has been
+folded into this table yet — so read §2.1 as *complete for WP0–WP7 and silent
+thereafter*, not as the whole ledger. Until it is extended, the WP8+ evidence lives at:
+the decision-layer trace oracle (`engine/test/decision/oracle.trace.test.ts`, gated on
+the 477 MB dump) with its committed 424-row clean-clone slice
+(`validation/test/mutation/fixtures/decision-hz-slice.tsv`); the closure-reaction
+oracle (`engine/test/closures/reaction.oracle.test.ts`); the archive gate ports and
+acceptance replays (`validation/test/gates/` — `wp9-archive-gates.test.ts` alone walks
+all 60 Phase-E / Scenario-E run directories — plus `validation/test/wp8-*.test.ts` and
+`validation/test/wp9-*.test.ts`) and the report they emit
+(`validation/src/report/`, `VALIDATION_REPORT.json`); the mutation catalogue
+(`validation/test/mutation/catalogue.ts`, nine injections, each with its *measured*
+smallest detected magnitude and the test that caught it); and the worker suites
+(`engine/test/worker/`, `engine/test-browser/worker/`). The independent gate's own
+census of all of that — including its from-scratch re-derivation of the Tier-4
+attribution — is in
+[`DR-WP9-WP10-verification.md`](docs/DR-WP9-WP10-verification.md); its numbers are
+quoted there rather than here, because this README's rule is that a number in §2.1 is
+one this document's author re-ran.
+
 ### 2.2 Not built
 
 Nothing in this list has an implementation, and no claim in this README depends on
-one. Stated explicitly because the previous version of this file was stale in the
-opposite direction, and a fidelity contract that overstates its own coverage is
-worse than no contract.
+one. Stated explicitly because this file has been stale in **both** directions at
+different times — a fidelity contract that overstates its coverage is worse than no
+contract, and one that understates it is a false self-report too. The list below is
+the short one it should be; the paragraph after it is the record of what came off.
 
-- **The badge.** §4 specifies its semantics. No badge is computed or displayed today,
-  and no configuration has yet earned one.
 - **The UI.** No run screen, map, compare view, archive browser, provenance panel,
-  permalink codec use, or export path. `app/src/index.ts` is still the WP0 scaffold
-  that fixes the vocabulary (screens, badge states) and nothing else.
-- **The worker runtime**, streaming, snapshots and the replay harness. The engine
-  runs headless in Node (`validation/src/headless.ts`); nothing hosts it in a Web
-  Worker yet.
+  permalink codec use, or export path. `app/src/index.ts` is still the 97-line WP0
+  scaffold: it fixes vocabulary (screens, badge states, provenance classes) and
+  carries the data-attribution strings §10 requires the deployed page to render —
+  declarations only, with nothing rendering them yet. **The footer credit is
+  therefore specified and not shipped**, and stays on this list until a page
+  renders it.
+- **The badge as a displayed thing.** §4 specifies its semantics, and the
+  *eligibility* half is now computed and shipped: `VALIDATION_REPORT.json` carries
+  an `archive_validated` list of the configurations whose replay earned the badge
+  for this build, and it is empty unless Tier 2, Tier 4 and the cross-arm gate are
+  all green **and** the working tree was clean. Nothing displays it, nothing scores
+  a live browser run against it, and the in-browser gate subset the badge is also
+  supposed to consult does not exist. So the badge is half built, and the half that
+  is missing is the half a user would see.
 - **The v2-web escaping and timestamp fixes.** Named in divergence 5 and §7 as
-  v2-web behaviours; neither is written. See those two rows.
-- **The WP8 layers.** Closure waves, the Phase-E decision layer at runtime, hazard
-  departure, outreach conversion, push/stuck. The fields exist on `Resident` so the
-  output layer has one shape to read; they are inert, and the `l` counter identity
-  gate asserts that they are.
+  v2-web behaviours; neither is written — `jsonEsc` is still flavour-independent,
+  so v2 reproduces the instrument's incomplete escaping. See those two rows.
+- **Everything from WP11 on**: the Vite app, the accessibility gate, the publish
+  step. `npm run check:deploy` (the WP4 publication gate) exists and runs in CI, but
+  there is no deployed site for it to gate.
 
-**Was on this list and no longer is** (WP7 closed): the simulation itself — the
-agent step, tick loop, movement, admission, exposure/dose accumulation and the
-`OutcomeLogger` port all exist and are measured in §2.1; and Tiers 2, 3 and 4,
-which now report numbers rather than a specification. This paragraph exists
-because the previous version of this file was stale in *both* directions at
-different times, and an understated contract is a false self-report too.
+**Was on this list and no longer is.** Each of these is now code with tests, and
+each moved off this list by landing, not by being reclassified:
+
+- *(WP7)* the simulation itself — agent step, tick loop, movement, admission,
+  exposure/dose accumulation, the `OutcomeLogger` port — and Tiers 2, 3 and 4,
+  which now report numbers rather than a specification (§2.1).
+- *(WP8)* **the decision and closure layers.** `engine/src/decision/` (arm, belief,
+  closure reaction, hazard departure, outreach conversion, pace, pets, probe, the
+  utility chooser and the runtime invariants) and `engine/src/closures/` (wave
+  schedule + runtime). They are wired and executing, not inert fields on
+  `Resident`; the decision layer is bit-verified against a 20-run instrumented
+  Repast trace, and a 424-row stratified slice of that trace is committed so a
+  clean clone can still catch a 1-ULP drift in the hazard coefficient.
+- *(WP9)* **the replay harness and the validation report.** `validation/src/harness/`
+  replays the archive and the curated working set, `validation/src/gates/` ports the
+  scored gates, `validation/src/report/` emits `VALIDATION_REPORT.json` against a
+  checked schema, and `validation/test/mutation/` is a nine-injection mutation
+  catalogue with a CI job whose success condition is that the suite goes **red**.
+- *(WP10)* **the worker runtime, streaming and snapshots.** `engine/src/worker/`
+  carries the protocol, the sim host, the worker entry, the frame ring and the
+  snapshot codec; `engine/test/worker/` and `engine/test-browser/worker/` exercise
+  them in Node and in real browsers. The engine still *also* runs headless in Node
+  (`validation/src/headless.ts`) — that path did not go away.
+
+**Read this list together with the gate.** WP8, WP9 and WP10 are built and tested;
+WP9 and WP10 have also been independently gated and returned NO-GO on mechanical
+defects. "Built" is the claim being made here. "Accepted" is
+[`DR-WP9-WP10-verification.md`](docs/DR-WP9-WP10-verification.md)'s to make.
 
 ### 2.3 Reproducing the evidence
 
@@ -219,17 +294,24 @@ green in CI; the Tier-4 report reviewed with zero unexplained divergences.**
 | **0** | Component bit-parity | RNG draw fixtures, sampler draw-order dumps, CSV loader byte fixtures, the HALF_UP formatter table, deterministic-math identity across engines | Every push |
 | **1** | Initial-world identity | The full world build at archived configs is bit-equal to Java-exported dumps: camp assignments, demographic table, attribute tables, decision seeds, shelter distance arrays, and the snap *node assignment*. Converts any downstream statistical failure into exact fault localisation. **The one exception is `snap_gap_m`, which is tolerance-equal, not bit-equal** — it is a geodesic, it decides nothing, and it is registered as divergence 9 in §6 | Every push |
 | **2** | Own-engine R3 | A degenerate-config run is byte-identical to a no-layer run on the shared-column projection, under the archive's exclusion discipline; plus deterministic replay (same config twice, four engines) and the snapshot-replay property | Every push |
-| **3** | Statistical cross-validation vs the archive | Sheltered counts inside the nine-seed archive ranges; unreachable id-set hashes exact; realised marginals equal rather than close; the exposure and dose identities; counter identities; zero out-of-range concentration lookups | Working set on PRs, full archive nightly |
+| **3** | Statistical cross-validation vs the archive | Sheltered counts inside the nine-seed archive ranges; unreachable id-set hashes exact; realised marginals equal rather than close; the exposure and dose identities; counter identities; zero out-of-range concentration lookups | Working set on PRs **and the full archive nightly — but only on a runner that holds them.** A hosted runner has neither, so on a repository with no artifact runner configured these gates run *nowhere in CI*: the PR job reports them skipped with a `!!` banner each, and the nightly runs its `degraded-clean-clone` job and says so on the run page. §8.1 item 4b |
 | **4** | Structural identity where the shuffle is inert | In arms where capacity never binds, per-agent rows should reproduce exactly. The harness publishes the per-config bit-match census. **Any divergence not attributable to the declared within-tick-order channel is a release-blocking bug** | Measured and reported |
 
-A cheap subset of the gates runs **in the browser after every user run** and feeds
-the badge; missing archive data degrades loudly and is never reported as a pass.
+A cheap subset of the gates is **specified** to run in the browser after every user
+run and feed the badge, with missing archive data degrading loudly and never reported
+as a pass. **That subset is not written** — there is no user run to run it after
+(§2.2). The degradation discipline it names is real and is implemented for the Node
+suite in §8.1.
 
 ---
 
 ## 4. Badge semantics
 
 The badge is earned per configuration, per run — never inherited from a preset.
+
+**This table is a specification, not a description.** The eligibility half exists
+(`VALIDATION_REPORT.json#archive_validated`); nothing renders a badge, and the
+in-browser gate subset three of these four rows depend on is not written. §2.2.
 
 | Badge | Earned when | Shown as |
 |---|---|---|
@@ -334,7 +416,7 @@ named in the row.
 | Incomplete JSON string escaping | Formatting | **Parity half implemented + gated** (`logger.ts#jsonEsc`, `logger.units.test.ts`); **the v2-web half is NOT written** — `jsonEsc` is flavour-independent, so v2 reproduces the incompleteness too | Reproduced | **Open** — full escaping is specified, not implemented |
 | Double concentration lookup, double-incrementing the out-of-range counter | **Semantics** | **Implemented** — `agents/step.ts` blocks 5 and 6 each call `concentrationForTick` | Reproduced | Reproduced |
 | An agent turned away at a closed door is not counted as refused | **Semantics** | **Implemented** — `shelters/admit.ts` (`refused-closed` touches no counter) | Reproduced | Reproduced |
-| Archived severe runs executed a zeroed push threshold (see divergence 6) | **Provenance note** | Specified (WP8) | State in the manifest | State in the manifest and in preset copy |
+| Archived severe runs executed a zeroed push threshold (see divergence 6) | **Provenance note** | **Manifest half implemented + pinned** — `shared/src/manifest.ts#PROVENANCE_QUIRKS` carries the note verbatim and `shared/test/manifest.test.ts` asserts the exact string, the archived executed value (`0.0`) and the preset value (`−0.25`); **the preset-copy half is NOT written**, because no UI renders preset copy | Stated in the manifest | Stated in the manifest; **open** in preset copy until a page exists to carry it |
 
 ---
 
@@ -401,11 +483,30 @@ and unset disable it, and **anything else throws**. Reading a typo as "off" woul
 hand back the silent pass this policy exists to remove, so `WEBSIM_REQUIRE_ARTIFACTS=ture`
 is an error, not a default.
 
-**4. Which CI job sets it.** A job without the artifacts (the hosted `build` and
-`cross-engine` jobs — a clean clone) leaves it off and gets loud, reported skips; the
-`strict-artifacts` job, which runs on a runner that holds the data, sets it to `1`, so
-an artifact that silently stops being produced turns CI red instead of turning it
-quiet. Locally, `npm run test:strict` is the same thing on any platform.
+**4. Which CI job sets it.** The three hosted jobs that run the suite — `build` in
+`websim-ci.yml`, the clean-clone `mutation-gate`, and the nightly's
+`degraded-clean-clone` — set it to `0` *explicitly* rather than leaving it unset, so
+their degraded status is on the record, and they get loud, reported skips. The three
+jobs that run on a runner holding the data (`strict-artifacts`, `mutation-gate-full`,
+the nightly's `full-archive`) set it to `1`, so an artifact that silently stops being
+produced turns CI red instead of turning it quiet. (`cross-engine` sets nothing: it
+runs one config that touches no gated artifact.) Locally, `npm run test:strict` is the
+same thing on any platform.
+
+**4b. The same rule applies to the JOBS, not only to the suites.** The three
+artifact-runner jobs are opt-in — they run only when `vars.WEBSIM_ARTIFACT_RUNNER` is
+`true`, or when a `workflow_dispatch` explicitly asks for them — and an opt-in job
+that is skipped contributes a grey tick that reads like a
+green one. `websim-nightly.yml` used to be exactly that failure: one opt-in job, so a
+scheduled run with the variable unset **skipped everything and reported success**. It
+now carries a `degraded-clean-clone` job conditioned on the precise negation, which
+runs the clean-clone subset and republishes every `!!` banner into the run summary, and
+a `nightly-verdict` job that runs with `if: always()` and **fails when neither job did
+any work** — so "green having run nothing" is structurally impossible rather than
+merely unlikely. `websim-ci.yml` and `websim-mutation-gate.yml` carry the reporting
+half of the same idea (`artifact-coverage`, `mutation-coverage`): they cannot report
+nothing, because their clean-clone jobs are unconditional, but they now say on the run
+page which evidence the absent artifact runner cost this push.
 
 **5. Reduced sets are covered too.** Inside a satisfied gate, a suite that walks a
 list of fixtures uses `gatedFixturePresent()`, which announces an individual absent
@@ -433,6 +534,16 @@ hidden, `npm test` exits 0 with 43 tests reported skipped across 9 files and 18 
 banners; `npm run test:strict` on the identical tree exits non-zero with 16 failures,
 one per gate, each naming its gate id.
 
+**Those three counts are stale in the understating direction and are left here as a
+floor rather than silently refreshed.** They were taken before the WP8, WP9 and WP10
+layers landed, and every one of those added artifact-gated suites, so the real figures
+are larger. Re-measuring means hiding `pipeline/out/` — 831 MB of un-versioned Java
+dumps whose regeneration needs JDK 17 and Repast — and that manoeuvre is exactly the
+one that left five stray directories behind the last time it was tried here (§8.2).
+It was not repeated for a documentation number. The *behaviour* the counts illustrate
+is proved independently and cheaply by `tools/test/artifact-gate.test.ts`, which spawns a real
+child vitest run over a deliberately absent fixture and asserts both directions.
+
 ### 8.2 Scratch guard
 
 `pipeline/out/` is the only directory the builders may write to, which makes it the
@@ -455,8 +566,9 @@ share it and vitest runs them in parallel workers, so "the root must be gone" wo
 a race between whichever worker finished last. "The root must be empty" is race-free —
 each file removes only what it created — and still catches every byte left behind.
 
-It runs **after** `npm test` in `npm run ci` and in both the `build` and
-`strict-artifacts` CI jobs, and it is not itself a test: while vitest is running,
+It runs **after** `npm test` in `npm run ci` and in every CI job that runs the suite
+(`build`, `strict-artifacts`, both mutation-gate jobs, and both nightly jobs), and it
+is not itself a test: while vitest is running,
 other workers are still writing, so the end state is only observable from outside the
 runner. Its own logic is unit-tested against a fake filesystem and end to end against
 a real fixture tree, where a dirty tree is shown to exit 1 and the same tree exits 0
@@ -466,7 +578,19 @@ Two real leaks were found by writing it, and both are fixed: `graph-asset.test.t
 freed its temp tree from `process.on("beforeExit", …)`, which never fires inside a
 pooled vitest worker, so `out/test-tmp/graph-asset/dump/` had survived every run this
 tree has ever made; and five directories left by clean-clone simulations that moved
-`pipeline/out` aside and restored it imperfectly. `--clean` removes what it finds.
+`pipeline/out` aside and restored it imperfectly.
+
+**`--clean` deletes what it finds, and "what it finds" is defined by the allowlist.**
+That is the correct design — an allowlist catches the leftover nobody thought of — but
+it has a sharp edge that is worth stating where the remedy is printed. A *legitimately
+new* artifact directory that has not yet been added to `PRODUCED_ENTRIES` is a
+violation by definition, so `--clean` removes it, and `pipeline/out/` holds **831 MB**
+of Java oracle dumps that are **not in git** and cost hours of Repast time to
+regenerate (477 MB decision-fixtures, 153 MB world-fixtures, 30 MB closure-fixtures,
+45 MB graph-dump, measured 2026-08-03). When the guard names a directory you do not
+recognise, add it to the
+allowlist with its producer, or move it aside by hand. Reach for `--clean` only for
+scratch you can name.
 
 ---
 
@@ -476,13 +600,65 @@ tree has ever made; and five directories left by clean-clone simulations that mo
 websim/
   shared/      contract plane: config, schema, manifests, permalink codec
   engine/      deterministic core — no DOM, no clock, no ambient randomness
+               (src/worker/ is the WP10 host: protocol, frame ring, snapshot codec;
+                it uses Worker APIs and is typechecked by its own tsconfig.browser.json)
   pipeline/    offline asset builds (Node + read-only Java exporter); out/ is generated
-  app/         UI: run, compare, archive, provenance
-  validation/  gate ports, replay harness, divergence report, mutation test
-  tools/       repo scripts (claim linter, artifact-gate skip-vs-fail policy)
+  app/         UI: run, compare, archive, provenance — WP0 SCAFFOLD ONLY, see §2.2
+  validation/  gate ports, replay harness, VALIDATION_REPORT.json, mutation catalogue
+  tools/       repo scripts (claim linter, artifact-gate skip-vs-fail policy, scratch guard)
   docs/        the implementation plan, the engine reference, and decision records
 ```
 
 `docs/runs/` at the repository root is consumed read-only by `validation/` and is
 never copied into this tree. `Geography/` is untouched; the Java exporter compiles
 against it out-of-tree.
+
+---
+
+## 10. Data sources and attribution
+
+The assets this port ships are derived from two third-party datasets. Both must be
+credited, and the credit must appear **in the deployed page**, not only here — the
+string the UI is required to render is
+`DATA_ATTRIBUTION` in [`app/src/index.ts`](app/src/index.ts), and the doc comment on
+it states that requirement. The repository-level record is `../LICENSE` §3 and §4,
+`../Geography/data/README.md`, and `../docs/science/DATA_SOURCES.md` (sources D0 and
+D2b); those four places and this one must say the same thing.
+
+| Layer | Credit | Redistribution |
+|---|---|---|
+| Street centerlines — the routing graph, and therefore every distance in this tree | **Regional Land Information System (RLIS), Oregon Metro.** RLIS is an Oregon Metro programme, not a City of Portland one | Derived products redistributed with the provider's approval — see the note below for what "approval" means here |
+| Encampment reports — the spatial distribution residents are sampled from | **City of Portland**, Impact Reduction Program campsite reports, obtained via the City's open-data ArcGIS service | Derived products redistributed with the provider's approval — same note |
+
+**What the approval is, stated no more strongly than the evidence.** The researcher
+reports that Oregon Metro approved redistribution of the RLIS-derived products, and
+that the City of Portland approved redistribution of the campsite-report-derived
+products; both relayed **2026-08-02**. **There is no written determination from
+either provider on file anywhere in this repository.** What exists is the
+researcher's report of the approvals. No reference number, contact name, approval
+date, licence name, licence version or licence URL is claimed anywhere in this tree,
+because none has been recorded. If a reader asks where the paperwork is, the honest
+answer is that there is none in the repo and the approval was relayed verbally.
+
+This is deliberately weaker prose than "Metro has granted permission", and the gap is
+the point: this project has previously shipped claims slightly stronger than the
+evidence behind them (§5 is the register of what that cost), and a verbal approval
+recorded accurately is the correct outcome, not a lesser one.
+
+**Human-subjects review.** The faculty mentor determined that no IRB review is
+required, on the grounds that the work does not involve human subjects and is not yet
+a real-world application. That is recorded as the mentor's determination, as reported
+by the researcher; no exemption letter or IRB correspondence is on file in this
+repository, and nothing here adds a legal interpretation of its own. The full record
+is [`DR-WP1-irb-determination.md`](docs/DR-WP1-irb-determination.md); the
+redistribution-rights record is
+[`DR-WP1-data-rights.md`](docs/DR-WP1-data-rights.md).
+
+**What the approvals do not change.** Two things stand regardless: (a) the RLIS
+layer's original download date and RLIS release version are still unrecovered, so it
+remains uncitable as *provenanced* data even though it is now redistributable
+(`../docs/science/DATA_SOURCES.md` D0); and (b) the ethics constraint in §1 item 8 is
+unaffected — no public asset carries raw encampment coordinates or raw incident ids,
+raw feed data stays in the git-ignored `pipeline/local-raw/`, and the deploy job greps
+for both before publishing. Permission to redistribute a derived product is not
+permission to publish the raw points.

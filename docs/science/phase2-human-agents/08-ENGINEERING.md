@@ -46,7 +46,7 @@ in isolation; policies must not inherit that.
 
 **Why the mask lives in `routing`, not `StreetNetwork`:** keeping it out of the
 graph leaves `StreetNetwork` immutable, which also permits memoising the
-112,070-feature graph across batch runs in one JVM â€” roughly 10Ã— on a scenario
+109,434-feature graph across batch runs in one JVM â€” roughly 10Ã— on a scenario
 campaign.
 
 ---

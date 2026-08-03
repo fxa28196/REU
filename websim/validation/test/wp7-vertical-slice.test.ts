@@ -56,6 +56,30 @@ const gate = artifactGate({
   artifacts: [TOPOLOGY, GEOMETRY, GEOGRAPHY],
 });
 
+/**
+ * Wall-clock budget for every case in this file. **Not** an assertion — see
+ * `websim/vitest.config.ts` for the measured schedule this number comes from
+ * and why the whole class of failure needed a policy rather than a nudge.
+ *
+ * Measured here: this file runs in **24.6 s in isolation** (`npm test -w
+ * validation -- test/wp7-vertical-slice.test.ts`, idle 16-core box). Under
+ * `npm test` it took **73.4 s** — a 2.99x contention factor — and the case that
+ * pays for the memoised n=6,842 run took 67.9 s against the 60 s budget it used
+ * to declare, so the suite reported the port as broken because the suite was
+ * busy. The 60 s figure was 2.44x isolated: below the contention this schedule
+ * actually produces.
+ *
+ * 300 s is **12.2x** the measured isolated runtime, and above the worst
+ * contention factor ever recorded against this tree (tier4-attribution once
+ * exceeded 120 s against a 19.8 s isolated baseline, >6.1x). It stays well
+ * clear of the 600 s / 900 s budgets the genuinely long replay suites declare,
+ * so "declared heavy" still means something.
+ *
+ * The one real performance budget in this file states itself as an assertion —
+ * `expect(r.timings.runMs).toBeLessThan(60_000)` — and is untouched by this.
+ */
+const CASE_TIMEOUT_MS = 300_000;
+
 /** The archived seed-42 marginals, in `OutcomeLogger` order (finding F1-F1). */
 const ARCHIVED_MARGINALS_SEED42 = ["0.1988", "0.1478", "0.1079", "0.2381", "0.2622", "1.2805"];
 
@@ -125,7 +149,7 @@ describeGated(gate, () => {
     // arm-A sites sit in the 27,543-node Portland component, so 28 residents
     // start on the 59,725-node regional one with no shelter on it.
     expect(c.UNREACHABLE).toBe(28);
-  }, 60_000);
+  }, CASE_TIMEOUT_MS);
 
   it("n=6,842: realised marginals are EQUAL to the archive, not merely close", () => {
     const pm = run6842().world.populationMarginals;
@@ -139,7 +163,7 @@ describeGated(gate, () => {
       pm!.meanWalkingSpeedMps,
     ].map((v) => javaFormatFixed(v, 4));
     expect(got).toEqual(ARCHIVED_MARGINALS_SEED42);
-  }, 60_000);
+  }, CASE_TIMEOUT_MS);
 
   it("the never-sheltered exposure identity is a single exact value, 54002.8192", () => {
     for (const r of [run2037(), run6842()]) {
@@ -152,7 +176,7 @@ describeGated(gate, () => {
       expect(javaFormatFixed(a.peakConcUgM3, 2)).toBe("562.70");
       expect(javaFormatFixed(a.hoursAboveUnhealthy, 4)).toBe("194.0000");
     }
-  }, 60_000);
+  }, CASE_TIMEOUT_MS);
 
   it("dose == exposure x 0.61 for every resident that stayed at resting ventilation", () => {
     const r = run6842();
@@ -172,7 +196,7 @@ describeGated(gate, () => {
     // the certified model carries the same residual, so this is a bound on
     // floating-point drift, not a tolerance for a modelling difference.
     expect(worstRel).toBeLessThan(1e-12);
-  }, 60_000);
+  }, CASE_TIMEOUT_MS);
 
   it("vwe is byte-identical to exposure (both RRs pinned at 1.0)", () => {
     for (const a of run6842().sim.residents) {
@@ -180,7 +204,7 @@ describeGated(gate, () => {
       expect(a.ageRR).toBe(1);
       expect(a.comorbidityRR).toBe(1);
     }
-  }, 60_000);
+  }, CASE_TIMEOUT_MS);
 
   it("gate (b): the U-03 four-way bed sum closes", () => {
     for (const r of [run2037(), run6842()]) {
@@ -192,7 +216,7 @@ describeGated(gate, () => {
       expect(occupancy).toBe(sheltered);
       expect(withTarget).toBe(sheltered);
     }
-  }, 60_000);
+  }, CASE_TIMEOUT_MS);
 
   it("gate (d): terminal-state conservation, closed vocabulary", () => {
     for (const r of [run2037(), run6842()]) {
@@ -201,7 +225,7 @@ describeGated(gate, () => {
       expect(total).toBe(r.world.config.numAgents);
       expect(total).toBe(r.sim.residents.length);
     }
-  }, 60_000);
+  }, CASE_TIMEOUT_MS);
 
   it("gate (e): no UNAWARE resident ever moves (and there are none without the layer)", () => {
     for (const r of [run2037(), run6842()]) {
@@ -213,7 +237,7 @@ describeGated(gate, () => {
       }
       expect(census(r).UNAWARE).toBe(0);
     }
-  }, 60_000);
+  }, CASE_TIMEOUT_MS);
 
   it("gate (l): closuresCode 0 leaves all four Scenario-E counters at zero", () => {
     for (const a of run6842().sim.residents) {
@@ -222,7 +246,7 @@ describeGated(gate, () => {
       expect(a.reroutes).toBe(0);
       expect(a.stuckEvents).toBe(0);
     }
-  }, 60_000);
+  }, CASE_TIMEOUT_MS);
 
   it("A-17: nobody walks further than planned + snap gap (+200 m tolerance)", () => {
     for (const r of [run2037(), run6842()]) {
@@ -230,12 +254,12 @@ describeGated(gate, () => {
         expect(a.distanceTraveledM).toBeLessThanOrEqual(a.plannedRouteM + a.snapGapM + 200);
       }
     }
-  }, 60_000);
+  }, CASE_TIMEOUT_MS);
 
   it("out_of_range_lookups is 0 at 312 h against the 576-slice observed series", () => {
     expect(run6842().outcome.outOfRangeLookups).toBe(0);
     expect(run2037().outcome.outOfRangeLookups).toBe(0);
-  }, 60_000);
+  }, CASE_TIMEOUT_MS);
 
   it("both output flavours are produced, and only the v2 one is parseable JSON", () => {
     const r = run2037();
@@ -247,7 +271,7 @@ describeGated(gate, () => {
     // n=2,037 both happen to parse, so the assertion is on the shape instead.
     expect(r.parity.simulationJson).toContain('"repast_version": "2.11.0"');
     expect(r.parity.sheltersCsv.split("\r\n")[0]!.split(",")).toHaveLength(12);
-  }, 60_000);
+  }, CASE_TIMEOUT_MS);
 
   it("the run is deterministic: the same config twice is byte-identical", () => {
     const a = runHeadless({ config: armA(500), paramNames: PARAM_NAMES });
@@ -255,7 +279,7 @@ describeGated(gate, () => {
     expect(b.parity.agentsCsv).toBe(a.parity.agentsCsv);
     expect(b.parity.sheltersCsv).toBe(a.parity.sheltersCsv);
     expect(b.parity.simulationJson).toBe(a.parity.simulationJson);
-  }, 60_000);
+  }, CASE_TIMEOUT_MS);
 
   it("the shuffle is load-bearing: identity order gives a different admission set", () => {
     const shuffled = runHeadless({ config: armA(500), paramNames: PARAM_NAMES });
@@ -270,7 +294,7 @@ describeGated(gate, () => {
     // ever stops differing, the declared divergence channel has gone inert and
     // the Tier-4 attribution argument needs re-deriving, not silencing.
     expect(identity.parity.agentsCsv).not.toBe(shuffled.parity.agentsCsv);
-  }, 60_000);
+  }, CASE_TIMEOUT_MS);
 
   it("performance: 2,037 x 312 h stays inside the plan's 60 s budget", () => {
     const r = run2037();
@@ -280,5 +304,5 @@ describeGated(gate, () => {
         `(assets ${r.timings.assetsMs.toFixed(0)} ms one-time, build ${r.timings.buildMs.toFixed(0)} ms, ` +
         `output ${r.timings.outputMs.toFixed(0)} ms)`,
     );
-  }, 120_000);
+  }, CASE_TIMEOUT_MS);
 });

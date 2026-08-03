@@ -508,6 +508,29 @@ capacity binds. These runs shelter 1,215–1,307 against arm A's 2,234 beds, wit
 nothing to act on. The WP7 arm-A slice, where capacity *does* bind, still shows
 its 114 balanced `final_state` flips.
 
+> **Correction (2026-08-02), left as an annotation rather than a rewrite.** The
+> clause above is **wrong on its stated mechanism**, and the error propagated
+> from here into `VALIDATION_REPORT.json`'s `tiers.tier4.caution`. Shelters *do*
+> saturate in these runs: `docs/runs/scenario-e/SE-E18-seed42/shelters.csv` has 9
+> of its 36 sites at or above capacity and 291 capacity refusals;
+> `docs/runs/phase-e/ER-A-n6842-seed42/shelters.csv` has 8 and 295. Across the
+> five exactly-matching configurations it is 8–12 of 36 and 291–443, and
+> `capacity_binds` is `true` on every one. What `REFUSED_ALL_FULL = 1` says is
+> that almost nobody is *ultimately* turned away — a resident refused at a full
+> door is admitted at the next — which is not the same claim as "no shelter
+> saturates".
+>
+> **The refutation result is unaffected, and the reading of it gets stronger.**
+> Because doors do saturate, the ordering channel was armed here — 274–349 of
+> 6,842 rows were refused at some door in at least one run — and the port
+> reproduced every row anyway. Per-row and per-site agreement *despite* binding
+> capacity is better evidence than agreement in a regime where the channel could
+> not act. What limits the generalisation is the channel's reach, not its
+> existence: the twelve diverging configurations contest 2,711–5,128 rows.
+> `validation/src/report/schema.ts` (`tier4Caution`) now generates the shipped
+> caution from the measured fields so this cannot drift again; see
+> `DR-WP9-WP10-verification.md` §B3.
+
 ### R3 — "clause 1 holds" is vacuous again, because `step.ts` still takes the legacy branch
 
 The most damaging possible failure: residents armed, but the tick loop still

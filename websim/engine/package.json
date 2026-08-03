@@ -17,14 +17,17 @@
     "./sim": "./src/sim.ts",
     "./output": "./src/output/logger.ts",
     "./smoke": "./src/smoke/field.ts",
-    "./mathx": "./src/mathx/index.ts"
+    "./mathx": "./src/mathx/index.ts",
+    "./worker": "./src/worker/index.ts",
+    "./worker/simWorker": "./src/worker/simWorker.ts"
   },
   "scripts": {
     "test": "vitest run",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.browser.json --noEmit"
   },
   "dependencies": {
     "@websim/shared": "*",
+    "comlink": "^4.4.2",
     "geographiclib-geodesic": "2.2.0"
   }
 }

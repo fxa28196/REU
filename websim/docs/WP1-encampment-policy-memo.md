@@ -1,3 +1,49 @@
+> # ⛔ SUPERSEDED — 2026-08-02 — THIS MEMO WAS NEVER SENT
+>
+> **This memo asked two questions. Both have been answered by other means, and it was never
+> sent to the mentor, to an IRB or human-subjects office, or to the City of Portland.**
+>
+> **1. IRB (§8, and §0.1's IRB STATUS block).** The faculty mentor determined that **no IRB
+> review is required**, on the reported grounds that the work does not involve human subjects
+> and is not yet a real-world application. Relayed by the researcher 2026-08-02.
+> → **`websim/docs/DR-WP1-irb-determination.md`**
+>
+> **2. City of Portland licence (§7, Decision L).** The researcher reports that **the City
+> approved** redistribution of the campsite-report-derived products, relayed 2026-08-02,
+> asking only that the source be credited formally.
+> → **`websim/docs/DR-WP1-data-rights.md`**
+>
+> **Those two decision records are operative. This file is not.**
+>
+> **Both outcomes stated at their true strength:** what exists in each case is the
+> *researcher's report* of a determination relayed on 2026-08-02. **No IRB protocol number,
+> exemption letter or written determination exists in this repository, and no written
+> determination from the City of Portland exists either** — no correspondence, no reference
+> number, no named contact, no terms URL. Any future publication that needs documentary
+> evidence of either must obtain it. Do not fill in §8's tick-boxes as though a form came
+> back.
+>
+> **Note the scope limit on the IRB determination.** It rests partly on "not *yet* a
+> real-world application," so it covers the current research use only. A genuine real-world
+> deployment is a materially different question and must be re-raised with the mentor. See
+> `DR-WP1-irb-determination.md` §3.
+>
+> **Why this file is kept, and what in it is still live:** it is the reasoning record, and
+> its substantive disclosure analysis is *not* superseded by either outcome. Rights and
+> disclosure are different questions — approval to redistribute says nothing about whether
+> the published granularity is appropriate. In particular §3.3 (**the k = 5 floor counts
+> reports, not sites: 10 of the 90 finest published cells are backed by exactly one snapped
+> street node, 22 more by exactly two**), §4.2, and the error table at §101 remain the
+> project's most accurate account of what the encampment assets disclose. Those findings are
+> carried forward in `DR-WP1-data-rights.md` §6.2, and the controls themselves live in
+> `DR-Q4-encampment-disclosure.md`, whose open salt-custody decision is untouched by any of
+> this.
+>
+> **Stale in the body below:** §0.1's placeholder table and §0.2's send order describe
+> sending a memo that will not be sent.
+
+---
+
 # WP1 — Encampment derived-product policy memo (DRAFT FOR REVIEW, NOT SENT)
 
 ---
