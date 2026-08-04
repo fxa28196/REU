@@ -3,8 +3,7 @@
 # Capacity Is Not Access: Agent-Based Modeling of Clean-Air Shelter Siting During Wildfire Smoke in Portland
 
 **Fatima Asghar**
-Harrisburg University of Science and Technology, Harrisburg, PA
-e-mail: fxa28196@hawkmail.hacc.edu
+Harrisburg University of Science and Technology, Harrisburg, PA, USA
 
 *Running head: Capacity Is Not Access*
 
@@ -16,7 +15,7 @@ e-mail: fxa28196@hawkmail.hacc.edu
 >
 > **Figures removed.** Old Fig. 5 (access by mobility status) duplicated the first three rows of Table 5 exactly, and old Fig. 6 (all 27 runs on a log scale) showed three flat lines whose entire content is one sentence. Both are now text. **Renumbering is not needed** — Figs. 1–4 keep their numbers. If the compiled file comes in under 15 pages, restoring Fig. 5 is the better of the two to bring back.
 >
-> **Two markers remain.** Search for `[AUTHOR:`. One is the NSF award number. One is the citation for the Pathways Study in Table 2.
+> **One marker remains** (2026-08-04). Search for `[AUTHOR:` — the only one left is the citation for the Pathways Study in Table 2, which is under verification. The NSF award number is resolved: **2244551**. A second, conditional marker `[ORCA-TOGGLE:` sits in the acknowledgements — keep it only if ORCA compute is actually used before camera-ready.
 >
 > **Corrections applied since the last version:** the "four exposure measures" claim now matches what is actually tabulated; the block-level-coordinate count is no longer self-contradictory; the uncited 1.008 figure is gone from §3.2.5 and §4.4; the abstract says "unsheltered count"; §1 no longer mixes nine days with a 312-hour window; the standard deviation in Eq. 2 is now sourced; Table 3 bolding is removed; street-centerline provenance now appears in §3.1; §4.4's forward reference to §5.1 is softened; "halve" is now "more than halve"; and §5.1 discloses the size of the ten new facilities.
 
@@ -71,7 +70,7 @@ Every dataset is recorded in a provenance registry in the project repository, wi
 | Dataset | Source | Retrieved | Content |
 |---|---|---|---|
 | Hourly PM2.5 | U.S. EPA Air Quality System, parameter 88502 [23] | 2026-07-24 | 4,795 rows; 312 hourly slices, no gaps |
-| Street centerlines | Portland Metro RLIS | not recorded | 112,070 polylines; 88,100-node graph |
+| Street centerlines | Oregon Metro RLIS | not recorded | 112,070 polylines; 88,100-node graph |
 | Encampment points | City of Portland campsite reports [7] | 2026-07-24 | 3,400 points; 2,981 used |
 | Shelter inventory | Multnomah County HSD [15]; City of Portland [8] | 2026-07-24 | 36 facilities, 2,234 spaces |
 | Population count | 2025 Tri-County Point-in-Time count [18] | 2026-07-25 | 6,842 unsheltered |
@@ -100,7 +99,7 @@ No coordinate was guessed. The raw inventory file contains no coordinates, so ev
 
 Two facilities are excluded because neither publishes a street address: Clinton Triangle, which at 160 units is the largest single site in the inventory, and Multnomah Safe Rest Village at 28. Real capacity is therefore roughly 207 people higher than modeled. Ten day centers are also excluded because none publishes a capacity.
 
-Street centerlines come from Portland Metro's Regional Land Information System and are redistributed as received. This is the one input whose retrieval date was not recorded and whose original release version and license could not be recovered; the repository states its terms as unverified rather than relicensing it.
+Street centerlines come from Oregon Metro's Regional Land Information System (RLIS), a regional geographic data resource Metro publishes for public use, and are redistributed as received with Metro's permission and credited to Metro as their source. This work does not relicense them; the repository's license file carves them out accordingly. This is also the one input whose retrieval date and original release version were not recorded.
 
 ### 3.2 Methods
 
@@ -324,11 +323,13 @@ The approach generalizes beyond smoke. The same structure — a hazard varying o
 
 ---
 
-**Acknowledgements** This work was completed through the National Science Foundation Research Experiences for Undergraduates program, Computational Modeling Serving Portland, hosted by Portland State University under Grant No. `[AUTHOR: NSF award number]`. I thank Prof. Christof Teuscher for his mentorship and guidance throughout the program.
+**Acknowledgements** This work was completed through the National Science Foundation Research Experiences for Undergraduates program, Computational Modeling Serving Portland, hosted by Portland State University under NSF Award No. 2244551. `[ORCA-TOGGLE: Computational resources were provided in part by ORCA, supported by NSF Award No. 2346732.]` I thank Prof. Christof Teuscher for his mentorship and guidance throughout the program. Street centerline data was provided by Oregon Metro through its Regional Land Information System, used here with Metro's permission.
+
+> **`[ORCA-TOGGLE: …]`** — keep this sentence only if ORCA compute is actually used before camera-ready (2026-08-23); otherwise delete it. In the LaTeX source it is the `\orcaack` macro in the preamble, a one-line comment swap.
 
 I directed the research, made all research decisions, and wrote the manuscript. Claude (Anthropic) assisted with coding, with data-acquisition and analysis scripting, with verification tooling, with drafting documentation, and with the citation audit reported in Section 3.2.5, which I then verified against the original publisher records. I reviewed, revised, and approved all outputs, and I take full responsibility for the final text and for every number in it.
 
-**Code and data availability.** The full simulation source, analysis scripts, input data, configuration files, and all 27 run manifests are available at https://github.com/fxa28196/REU under the MIT License. Every result was produced from a clean working tree. Each run manifest records its git commit, random seed, Java and Repast versions, every parameter value, and a SHA-256 checksum for every input file. The reported results use seeds 42 through 50, with seed 42 as the reported run. The EPA air-quality data and the City of Portland campsite reports are public and their retrieval scripts are included. The street centerline file is redistributed as received; its original release version and license could not be recovered, so the repository's license file states its terms as unverified rather than relicensing it.
+**Code and data availability.** The full simulation source, analysis scripts, input data, configuration files, and all 27 run manifests are available at https://github.com/fxa28196/REU under the MIT License. Every result was produced from a clean working tree. Each run manifest records its git commit, random seed, Java and Repast versions, every parameter value, and a SHA-256 checksum for every input file. The reported results use seeds 42 through 50, with seed 42 as the reported run. The EPA air-quality data and the City of Portland campsite reports are public and their retrieval scripts are included. The street centerline file is Oregon Metro RLIS data, redistributed as received with Metro's permission and credited to Metro; the repository's license file carves it out rather than relicensing it.
 
 ## References
 

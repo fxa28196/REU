@@ -19,13 +19,28 @@
 % below to:  \newcommand{\authornote}[1]{}
 \newcommand{\authornote}[1]{\textbf{#1}}
 
+% ===========================================================================
+% ORCA ACKNOWLEDGEMENT -- ONE-LINE TOGGLE
+% ---------------------------------------------------------------------------
+% NSF Award 2346732 funds the ORCA GPU accelerator. Acknowledging it is
+% ACCURATE ONLY IF ORCA COMPUTE WAS ACTUALLY USED to produce results in this
+% paper. As of 2026-08-04 it has NOT been used.
+%
+% BEFORE CAMERA-READY (2026-08-23), pick exactly one:
+%   ORCA WAS used  -> leave the first line active, comment out the second.
+%   ORCA NOT used  -> comment out the first line, uncomment the second.
+% Nothing else in the document needs to change either way.
+% ===========================================================================
+\newcommand{\orcaack}{ Computational resources were provided in part by ORCA, supported by NSF Award No.~2346732.}
+%\newcommand{\orcaack}{}
+
 \begin{document}
 
 \title*{Capacity Is Not Access: Agent-Based Modeling of Clean-Air Shelter Siting During Wildfire Smoke in Portland}
 \titlerunning{Capacity Is Not Access}
 \author{Fatima Asghar}
 \authorrunning{Fatima Asghar}
-\institute{Fatima Asghar \at Harrisburg University of Science and Technology, Harrisburg, PA, \email{fxa28196@hawkmail.hacc.edu}}
+\institute{Fatima Asghar \at Harrisburg University of Science and Technology, Harrisburg, PA, USA}
 \maketitle
 
 \abstract{Most planning for emergency clean-air shelters uses static screening
@@ -213,7 +228,7 @@ exact bytes that produced it.}
 Dataset & Source & Retrieved & Content \\
 \noalign{\smallskip}\svhline\noalign{\smallskip}
 Hourly PM$_{2.5}$ & U.S. EPA Air Quality System, parameter 88502 \cite{epaaqs2020} & 2026-07-24 & 4,795 rows; 312 hourly slices, no gaps \\
-Street centerlines & Portland Metro RLIS & not recorded & 112,070 polylines; 88,100-node graph \\
+Street centerlines & Oregon Metro RLIS & not recorded & 112,070 polylines; 88,100-node graph \\
 Encampment points & City of Portland campsite reports \cite{portlandcampsites} & 2026-07-24 & 3,400 points; 2,981 used \\
 Shelter inventory & Multnomah County HSD \cite{multcohsd}; City of Portland \cite{portlandsrv} & 2026-07-24 & 36 facilities, 2,234 spaces \\
 Population count & 2025 Tri-County Point-in-Time count \cite{psupit2025} & 2026-07-25 & 6,842 unsheltered \\
@@ -316,11 +331,12 @@ Multnomah Safe Rest Village at 28. Real capacity is therefore roughly 207 people
 higher than modeled. Ten day centers are also excluded because none publishes a
 capacity.
 
-Street centerlines come from Portland Metro's Regional Land Information System
-and are redistributed as received. This is the one input whose retrieval date was
-not recorded and whose original release version and license could not be
-recovered; the repository states its terms as unverified rather than relicensing
-it.
+Street centerlines come from Oregon Metro's Regional Land Information System
+(RLIS), a regional geographic data resource Metro publishes for public use, and
+are redistributed as received with Metro's permission and credited to Metro as
+their source. This work does not relicense them; the repository's license file
+carves them out accordingly. This is also the one input whose retrieval date and
+original release version were not recorded.
 
 \subsection{Methods}
 \label{sec:methods}
@@ -1072,9 +1088,10 @@ hypothesis those settings could test.
 \begin{acknowledgement}
 This work was completed through the National Science Foundation Research
 Experiences for Undergraduates program, Computational Modeling Serving Portland,
-hosted by Portland State University under Grant No.
-\authornote{[NSF award number to be inserted]}. I thank Prof. Christof Teuscher
-for his mentorship and guidance throughout the program.
+hosted by Portland State University under NSF Award No.~2244551.\orcaack{} I
+thank Prof. Christof Teuscher for his mentorship and guidance throughout the
+program. Street centerline data was provided by Oregon Metro through its
+Regional Land Information System, used here with Metro's permission.
 
 I directed the research, made all research decisions, and wrote the manuscript.
 Claude (Anthropic) assisted with coding, with data-acquisition and analysis
@@ -1093,9 +1110,9 @@ commit, random seed, Java and Repast versions, every parameter value, and a
 SHA-256 checksum for every input file. The reported results use seeds 42 through
 50, with seed 42 as the reported run. The EPA air-quality data and the City of
 Portland campsite reports are public and their retrieval scripts are included.
-The street centerline file is redistributed as received; its original release
-version and license could not be recovered, so the repository's license file
-states its terms as unverified rather than relicensing it.
+The street centerline file is Oregon Metro RLIS data, redistributed as received
+with Metro's permission and credited to Metro; the repository's license file
+carves it out rather than relicensing it.
 
 \begin{thebibliography}{99}
 
