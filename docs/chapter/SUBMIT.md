@@ -1,37 +1,42 @@
 # How to submit the chapter
 
-Everything needed is in this folder. Read §0 first — the four items there need
-your decision before you upload, and one of them is in the author line.
+Everything needed is in this folder. Read §0 first. **As of 2026-08-04 most of
+it is resolved** — only one item still needs anything from you.
 
 ---
 
-## 0. Do these first (they are not optional)
+## 0. Status of the pre-upload items
 
-### 0.1 Check the author line — I inferred it
+### 0.1 Author line — RESOLVED (author-confirmed 2026-08-04)
 
-`Capacity_Is_Not_Access.tex` should say (all metadata files are normalized to
-this affiliation):
+`Capacity_Is_Not_Access.tex` now reads:
 
 ```latex
-\institute{Fatima Asghar \at Harrisburg University of Science and Technology, Harrisburg, PA,
-\email{fxa28196@hawkmail.hacc.edu}}
+\institute{Fatima Asghar \at Harrisburg University of Science and Technology, Harrisburg, PA, USA}
 ```
 
-I took that email from `scripts/geocode_shelters.py`, where you set it as the
-Nominatim User-Agent contact, and inferred the institution from the `hacc.edu`
-domain. (An earlier pass briefly said "Harrisburg University of Science and
-Technology" — that contradicts the `hawkmail.hacc.edu` domain and the v0
-archive, so everything is now normalized to Harrisburg Area Community
-College.) **I did not verify either value.** Van Pelt's chapter uses his
-*home* institution rather than PSU, so the pattern is right, but the specific
-values are my inference from a string in your own code.
+The author confirmed the institution directly. The `fxa28196@hawkmail.hacc.edu`
+address has been **removed everywhere** — it is not an address at this
+institution, and it was never anything but a Nominatim User-Agent contact
+string I found in `scripts/geocode_shelters.py`. Do not reinstate it. The
+earlier "Harrisburg Area Community College" reading, which I inferred from that
+domain, was wrong and is retracted.
 
-Open `Capacity_Is_Not_Access.tex`, find that line, and correct it if either
-the institution or the email is wrong. The same affiliation now appears in
-`.zenodo.json` and `CITATION.cff` — if you change it in one place, change it
-in all three.
+The REU host institution is **Portland State University** and appears in the
+acknowledgements, which is the correct place for it — the `\institute` line
+carries the author's *home* institution, matching the pattern in Van Pelt's
+chapter.
 
-### 0.2 The repository is private
+`CITATION.cff` and `.zenodo.json` already carry the same affiliation. Nothing to
+change there.
+
+### 0.2 Repository visibility — RESOLVED
+
+`https://github.com/fxa28196/REU` is **public** (verified 2026-07-31). The
+code-availability URL in the chapter resolves, and the checklist's public-repo
+requirement is satisfied. Nothing to do.
+
+*Historical note, superseded — kept only so the reasoning is on record:*
 
 The chapter's code-availability note points at
 `https://github.com/fxa28196/REU`, and the checklist asks for a **public**
@@ -46,13 +51,28 @@ Before the **23 August camera-ready**, do one of:
 If you decide to keep it private, delete the sentence and say instead that code
 is available on request — but do not leave a dead URL in a published chapter.
 
-### 0.3 Licence — done. Zenodo DOI — needs ten minutes of your clicking
+### 0.3 Licence — done. Zenodo DOI — DROPPED by author decision (2026-08-04)
 
 | Checklist item | Status |
 |---|---|
 | MIT `LICENSE` file present | **Done.** `LICENSE` at the repo root. |
 | Citation metadata | **Done.** `CITATION.cff` gives GitHub a "Cite this repository" button. |
-| Zenodo DOI minted and cited | **Prepared, not minted.** `.zenodo.json` is written; the archive needs your GitHub account and a public repo. Steps below. |
+| Zenodo DOI minted and cited | **Dropped.** The author decided on 2026-08-04 not to mint one. `.zenodo.json` stays in the tree, unused and harmless, in case that changes. `doi:` in `CITATION.cff` stays commented out — never placeholder it. |
+
+**Street data — RESOLVED (2026-08-04).** Oregon Metro gave the author the
+go-ahead to use the RLIS street centerlines. The chapter now credits Metro in
+the acknowledgements and in §3.1, as ordinary use of a public regional data
+resource. This is a **verbal/author-attested clearance, not a written licence
+grant** — so the `LICENSE` carve-out stays exactly as it is and the chapter
+claims permission to *use and credit*, never a relicensing right. Do not
+upgrade that wording.
+
+**IRB — RESOLVED (2026-08-04).** The author's professor determined that no IRB
+review is required: the work uses published municipal open data and simulated
+agents, with no human subjects and no interaction with any individual. Recorded
+in `websim/docs/DR-WP1-irb-determination.md`.
+
+*The Zenodo steps below are retained only in case the decision is reversed.*
 
 **About the licence.** It is MIT, but *scoped* — because a blanket MIT grant
 over this repository would have been false. The repo contains Springer's
@@ -87,17 +107,35 @@ that file once, so you can answer for it if a reviewer asks.
 
 Nothing here blocks the July draft. Do it before 23 August.
 
-### 0.4 Two bold placeholders print in the PDF
+### 0.4 ONE bold placeholder still prints in the PDF
 
 `\authornote` deliberately prints its argument **in bold** so a placeholder
-cannot ship unnoticed. Two remain in the source until you supply the values:
+cannot ship unnoticed.
 
-- the full Pathways Study 2026 citation (near line 366), and
-- the NSF award number in the acknowledgements (near line 971).
+| Placeholder | Status |
+|---|---|
+| NSF award number, acknowledgements | **Filled — 2244551.** |
+| Full Pathways Study 2026 citation, Table 2 | **STILL OPEN.** Under verification. This is the last one. |
 
-Fill both in, then switch `\authornote` to the blank definition commented at
-the top of the file. If either value is still unknown at upload time, leave
+Once the Pathways citation lands, switch `\authornote` to the blank definition
+commented at the top of the file. If it is still unknown at upload time, leave
 the bold flag visible — do not silently hide an unfilled placeholder.
+
+### 0.5 ORCA acknowledgement — a decision you must make before camera-ready
+
+The acknowledgements carry a second NSF award, **2346732** (the ORCA GPU
+accelerator), through a one-line macro `\orcaack` defined in the preamble.
+
+**As of 2026-08-04 ORCA has not been used for any result in this paper.**
+Acknowledging a computing resource you did not use would be inaccurate, so this
+is a genuine either/or, not a formality:
+
+- **ORCA gets used before 2026-08-23** → leave the preamble as it is.
+- **ORCA does not get used** → comment out the active `\orcaack` line and
+  uncomment the empty one directly below it. One line, nothing else changes.
+
+Search the `.tex` for `ORCA ACKNOWLEDGEMENT` — the block is self-documenting.
+The Markdown twin carries the same sentence tagged `[ORCA-TOGGLE:`.
 
 ---
 
