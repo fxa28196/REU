@@ -79,7 +79,7 @@
  * lives in `engine/vitest.browser.config.ts`, outside this change's scope, so it
  * is recorded here rather than applied.
  *
- * ## What causes it — and it is NOT the frame stream
+ * ## What causes it — and it is NOT the frame stream, NOR (withdrawn) the ring
  *
  * A 2x2 on Firefox at the same scale, frames disabled in every cell so the UI
  * thread receives 14,560 bytes in total (measured, same box, same day):
@@ -93,20 +93,42 @@
  * The stall reproduces with **no frames at all**, so the transferable frame
  * protocol is exonerated — and separately confirmed: at max frame rate with
  * `snapshotEveryTicks: 0`, streaming the full 1.68 GB in 27,300 batches, Firefox
- * reports `max 12 ms, 0 long tasks`. What costs 157 ms is the **snapshot ring at
- * production population** (228 snapshots taken, 122 MB resident by
- * `RingStats.approxBytes`) combined with the short slice cadence, which yields
- * to the worker's event loop 910 times instead of 114. Both factors are needed;
- * neither alone exceeds 27 ms. The signature is a Firefox garbage collection
- * over the worker's ring stalling the page.
+ * reports `max 12 ms, 0 long tasks`.
  *
- * That localisation matters for the fallback: the lever is the ring's footprint
- * and the yield cadence, not the frame protocol. Two nearby configurations were
- * measured at production scale **on Firefox**, the engine that fails, and both
- * are clean: the protocol's own defaults (a frame every 60 ticks, batches of 8,
- * 240-tick slices) give `max 11 ms, 0 long tasks`, and max frame rate with scrub
- * disabled gives `max 12 ms, 0`. Neither was measured on Chromium or WebKit —
- * both pass the gated case there, so there was nothing to localise.
+ * **This file used to continue: "what costs 157 ms is the snapshot ring at
+ * production population (228 snapshots, 122 MB) combined with the short slice
+ * cadence… the signature is a Firefox garbage collection over the worker's ring
+ * stalling the page." That attribution is WITHDRAWN.** It is quoted rather than
+ * silently deleted because a gate that changes its story without saying so is
+ * worse than one that shows its working. `DR-WP10-uithread-perf` §7 disproves
+ * it: every
+ * cell of the 2x2 above was a single run of a bimodal event, and every cell that
+ * stalled happened to be the first run in its page. Holding the ring's footprint
+ * fixed and varying its churn 16x changes nothing (57 snapshots / 126 MB → 18 ms,
+ * 0 long tasks; 911 snapshots / 144 MB → 11 ms, 0). Removing the ring **and** the
+ * frames from a cold page does not help: 153–158 ms, 2 long tasks, with a ring of
+ * 0 MB. And the same gated configuration is clean on its second and third run in
+ * the same page (23 ms, 15 ms).
+ *
+ * What the DR measured instead, and what this file must not be read as
+ * contradicting: on a cold Firefox page the accepted probe records **138–143 ms
+ * followed by 64–65 ms, three runs out of three, at t ≈ 3.4 s and t ≈ 4.9 s, with
+ * no worker, no simulation, no frame stream and no ring — nothing under test at
+ * all.** Inside the gap: zero messages handled, 0.00 ms of handler self-time, one
+ * animation-frame callback that did nothing, and `requestAnimationFrame` itself
+ * stalled alongside. Read literally, therefore, **the clause this file gates is
+ * false on Firefox and no change to `websim` can make it true.** DR §8 sets out
+ * what closing it would require — a differential empty-page control, which is a
+ * renegotiation of a WP10 acceptance criterion and needs sign-off under plan
+ * §9.3, not an edit made inside this file.
+ *
+ * One consequence follows immediately and is not optional: **this gate is
+ * non-deterministic.** Of five isolated Firefox runs of the gated configuration
+ * on 2026-08-03, three were red and two would have passed. Isolated re-runs on
+ * the same box the same day: Firefox 2/150, 2/206, 2/158 (three of three red);
+ * WebKit 0/41, 0/35, 0/38 (three of three green, but with 158–172 gaps at or over
+ * half the budget and p99.9 at 26 ms — no headroom, which is itself the finding);
+ * Chromium 0/5.6, 0/5.9, 0/5.7.
  *
  * ## What this gate is and is not sensitive to
  *
@@ -143,7 +165,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import type { StreamMessage } from "../../src/worker/protocol.js";
+import type { RunStatus, StreamMessage } from "../../src/worker/protocol.js";
 import { ENGINE_LABEL, initPayload, startWorker } from "./harness.js";
 import { LongTaskProbe } from "./probe.js";
 
@@ -193,8 +215,13 @@ describe(`UI-thread responsiveness at PRODUCTION scale [${ENGINE_LABEL}]`, () =>
     let occupancySum = 0;
     let residentCountSeen = 0;
     let frameBytesSeen = 0;
+    let settled: RunStatus | null = null;
 
     const onMessage = (m: StreamMessage): void => {
+      if (m.kind === "status" && m.phase === "finished") {
+        settled = m;
+        return;
+      }
       if (m.kind !== "frames") {
         return;
       }
@@ -233,8 +260,35 @@ describe(`UI-thread responsiveness at PRODUCTION scale [${ENGINE_LABEL}]`, () =>
         frameBatchSize: 1,
         metricBatchSize: 1,
         snapshotEveryTicks: 120,
+        // Explicit, though `0` is also the shipped default: this gate measures
+        // the UNCAPPED path on purpose. `maxFramesPerSecond` (DR-WP10 §8.3 D1)
+        // would cut the payload this thread absorbs by ~8x, and turning it on
+        // here would be shrinking the workload to pass — the exact move DR §8.4
+        // rules out. The ceiling's own effect is measured, separately and
+        // without a budget attached, in `profile/wp10-cap.profile.ts`.
+        maxFramesPerSecond: 0,
       });
       const dist = probe.stop();
+
+      // Let the STREAM finish arriving before reading any counter off it.
+      //
+      // `await w.api.run(...)` returns over Comlink's own MessageChannel;
+      // nothing orders that reply against the last `postMessage` on the
+      // unrelated stream port, so the frame counters can legitimately be short
+      // when the reply lands. Measured here 2026-08-03: an isolated Firefox run
+      // reported `framesSeen` 27,299 of 27,300 and failed the non-vacuity guard
+      // — masking the long-task result, which was ALSO red in that run. The
+      // hazard is the one `compare.worker.test.ts`'s `awaitStreamTick` documents
+      // and waits out; this file did not, and that was a defect in the gate.
+      //
+      // The wait is deliberately AFTER `probe.stop()`, so it is outside the
+      // measurement window and cannot flatter or worsen a single gap. Ports
+      // deliver in order and `SimHost.run` flushes the streams before emitting
+      // the terminal status, so that status arriving means every frame did.
+      const drainDeadline = performance.now() + 30_000;
+      while (settled === null && performance.now() < drainDeadline) {
+        await new Promise<void>((r) => setTimeout(r, 5));
+      }
       const ring = await w.api.ringStats();
 
       // eslint-disable-next-line no-console -- the distribution IS the deliverable.
@@ -258,6 +312,11 @@ describe(`UI-thread responsiveness at PRODUCTION scale [${ENGINE_LABEL}]`, () =>
       );
 
       // --- non-vacuity: this really was the production payload ---------------
+      expect(
+        settled,
+        "the worker's stream never delivered a finished status, so the frame counters below " +
+          "would be read mid-flight",
+      ).not.toBeNull();
       expect(summary.tick, "the worker did not run to the production horizon").toBe(TICKS);
       expect(residentCountSeen, "the frames did not carry the production population").toBe(RESIDENTS);
       expect(
@@ -283,15 +342,20 @@ describe(`UI-thread responsiveness at PRODUCTION scale [${ENGINE_LABEL}]`, () =>
       );
 
       // --- the criterion -----------------------------------------------------
-      // RED AT THE TIME OF WRITING: Firefox always (2-4 long tasks, 127-223 ms),
-      // WebKit whenever the box is shared (0-4 long tasks, 34-138 ms).
-      // Attributed in this file's header to the snapshot ring at production
-      // population (122 MB) plus the 30-tick yield cadence, NOT to the frame
-      // stream — which is exonerated by a frames-disabled control that stalls
-      // just as hard and a snapshots-disabled control that streams the whole
-      // 1.68 GB in 12 ms. Do not silence this by widening the threshold, by
-      // shrinking the population, or by shortening the horizon: the number is
-      // the finding.
+      // STILL RED: Firefox always (2 long tasks, 150-206 ms isolated on
+      // 2026-08-03), WebKit whenever the box is shared. The header's original
+      // attribution to the snapshot ring is WITHDRAWN; DR-WP10-uithread-perf
+      // §6.3 reproduces the same 138-143 ms signature on a cold Firefox page
+      // with no worker and nothing under test, so this assertion is measuring
+      // the browser as much as the code.
+      //
+      // That is an argument for making the clause DIFFERENTIAL against an
+      // empty-page control (DR §8.1) — which is a renegotiation of a WP10
+      // acceptance criterion and needs sign-off under plan §9.3. It is NOT an
+      // argument for widening the threshold, shrinking the population,
+      // shortening the horizon, capping the frame rate, or narrowing the clause
+      // to Chromium. All five are available, all five would be dishonest, and
+      // DR §6.3 shows the first three would not even work.
       expect(
         dist.longTasks,
         `${ENGINE_LABEL}: ${dist.longTasks} main-thread gap(s) >= ${LONG_TASK_MS} ms at ` +

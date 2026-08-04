@@ -272,8 +272,15 @@ jobs:
       # Asserts the SAME committed digests the Node suite asserts, inside three real
       # engines. Failure means an outcome-relevant value is engine-dependent, which is
       # release-blocking for a determinism claim -- see docs/DR-WP3-cross-engine.md.
-      - name: Cross-engine determinism matrix
-        run: npm run test:browser
+      #
+      # `gate:browser` rather than `test:browser` on purpose: it is the same matrix
+      # behind the same probe the LOCAL gate (`npm run ci`) uses, so this job and a
+      # developer's machine cannot diverge about what "the browser matrix ran" means.
+      # If the install step above ever half-succeeds, the probe names the missing
+      # engine and the WP10 clauses it leaves unverified, instead of the matrix
+      # failing to launch with a Playwright error.
+      - name: Cross-engine determinism + WP10 acceptance matrix
+        run: npm run gate:browser
 
   strict-artifacts:
     name: strict (artifacts required, no skips permitted)

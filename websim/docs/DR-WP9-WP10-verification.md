@@ -1192,3 +1192,465 @@ one Java edit is a comment. Nothing outside `websim/` was written by this gate.
 None of 1–5 touches the science. The Tier-4 attribution re-derived from raw bytes
 by an independent script reproduces the shipped census exactly, and the ported
 gates reproduce the certified Python on the archive. That result stands.
+
+
+---
+---
+
+# PART III — FINAL GATE ON WP10 (third pass, 2026-08-03)
+
+*A clearly-marked NEW section. Nothing above this line was edited. Part I returned NO-GO
+on both work packages; Part II returned GO on WP9 and NO-GO on WP10 clause 2. This pass
+re-measured clause 2 from the tree, distrusting both earlier passes, and hunted
+specifically for the failure mode a second look invites: **a clause that turned green by
+measuring less.***
+
+**Tree under test:** `main` at `e53e55b` + uncommitted work — 9 modified and 7 untracked
+paths, all inside `websim/` and `.github/`. (This document is the 17th entry; it is the
+only file this gate wrote.)
+
+---
+
+## III.0 Verdict
+
+| Work package | Verdict |
+|---|---|
+| **WP10 — worker runtime, streaming, snapshots, Compare backend** | **NO-GO.** Clauses 1 and 3 hold and I revert-proofed both myself. **Clause 2 is false**, measured by me at production scale on all three engines — nine isolated runs plus three full three-engine matrix runs. |
+
+**And the clause did not become easier.** That was the thing I was sent to find, and it is
+not there. The workload, the threshold, the sampling window, the long-task detector and
+the engine set are all provably unchanged — five of them by SHA-256 against `e53e55b`,
+the sixth constant-for-constant. The gate is red for the same reason it was red before,
+and the number is bigger, not smaller.
+
+The one substantive change since `e53e55b` on the WP10 surface is an **opt-in display
+ceiling** (`RunOptions.maxFramesPerSecond`) that **defaults to `0` (off), is explicitly
+set to `0` in the gate, and has no caller anywhere in the tree**. It cannot be the
+mechanism by which anything passed, because nothing passed.
+
+---
+
+## III.1 The "measured less" hunt, item by item
+
+The brief named six ways a perf budget can be made to pass dishonestly. Each is
+addressed with evidence, not assurance.
+
+| Move | Evidence it did not happen |
+|---|---|
+| **Workload shrunk** | `RESIDENTS = 6842`, `HOURS = 455`, `TICKS = 27_300`, `sliceTicks: 30`, `frameEveryTicks: 1`, `frameBatchSize: 1`, `snapshotEveryTicks: 120` — every one identical to `e53e55b`. Observed in **all 18 production-scale runs I took**: `framesSeen 27301`, `streamMessages 28675`, `bytesReceived 1681919966`, `bytesPerFrame 61606`, `workerTicks 27300`, `snapshotsTaken 228` — **byte-identical figures in every run, on every engine**. |
+| **Threshold raised** | `const LONG_TASK_MS = 50;` unchanged. The criterion is still `expect(dist.longTasks).toBe(0)` and `expect(dist.maxMs).toBeLessThan(LONG_TASK_MS)`. |
+| **Sampling window narrowed** | `expect(dist.windowMs).toBeGreaterThan(20_000)` unchanged; `expect(dist.samples).toBeGreaterThan(20_000)` unchanged. Observed windows **57.9–223 s**, samples **1.3 × 10⁵ – 2.7 × 10⁷**. |
+| **Long-task detector desensitised** | `engine/test-browser/worker/probe.ts` is **byte-identical** to `e53e55b`: SHA-256 `554e424360079b9028760756fbce3d8480d74e6a7e28ad123c82112ea1f12a17` on both sides. |
+| **Moved to a friendlier engine** | `engine/vitest.browser.config.ts` is **byte-identical** to `e53e55b` (`instances: chromium, firefox, webkit`, `headless`, default file parallelism). The harness `test-browser/worker/harness.ts` is byte-identical too. |
+| **Frame rate capped to cut the payload** | The gate passes `maxFramesPerSecond: 0` explicitly, `RUN_OPTION_DEFAULTS.maxFramesPerSecond` is `0`, and `engine/test/worker/host.test.ts` pins that default with a test that names Compare as the reason. The 1.68 GB figure above is the proof it did not bite. |
+
+The whole determinism core is untouched: `snapshot.ts`, `digest.ts`, `frames.ts`,
+`simWorker.ts`, `api.ts`, `agents/step.ts`, `world/build.ts` and `vitest.config.ts` are
+all SHA-256-identical to `e53e55b`. Only `protocol.ts` and `simHost.ts` changed, and only
+for the fenced ceiling.
+
+### III.1.1 Every deleted line in every changed test file, accounted for
+
+`git diff --numstat e53e55b -- 'websim/**/*.test.ts'` reports three changed files,
+`88/24`, `142/4`, `176/1`. All 29 deletions:
+
+* `uithread.scale.worker.test.ts` — **23 comment lines** (the withdrawn attribution,
+  quoted rather than dropped) and **1 import line**. **Zero assertions deleted.** One
+  assertion *added* (`expect(settled).not.toBeNull()`).
+* `uithread.worker.test.ts` — 1 function signature (gained `export`), 1 field line
+  (became two), and **2 assertions repointed from `maxMs` to `maxExactMs`** — the G1 fix.
+* `host.test.ts` — **1 import line**.
+
+**The only change to assertion semantics anywhere in the diff is `maxMs` → `maxExactMs`.**
+That is a loosening on exactly one half-open interval, `[49.995, 50)`, where the old
+assertion was *false on a sample carrying zero long tasks*. It is the defect Part II
+§II.8 identified, and it is accompanied by a new contradiction guard plus four new pinned
+boundary cases. Net: one measure-zero correction, five added assertions.
+
+### III.1.2 The one change that made the gate *harder*, not easier
+
+The gate now waits for the worker's terminal `status` before reading the frame counters.
+Part II's own run and the profiling DR both recorded `framesSeen 27,299 of 27,300` /
+`bytes 1,681,858,328` — the stream was being read mid-flight, so the **non-vacuity guard
+failed first and masked a long-task result that was also red**. With the drain, every run
+reads the complete `27,301 / 1,681,919,966`. The wait sits *after* `probe.stop()`, so it
+is outside the measurement window. This exposes more red, not less.
+
+---
+
+## III.2 Clause 2 re-measured — the full distribution, per engine
+
+Windows 11, 16 logical cores, headless. The shipped gate file, unmodified.
+
+### Isolated (one engine, this file only) — three repetitions each
+
+```
+engine    rep exit    samples    p50   p99  p99.9    max   >=50ms  >=25ms  window   frames
+chromium   1   0    16,182,724   0.1   0.1    0.2    6.4       0       0   69.7 s   27,301
+chromium   2   0    16,111,328   0.1   0.1    0.2    6.6       0       0   69.1 s   27,301
+chromium   3   0    15,817,193   0.1   0.1    0.2    6.4       0       0   68.6 s   27,301
+firefox    1   1    21,888,097   0.1   0.1    1.1    223       2      27  146.3 s   27,301
+firefox    2   1    17,704,338   0.1   0.1    1.1    214       3      14  113.1 s   27,301
+firefox    3   1    10,679,125   0.1   0.1    1.1    180       3      14   60.4 s   27,301
+webkit     1   0       277,686   0.1   1.1   23.1     39       0     235  108.2 s   27,301
+webkit     2   0       188,483   0.1   3.1   27.0     44       0     243  107.0 s   27,301
+webkit     3   0       134,748   0.1   6.1   25.1     35       0     170   57.9 s   27,301
+```
+
+### Three-up — `npm run test:browser` exactly as CI runs it
+
+```
+engine     scale            longTasks  max      p99.9   >=25ms  window    frames
+chromium   6,842 / 455 h        0      15.8 ms   0.2 ms      0  164.4 s   27,301
+firefox    6,842 / 455 h        2     113   ms   1.1 ms      3  223.2 s   27,301
+webkit     6,842 / 455 h       11     154   ms  29   ms    479  191.6 s   27,301
+chromium     800 /  24 h        0       9   ms      —       —     2.1 s    1,441
+firefox      800 /  24 h        1      94   ms      —       —     1.6 s    1,290
+webkit       800 /  24 h        4      97   ms      —       —     3.8 s    1,411
+```
+
+### Does the clause hold on all three? **No.**
+
+* **Chromium — holds**, with ~7.6x headroom and not one gap even at half the budget, in
+  six runs out of six (max 6.4–15.8 ms).
+* **Firefox — fails, every time.** **Six of six at production scale** — three isolated and
+  three matrix runs — plus the 800-resident case in all three matrix runs. 2–3 long tasks,
+  worst gap **180–223 ms isolated** and 113–149 ms under the matrix, i.e. **2.3–4.5x the
+  budget**. This is not load and it is not the instrument: `probe.ts` is byte-identical to
+  the version that produced every earlier number.
+* **WebKit — no usable headroom, and red under the configuration CI runs.** One matrix run
+  in three was red (**11 long tasks, 154 ms**); the other two and all three isolated runs
+  were green at 35–44 ms — but with **170–479 gaps at or above half the budget** and p99.9
+  of 23–29 ms in every single run. 50 ms sits inside its normal spread. "Green" here is a
+  coin landing the right way up, not headroom.
+
+**Clause 2 — "UI thread long-task-free (< 50 ms) at max speed" — is FALSE on two of the
+three shipped engines.**
+
+### III.2.1 The gate is a live instrument, not a permanently-red stamp
+
+A budget that is always red proves nothing. So I injected a UI-thread regression on
+**Chromium — the one engine that passes** — and watched it fail (RP2 below): forcing
+2,048-frame batches took Chromium from `max 6.4 ms, 0 long tasks` to `max 55.4 ms, 2 long
+tasks`, and the failure message names the clause verbatim. The gate discriminates.
+
+### III.2.2 The null control, re-run independently — it reproduces
+
+`DR-WP10-uithread-perf` §6.3(c) is the load-bearing experiment for the claim that no
+change to `websim` can make clause 2 true on Firefox, and Part III's brief was to distrust
+every report. So I re-ran cell **N1** myself — the accepted probe on a cold page for 40 s,
+**no worker, no simulation, no frame stream, no snapshot ring, nothing under test at all**:
+
+```
+engine    run   hops/s     max      >=50ms  >=25ms  gap at    inside the worst gap
+firefox    1   201,084   137 ms       2       10    t=3.40 s  0 messages, 0.00 ms handler, 1 rAF, 137 ms unaccounted
+firefox    2   202,910   140 ms       2       12    t=3.41 s  0 messages, 0.00 ms handler, 1 rAF, 140 ms unaccounted
+firefox    3   201,374   143 ms       2        7    t=3.41 s  0 messages, 0.00 ms handler, 1 rAF, 143 ms unaccounted
+chromium   1   317,172    18.8 ms     0        0    t=3.27 s
+webkit     1     3,852    15   ms     0        0    t=0.69 s
+```
+
+Firefox's `rafMaxGapMs` is **168–170 ms** in all three runs, so `requestAnimationFrame`
+stalls alongside the probe. **Three runs out of three, a ~140 ms long task with nothing
+under test.** This matches the DR's own 138/139/143 ms at t ≈ 3.36–3.52 s to within a few
+milliseconds. The attribution stands, independently confirmed, and the earlier attribution
+to the snapshot ring is rightly withdrawn.
+
+Three things follow, and all three matter:
+
+1. **It changes nothing about this verdict.** Clause 2 *as written* — "the UI thread stays
+   long-task-free (< 50 ms) at max speed" — is false on Firefox. A criterion that cannot
+   distinguish "our code stalls the thread" from "the page stalls" is still a criterion,
+   and it is not satisfied.
+2. **But it does change what the right fix is.** The lever is not in `websim`. Widening
+   the threshold, shrinking the population, shortening the horizon or capping the frame
+   rate would not merely be dishonest — per DR §6.3 the first three would not even work,
+   and my N1 runs are why.
+3. **The remedy the DR proposes (§8.1, a differential empty-page control) is a
+   renegotiation of a WP10 acceptance criterion** and needs a decision record and sign-off
+   under plan §9.3. It has correctly **not** been applied inside the gate file. Note also
+   the DR's own caveat — cell N3, which I did **not** re-run and therefore do not certify:
+   it reports the event vanishing when the probe samples at 36 Hz instead of ~201,000 Hz,
+   i.e. the instrument is part of the phenomenon. My own N1 numbers are consistent with
+   that (the probe occupies the thread at ~201 k hops/s and 0.00 ms of that is handler
+   work), but consistent is not the same as verified. Any restatement of the clause should
+   say what main-thread duty cycle it is about, and N3 should be re-run before it is.
+
+---
+
+## III.3 Determinism survived
+
+The risk with any change to frame cadence or the streaming path is that the thing this
+project exists for gets traded for a frame budget. It did not.
+
+### III.3.1 The simulation still executes every tick
+
+Directly observed, not argued. In **all 18** production-scale runs across three engines
+(nine isolated, plus three three-engine matrix runs):
+
+```
+workerTicks   27,300   (= 455 h × 60, the full horizon)
+framesSeen    27,301   (a frame at tick 0 and at every one of 27,300 ticks)
+streamMessages 28,675
+bytesReceived 1,681,919,966
+snapshotsTaken   228
+```
+
+Identical to the digit in every run. **No frame was coalesced, no frame was dropped, no
+tick was skipped.** The gate asserts `summary.tick === 27_300` and
+`framesSeen >= 27_300` in its own right, so a run that skipped work could not report green.
+
+### III.3.2 The display ceiling cannot reach the model
+
+`maxFramesPerSecond` is the only wall-clock-dependent decision in `SimHost`. With the
+shipped default (`0`) every added branch short-circuits, so the default path is provably
+the `e53e55b` path. With the ceiling **on**, `engine/test/worker/host.test.ts` proves the
+fence by digest rather than by prose: a capped run is byte-identical to a **bare
+`sim.run()`** reference (not to another hosted run, so two equally-wrong hosts cannot
+agree), with a non-vacuity assertion that the ceiling actually suppressed > 600 frames,
+plus subsequence/ordering, metric-losslessness, no-op-at-high-ceiling and input-validation
+cases. `nextStopTick` never consults it.
+
+### III.3.3 Byte identity in the worker, all three engines
+
+`engine/test-browser/worker/snapshot.worker.test.ts` — **7 tests passed on Chromium,
+Firefox and WebKit** in the full matrix run. `cross-engine.digest.test.ts` — **17 tests
+passed on all three**, which is the Tier-2 cross-engine digest gate.
+
+### III.3.4 WP8 clause 3, recomputed from raw archive bytes
+
+I did not read the harness's numbers. I read the certified Java CSVs under `docs/runs/`
+with my own one-line counters — `final_state == "SHELTERED"` over `agents.csv`, and the
+`policy_refused` / `refused_count` columns summed over `shelters.csv`:
+
+| Archive run | rows | sheltered | policy_refusals | door_refusals_total | unreachable |
+|---|---|---|---|---|---|
+| `phase-e/ER-A-n6842-seed42` | 6,842 | **1,215** | **541** | 836 | 4 |
+| `scenario-e/SE-E18-seed42` | 6,842 | **1,252** | **543** | 834 | 9 |
+| `scenario-e-v2/SE2-E18-d1-seed42` | 6,842 | **1,307** | **709** | 1,152 | 9 |
+
+**All six named figures reproduce exactly** — 1,215 / 1,252 / 1,307 sheltered and
+541 / 543 / 709 policy refusals — and match `validation/test/wp8-archive-replay.test.ts`'s
+`HEADLINE` literals cell for cell.
+
+---
+
+## III.4 Revert-proofs — all three WP10 clauses
+
+Method: SHA-256 the target, park the bytes outside the repository, apply **one** textual
+substitution (aborting unless the anchor is unique), run a real child `vitest`, restore
+from the parked copy, re-hash. **All three restored byte-identical.**
+
+| ID | Clause | Mutation | Result |
+|---|---|---|---|
+| **RP1** | **W10-1** snapshot-replay byte identity in the worker | `snapshot.ts`: `internals.admissionEpoch = snap.admissionEpoch;` → `= 0;` | **RED in real Chromium**, 3 failed / 4 passed. Names the field: *"worker replay diverged. token 1: sim.admissionEpoch=4042000000000000 != 0000000000000000"*, plus scrub and scrub-and-continue digest divergences. |
+| **RP2** | **W10-2** UI thread long-task-free | `simHost.ts`: `frameBatchSize` forced to `2048` | **RED on Chromium — the only engine that passes.** 1 failed / 1 passed: *"2 main-thread gap(s) >= 50 ms … (max 55.4 ms) … The WP10 clause 'UI thread long-task-free (< 50 ms) at max speed' does not hold at production scale in this engine."* Baseline on the same engine: 0 gaps, 6.4 ms. |
+| **RP3** | **W10-3** Compare runs two synced workers | `simHost.ts`: round the stop tick down to the 240-tick slice grid | **RED in real Chromium**, 3 failed / 3. *"worker A overshot or undershot stop 60: expected +0 to be 60"*, *"expected 240 to be 300"*. |
+
+```
+snapshot.ts  before/after  ec5dc206ea5fb15f6bce256a5c33a4cd57e2b92284c21d90a32aee0dbb0808cc  RESTORED
+simHost.ts   before/after  b1b16a4457d4fe45c9f43c5c3e4196895327fabd71f77fd2aa082e868ade0777  RESTORED
+```
+
+---
+
+## III.5 G1, G2, G3 — each closed, each broken to prove it
+
+| ID | The gap | Break applied | What went red |
+|---|---|---|---|
+| **G1** | the two boundary assertions read different quantities | `uithread.worker.test.ts`: round `maxExactMs` | **3 failed / 5 passed**, naming it: *"gap 49.9951: the two criterion assertions disagree: expected true to be false"* and *"expected 50 to be less than 50"* — the original WebKit signature, reproduced on demand |
+| **G2** | `npm run ci` did not cover WP10 | `package.json`: drop `&& npm run gate:browser` from `ci` | **1 failed / 13 passed** — *"`npm run ci` probes for browsers but never runs the matrix"* |
+| **G3** | the nightly YAML was gated by nothing | `websim-nightly.yml`: make the two working jobs' `if:` conditions non-complementary | **3 failed / 6 passed** — *"routes a scheduled run with no artifact runner to the DEGRADED job, not to nothing"*, plus the exact-complement and needs-graph assertions |
+
+All three restored SHA-256-identical (`9fc9992c…`, `91b93015…`, `ae75c2f5…`).
+
+**G2 is closed in the way that matters most here:** `npm run ci` now ends with the full
+browser matrix, so it **cannot be green while clause 2 is red** — and on this tree it is
+not. The local gate and the hosted `cross-engine` job now run the same command behind the
+same probe.
+
+### III.5.1 G1 is closed in one file of the two that have the defect — OPEN
+
+`probe.ts` is unchanged, and the production-scale gate still asserts its **rounded**
+`maxMs` against the threshold while counting `longTasks` from the exact histogram.
+Reproducing `probe.ts`'s own arithmetic:
+
+```
+gap 49.9951  ->  bin 499, longTasks 0, maxMs 50.00
+                 expect(longTasks).toBe(0)          PASSES
+                 expect(maxMs).toBeLessThan(50)     FAILS      <-- the same contradiction
+```
+
+It fails *safe* — red where the clause holds — so it cannot manufacture a false GO, and
+Chromium's 6.4 ms and Firefox's 180 ms are nowhere near the boundary. But it is the exact
+defect G1 was raised to close, still live in the file that is the headline gate, and
+WebKit's 35–44 ms is closer to it than anything else in this report. **Recommend giving
+`GapDistribution` a `maxExactMs` and repointing
+`uithread.scale.worker.test.ts:366` at it.**
+
+---
+
+## III.6 Runs, exact counts and exit codes
+
+All on the dev box (16 logical cores), from `websim/`.
+
+| Command | Exit | Result |
+|---|---|---|
+| `npm test` | **0** | `Test Files 113 passed (113)`; `Tests 1789 passed (1789)`; 621.18 s |
+| `npm run test:strict` | **0** | `Test Files 113 passed (113)`; `Tests 1789 passed (1789)`; 622.08 s. **Zero** `REQUIRES artifacts` in the log — no greenness anywhere in this report is greenness-by-skipping |
+| `npm run ci` | **1** | Fails at the **final** step, `gate:browser`. Everything before it green: probe (3 engines present) → typecheck (all workspaces, and `engine` compiles `tsconfig.json` *and* `tsconfig.browser.json`) → `Tests 1789 passed (1789)` → `check:scratch` *"pipeline/out is clean — 13 produced entr(ies) allowed, test-tmp/ empty"* → `lint:claims` *"0 hit(s) in 0 file(s); 456 file(s) scanned against 23 active rule(s)"* → matrix `Tests 2 failed \| 109 passed (111)`, both Firefox |
+| `npm run test:browser` (run 1) | **1** | `Test Files 4 failed \| 11 passed (15)`; `Tests 4 failed \| 107 passed (111)`; 238.69 s. Firefox × 2 scales, WebKit × 2 scales |
+| `npm run test:browser` (run 2) | **1** | `Test Files 2 failed \| 13 passed (15)`; `Tests 2 failed \| 109 passed (111)`; 110.70 s. Firefox × 2 scales |
+
+**Three independent matrix runs, three different failure sets, one constant: Firefox is
+red at production scale in every one.** WebKit was red in the first and green in the other
+two — which is the non-determinism recorded as open item 5, not a reason to discount it.
+
+| matrix run | chromium | firefox | webkit |
+|---|---|---|---|
+| `test:browser` run 1 | 0 gaps, 15.8 ms | **2 gaps, 113 ms** | **11 gaps, 154 ms** |
+| `npm run ci` matrix | 0 gaps, 11 ms | **2 gaps, 149 ms** | 0 gaps, 42 ms (201 gaps ≥ 25 ms) |
+| `test:browser` run 2 | 0 gaps | **red** | green |
+
+### III.6.1 `npm run ci` is red, and that is G2 working
+
+`ci` is now
+`gate:browser --probe && typecheck && test && check:scratch && lint:claims && gate:browser`.
+It fails at the **final** step — the browser matrix — having passed every earlier one.
+That is precisely the outcome G2 was raised to produce: before this change `npm run ci`
+returned 0 while WP10 clause 2 was red, because nothing in it ran the browser matrix.
+**A red `ci` here is the gate telling the truth, not a regression.**
+
+---
+
+## III.7 No test was weakened
+
+| Measure | At `e53e55b` | Now | Delta |
+|---|---|---|---|
+| `.test.ts` files under `websim/` | 116 | **118** | +2, **0 deleted** |
+| Browser test **files** | 5 (15 file-instances) | **5 (15)** | unchanged, same five paths |
+| Browser tests | 99 | **111** | +12 = 4 new boundary cases × 3 engines |
+
+* **Zero test files deleted.** Every path in `git ls-tree -r e53e55b -- websim | grep
+  '\.test\.ts$'` still exists on disk; I checked all 116 individually.
+* **Three tracked test files changed**, 29 deletions total, every one accounted for in
+  §III.1.1: 24 comment/import lines, 1 signature line, 1 field line, and the 2 G1
+  repointings. **No assertion was deleted.**
+* **Two new test files**, both additive: `tools/test/browser-gate.test.ts` (14 tests) and
+  `validation/test/wp9-nightly-workflow.test.ts` (9 tests). Neither is artifact-gated;
+  neither can skip.
+* **No raised threshold.** `LONG_TASK_MS` is 50 on both sides. No `testTimeout` was
+  changed on this tree.
+* **No loosened tolerance.** No added line in the diff matches `toBeCloseTo`, `tolerance`,
+  `epsilon` or a widened `Math.abs(...) <` bound.
+* **No `skip` / `only` / `todo`.** A tree-wide scan finds none outside comments, the
+  artifact-gate machinery (`tools/artifact-gate.ts`, which *is* the sanctioned loud-skip
+  path) and the linter's own fixtures — and that scan is itself a test
+  (`tools/test/artifact-gate.test.ts:356`).
+
+---
+
+## III.8 Oracle corpus, scratch, tree
+
+```
+decision-fixtures :  25 files, 476.9 MiB
+world-fixtures    : 185 files, 151.7 MiB
+closure-fixtures  :  21 files,  29.4 MiB
+TOTAL pipeline/out: 852 files, 828.8 MiB
+```
+
+**No shrink** — identical to the file and the byte to the figures recorded in Part I §9
+and Part II §II.9. **No `--clean` was run at any point and nothing under
+`pipeline/out/` was deleted.**
+
+`git status --porcelain` from the repository root lists **16 paths, every one inside
+`websim/` or `.github/workflows/`**. Nothing outside. `docs/runs/`, `Geography/` and
+`docs/` were read-only throughout; the only files I created outside the repository are in
+a scratch directory.
+
+Six source files were mutated during this gate (three for the WP10 clauses, three for
+G1/G2/G3). Every one was restored from a parked copy and re-verified by SHA-256:
+
+```
+engine/src/worker/snapshot.ts                    ec5dc206ea5fb15f6bce256a5c33a4cd57e2b92284c21d90a32aee0dbb0808cc
+engine/src/worker/simHost.ts                     b1b16a4457d4fe45c9f43c5c3e4196895327fabd71f77fd2aa082e868ade0777
+engine/test-browser/worker/uithread.worker.test.ts  9fc9992c6c1e68dd7acf7c820c1797335926a894333873889c4e808c752ab7c9
+package.json                                     91b93015ccf42c5a0844d67a07aa0ad24201162eefc1eb1d41fccae8e8867f5e
+.github/workflows/websim-nightly.yml             ae75c2f593ebe15fc421507b14ad3ab60a6addfbeb9d1ec597ba627f5a352163
+```
+
+---
+
+## III.9 Open items
+
+1. **WP10 clause 2 is false and remains the blocker.** The three honest routes are
+   unchanged: fix the stall, renegotiate the clause with a decision record and sign-off
+   under plan §9.3, or state plainly that the product ships with a first-run pause on
+   Firefox. Widening the threshold, shrinking the population, shortening the horizon,
+   capping the frame rate and narrowing to Chromium remain off the table, and the gate
+   file says so in its own text.
+2. **G1 survives in `probe.ts` / `uithread.scale.worker.test.ts`** (§III.5.1). Fails safe;
+   still the same defect; one field and one line to close. It is easy to miss because
+   `probe.ts:59` documents `maxMs` as *"Exact, not binned"* while `stop()` returns
+   `Number(this.max.toFixed(2))` — not binned, but rounded, which is the half of the
+   sentence that decides the comparison. Fix the comment even if the field stays.
+3. **`DR-WP10-uithread-perf` §6.3's null control is single-sourced.** It is the load-
+   bearing experiment for "no change to `websim` can make the clause true", and the
+   decision in item 1 should not be taken on one investigator's measurement of it.
+4. **`maxFramesPerSecond` has no caller.** `protocol.ts` describes its intended use in the
+   present tense — *"free-running playback (the Run screen at max speed) sets it"* — but
+   the Run screen is WP11 and nothing in the tree passes a non-zero value. The behaviour
+   is fully gated by `host.test.ts`; only the tense over-claims. Worth a word given this
+   project's standards for the difference between built and shipped.
+5. **The gate is non-deterministic on WebKit**, and that is now measured rather than
+   suspected: red three-up (11 gaps, 154 ms), green isolated three times (35–44 ms), with
+   170–479 gaps at or over half the budget in every isolated run. Whatever is decided
+   about clause 2, WebKit's absence of headroom is a finding in its own right and should
+   not be filed as CI flake.
+6. **The nightly workflow is now gated by a test (G3), but only structurally.** The test
+   proves the two conditions are exact complements and that the verdict job fails when
+   neither branch worked. It cannot prove GitHub ever runs it.
+
+---
+
+## III.10 Verdict
+
+**WP10 — NO-GO.**
+
+Clause 1 holds and is revert-proofed in a real `Worker` across all three engines.
+Clause 3 holds and is revert-proofed. **Clause 2 is false on Firefox and on WebKit at the
+population and horizon the product ships with**, and I measured it myself — nine isolated
+runs and three full matrix runs — rather than reading it.
+
+This is the second consecutive accurate NO-GO on the same clause, and the important thing
+about it is what did *not* happen in between. The workload is byte-for-byte what it was —
+1,681,919,966 bytes, 28,675 messages, 27,301 frames, 27,300 ticks, in every one of
+eighteen runs. The threshold is still 50 ms. The probe, the harness and the matrix config
+are SHA-256-identical to `e53e55b`. The one new lever that *could* have bought a green
+number defaults to off, is set to off in the gate, and has no caller. The gate was made
+strictly harder in one respect (the stream-drain fix, which removed an under-count that
+was masking a red result) and its verdict got worse, not better: 180–223 ms isolated on
+Firefox against Part II's 156 ms.
+
+A red number that survives this much scrutiny is a measurement. The correct action is to
+decide what to do about the clause — with a decision record — not to make the gate
+quieter.
+
+**One thing this pass adds that Parts I and II did not have: the null control, re-run by a
+second party.** Three runs out of three, a cold Firefox page with no worker, no simulation
+and nothing under test produces a 137–143 ms long task with zero messages and 0.00 ms of
+handler time inside it (§III.2.2). So the honest statement of the blocker is sharper than
+"WP10 is slow":
+
+> Clause 2 as written is **false**, and the cause is **not in `websim`**. It cannot be
+> closed by engineering inside this work package, and it must not be closed by editing the
+> gate. It needs a decision — a differential control against an empty page, or an explicit
+> restatement of what the clause is about — recorded and signed off under plan §9.3.
+
+Two genuine defects the profiling work did surface are worth carrying forward on their own
+merits, neither of which is the long task and neither of which should be sold as fixing
+it: the frame stream emits 12–136 frames per paintable frame (92–99 % of 1.68 GB is never
+rendered), and `sliceTicks: 30` costs WebKit 15–18 s of pure yield latency per run. The
+`maxFramesPerSecond` ceiling addresses the first, is correctly defaulted off, is fenced by
+digest, and — correctly — is not wired to anything yet.
+
