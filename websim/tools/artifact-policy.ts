@@ -174,6 +174,14 @@ export const ARTIFACT_SOURCES = {
     produce: "check out the full repository, not websim/ alone — Geography/ is never copied in",
     external: true,
   },
+  "playwright-browsers": {
+    id: "playwright-browsers",
+    what:
+      "the ~400 MB Playwright browser builds (Chromium, Firefox, WebKit) the WP10 acceptance " +
+      "matrix and the cross-engine determinism gate run inside",
+    produce: "npx playwright install chromium firefox webkit (add --with-deps on Linux)",
+    external: true,
+  },
   "policy-proof": {
     id: "policy-proof",
     what: "a stand-in artifact used ONLY by this policy's own proof fixture",
@@ -197,6 +205,38 @@ export interface ArtifactRef {
   readonly label?: string;
 }
 
+/**
+ * The four sentences the banner is built from.
+ *
+ * They are overridable per gate because not every gate's strictness is decided
+ * by `WEBSIM_REQUIRE_ARTIFACTS`. `tools/browser-gate.ts` runs the same policy
+ * over Playwright's browser builds with **no permissive mode at all**, and a
+ * banner telling that reader to "set WEBSIM_REQUIRE_ARTIFACTS=1 to make this a
+ * hard failure" would be naming a variable that changes nothing — the same class
+ * of defect as the wrong-`produce:` banner the catalogue exists to prevent.
+ */
+export interface GatePolicyText {
+  /** First line when artifacts are absent and the gate is permissive. */
+  readonly degradedHead: string;
+  /** First line when artifacts are absent and the gate is strict. */
+  readonly strictHead: string;
+  /** Closing `policy:` line, permissive. */
+  readonly degradedPolicy: string;
+  /** Closing `policy:` line, strict. */
+  readonly strictPolicy: string;
+}
+
+export const DEFAULT_GATE_TEXT: GatePolicyText = {
+  degradedHead: "!! ARTIFACT-GATED SUITE SKIPPED — this run is DEGRADED, not fully green.",
+  strictHead: `!! ARTIFACT-GATED SUITE CANNOT RUN and ${REQUIRE_ARTIFACTS_ENV} is set — FAILING.`,
+  degradedPolicy:
+    `set ${REQUIRE_ARTIFACTS_ENV}=1 to make this a hard failure ` +
+    "(see websim/README.md, 'Skip-vs-fail policy').",
+  strictPolicy:
+    `${REQUIRE_ARTIFACTS_ENV} is on, so a missing artifact is a hard failure. ` +
+    "Provide the artifact or run without it (see websim/README.md, 'Skip-vs-fail policy').",
+};
+
 export interface ArtifactGateSpec {
   /** Stable gate id, `package:suite` — printed in banners and greppable. */
   readonly gate: string;
@@ -206,6 +246,11 @@ export interface ArtifactGateSpec {
   readonly evidence: string;
   /** Every artifact the suite needs. Must be non-empty. */
   readonly artifacts: readonly ArtifactRef[];
+  /**
+   * Overrides for any of {@link DEFAULT_GATE_TEXT}'s four sentences. Omit for
+   * gates whose strictness really is `WEBSIM_REQUIRE_ARTIFACTS`.
+   */
+  readonly text?: Partial<GatePolicyText>;
 }
 
 export interface ProbedArtifact extends ArtifactRef {
@@ -275,9 +320,8 @@ export function artifactGateReport(
   strict: boolean,
 ): string {
   const missing = probed.filter((p) => !p.present);
-  const head = strict
-    ? `!! ARTIFACT-GATED SUITE CANNOT RUN and ${REQUIRE_ARTIFACTS_ENV} is set — FAILING.`
-    : "!! ARTIFACT-GATED SUITE SKIPPED — this run is DEGRADED, not fully green.";
+  const text = { ...DEFAULT_GATE_TEXT, ...spec.text };
+  const head = strict ? text.strictHead : text.degradedHead;
   const lines = [
     head,
     `!! gate:     ${spec.gate}`,
@@ -293,24 +337,28 @@ export function artifactGateReport(
   for (const p of probed.filter((q) => q.present)) {
     lines.push(`!! present:  [${ARTIFACT_SOURCES[p.source].id}] ${displayPath(p.path)}`);
   }
-  lines.push(
-    strict
-      ? `!! policy:   ${REQUIRE_ARTIFACTS_ENV} is on, so a missing artifact is a hard failure. ` +
-          "Provide the artifact or run without it (see websim/README.md, 'Skip-vs-fail policy')."
-      : `!! policy:   set ${REQUIRE_ARTIFACTS_ENV}=1 to make this a hard failure ` +
-          "(see websim/README.md, 'Skip-vs-fail policy').",
-  );
+  for (const line of (strict ? text.strictPolicy : text.degradedPolicy).split("\n")) {
+    lines.push(`!! policy:   ${line}`);
+  }
   return lines.join("\n");
 }
 
-/** Probe a spec's artifacts and decide what the harness should do. */
+/**
+ * Probe a spec's artifacts and decide what the harness should do.
+ *
+ * `strictOverride` exists for gates whose strictness is not
+ * `WEBSIM_REQUIRE_ARTIFACTS` — see {@link GatePolicyText}. Pass `true` for a
+ * gate that has no permissive mode. Leave it undefined and the env var decides,
+ * which is what every in-suite gate does.
+ */
 export function artifactGate(
   spec: ArtifactGateSpec,
   env: NodeJS.ProcessEnv = process.env,
   probe: (p: string) => boolean = existsSync,
+  strictOverride?: boolean,
 ): ArtifactGate {
   assertSpec(spec);
-  const strict = parseRequireArtifacts(env);
+  const strict = strictOverride ?? parseRequireArtifacts(env);
   const probed: ProbedArtifact[] = spec.artifacts.map((ref) => ({
     ...ref,
     present: probe(ref.path),

@@ -19,10 +19,11 @@
     "test:watch": "vitest",
     "test:strict": "tsx tools/test-strict.ts",
     "test:browser": "vitest run --config engine/vitest.browser.config.ts",
+    "gate:browser": "tsx tools/browser-gate.ts",
     "typecheck": "npm run typecheck --workspaces && tsc -p tools --noEmit",
     "lint:claims": "tsx tools/lint-claims.ts",
     "check:scratch": "tsx tools/check-scratch.ts",
-    "ci": "npm run typecheck && npm test && npm run check:scratch && npm run lint:claims"
+    "ci": "npm run gate:browser -- --probe && npm run typecheck && npm test && npm run check:scratch && npm run lint:claims && npm run gate:browser"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

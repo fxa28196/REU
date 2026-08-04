@@ -30,6 +30,29 @@
  * `blocks the main thread on purpose` deliberately spins for 120 ms and requires
  * the probe to report it. Without that, "zero long tasks" could mean "the probe
  * cannot see one".
+ *
+ * ## The two criterion assertions read ONE quantity (defect G1, fixed)
+ *
+ * They used not to. `longTasks` counted raw gaps `>= 50`, while the asserted
+ * maximum was `Number(max.toFixed(2))` — a **rounded** number. Those disagree on
+ * the half-open interval `[49.995, 50)`: a worst gap of 49.9951 ms is not a long
+ * task by the clause and is not counted by `longTasks`, but rounds to exactly
+ * `50`, so `expect(maxMs).toBeLessThan(50)` failed with
+ *
+ *     AssertionError: expected 50 to be less than 50
+ *
+ * beside a passing `expect(longTasks).toBe(0)` — two assertions about the same
+ * threshold returning opposite verdicts on the same sample. Observed on WebKit.
+ *
+ * It failed *safe* (red where the clause was in fact satisfied), which is why it
+ * survived; a gate that contradicts itself is still a broken gate, because the
+ * next reader cannot tell which half to believe. The rounded value is now
+ * {@link Distribution.maxMs} and is for **reading only**; the criterion asserts
+ * {@link Distribution.maxExactMs}, which is the same double `longTasks` is
+ * counted from, so `longTasks === 0` and `maxExactMs < 50` are now the same
+ * statement. `summarise` is exported and the boundary is pinned by its own suite
+ * below, including a case that reproduces the old contradiction, so the pair
+ * cannot silently drift apart again.
  */
 
 import { describe, expect, it } from "vitest";
@@ -43,7 +66,19 @@ interface Distribution {
   readonly p50Ms: number;
   readonly p90Ms: number;
   readonly p99Ms: number;
+  /**
+   * Worst gap, rounded to 2 dp — for READING (logs, failure messages).
+   *
+   * Never assert a threshold against this: rounding moves a value across the
+   * threshold it is being compared to. 49.9951 ms renders as `50`.
+   */
   readonly maxMs: number;
+  /**
+   * Worst gap, exact — the double {@link Distribution.longTasks} is counted
+   * from. `longTasks === 0` if and only if this is `< LONG_TASK_MS`, so the two
+   * criterion assertions cannot contradict each other.
+   */
+  readonly maxExactMs: number;
   /** Gaps at or above the 50 ms long-task threshold. */
   readonly longTasks: number;
   readonly windowMs: number;
@@ -59,15 +94,17 @@ function percentile(sorted: readonly number[], p: number): number {
   return sorted[i]!;
 }
 
-function summarise(gaps: readonly number[], windowMs: number): Distribution {
+export function summarise(gaps: readonly number[], windowMs: number): Distribution {
   const sorted = [...gaps].sort((a, b) => a - b);
+  const maxExactMs = sorted[sorted.length - 1] ?? Number.NaN;
   return {
     samples: gaps.length,
     minMs: round(sorted[0] ?? Number.NaN),
     p50Ms: round(percentile(sorted, 50)),
     p90Ms: round(percentile(sorted, 90)),
     p99Ms: round(percentile(sorted, 99)),
-    maxMs: round(sorted[sorted.length - 1] ?? Number.NaN),
+    maxMs: round(maxExactMs),
+    maxExactMs,
     longTasks: gaps.filter((g) => g >= LONG_TASK_MS).length,
     windowMs: round(windowMs),
   };
@@ -155,7 +192,10 @@ describe(`UI-thread responsiveness at max speed [${ENGINE_LABEL}]`, () => {
     // eslint-disable-next-line no-console -- the control's own numbers.
     console.log(`[wp10-uithread-control] ${ENGINE_LABEL}`, JSON.stringify(d));
     expect(d.samples).toBeGreaterThan(warmSamples);
-    expect(d.maxMs, `${ENGINE_LABEL}: the probe missed a 120 ms block`).toBeGreaterThanOrEqual(
+    // `maxExactMs`, not `maxMs`: every threshold comparison in this file reads
+    // the raw double, so the control is graded on the same quantity the
+    // criterion is (see the header note on defect G1).
+    expect(d.maxExactMs, `${ENGINE_LABEL}: the probe missed a 120 ms block`).toBeGreaterThanOrEqual(
       LONG_TASK_MS,
     );
     expect(d.longTasks, "the probe recorded no long task despite a 120 ms block").toBeGreaterThan(0);
@@ -232,13 +272,30 @@ describe(`UI-thread responsiveness at max speed [${ENGINE_LABEL}]`, () => {
       );
       expect(dist.windowMs, "the measurement window was too short").toBeGreaterThan(200);
 
+      // --- the instrument does not contradict itself ------------------------
+      // Defect G1: the count and the maximum must be two readings of ONE
+      // quantity. If they ever disagree the two criterion assertions below are
+      // asserting different things and the verdict is unreadable, so that is
+      // caught here, before the verdict, with a message that names it.
+      expect(
+        dist.longTasks === 0,
+        `${ENGINE_LABEL}: the instrument contradicted itself — longTasks=${dist.longTasks} but ` +
+          `maxExactMs=${dist.maxExactMs} (rendered ${dist.maxMs}) against a ${LONG_TASK_MS} ms ` +
+          "threshold. The count and the maximum must be read off the same number.",
+      ).toBe(dist.maxExactMs < LONG_TASK_MS);
+
       // --- the criterion ----------------------------------------------------
       expect(
         dist.longTasks,
         `${ENGINE_LABEL}: ${dist.longTasks} main-thread gap(s) >= ${LONG_TASK_MS} ms while ` +
           `streaming ${framesSeen} frames (max ${dist.maxMs} ms, p99 ${dist.p99Ms} ms)`,
       ).toBe(0);
-      expect(dist.maxMs).toBeLessThan(LONG_TASK_MS);
+      // `maxExactMs`, never the rounded `maxMs` — a 49.9951 ms worst gap is not
+      // a long task and must not be rounded into one (header note, defect G1).
+      expect(
+        dist.maxExactMs,
+        `${ENGINE_LABEL}: worst main-thread gap ${dist.maxMs} ms`,
+      ).toBeLessThan(LONG_TASK_MS);
     } finally {
       w.terminate();
     }
@@ -291,4 +348,85 @@ describe(`UI-thread responsiveness at max speed [${ENGINE_LABEL}]`, () => {
       w.terminate();
     }
   }, 300_000);
+});
+
+/**
+ * Defect G1, pinned.
+ *
+ * The criterion above is two assertions, `longTasks === 0` and `max < 50`. They
+ * are only one criterion if they are two readings of the same number. They were
+ * not: the count read the raw gap and the maximum read `Number(g.toFixed(2))`,
+ * and rounding is precisely the operation that moves a value across the
+ * threshold it is about to be compared to.
+ *
+ * These cases are the boundary, driven through the real `summarise()` — no
+ * browser, no worker, ~1 ms — so the pair cannot drift apart again without a
+ * red test naming the reason. Every rounded value below was measured with
+ * `Number(x.toFixed(2))` in V8 rather than reasoned about, because binary
+ * doubles decide the half-way cases and intuition gets them wrong: 49.995 is
+ * stored as 49.994999999999998863 and rounds DOWN, so the contradiction window
+ * is not the decimal interval one would guess.
+ */
+describe(`the long-task threshold is read off ONE number [${ENGINE_LABEL}]`, () => {
+  /**
+   * `gap → [rounded, longTasks]`. Rounding is *display*; the count and the
+   * verdict are the raw gap. The `rounded` column is asserted so that the reason
+   * `maxMs` may not be compared to a threshold stays visible in the test.
+   */
+  const CASES: ReadonlyArray<readonly [gap: number, rounded: number, longTasks: number]> = [
+    [49.99, 49.99, 0],
+    [49.994, 49.99, 0],
+    // Rounds DOWN despite the decimal spelling — 49.995 is not representable.
+    [49.995, 49.99, 0],
+    // The observed WebKit case: NOT a long task, but renders as exactly "50".
+    [49.9951, 50, 0],
+    [49.99999, 50, 0],
+    // `>=` is the threshold, so 50 itself IS a long task.
+    [50, 50, 1],
+    [50.004, 50, 1],
+    [50.005, 50.01, 1],
+    [120.4567, 120.46, 1],
+  ];
+
+  it("counts a gap as a long task if and only if the exact gap is >= 50 ms", () => {
+    for (const [gap, rounded, longTasks] of CASES) {
+      const d = summarise([0.1, gap, 0.2], 1000);
+      expect(d.maxExactMs, `gap ${gap}: maxExactMs must be the raw double`).toBe(gap);
+      expect(d.maxMs, `gap ${gap}: rendered value`).toBe(rounded);
+      expect(d.longTasks, `gap ${gap}: long-task count`).toBe(longTasks);
+    }
+  });
+
+  it("never lets the count and the maximum disagree about the threshold", () => {
+    // The invariant the live criterion depends on, over the whole boundary.
+    for (const [gap] of CASES) {
+      const d = summarise([0.1, gap, 0.2], 1000);
+      expect(d.longTasks === 0, `gap ${gap}: the two criterion assertions disagree`).toBe(
+        d.maxExactMs < LONG_TASK_MS,
+      );
+    }
+  });
+
+  it("reproduces the contradiction the OLD reading produced, so the fix cannot be undone quietly", () => {
+    // This is the defect itself, executed. `maxMs` is retained for display and
+    // still rounds 49.9951 up to 50; asserting `maxMs < 50` therefore still
+    // fails on a sample that carries zero long tasks. That is why the criterion
+    // reads `maxExactMs`, and this case fails the moment anyone points the
+    // criterion back at `maxMs`.
+    const d = summarise([0.1, 49.9951, 0.2], 1000);
+    expect(d.longTasks, "the sample contains no long task").toBe(0);
+    expect(d.maxMs, "the rendered maximum still rounds up to the threshold").toBe(LONG_TASK_MS);
+    expect(d.maxMs < LONG_TASK_MS, "the OLD assertion was false on a passing sample").toBe(false);
+    // …and the value the criterion actually reads is on the right side of it.
+    expect(d.maxExactMs).toBeLessThan(LONG_TASK_MS);
+  });
+
+  it("is not vacuous — an empty sample yields NaN rather than a passing zero", () => {
+    const d = summarise([], 1000);
+    expect(d.samples).toBe(0);
+    expect(Number.isNaN(d.maxExactMs)).toBe(true);
+    // NaN < 50 is false, so an empty distribution can never pass the criterion
+    // by having "no gaps over the threshold".
+    expect(d.maxExactMs < LONG_TASK_MS).toBe(false);
+  });
 });

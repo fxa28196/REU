@@ -15,7 +15,7 @@ import { digestSimulation } from "../../src/worker/digest.js";
 import { SimHost, type StreamSink } from "../../src/worker/simHost.js";
 import { makeAssetBundle, type SimBundle } from "../../src/worker/build.js";
 import { buildRoutingGraph } from "../../src/graph/csr.js";
-import type { StreamMessage } from "../../src/worker/protocol.js";
+import { RUN_OPTION_DEFAULTS, type StreamMessage } from "../../src/worker/protocol.js";
 
 import {
   buildSynthWorld,
@@ -214,6 +214,181 @@ describe("SimHost — streaming", () => {
       expect(last.keyframeTicks).toContain(0);
       expect(last.keyframeTicks).toContain(720);
       expect(last.ticksPerSecond).toBeGreaterThan(0);
+    }
+  }, 120_000);
+});
+
+/**
+ * `RunOptions.maxFramesPerSecond` — the display-cadence ceiling
+ * (DR-WP10-uithread-perf §8.3 D1).
+ *
+ * The ceiling exists because at max speed the worker hands the page 12–136
+ * frames for every one it can paint, so 92–99 % of the bytes are rendered by
+ * nobody. It is the **only** wall-clock-dependent decision in `SimHost`, which
+ * makes it the one place a display optimisation could leak into the model. Every
+ * test below is about that fence rather than about the saving:
+ *
+ *  - the model is byte-identical with the ceiling on, against the *bare*
+ *    `sim.run()` reference this file uses throughout — not against another
+ *    hosted run, so two equally-wrong hosts cannot agree;
+ *  - the ceiling is proven to have actually fired (a green determinism test
+ *    under a ceiling that suppressed nothing would be vacuous);
+ *  - the frames that *do* come out are a subsequence of the uncapped ones, plus
+ *    the forced first and last — it drops pictures, it does not invent or
+ *    reorder them;
+ *  - metric rows, which charts read and which must not be lossy, are untouched;
+ *  - and the default is pinned OFF, with the reason, because flipping it is what
+ *    would break Compare.
+ */
+describe("SimHost — the display-cadence ceiling drops frames, never ticks", () => {
+  /** Ticks of every frame the sink received, in arrival order. */
+  function frameTicks(c: Collected): number[] {
+    const out: number[] = [];
+    for (const m of c.messages) {
+      if (m.kind === "frames") {
+        for (const t of m.batch.ticks) {
+          out.push(t);
+        }
+      }
+    }
+    return out;
+  }
+
+  it("is OFF by default, and turning it on is a Compare decision, not a tuning one", () => {
+    // Pinned deliberately. `compare.worker.test.ts` — the only test of WP10
+    // acceptance clause 3 — asserts that two independently scheduled workers
+    // report the same `framesEmitted` and the same number of frame batches at
+    // six stops. Under a wall-clock ceiling both are functions of how fast each
+    // machine happened to run, so neither equality could hold. If this line is
+    // ever changed, that gate has to be answered first.
+    expect(
+      RUN_OPTION_DEFAULTS.maxFramesPerSecond,
+      "the display ceiling was defaulted on; see compare.worker.test.ts clause 3",
+    ).toBe(0);
+
+    const host = makeHost({}, collector().sink);
+    expect(host.summary().framesSuppressed).toBe(0);
+  });
+
+  it("a capped run is byte-identical to a bare sim.run(), and really did suppress frames", async () => {
+    const bare = buildSynthWorld();
+    bare.sim.run();
+    const expected = await digestOf(bare);
+
+    // Frame per tick — the configuration the WP10 production-scale gate uses —
+    // against a 1 fps ceiling, so on any machine that runs 720 ticks in under
+    // twelve minutes the ceiling has to swallow almost all of them.
+    const c = collector();
+    const host = makeHost({}, c.sink);
+    const summary = await host.run({
+      sliceTicks: 30,
+      frameEveryTicks: 1,
+      frameBatchSize: 1,
+      snapshotEveryTicks: 120,
+      maxFramesPerSecond: 1,
+    });
+
+    expect(summary.tick, "the ceiling skipped ticks — it must only skip pictures").toBe(bare.sim.endTick);
+    expect(await host.digest(), "the display ceiling changed the run").toBe(expected);
+
+    // Non-vacuity: without this the digest equality above proves nothing.
+    expect(
+      summary.framesSuppressed,
+      "the ceiling suppressed nothing, so the byte-identity above was not tested",
+    ).toBeGreaterThan(600);
+    // Every scheduled frame is accounted for exactly once — shown or declined.
+    // The forced end-of-run frame replaces the declined attempt at that tick
+    // rather than inflating the total, so this is 721 (ticks 0…720), not 722.
+    expect(
+      summary.framesEmitted + summary.framesSuppressed,
+      "shown + declined must equal the frames the cadence scheduled",
+    ).toBe(721);
+    expect(summary.framesEmitted).toBeLessThan(30);
+  }, 300_000);
+
+  it("keeps the first and last frame, and every frame it keeps is one the uncapped run made", async () => {
+    const uncapped = collector();
+    await makeHost({}, uncapped.sink).run({ frameEveryTicks: 1, frameBatchSize: 1, snapshotEveryTicks: 0 });
+    const all = frameTicks(uncapped);
+    expect(all[0]).toBe(0);
+    expect(all[all.length - 1]).toBe(720);
+    expect(all.length).toBe(721);
+
+    const capped = collector();
+    const summary = await makeHost({}, capped.sink).run({
+      frameEveryTicks: 1,
+      frameBatchSize: 1,
+      snapshotEveryTicks: 0,
+      maxFramesPerSecond: 1,
+    });
+    const kept = frameTicks(capped);
+
+    expect(summary.framesSuppressed, "the ceiling did not fire").toBeGreaterThan(600);
+    expect(kept.length, "the sink saw a different number of frames than the summary counted").toBe(
+      summary.framesEmitted,
+    );
+    // The display must start on the initial state and END ON THE STATE THE RUN
+    // STOPPED AT: a map frozen thousands of ticks behind the metrics would be a
+    // worse defect than the one the ceiling fixes.
+    expect(kept[0], "the ceiling swallowed the opening frame").toBe(0);
+    expect(kept[kept.length - 1], "the display did not land on the final state").toBe(720);
+    // Strictly increasing, and a subsequence of the uncapped ticks: dropped, not
+    // reordered, not invented, not interpolated.
+    const allSet = new Set(all);
+    for (let i = 0; i < kept.length; i++) {
+      expect(allSet.has(kept[i]!), `frame at tick ${kept[i]} is not a tick the uncapped run framed`).toBe(true);
+      if (i > 0) {
+        expect(kept[i]!, "frames came out of order").toBeGreaterThan(kept[i - 1]!);
+      }
+    }
+  }, 300_000);
+
+  it("does not decimate the metric stream — charts stay lossless", async () => {
+    // The frames are the lossy display path; the metric rows are not, and a
+    // ceiling that quietly thinned them would silently change every chart.
+    const c = collector();
+    await makeHost({}, c.sink).run({
+      frameEveryTicks: 1,
+      frameBatchSize: 1,
+      metricBatchSize: 4,
+      snapshotEveryTicks: 0,
+      maxFramesPerSecond: 1,
+    });
+    const hours: number[] = [];
+    for (const m of c.messages) {
+      if (m.kind === "metrics") {
+        for (const h of m.batch.hours) {
+          hours.push(h);
+        }
+      }
+    }
+    expect(hours).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  }, 300_000);
+
+  it("a ceiling too high to bite leaves the frame stream exactly as it was", async () => {
+    // The other end of the range: the ceiling must be a no-op when the display
+    // can keep up, or it would be a second, hidden cadence knob.
+    const reference = collector();
+    await makeHost({}, reference.sink).run({ frameEveryTicks: 120, frameBatchSize: 2, snapshotEveryTicks: 0 });
+
+    const c = collector();
+    const summary = await makeHost({}, c.sink).run({
+      frameEveryTicks: 120,
+      frameBatchSize: 2,
+      snapshotEveryTicks: 0,
+      maxFramesPerSecond: 1e6,
+    });
+    expect(frameTicks(c)).toEqual(frameTicks(reference));
+    expect(summary.framesSuppressed).toBe(0);
+  }, 300_000);
+
+  it("rejects a ceiling that is not a finite count per second", async () => {
+    for (const bad of [-1, -0.5, Number.NaN, Number.POSITIVE_INFINITY]) {
+      const host = makeHost({}, collector().sink);
+      await expect(
+        host.run({ maxFramesPerSecond: bad, untilTick: 60 }),
+        `maxFramesPerSecond ${String(bad)} was accepted`,
+      ).rejects.toThrow(RangeError);
     }
   }, 120_000);
 });

@@ -24,6 +24,23 @@
  * `engine/test/worker/host.test.ts` runs the same configuration at four
  * different slice cadences and asserts one digest.
  *
+ * ## The one wall-clock-dependent thing in this file, fenced
+ *
+ * `RunOptions.maxFramesPerSecond` (default off) lets a free-running client cap
+ * how often a **display** frame is captured, because at max speed the worker
+ * produces 12–136 frames for every one the page can paint
+ * (DR-WP10-uithread-perf §5.1). It is the only place the host reads a clock to
+ * decide anything, and the fence around it is that it decides only whether a
+ * *picture* is taken:
+ *
+ *  - it never moves a tick boundary — `nextStopTick` does not consult it;
+ *  - a frame is a pure read, so a frame not taken changes nothing;
+ *  - it therefore cannot reach a digest, a census, `exportOutputs`, or any
+ *    output CSV, and `host.test.ts` proves that by digest rather than by claim.
+ *
+ * What it *can* reach is `RunSummary.framesEmitted`, which is why it is off by
+ * default; see the option's own doc in `protocol.ts`.
+ *
  * ## Scrub
  *
  * `scrubTo(t)` restores the newest keyframe at or before `t` and fast-forwards.
@@ -94,6 +111,17 @@ function makeYield(): () => Promise<void> {
     // `setTimeout(0)` is clamped to 4 ms once nested five deep, which on a run
     // with hundreds of slices is hundreds of milliseconds of pure waiting. A
     // MessageChannel round-trip is a macrotask with no clamp.
+    //
+    // "No clamp" is true in Chromium and Firefox and NOT in WebKit, measured
+    // (DR-WP10-uithread-perf §0 D2, §6.2): the cost of one yield here is
+    // 0.08–0.37 ms on Chromium and 0.10–0.95 ms on Firefox, but **16.8–19.8 ms
+    // on WebKit**, whose port dispatch costs 264–535 µs per message against
+    // 3.1–5.0 µs on the other two. A 27,300-tick run at `sliceTicks: 30` yields
+    // 910 times and hands WebKit **15.3–18.0 s of pure waiting**; the same run
+    // at the shipped `sliceTicks: 240` yields 114 times for 0.1 s. The default
+    // is 240 and the ceiling on how low a caller should go is WebKit's, not the
+    // clamp's — do not ship a short slice cadence to buy pause latency without
+    // measuring it there.
     const MC = g.MessageChannel;
     return () =>
       new Promise<void>((resolve) => {
@@ -159,6 +187,26 @@ export class SimHost {
   private wavesFired = 0;
   private lastTicksPerSecond = Number.NaN;
 
+  private framesSuppressed = 0;
+  /**
+   * `performanceNow()` of the last captured frame, for the
+   * {@link RunOptions.maxFramesPerSecond} ceiling. `-Infinity` so the first
+   * frame of a run is never suppressed whatever the ceiling is.
+   */
+  private lastFrameWallMs = Number.NEGATIVE_INFINITY;
+  /** Tick of the last captured frame; `-1` before any. */
+  private lastFrameTick = -1;
+  /**
+   * Tick of the last capture the ceiling declined; `-1` before any.
+   *
+   * Exists so the forced end-of-run frame **replaces** the declined attempt at
+   * that same tick instead of being counted on top of it, which keeps
+   * `framesEmitted + framesSuppressed` equal to the number of frames the cadence
+   * scheduled — the invariant that makes "the display showed 20 of 721" a fact
+   * rather than an estimate.
+   */
+  private lastSuppressedTick = -1;
+
   private frames: FrameEncoder | null = null;
   private metrics: MetricEncoder | null = null;
   private opts: Required<Omit<RunOptions, "untilTick">> = { ...RUN_OPTION_DEFAULTS };
@@ -219,6 +267,10 @@ export class SimHost {
     this.ring = new SnapshotRing(this.ringOptions);
     this.runMs = 0;
     this.framesEmitted = 0;
+    this.framesSuppressed = 0;
+    this.lastFrameWallMs = Number.NEGATIVE_INFINITY;
+    this.lastFrameTick = -1;
+    this.lastSuppressedTick = -1;
     this.metricRowsEmitted = 0;
     this.wavesFired = 0;
     this.lastTicksPerSecond = Number.NaN;
@@ -242,9 +294,16 @@ export class SimHost {
       frameBatchSize: options.frameBatchSize ?? RUN_OPTION_DEFAULTS.frameBatchSize,
       metricBatchSize: options.metricBatchSize ?? RUN_OPTION_DEFAULTS.metricBatchSize,
       snapshotEveryTicks: options.snapshotEveryTicks ?? RUN_OPTION_DEFAULTS.snapshotEveryTicks,
+      maxFramesPerSecond: options.maxFramesPerSecond ?? RUN_OPTION_DEFAULTS.maxFramesPerSecond,
     };
     if (this.opts.sliceTicks < 1 || !Number.isInteger(this.opts.sliceTicks)) {
       throw new RangeError(`sliceTicks must be a positive integer, got ${this.opts.sliceTicks}`);
+    }
+    if (!Number.isFinite(this.opts.maxFramesPerSecond) || this.opts.maxFramesPerSecond < 0) {
+      throw new RangeError(
+        `maxFramesPerSecond must be a finite number >= 0 (0 disables the ceiling), got ` +
+          `${this.opts.maxFramesPerSecond}`,
+      );
     }
     if (this.frames === null && this.opts.frameEveryTicks > 0) {
       this.frames = new FrameEncoder(b.sim.residents.length, b.sim.shelters.length, this.opts.frameBatchSize);
@@ -263,7 +322,9 @@ export class SimHost {
       this.ring.offer(captureSnapshot(this.target));
     }
     if (this.opts.frameEveryTicks > 0 && b.sim.tick === 0) {
-      this.captureFrame();
+      // Forced: tick 0 is the display's starting state, and a ceiling that
+      // swallowed it would leave the map empty until the second frame.
+      this.captureFrame(true);
     }
 
     while (b.sim.tick < stop && !this.pauseRequested) {
@@ -288,6 +349,23 @@ export class SimHost {
       }
     }
 
+    // Under a display ceiling the run must still LEAVE the display on the state
+    // it stopped at: without this a max-speed run ends showing a frame from up
+    // to 1/maxFramesPerSecond seconds — thousands of ticks — before the end, and
+    // the map would disagree with the metrics and the census. Gated on the
+    // ceiling being on so that the uncapped frame count stays exactly what it
+    // has always been (a frame only on a `frameEveryTicks` boundary).
+    if (this.opts.maxFramesPerSecond > 0 && this.opts.frameEveryTicks > 0 && this.lastFrameTick !== b.sim.tick) {
+      if (this.lastSuppressedTick === b.sim.tick) {
+        // This frame was scheduled and declined a moment ago; taking it now
+        // replaces that decision rather than adding a second scheduled frame.
+        // Cleared as it is consumed so a later `scrubTo` back onto the same tick
+        // cannot make the same decision pay twice.
+        this.framesSuppressed--;
+        this.lastSuppressedTick = -1;
+      }
+      this.captureFrame(true);
+    }
     this.flushStreams();
     this.phase = this.pauseRequested && b.sim.tick < stop ? "paused" : b.sim.tick >= b.sim.endTick ? "finished" : "paused";
     this.emitStatus(this.phase);
@@ -334,20 +412,46 @@ export class SimHost {
   private afterStop(): void {
     const t = this.built.sim.tick;
     if (this.opts.frameEveryTicks > 0 && t % this.opts.frameEveryTicks === 0) {
-      this.captureFrame();
+      this.captureFrame(false);
     }
     if (this.opts.snapshotEveryTicks > 0 && t % this.opts.snapshotEveryTicks === 0) {
       this.ring.offer(captureSnapshot(this.target));
     }
   }
 
-  private captureFrame(): void {
+  /**
+   * Read one display frame out of the live simulation.
+   *
+   * `force` bypasses the {@link RunOptions.maxFramesPerSecond} ceiling. It is
+   * set for the two frames the display cannot do without — the first (tick 0)
+   * and the last (wherever the run stopped) — and for nothing else.
+   *
+   * **The ceiling drops frames, never ticks.** Every early return here is a
+   * picture not taken; the model has already advanced to `sim.tick` by the time
+   * this is called, `nextStopTick` never consults the ceiling, and
+   * `FrameEncoder.capture` is a pure read. So an ordinary run and a capped run
+   * of the same configuration execute the identical sequence of `runUntil`
+   * calls and end on identical bytes — which is asserted, not asserted-in-prose:
+   * `engine/test/worker/host.test.ts` digests both.
+   */
+  private captureFrame(force: boolean): void {
     const enc = this.frames;
     if (enc === null) {
       return;
     }
     const b = this.built;
+    const cap = this.opts.maxFramesPerSecond;
+    if (cap > 0) {
+      const now = performanceNow();
+      if (!force && now - this.lastFrameWallMs < 1000 / cap) {
+        this.framesSuppressed++;
+        this.lastSuppressedTick = b.sim.tick;
+        return;
+      }
+      this.lastFrameWallMs = now;
+    }
     enc.capture(b.sim, b.smoke);
+    this.lastFrameTick = b.sim.tick;
     this.framesEmitted++;
     if (enc.full) {
       this.emitFrames();
@@ -517,6 +621,7 @@ export class SimHost {
       runMs: this.runMs,
       buildMs: b?.buildMs ?? 0,
       framesEmitted: this.framesEmitted,
+      framesSuppressed: this.framesSuppressed,
       metricRowsEmitted: this.metricRowsEmitted,
       snapshotsTaken: this.ring.stats().taken,
       wavesFired: this.wavesFired,

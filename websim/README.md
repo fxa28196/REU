@@ -50,11 +50,18 @@ npm run typecheck # tsc --noEmit across every workspace + tools
 npm test          # vitest, all packages
 npm run lint:claims
 npm run check:scratch # pipeline/out holds no leftover test scratch (§8.2)
-npm run ci        # all four, in that order — the gate
+npm run gate:browser  # the WP10 browser matrix, artifact-gated on the Playwright builds
+npm run ci        # all five, in that order — the gate
 npm run test:strict  # same suite, but artifact-gated skips become failures (§8.1)
 
-# Not in `npm run ci`, because each needs something a bare `npm ci` does not give you:
-npm run test:browser  # Tier-2 three-engine matrix; needs `npx playwright install` (~400 MB)
+# `npm run ci` needs the Playwright browsers (~400 MB, `npx playwright install
+# chromium firefox webkit`). It probes for them FIRST and, if they are absent, fails
+# with a `!!` banner naming the WP10 clauses that are therefore unverified. That gate
+# has no permissive mode: every WP10 acceptance clause is measured only in the browser
+# matrix, so a green `ci` that skipped it would be a green tick over an unmeasured
+# work package. `npm run test:browser` still runs the matrix directly, without the gate.
+
+# Not in `npm run ci`, because it needs something a bare `npm ci` does not give you:
 npx tsx validation/test/mutation/run-mutation-gate.ts --gate --scope fast
                       # WP9 mutation gate: edits real source, requires the suite to go RED,
                       # restores every byte and proves it by SHA-256. Minutes, not seconds.
@@ -274,9 +281,9 @@ defects. "Built" is the claim being made here. "Accepted" is
 
 ### 2.3 Reproducing the evidence
 
-`npm run ci` on a clean checkout runs the committed-fixture tier and **artifact-gates**
-the bulk parity suites, printing a loud banner for each one it could not run (see
-§8.1, Skip-vs-fail policy). The full ladder additionally needs the exporter output in
+`npm run ci` on a clean checkout runs the committed-fixture tier, the WP10 browser
+matrix, and **artifact-gates** the bulk parity suites, printing a loud banner for each
+one it could not run (see §8.1, Skip-vs-fail policy). The full ladder additionally needs the exporter output in
 `pipeline/out/`, produced by the read-only Java exporter under `pipeline/java-exporter/`
 against the certified `Geography/` classes; `Geography/` is never modified and never
 has anything written into it. On a machine that has those artifacts, run
