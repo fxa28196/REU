@@ -130,3 +130,36 @@ the source's own range.
    from evidence class L to A** with an explicit note that it is an assumption.
 
 Until (1)–(6) are done, **do not publish V25 as currently sourced.**
+
+---
+
+## 7. Editing the registry — the rebuild step, learned the hard way
+
+`Geography/data/registry/variables.csv` is a **source**; `websim` ships a
+**derived** snapshot of it (`pipeline/out/assets/registry-snapshot.json`, whose
+SHA-256 is in the asset manifest and is re-verified in the browser at load).
+Editing the CSV without rebuilding leaves the two disagreeing.
+
+That is caught, not silent — `websim/pipeline/test/reproducibility.test.ts >
+"reproduces the registry snapshot"` compares the on-disk asset against a fresh
+build and fails on the hash. The provenance edits recorded above tripped it
+within minutes, exactly as intended.
+
+**So after ANY edit to `variables.csv` or `assumptions.csv`, run from `websim/`:**
+
+```
+npm run build:registry -w pipeline    # rewrites the snapshot
+npm run build:checksums -w pipeline   # re-stamps the asset manifest
+```
+
+Both are also covered by `npm run build:data -w pipeline`. `pipeline/out/` is
+git-ignored, so this is a step every working copy performs for itself; the test
+is what guarantees nobody forgets.
+
+**A diagnostic note worth keeping.** When this first appeared inside the
+2,159-test aggregate run it looked like the documented `npm test` contention
+timeout (`Timeout calling "onTaskUpdate"` unhandled errors were present in the
+same output) — and it was nothing of the sort: a **14 ms assertion failure** on
+a SHA-256 comparison. The unhandled reporter timeouts were real but incidental,
+and reading them as the cause pointed at the wrong fix entirely. Name the
+failing test before diagnosing it.
