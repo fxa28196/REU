@@ -34,6 +34,8 @@ import { PROVENANCE_QUIRKS } from "@websim/shared";
 import { unpackTopology } from "@websim/shared/graph-asset";
 
 import { DATA_ATTRIBUTION, PROVENANCE_CLASSES } from "../index.js";
+import { WARN_TEXT } from "../a11y/contrast.js";
+import { ScrollRegion } from "../a11y/ScrollRegion.js";
 import { ExecutedDiff } from "../badge/ExecutedDiff.js";
 import useAppStore from "../state/store.js";
 import { formatCount } from "../sim/useSimRun.js";
@@ -53,7 +55,10 @@ import type {
   RegistrySnapshotLoad,
 } from "../provenance/registry.js";
 
-const FAILED_RED = "#d55e00"; // Okabe-Ito vermillion, matching .panel-warn
+// Okabe-Ito vermillion lightened for AA as TEXT, matching .panel-warn. The raw
+// #d55e00 measured 4.27:1 on the panel surface — an axe color-contrast
+// violation (serious) on the placeholder markers and the "blocking" cells.
+const FAILED_RED = WARN_TEXT;
 
 const pageStyle: CSSProperties = {
   height: "100%",
@@ -171,7 +176,11 @@ export function Provenance(): ReactElement {
     lastRunConfig === null ? null : { ...lastRunConfig };
 
   return (
-    <div style={pageStyle}>
+    // A ScrollRegion, not a plain div: this page scrolls and — unlike Archive
+    // and Compare — holds no focusable content, so a keyboard-only user could
+    // not reach anything below the fold (axe `scrollable-region-focusable`,
+    // serious; WCAG 2.1.1).
+    <ScrollRegion label="Provenance details" style={pageStyle}>
       {/* ---- 1. governance registry ---------------------------------------- */}
       <section className="panel" aria-label="Governance registry">
         <h2 className="panel-title">Governance registry</h2>
@@ -212,7 +221,10 @@ export function Provenance(): ReactElement {
                 {group.variables.length === 0 ? (
                   <p className="panel-sub">No variables in this class.</p>
                 ) : (
-                  <div style={{ overflowX: "auto" }}>
+                  <ScrollRegion
+                    label={`Variables in evidence class ${group.label}`}
+                    style={{ overflowX: "auto" }}
+                  >
                     <table style={tableStyle}>
                       <thead>
                         <tr>
@@ -240,7 +252,7 @@ export function Provenance(): ReactElement {
                         ))}
                       </tbody>
                     </table>
-                  </div>
+                  </ScrollRegion>
                 )}
               </div>
             ))}
@@ -259,7 +271,7 @@ export function Provenance(): ReactElement {
                 </p>
               </div>
             ) : null}
-            <div style={{ overflowX: "auto" }}>
+            <ScrollRegion label="Assumptions table" style={{ overflowX: "auto" }}>
               <table style={tableStyle}>
                 <thead>
                   <tr>
@@ -282,7 +294,7 @@ export function Provenance(): ReactElement {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </ScrollRegion>
           </div>
         ) : null}
       </section>
@@ -310,7 +322,7 @@ export function Provenance(): ReactElement {
               Correction records ({formatCount(corrections.reattached.length)} reattached,{" "}
               {formatCount(corrections.split.length)} split)
             </h3>
-            <div style={{ overflowX: "auto" }}>
+            <ScrollRegion label="Graph correction records table" style={{ overflowX: "auto" }}>
               <table style={tableStyle}>
                 <thead>
                   <tr>
@@ -333,7 +345,7 @@ export function Provenance(): ReactElement {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </ScrollRegion>
           </div>
         ) : null}
       </section>
@@ -356,7 +368,7 @@ export function Provenance(): ReactElement {
             <FactRow label="Build commit" value={manifestBlock.buildCommit} />
             <FactRow label="Built (UTC)" value={manifestBlock.builtUtc} />
             <FactRow label="Assets listed" value={formatCount(manifestBlock.rows.length)} />
-            <div style={{ overflowX: "auto" }}>
+            <ScrollRegion label="Asset manifest table" style={{ overflowX: "auto" }}>
               <table style={tableStyle}>
                 <thead>
                   <tr>
@@ -377,7 +389,7 @@ export function Provenance(): ReactElement {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </ScrollRegion>
           </div>
         ) : null}
       </section>
@@ -442,6 +454,6 @@ export function Provenance(): ReactElement {
           </div>
         ))}
       </section>
-    </div>
+    </ScrollRegion>
   );
 }

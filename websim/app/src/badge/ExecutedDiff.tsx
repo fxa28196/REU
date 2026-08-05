@@ -10,6 +10,8 @@
  */
 import type { CSSProperties, ReactElement } from "react";
 
+import { WARN_TEXT } from "../a11y/contrast.js";
+
 /** One differing parameter. `null` marks a key missing on that side. */
 export interface ParamDiffRow {
   readonly name: string;
@@ -109,7 +111,12 @@ const cellStyle: CSSProperties = {
 
 const executedCellStyle: CSSProperties = {
   ...cellStyle,
-  color: "#D55E00",
+  // Vermillion as TEXT on the panel measures 4.27:1, under WCAG 1.4.3 AA. The
+  // lightened tint measures 5.01:1. (Unreachable by the axe run — this cell
+  // only renders when configured and executed actually differ — but it is the
+  // same defect the run found elsewhere.) The banner above keeps the raw
+  // #D55E00 because there it is a FILL, and dark ink on it measures 4.68:1.
+  color: WARN_TEXT,
   fontWeight: 700,
 };
 

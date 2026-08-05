@@ -14,6 +14,7 @@ import type { CSSProperties, ReactElement } from "react";
 
 import { DATA_ATTRIBUTION_LINE, PROVENANCE_CLASSES } from "../index";
 import type { BadgeState, ProvenanceClass } from "../index";
+import { inkOn } from "../a11y/contrast.js";
 
 /** Okabe-Ito chip color per badge state. */
 export const BADGE_COLORS: Record<BadgeState, string> = {
@@ -89,7 +90,10 @@ function chipStyle(badge: BadgeState): CSSProperties {
   return {
     display: "inline-block",
     background: badgeColor(badge),
-    color: "#14161a",
+    // Not a fixed dark ink: on the ENGINE-CERTIFIED blue that measured 3.49:1
+    // (axe `color-contrast`, serious). `inkOn` picks whichever ink actually
+    // clears AA on this swatch — dark on green/amber/vermillion, white on blue.
+    color: inkOn(badgeColor(badge)),
     fontWeight: 700,
     fontSize: "0.8rem",
     letterSpacing: "0.05em",

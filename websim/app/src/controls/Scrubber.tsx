@@ -193,7 +193,15 @@ export function Scrubber(props: ScrubberProps): JSX.Element {
         {playing ? "Pause" : "Play"}
       </button>
 
-      <span aria-label="Simulated clock" style={{ minWidth: "7.5rem" }}>
+      {/* A visually-hidden label rather than `aria-label`: `aria-label` is
+          PROHIBITED on the generic role a bare <span> carries, so support for
+          it is not guaranteed — axe raised this node as `aria-prohibited-attr`
+          (serious) in the 2026-08-05 run, as "incomplete" rather than a
+          violation because the outcome is engine-dependent. Real text in the
+          accessibility tree has no such ambiguity: this reads as
+          "Simulated clock 03:00". */}
+      <span style={{ minWidth: "7.5rem" }}>
+        <span className="visually-hidden">Simulated clock </span>
         {formatTickClock(tick)}
       </span>
 
