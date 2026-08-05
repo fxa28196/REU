@@ -16,13 +16,15 @@
  *   holes are visible holes — never zeros, never interpolated across.
  */
 
-import { useMemo } from "react";
+import { useId, useMemo } from "react";
 import type { CSSProperties, ReactElement } from "react";
 import type uPlot from "uplot";
 
 import { UNHEALTHY_UGM3 } from "@websim/engine/agents";
 
 import { CONSTRUCTED_SERIES_LABEL } from "../index";
+import { smokeChartSummary } from "../a11y/announce.js";
+import { DataTableToggle, smokeTableModel } from "../a11y/DataTable.js";
 import { SMOKE_SCRIM_RGB } from "../map/colors";
 import type { MetricSeries } from "../state/stream";
 import { nanToNullForGaps, rgbToCss, smokeStripData, smokeYRange } from "./transforms";
@@ -154,10 +156,32 @@ export function SmokeStrip({ series, isConstructed, height = 160 }: SmokeStripPr
 
   const containerRef = useUplot(options, data);
 
+  // WP13: the canvas gets a real accessible name + a visually-hidden text
+  // summary (aria-describedby), and the same numbers render as a real table.
+  const summaryId = useId();
+  const summary = useMemo(
+    () => smokeChartSummary(series, UNHEALTHY_UGM3, isConstructed),
+    [series, isConstructed],
+  );
+  const tableModel = useMemo(() => smokeTableModel(series), [series]);
+
   return (
     <div style={panelStyle}>
       {isConstructed ? <div role="note" style={bannerStyle}>{CONSTRUCTED_SERIES_LABEL}</div> : null}
-      <div ref={containerRef} />
+      <div
+        ref={containerRef}
+        role="img"
+        aria-label="Smoke concentration (ug/m3) by simulation hour — line chart"
+        aria-describedby={summaryId}
+      />
+      <p id={summaryId} className="visually-hidden">
+        {summary}
+      </p>
+      <DataTableToggle
+        chartName="smoke concentration"
+        caption="Ambient smoke concentration (ug/m3) by simulation hour — the same numbers as the line chart; missing hours read 'missing' and render as gaps on the chart."
+        model={tableModel}
+      />
     </div>
   );
 }

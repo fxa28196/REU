@@ -18,13 +18,24 @@
  * two chips are the two `PROVENANCE_CLASSES` labels, verbatim.
  */
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { CSSProperties, ReactElement } from "react";
+import type { OutputFlavour } from "@websim/engine/output";
 
 import type { PresetId } from "@websim/shared/presets/definitions";
 
 import { PROVENANCE_CLASSES } from "../index.js";
+import { LiveTicker } from "../a11y/LiveTicker.js";
+import { runCenterMode, useReducedMotion } from "../a11y/useReducedMotion.js";
 import { BadgePanel } from "../badge/BadgePanel.js";
+import { CapabilityDialog } from "../mobile/CapabilityDialog.js";
+import type { CapabilityMeasurements } from "../mobile/capability.js";
+import {
+  getSessionDecision,
+  readDeviceSignals,
+  runMicroBenchmark,
+  setSessionDecision,
+} from "../mobile/capability.js";
 import { OccupancyPanel } from "../charts/OccupancyPanel.js";
 import { SmokeStrip } from "../charts/SmokeStrip.js";
 import { StateCensusChart } from "../charts/StateCensusChart.js";
@@ -109,7 +120,27 @@ export function Run(): ReactElement {
   // config edits (store.shouldClearRunEvidence).
   const lastRunConfig = useAppStore((s) => s.lastRunConfig);
 
-  const { ready, running, error, summary, assets, start, pause, resumeToEnd } = useSimRun();
+  const { ready, running, error, summary, assets, start, pause, resumeToEnd, exportRun } = useSimRun();
+  const [exporting, setExporting] = useState(false);
+  const [exportNote, setExportNote] = useState<string | null>(null);
+
+  const doExport = useCallback(
+    async (flavour: OutputFlavour): Promise<void> => {
+      setExporting(true);
+      setExportNote(null);
+      try {
+        const simId = await exportRun(flavour);
+        setExportNote(`Saved ${flavour} export — sim_id ${simId}`);
+      } catch (err: unknown) {
+        // Reported, never swallowed: a download that silently did not happen is
+        // indistinguishable from one the browser blocked.
+        setExportNote(`Export failed: ${err instanceof Error ? err.message : String(err)}`);
+      } finally {
+        setExporting(false);
+      }
+    },
+    [exportRun],
+  );
 
   // Display-only until WP12 wires pacing; see useSimRun's module doc.
   const [speed, setSpeed] = useState<SpeedSetting>("max");
@@ -268,14 +299,57 @@ export function Run(): ReactElement {
 
   const explanation = runBadgeExplanation(badge, modifiedFromPreset.length, summary);
 
+  // ---- WP13: reduced motion + capability gate ------------------------------
+  // Under prefers-reduced-motion the per-frame agent animation is replaced by
+  // the state-census flow chart (pure decision: runCenterMode).
+  const reducedMotion = useReducedMotion();
+  const centerMode = runCenterMode(reducedMotion);
+
+  // Honest capability gate: the FIRST live run of a session goes through the
+  // CapabilityDialog ("this computes a research model on your device").
+  // Archived display is never gated. Resuming a paused leg is the same run
+  // and is not re-gated.
+  const [capabilityOpen, setCapabilityOpen] = useState(false);
+  const [deviceSignals] = useState(() => readDeviceSignals());
+  const [benchScorePerMs, setBenchScorePerMs] = useState<number | null>(null);
+  const [benchRunning, setBenchRunning] = useState(false);
+  const measurements: CapabilityMeasurements = { ...deviceSignals, benchScorePerMs };
+
   const onPlay = (): void => {
     if (runPhase === "paused") {
       void resumeToEnd();
-    } else {
+      return;
+    }
+    if (getSessionDecision() === "proceed-live") {
       // start() records the executed config in the store (markRunStarting)
       // before its first await — no separate bookkeeping here.
       void start(config);
+      return;
     }
+    setCapabilityOpen(true);
+  };
+  const onRunBenchmark = (): void => {
+    if (benchRunning) {
+      return;
+    }
+    setBenchRunning(true);
+    runMicroBenchmark().then(
+      (score) => {
+        setBenchScorePerMs(score);
+        setBenchRunning(false);
+      },
+      () => {
+        setBenchRunning(false);
+      },
+    );
+  };
+  const onCapabilityProceed = (): void => {
+    setSessionDecision("proceed-live");
+    setCapabilityOpen(false);
+    void start(config);
+  };
+  const onCapabilityArchivedOnly = (): void => {
+    setCapabilityOpen(false);
   };
   const onPause = (): void => {
     void pause();
@@ -295,14 +369,28 @@ export function Run(): ReactElement {
         <SliderDrawer />
       </aside>
 
-      <section className="run-center" aria-label="Map">
-        <MapView
-          graph={graph}
-          frame={latestFrame}
-          shelters={shelterViews}
-          smokeUgM3={latestFrame === null ? null : latestFrame.smokeUgM3}
-          encampmentDensity={densityCells ?? undefined}
-        />
+      <section
+        className="run-center"
+        aria-label={centerMode === "animated-map" ? "Map" : "State-census flow (reduced motion)"}
+      >
+        {centerMode === "animated-map" ? (
+          <MapView
+            graph={graph}
+            frame={latestFrame}
+            shelters={shelterViews}
+            smokeUgM3={latestFrame === null ? null : latestFrame.smokeUgM3}
+            encampmentDensity={densityCells ?? undefined}
+          />
+        ) : (
+          <div className="reduced-motion-center">
+            <p className="panel-sub">
+              Reduced motion is on: the per-frame agent animation is replaced by this
+              state-census flow chart, which advances once per simulated hour — no continuous
+              motion.
+            </p>
+            <StateCensusChart series={metrics} />
+          </div>
+        )}
         {!ready && error === null ? (
           <div className="map-overlay-note">Loading assets and booting the simulation worker…</div>
         ) : null}
@@ -370,8 +458,8 @@ export function Run(): ReactElement {
               <HeadlineRow label="Refused (all full)" value={formatCount(live.refusedAllFull)} />
               <HeadlineRow label="Unreachable" value={formatCount(live.unreachable)} />
               <p className="panel-sub">
-                Person-hours above the 55.5 µg/m³ threshold ship with the WP12 export; no live value is
-                computed yet.
+                Person-hours above the 55.5 µg/m³ concentration threshold are not accumulated live —
+                export this run to get them from the engine&apos;s own writers.
               </p>
             </div>
           )}
@@ -381,6 +469,39 @@ export function Run(): ReactElement {
               INVALID.
             </p>
           ) : null}
+          {/* WP12 exports. Enabled only once a run exists in the worker: an
+              export button that produces an empty bundle is worse than one
+              that says why it is off. The parity flavour is offered separately
+              and labelled, because it deliberately reproduces the archive's
+              output quirks and is for validation, not for reading. */}
+          <div className="run-export-row">
+            <button
+              type="button"
+              disabled={summary === null || exporting}
+              onClick={() => {
+                void doExport("v2-web");
+              }}
+              title={
+                summary === null
+                  ? "Run this configuration first — there is nothing to export yet"
+                  : "Download agents.csv, shelters.csv, simulation.v2.json, the executed manifest and the replay token"
+              }
+            >
+              {exporting ? "Exporting…" : "Export run"}
+            </button>
+            <button
+              type="button"
+              className="run-export-parity"
+              disabled={summary === null || exporting}
+              onClick={() => {
+                void doExport("parity");
+              }}
+              title="Parity format — reproduces the archive's output quirks byte-for-byte, for validation against the Java runs"
+            >
+              Parity format
+            </button>
+          </div>
+          {exportNote === null ? null : <p className="panel-sub">{exportNote}</p>}
         </section>
 
         <div
@@ -400,6 +521,7 @@ export function Run(): ReactElement {
       </aside>
 
       <footer className="run-bottom">
+        <LiveTicker />
         <Scrubber
           tick={tick}
           endTick={endTick}
@@ -414,6 +536,16 @@ export function Run(): ReactElement {
           waveTicks={waveTicks}
         />
       </footer>
+
+      <CapabilityDialog
+        open={capabilityOpen}
+        measurements={measurements}
+        benchRunning={benchRunning}
+        numAgents={config.numAgents}
+        onRunBenchmark={onRunBenchmark}
+        onProceed={onCapabilityProceed}
+        onArchivedOnly={onCapabilityArchivedOnly}
+      />
     </div>
   );
 }

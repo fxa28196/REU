@@ -9,6 +9,7 @@
  * the archived class, or the reverse. The footer renders
  * `DATA_ATTRIBUTION_LINE` verbatim, visible without interaction.
  */
+import { memo } from "react";
 import type { CSSProperties, ReactElement } from "react";
 
 import { DATA_ATTRIBUTION_LINE, PROVENANCE_CLASSES } from "../index";
@@ -25,6 +26,24 @@ export const BADGE_COLORS: Record<BadgeState, string> = {
 /** Pure lookup, exported for tests. */
 export function badgeColor(state: BadgeState): string {
   return BADGE_COLORS[state];
+}
+
+/**
+ * Non-colour glyph per badge state (WP13: colour is never the sole channel —
+ * the chip already carries the state NAME as text; the glyph adds a shape
+ * channel). Total over `BadgeState`; all four distinct (pinned in
+ * `app/test/a11y.test.ts`).
+ */
+export const BADGE_GLYPHS: Record<BadgeState, string> = {
+  "ARCHIVE-VALIDATED": "✓",
+  "ENGINE-CERTIFIED": "◆",
+  EXPLORATORY: "△",
+  INVALID: "✕",
+};
+
+/** Pure lookup, exported for tests and the top-bar chip. */
+export function badgeGlyph(state: BadgeState): string {
+  return BADGE_GLYPHS[state];
 }
 
 /**
@@ -106,7 +125,17 @@ const footerStyle: CSSProperties = {
   color: "#9aa2ab",
 };
 
-export function BadgePanel({ badge, provenance, explanation }: BadgePanelProps): ReactElement {
+/**
+ * WP14 perf: memoised — the Run screen re-renders up to 60×/s while a run
+ * streams frames; this panel's three props (badge, provenance class,
+ * explanation string) change only on config edits or provenance transitions,
+ * so the shallow compare skips virtually every frame.
+ */
+export const BadgePanel = memo(function BadgePanel({
+  badge,
+  provenance,
+  explanation,
+}: BadgePanelProps): ReactElement {
   const label = provenanceLabel(provenance);
   return (
     <section style={panelStyle} aria-label="Run badge and provenance">
@@ -115,7 +144,10 @@ export function BadgePanel({ badge, provenance, explanation }: BadgePanelProps):
           INVALID
         </div>
       ) : null}
-      <span style={chipStyle(badge)}>{badge}</span>
+      <span style={chipStyle(badge)}>
+        <span aria-hidden="true">{badgeGlyph(badge)} </span>
+        {badge}
+      </span>
       {label !== null ? (
         <p style={provenanceStyle}>{label}</p>
       ) : (
@@ -125,4 +157,4 @@ export function BadgePanel({ badge, provenance, explanation }: BadgePanelProps):
       <footer style={footerStyle}>{DATA_ATTRIBUTION_LINE}</footer>
     </section>
   );
-}
+});

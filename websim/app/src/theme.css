@@ -98,6 +98,68 @@ body {
   white-space: nowrap;
 }
 
+/* WP12: the permalink affordance and the notice a stale link produces. */
+.app-permalink-button {
+  background: transparent;
+  color: var(--ws-muted);
+  border: 1px solid #3a4048;
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.app-permalink-button:hover:not(:disabled) {
+  color: var(--ws-text);
+  border-color: #e69f00;
+}
+
+.app-permalink-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.app-notice {
+  margin: 0;
+  padding: 6px 14px;
+  background: #2a2410;
+  border-bottom: 1px solid #e69f00;
+  color: var(--ws-text);
+  font-size: 0.8rem;
+}
+
+/* WP12: run export actions. */
+.run-export-row {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.run-export-row button {
+  background: #23272e;
+  color: var(--ws-text);
+  border: 1px solid #3a4048;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.run-export-row button:hover:not(:disabled) {
+  border-color: #e69f00;
+}
+
+.run-export-row button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.run-export-parity {
+  font-style: italic;
+}
+
 .app-content {
   flex: 1 1 auto;
   min-height: 0; /* lets the run grid own its scrolling */
@@ -240,6 +302,197 @@ body {
 .map-overlay-error {
   border: 1px solid #d55e00;
   color: #ffd9c4;
+}
+
+/* ---- accessibility (WP13) ------------------------------------------------ */
+
+/* Standard visually-hidden pattern: present to AT, invisible on screen. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skip link: offscreen until keyboard-focused, then a visible top-left tab. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 1000;
+  background: #e69f00;
+  color: var(--ws-bg);
+  font-weight: 700;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0 0 4px 0;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+/* One visible focus style everywhere; never removed, only offset. */
+:focus-visible {
+  outline: 2px solid #e69f00;
+  outline-offset: 2px;
+}
+
+/* The main landmark takes focus from the skip link without a focus ring of
+   its own (it is a target, not a control). */
+#main-content:focus-visible {
+  outline: none;
+}
+
+/* Live-region run narrative above the scrubber. */
+.live-ticker {
+  margin: 0 0 0.3rem;
+  padding: 0.15rem 0.75rem;
+  color: var(--ws-muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Chart data-table alternative. */
+.data-table-toggle {
+  background: var(--ws-bg);
+  color: var(--ws-text);
+  border: 1px solid var(--ws-muted);
+  border-radius: 4px;
+  padding: 0.2rem 0.6rem;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.data-table-wrap {
+  overflow: auto;
+  max-height: 14rem;
+  margin-top: 4px;
+}
+
+.data-table {
+  border-collapse: collapse;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  width: 100%;
+}
+
+.data-table caption {
+  text-align: left;
+  color: var(--ws-muted);
+  padding-bottom: 4px;
+}
+
+.data-table th,
+.data-table td {
+  border: 1px solid var(--ws-border);
+  padding: 2px 6px;
+  text-align: right;
+}
+
+.data-table th[scope="col"] {
+  position: sticky;
+  top: 0;
+  background: var(--ws-panel);
+}
+
+/* Map state legend: swatch + glyph + NAME — never colour alone. */
+.map-legend {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  margin: 0;
+  padding: 6px 10px;
+  list-style: none;
+  background: rgba(28, 31, 36, 0.88);
+  color: var(--ws-text);
+  font-size: 11px;
+  border-radius: 4px;
+  line-height: 1.5;
+}
+
+.map-legend-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 5px;
+  vertical-align: baseline;
+}
+
+.map-legend-glyph {
+  display: inline-block;
+  min-width: 1em;
+  margin-right: 4px;
+}
+
+.map-legend-note {
+  color: var(--ws-muted);
+  max-width: 15rem;
+}
+
+/* Reduced-motion replacement for the animated map (WP13 §6.7). */
+.reduced-motion-center {
+  height: 100%;
+  overflow-y: auto;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Capability dialog (native <dialog>, top layer). */
+.capability-dialog {
+  background: var(--ws-panel);
+  color: var(--ws-text);
+  border: 1px solid var(--ws-border);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  max-width: 30rem;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.capability-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.capability-title {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.capability-subtitle {
+  margin: 0.75rem 0 0.25rem;
+  font-size: 0.85rem;
+}
+
+.capability-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.capability-actions button {
+  background: var(--ws-bg);
+  color: var(--ws-text);
+  border: 1px solid var(--ws-muted);
+  border-radius: 4px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+}
+
+.capability-actions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 /* ---- placeholders -------------------------------------------------------- */

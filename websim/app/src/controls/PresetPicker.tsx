@@ -9,6 +9,7 @@
  * their "CONSTRUCTED COUNTERFACTUAL" marking and must not be shortened.
  */
 
+import { memo } from "react";
 import type { CSSProperties, JSX } from "react";
 
 import type { PresetId } from "@websim/shared/presets/definitions";
@@ -79,7 +80,12 @@ const activeItemButtonStyle: CSSProperties = {
 
 const GROUPS = groupPresets(PRESET_DEFINITIONS);
 
-export function PresetPicker(): JSX.Element {
+/**
+ * WP14 perf: memoised — the Run screen re-renders up to 60×/s while a run
+ * streams frames, and this subtree depends only on its own store selectors
+ * (which still trigger their own re-renders when a preset changes).
+ */
+export const PresetPicker = memo(function PresetPicker(): JSX.Element {
   const activePresetId = useAppStore((s: PresetPickerSlice) => s.activePresetId);
   const applyPreset = useAppStore((s: PresetPickerSlice) => s.applyPreset);
 
@@ -110,4 +116,4 @@ export function PresetPicker(): JSX.Element {
       ))}
     </nav>
   );
-}
+});

@@ -66,6 +66,15 @@ export function speedLabel(setting: SpeedSetting): string {
   return setting === "max" ? "max" : `${setting}x`;
 }
 
+/**
+ * Spoken value of the range input (`aria-valuetext`, WP13): the simulated
+ * clock rather than a raw tick number — "Day 1 01:19 of Day 4 23:00". The
+ * current tick is clamped into the track's range, like the rendered `value`.
+ */
+export function scrubberValueText(tick: number, endTick: number): string {
+  return `${formatTickClock(Math.min(tick, endTick))} of ${formatTickClock(endTick)}`;
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -206,6 +215,7 @@ export function Scrubber(props: ScrubberProps): JSX.Element {
         <input
           type="range"
           aria-label="Simulation time scrubber"
+          aria-valuetext={scrubberValueText(tick, endTick)}
           style={{ width: "100%", accentColor: COLORS.accent }}
           min={0}
           max={endTick}

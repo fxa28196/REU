@@ -47,12 +47,14 @@ and the per-tick oracle that closes it),
 ```
 npm install       # once, from websim/
 npm run typecheck # tsc --noEmit across every workspace + tools
+npm run lint      # eslint (WP14): no-console, react-hooks, jsx-a11y — see eslint.config.js
 npm test          # vitest, all packages
 npm run lint:claims
 npm run check:scratch # pipeline/out holds no leftover test scratch (§8.2)
 npm run gate:browser  # the WP10 browser matrix, artifact-gated on the Playwright builds
-npm run ci        # all five, in that order — the gate
+npm run ci        # all of the above, in that order — the gate
 npm run test:strict  # same suite, but artifact-gated skips become failures (§8.1)
+npm run deploy-check # WP14 publish gate over app/dist (see "Deploying" below)
 
 # `npm run ci` needs the Playwright browsers (~400 MB, `npx playwright install
 # chromium firefox webkit`). It probes for them FIRST and, if they are absent, fails
@@ -70,6 +72,38 @@ npx tsx validation/test/mutation/run-mutation-gate.ts --gate --scope fast
 Workspaces: `shared` (contracts), `engine` (deterministic core), `pipeline` (offline
 asset builds), `app` (UI), `validation` (gate ports and replay harness). `tools`
 holds repo scripts and is not a workspace.
+
+> **Status note (WP14, 2026-08-04).** The status paragraph above and §2.2's "Not
+> built" list predate WP11–WP14, which built the Vite app (Run screen, worker
+> wiring, badge/provenance surfaces, accessibility + mobile layer), the ESLint
+> plane (`eslint.config.js`, `npm run lint`), the error boundary, and the deploy
+> gate (`tools/deploy-check.ts`, `docs/DEPLOY.md`). Read those sections as the
+> WP0–WP10 record until the §2 evidence table is re-audited; where they say "no
+> screen exists", the honest current reading is "the screen exists and its
+> §2.1-style evidence table has not been written yet".
+
+## Deploying
+
+The site builds to a fully static `app/dist` (`npm run build -w app`) and deploys
+to GitHub Pages. The build uses a **relative base path** (`base: "./"` in
+`app/vite.config.ts`), so the same output serves from a project page, a domain
+root, or `vite preview` without a rebuild; permalinks are **hash fragments**, so
+shared links need no server rewrites, and a generated `404.html` forwards mistyped
+paths to the app root with the fragment intact. The full procedure — build, the
+two publish gates, Pages mechanics, and the post-deploy dry run — is
+[`docs/DEPLOY.md`](docs/DEPLOY.md); the proposed CI job is
+[`.github-workflow-additions.md`](.github-workflow-additions.md).
+
+**Public deploy is gated on the WP1 sign-offs, and both are recorded:**
+[`docs/DR-WP1-data-rights.md`](docs/DR-WP1-data-rights.md) (Oregon Metro and City
+of Portland approval **as reported by the researcher, relayed 2026-08-02** — no
+written determination from either body is on file, so these are author-relayed
+approvals, not written licence grants) and
+[`docs/DR-WP1-irb-determination.md`](docs/DR-WP1-irb-determination.md) (the
+mentor's determination that no IRB review is required — verbal, research-use
+scope, no institutional artefact on file). Every publish additionally runs the
+pipeline asset gate (`npm run check:deploy -w @websim/pipeline`) and the dist gate
+(`npm run deploy-check`); §1 item 8 stands unchanged.
 
 **Fixtures and the clean checkout.** The parity gates run against Java-dumped
 fixtures in two tiers. Small ones are committed under `engine/test/fixtures/` and

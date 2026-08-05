@@ -14,13 +14,15 @@
  *   happens to hold.
  */
 
-import { useMemo } from "react";
+import { useId, useMemo } from "react";
 import type { CSSProperties, ReactElement } from "react";
 import type uPlot from "uplot";
 
 import { STATES } from "@websim/engine/agents";
 import type { State } from "@websim/engine/agents";
 
+import { censusChartSummary } from "../a11y/announce.js";
+import { censusTableModel, DataTableToggle } from "../a11y/DataTable.js";
 import { STATE_COLORS } from "../map/colors";
 import type { RGB } from "../map/colors";
 import type { MetricSeries } from "../state/stream";
@@ -105,9 +107,29 @@ export function StateCensusChart({ series, height = 220 }: StateCensusChartProps
 
   const containerRef = useUplot(options, data);
 
+  // WP13: accessible name + visually-hidden summary + data-table alternative
+  // carrying the DE-STACKED per-state counts (the true numbers, not the
+  // cumulative plotting rows).
+  const summaryId = useId();
+  const summary = useMemo(() => censusChartSummary(series), [series]);
+  const tableModel = useMemo(() => censusTableModel(series), [series]);
+
   return (
     <div style={panelStyle}>
-      <div ref={containerRef} />
+      <div
+        ref={containerRef}
+        role="img"
+        aria-label="Resident state census by simulation hour — stacked area chart"
+        aria-describedby={summaryId}
+      />
+      <p id={summaryId} className="visually-hidden">
+        {summary}
+      </p>
+      <DataTableToggle
+        chartName="state census"
+        caption="Resident count per state by simulation hour — the same numbers the stacked-area chart encodes (per-state counts, de-stacked)."
+        model={tableModel}
+      />
     </div>
   );
 }
