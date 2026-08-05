@@ -20,10 +20,15 @@
  * ## Run lanes (WP11 scope)
  *
  * `start(config)` assembles the InitPayload (see {@link planRunCsvs}) and then
- * `runFreely()`s to the end of the run window. WP11 ships play / pause /
- * compute-to-end ONLY: paced playback speeds and arbitrary timeline scrubbing
- * (`scrubTo`) are WP12 — the Scrubber renders the speed control but it is
- * display-only until then.
+ * runs to the end of the run window. Arbitrary timeline scrubbing (`scrubTo`)
+ * is still WP12.
+ *
+ * **Playback speed is PACED as of 2026-08-05, and was not before.** The
+ * Scrubber shipped a speed selector that reached this hook and was then
+ * ignored: `runLeg` called an unbounded `runFreely()`, so every setting ran
+ * flat out and a 312-hour run finished in about five seconds. `runLeg` now
+ * bounds each call with `untilTick` and waits between calls; see its doc for
+ * why that cannot change what is computed.
  *
  * ## Encampments honesty (plan Q4)
  *
@@ -67,9 +72,23 @@ import type {
   EncampmentDisplay,
 } from "../assets/loader.js";
 import { loadAppAssets } from "../assets/loader.js";
+import { pacingFor, type SpeedSetting } from "../controls/Scrubber.js";
 import { downloadRunOutputs } from "../export/download.js";
 import useAppStore from "../state/store.js";
 import type { MetricSeries } from "../state/stream.js";
+
+/**
+ * Wall-clock wait between paced legs.
+ *
+ * The only place in the UI plane that reads a clock to decide anything, and it
+ * decides only how long to WAIT between two calls, never what those calls
+ * compute. See `runLeg`.
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
 // TYPE-ONLY on purpose — see the module doc. The value is dynamic-imported.
 import type { SimWorkerClient } from "./client.js";
 
@@ -592,6 +611,15 @@ export function useSimRun(): SimRunHandle {
   const [error, setError] = useState<string | null>(null);
   const [assets, setAssets] = useState<AppAssets | null>(null);
   const sessionRef = useRef<SimSession | null>(null);
+  /**
+   * Interrupts the PACED loop's wait.
+   *
+   * `client.pause()` alone is not enough once pacing exists: between legs the
+   * worker is idle, so there is no run loop for it to stop, and the paced loop
+   * would sleep and then start another leg. This ref is what makes Pause
+   * responsive at any speed, including one tick every ten seconds.
+   */
+  const pauseRef = useRef(false);
   // The run-in-flight guard and the leg summary are PAGE-level facts owned by
   // the store (they must survive this hook unmounting mid-run); this hook only
   // subscribes to them.
@@ -632,13 +660,63 @@ export function useSimRun(): SimRunHandle {
     }
   }, []);
 
+  /**
+   * Run one leg, PACED to the caller's speed setting.
+   *
+   * Until 2026-08-05 this was a single unbounded `runFreely()`, which meant the
+   * speed selector changed a label and nothing else: every setting ran flat out
+   * and a 312-hour run finished in about five seconds. The fix is a loop that
+   * bounds each call with `untilTick` and waits between calls.
+   *
+   * **Pacing cannot change what is computed.** `untilTick` only decides where a
+   * synchronous `runUntil` stops, and `SimHost` resumes from its own tick
+   * counter with the same encoders, so a run chopped into 27,300 one-tick legs
+   * executes exactly the ticks one uncut leg would. That is not an assertion
+   * made here: `engine/test/worker/host.test.ts` runs one configuration at four
+   * slice cadences and asserts a single digest. Wall-clock waiting between legs
+   * is invisible to a model that never reads a clock.
+   *
+   * `"max"` keeps the original single unbounded call, so the fast path is
+   * byte-for-byte the behaviour that shipped.
+   */
   const runLeg = useCallback(
-    async (client: SimWorkerClient): Promise<void> => {
-      // Free-running playback (display ceiling ON via runFreely). Pacing by
-      // speed setting and arbitrary scrubTo are WP12; WP11 is play / pause /
-      // compute-to-end only.
-      const runSummary = await client.runFreely();
+    async (client: SimWorkerClient, speed: SpeedSetting): Promise<void> => {
+      if (speed === "max") {
+        const runSummary = await client.runFreely();
+        useAppStore.getState().setRunSummary(runSummary);
+        applyRunBadge(runSummary);
+        return;
+      }
+
+      let runSummary = await client.runFreely({
+        untilTick: (useAppStore.getState().status?.tick ?? 0) + pacingFor(speed).ticks,
+      });
       useAppStore.getState().setRunSummary(runSummary);
+
+      // Stop when the run ends, when a pause is requested, or when a leg fails
+      // to advance (a guard against spinning if `untilTick` ever clamps short).
+      while (runSummary.tick < runSummary.endTick && !pauseRef.current) {
+        // Re-read the speed EVERY leg, so moving the selector mid-run responds
+        // now rather than at the next run. A switch to "max" drops out of the
+        // paced loop entirely and finishes in one unbounded call.
+        const live = useAppStore.getState().speed;
+        if (live === "max") {
+          runSummary = await client.runFreely();
+          useAppStore.getState().setRunSummary(runSummary);
+          break;
+        }
+        const { ticks, waitMs } = pacingFor(live);
+        await sleep(waitMs);
+        if (pauseRef.current) {
+          break;
+        }
+        const before = runSummary.tick;
+        runSummary = await client.runFreely({ untilTick: before + ticks });
+        useAppStore.getState().setRunSummary(runSummary);
+        if (runSummary.tick <= before) {
+          break;
+        }
+      }
       applyRunBadge(runSummary);
     },
     [applyRunBadge],
@@ -656,6 +734,7 @@ export function useSimRun(): SimRunHandle {
       // previous run's evidence, and record the executed config. A second
       // click during the whole boot/asset/init window re-enters above and
       // returns; nothing can double-init the worker.
+      pauseRef.current = false;
       store.markRunStarting(config);
       try {
         const session = sessionRef.current ?? (await bootSession());
@@ -685,7 +764,7 @@ export function useSimRun(): SimRunHandle {
           registryValidated: true,
         };
         await session.client.init(payload);
-        await runLeg(session.client);
+        await runLeg(session.client, useAppStore.getState().speed);
       } catch (err) {
         setError(err instanceof Error ? err.message : String(err));
       } finally {
@@ -697,6 +776,8 @@ export function useSimRun(): SimRunHandle {
   );
 
   const pause = useCallback(async (): Promise<void> => {
+    // Set FIRST, before any await: the paced loop checks it after every sleep.
+    pauseRef.current = true;
     try {
       // bootSession() is the cached page-level promise: after a remount it is
       // already resolved whenever a run is actually in flight.
@@ -716,11 +797,12 @@ export function useSimRun(): SimRunHandle {
     if (runLaneBusy(store.runInFlight, store.runPhase)) {
       return;
     }
+    pauseRef.current = false;
     store.markResumeStarting();
     try {
       const session = sessionRef.current ?? (await bootSession());
       sessionRef.current = session;
-      await runLeg(session.client);
+      await runLeg(session.client, useAppStore.getState().speed);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {

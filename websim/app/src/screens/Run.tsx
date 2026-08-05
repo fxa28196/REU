@@ -41,7 +41,6 @@ import { SmokeStrip } from "../charts/SmokeStrip.js";
 import { StateCensusChart } from "../charts/StateCensusChart.js";
 import { PresetPicker } from "../controls/PresetPicker.js";
 import { Scrubber } from "../controls/Scrubber.js";
-import type { SpeedSetting } from "../controls/Scrubber.js";
 import { SliderDrawer } from "../controls/SliderDrawer.js";
 import { isConstructedSeries } from "../controls/paramMeta.js";
 import { MapView } from "../map/MapView.js";
@@ -142,8 +141,10 @@ export function Run(): ReactElement {
     [exportRun],
   );
 
-  // Display-only until WP12 wires pacing; see useSimRun's module doc.
-  const [speed, setSpeed] = useState<SpeedSetting>("max");
+  // Store-held, not local: the pacing loop in useSimRun re-reads it between
+  // legs, so moving the selector DURING a run takes effect immediately.
+  const speed = useAppStore((st) => st.speed);
+  const setSpeed = useAppStore((st) => st.setSpeed);
 
   // ---- map graph (independent copies; never the worker's) ----------------
   const [graph, setGraph] = useState<GraphBuffersState | null>(null);
