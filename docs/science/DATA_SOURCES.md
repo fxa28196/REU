@@ -360,6 +360,35 @@ people, making them a category error for agent attributes.
 unsheltered-specific. Boyce and the EFH table cells require confirmation against
 the primary documents before publication.
 
+## D16 — U.S. EPA Exposure Factors Handbook 2011, Ch. 6 (inhalation rates)
+
+**Status: RE-READ FROM PRIMARY 2026-08-04 — SPLIT RESULT, one half is an OPEN
+DEFECT.** Full analysis, blast radius and the decision required:
+**[D16-EFH-VENTILATION-DEFECT.md](D16-EFH-VENTILATION-DEFECT.md).**
+
+> U.S. EPA, *Exposure Factors Handbook 2011 Edition, Chapter 6 — Inhalation
+> Rates*, EPA/600/R-09/052F, September 2011. Table 6-2, printed pp. 6-4/6-5.
+
+**Used for:** V25 `inhaled_dose_ug` = Σ C·IR(activity)·dt.
+
+- **Walking 1.62 m³/h — CONFIRMED.** Table 6-2 Moderate Intensity, ages 31 to
+  <41 (`2.7E-02 m³/min × 60`). Caveat to carry: one age-group cell, not an adult
+  aggregate (adult moderate means span 1.500–1.740; weighted ≈1.59).
+- **Resting 0.61 m³/h — NOT IN THE SOURCE.** No Table 6-2 cell equals
+  `1.017E-02 m³/min` at any age or activity level. Nearest real cells: Light
+  Intensity **0.720–0.780**, Sedentary/Passive **0.252–0.300**.
+
+The registry's `VERIFIED-IN-SECONDARY` flag on this row was warranted and has
+now been discharged: the walking half verifies, the resting half does not.
+
+**Nothing has been changed and no run invalidated.** The qualitative finding
+(dose falls further than exposure because placement removes walking time) holds
+for *any* IR_walk > IR_rest and is unaffected; the **absolute dose magnitudes and
+the published "2.7×" ratio are not** — the ratio becomes 2.25× under Light
+Intensity or 5.40× under Sedentary/Passive. See D16 for the decision.
+
+---
+
 ## D15 — Conte et al. 2026, The Pathways Study (PSU HRAC)
 
 **Status: ACQUIRED AND VERIFIED (2026-08-04).** Full citation:
