@@ -221,12 +221,13 @@ description: the repository's archived copy is SHA-256 byte-identical
 **Implements:** V18 age bands (0.527 / 0.423 / 0.050) and V22 chronic physical
 condition (0.391), both from Table 2.1 (pp. 29–30). Registry source `D15`.
 
-**⚠️ Carries an open subpopulation mismatch.** Table 2.1 is the *pooled* sample
-(unsheltered + sheltered + recently housed); the model's agents are unsheltered
-only. The unsheltered-only Table 6.1 (N=192, pp. 86–87) gives 53.4 / 44.0 / 2.6
-and 31.1%. The implemented population is therefore older and more chronically
-ill than the source supports. See `DATA_SOURCES.md` D15 for the full comparison
-and the secondary discrepancies. **Not yet resolved; nothing has been changed.**
+**Pooled sample, by deliberate choice (author-confirmed 2026-08-04).** Table 2.1
+is the *pooled* sample (unsheltered + sheltered + recently housed). The
+unsheltered-only Table 6.1 (N=192, pp. 86–87) gives 53.4 / 44.0 / 2.6 and 31.1%;
+it was examined and not used, on the strength of N=541 vs N=192 and the report's
+own statement that the full sample is its main focus. Describe these figures as
+**"pooled sample"**, never as "unsheltered". See `DATA_SOURCES.md` D15 for the
+side-by-side and the secondary discrepancies.
 
 ### Fazel, Geddes & Kushel (2014) — **[SPECIFIED]**
 Authoritative synthesis of the health burden of homelessness in high-income

@@ -395,7 +395,12 @@ this gives 275/522 = 52.7%, 221/522 = 42.3%, 26/522 = 5.0% — the implemented
 bands, exact to the decimal. Chronic condition from the same table:
 "Physical illness, chronic health condition, physical disability 194 (39.1%)".
 
-**⚠️ OPEN — SUBPOPULATION MISMATCH (found 2026-08-04, not yet resolved).**
+**SUBPOPULATION CHOICE — DELIBERATE AND AUTHOR-CONFIRMED (2026-08-04).**
+The pooled Table 2.1 figures are the intended inputs. The unsheltered-only
+Table 6.1 subgroup was examined and **not** used. The comparison below is
+retained deliberately, as evidence the alternative was considered rather than
+missed — a reviewer who knows the report will look for exactly this.
+
 Table 2.1 is the **pooled** sample. Per the report's Sample and Recruitment
 section (printed p. 20) it "intentionally recruited people who were living
 unsheltered, people currently living in shelter, and people who recently exited
@@ -410,12 +415,16 @@ characteristics by housed status", printed pp. 86–87** (Unsheltered N=192):
 | Age 65+ | **5.0%** | **2.6%** |
 | Chronic physical condition | **39.1%** | **31.1%** |
 
-Direction of the bias: the implemented population is **older and more
-chronically ill** than the source supports for the unsheltered subgroup. The
-65+ share is nearly double, and chronic-condition prevalence is 8 points high
-(the pooled figure is inflated by the housed subgroup, at 45.3%). Age drives
-walking speed through the Bohannon decade lookup, so this is not inert.
-Reparameterization is an open decision; **nothing has been changed.**
+Relative to the unsheltered subgroup the pooled figures are **older and
+report more chronic illness**: the 65+ share is roughly double and
+chronic-condition prevalence is 8 points higher (the pooled figure includes the
+housed subgroup, at 45.3%). Age drives walking speed through the Bohannon
+decade lookup, so the choice is not inert and is stated here rather than left
+implicit. Two points in favour of the pooled figures, for whoever has to defend
+this: N=541 against N=192 is materially more stable, and the report's own
+framing (printed p. 20) is that "the main focus of this report is on findings
+from the full sample". **Anything written up should say "pooled sample" rather
+than "unsheltered", which the chapter's Table 2 now does.**
 
 **Three secondary discrepancies, recorded so they are not lost:**
 1. `variables.csv` V33's "0.022 = Pathways 2026 caretaker rate" does not appear

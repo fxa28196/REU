@@ -4,6 +4,7 @@
 
 **Fatima Asghar**
 Harrisburg University of Science and Technology, Harrisburg, PA, USA
+e-mail: fxa28196@hawkmail.hacc.edu
 
 *Running head: Capacity Is Not Access*
 
@@ -15,7 +16,7 @@ Harrisburg University of Science and Technology, Harrisburg, PA, USA
 >
 > **Figures removed.** Old Fig. 5 (access by mobility status) duplicated the first three rows of Table 5 exactly, and old Fig. 6 (all 27 runs on a log scale) showed three flat lines whose entire content is one sentence. Both are now text. **Renumbering is not needed** — Figs. 1–4 keep their numbers. If the compiled file comes in under 15 pages, restoring Fig. 5 is the better of the two to bring back.
 >
-> **No `[AUTHOR:` markers remain** (2026-08-04). The NSF award number is resolved (**2244551**) and the Pathways Study citation is verified against the primary source (Conte et al. 2026, PSU HRAC, PDXScholar `hrac_pub/55`). **One open scientific question came out of that verification:** the age and chronic-condition figures are the report's *pooled* sample (Table 2.1, N=541, which includes sheltered and recently-housed respondents), not its unsheltered-only subgroup (Table 6.1, N=192: 53.4/44.0/2.6 and 31.1%). The table now says "pooled sample" rather than implying unsheltered. Whether to reparameterize is an open decision. A second, conditional marker `[ORCA-TOGGLE:` sits in the acknowledgements — keep it only if ORCA compute is actually used before camera-ready.
+> **No `[AUTHOR:` markers remain** (2026-08-04). The NSF award number is resolved (**2244551**) and the Pathways Study citation is verified against the primary source (Conte et al. 2026, PSU HRAC, PDXScholar `hrac_pub/55`). **One wording change came out of that verification:** the age and chronic-condition figures are the report's *pooled* sample (Table 2.1, N=541, which includes sheltered and recently-housed respondents), not its unsheltered-only subgroup (Table 6.1, N=192). The pooled figures are the intended inputs — author-confirmed — so the only change is that Table 2 now says "pooled sample" instead of implying unsheltered provenance. A second, conditional marker `[ORCA-TOGGLE:` sits in the acknowledgements — keep it only if ORCA compute is actually used before camera-ready.
 >
 > **Corrections applied since the last version:** the "four exposure measures" claim now matches what is actually tabulated; the block-level-coordinate count is no longer self-contradictory; the uncited 1.008 figure is gone from §3.2.5 and §4.4; the abstract says "unsheltered count"; §1 no longer mixes nine days with a 312-hour window; the standard deviation in Eq. 2 is now sourced; Table 3 bolding is removed; street-centerline provenance now appears in §3.1; §4.4's forward reference to §5.1 is softened; "halve" is now "more than halve"; and §5.1 discloses the size of the ten new facilities.
 
