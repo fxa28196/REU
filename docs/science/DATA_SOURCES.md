@@ -360,6 +360,77 @@ people, making them a category error for agent attributes.
 unsheltered-specific. Boyce and the EFH table cells require confirmation against
 the primary documents before publication.
 
+## D15 — Conte et al. 2026, The Pathways Study (PSU HRAC)
+
+**Status: ACQUIRED AND VERIFIED (2026-08-04).** Full citation:
+
+> Conte, K., Laird, A., DuBoise, D., Avila, S., Bone, C., TREES Committee, &
+> Zapata, M. (2026). *The Pathways Study: Findings from Surveys of People with
+> Recent Experience of Homelessness in Multnomah County.* Portland State
+> University Homelessness Research & Action Collaborative, published 9 April
+> 2026. HRAC Publications and Presentations, 55.
+> Persistent identifier: <https://archives.pdx.edu/ds/psu/44627>
+> PDXScholar: <https://pdxscholar.library.pdx.edu/hrac_pub/55/>
+
+No DOI exists; the `archives.pdx.edu` handle is the persistent identifier.
+Prepared by PSU HRAC with the OHSU-PSU School of Public Health for the
+Multnomah County Homeless Services Department — the "PSU HRAC / OHSU"
+shorthand used elsewhere in this repository is accurate but incomplete.
+
+**Provenance verified, not assumed.** The copy at
+`docs/evidence-package-2026/source-pdfs/Pathways-Survey-Findings-Published-4_9_2026.pdf`
+is SHA-256 byte-identical
+(`0f8f048c3553e265c6a18460090572b5a87cd2d8693566c48bf18974e1947f51`) to the
+file served by `hsd.multco.us`, re-fetched 2026-08-04.
+
+**Used for:** V18 age-band proportions and V22 chronic-physical-condition
+prevalence (`PopulationSampler.java`,
+`websim/engine/src/agents/populationSampler.ts`).
+
+**Values as implemented,** from Table 2.1 "Demographic characteristics of
+analytic sample (N=541)", printed pp. 29–30. Age categories 18–24 33 (6.3%),
+25–34 106 (20.3%), 35–44 136 (26.1%), 45–54 132 (25.3%), 55–64 89 (17.0%),
+65+ 26 (5.0%), 19 declined/missing. Re-aggregated over the 522 valid responses
+this gives 275/522 = 52.7%, 221/522 = 42.3%, 26/522 = 5.0% — the implemented
+bands, exact to the decimal. Chronic condition from the same table:
+"Physical illness, chronic health condition, physical disability 194 (39.1%)".
+
+**⚠️ OPEN — SUBPOPULATION MISMATCH (found 2026-08-04, not yet resolved).**
+Table 2.1 is the **pooled** sample. Per the report's Sample and Recruitment
+section (printed p. 20) it "intentionally recruited people who were living
+unsheltered, people currently living in shelter, and people who recently exited
+homelessness". This model's agents are **unsheltered only**, and the source
+publishes an unsheltered-only breakdown in **Table 6.1, "Demographic
+characteristics by housed status", printed pp. 86–87** (Unsheltered N=192):
+
+| Quantity | Implemented (Table 2.1, pooled) | Table 6.1, unsheltered only |
+|---|---|---|
+| Age 18–44 | 52.7% | 53.4% |
+| Age 45–64 | 42.3% | 44.0% |
+| Age 65+ | **5.0%** | **2.6%** |
+| Chronic physical condition | **39.1%** | **31.1%** |
+
+Direction of the bias: the implemented population is **older and more
+chronically ill** than the source supports for the unsheltered subgroup. The
+65+ share is nearly double, and chronic-condition prevalence is 8 points high
+(the pooled figure is inflated by the housed subgroup, at 45.3%). Age drives
+walking speed through the Bohannon decade lookup, so this is not inert.
+Reparameterization is an open decision; **nothing has been changed.**
+
+**Three secondary discrepancies, recorded so they are not lost:**
+1. `variables.csv` V33's "0.022 = Pathways 2026 caretaker rate" does not appear
+   in the source as stated. Table 2.1 gives "Caretaker of a child 19 (3.7%)";
+   the unsheltered column of Table 6.1 gives 4 (2.2%), which is the likely
+   intended provenance but is not what the row says.
+2. The source's item is a self-identified **disability** question bundling
+   "physical illness, chronic health condition, physical disability" — not a
+   clinically measured prevalence. V22's gloss "lives with a long-term physical
+   health condition" slightly overstates it.
+3. An inconsistency internal to the source: Table 2.1's disability percentages
+   imply a denominator of 496, while its stated missing count of 63 implies 478.
+
+---
+
 ## D14 — Street Roots, 16 September 2020 (shelter occupancy)
 
 **Status: ACQUIRED (news report).** The only quantitative behavioural calibration

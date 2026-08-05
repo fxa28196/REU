@@ -184,6 +184,50 @@ preserve rather than collapse into a single respiratory multiplier.
 
 ## 5. Health of people experiencing homelessness
 
+### Conte et al. (2026), The Pathways Study — **[IMPLEMENTED]**
+
+Conte, K., Laird, A., DuBoise, D., Avila, S., Bone, C., TREES Committee, &
+Zapata, M. (2026). *The Pathways Study: Findings from Surveys of People with
+Recent Experience of Homelessness in Multnomah County.* Portland State
+University Homelessness Research & Action Collaborative, published 9 April 2026.
+HRAC Publications and Presentations, 55.
+
+- Persistent identifier: <https://archives.pdx.edu/ds/psu/44627>
+- PDXScholar: <https://pdxscholar.library.pdx.edu/hrac_pub/55/>
+- **No DOI exists.** The `archives.pdx.edu` handle is the persistent identifier.
+
+```bibtex
+@techreport{conte2026pathways,
+  author      = {Conte, Kathleen and Laird, Amanda and DuBoise, Danielle and
+                 Avila, Sonia and Bone, Corinne and {TREES Committee} and
+                 Zapata, Marisa},
+  title       = {The {P}athways {S}tudy: Findings from Surveys of People with
+                 Recent Experience of Homelessness in {M}ultnomah {C}ounty},
+  institution = {Portland State University Homelessness Research and Action
+                 Collaborative},
+  year        = {2026},
+  month       = apr,
+  number      = {55},
+  type        = {Homelessness Research and Action Collaborative Publications
+                 and Presentations},
+  url         = {https://archives.pdx.edu/ds/psu/44627}
+}
+```
+
+**Verified against the primary source 2026-08-04**, not against a secondary
+description: the repository's archived copy is SHA-256 byte-identical
+(`0f8f048c…1947f51`) to the file served by `hsd.multco.us`.
+
+**Implements:** V18 age bands (0.527 / 0.423 / 0.050) and V22 chronic physical
+condition (0.391), both from Table 2.1 (pp. 29–30). Registry source `D15`.
+
+**⚠️ Carries an open subpopulation mismatch.** Table 2.1 is the *pooled* sample
+(unsheltered + sheltered + recently housed); the model's agents are unsheltered
+only. The unsheltered-only Table 6.1 (N=192, pp. 86–87) gives 53.4 / 44.0 / 2.6
+and 31.1%. The implemented population is therefore older and more chronically
+ill than the source supports. See `DATA_SOURCES.md` D15 for the full comparison
+and the secondary discrepancies. **Not yet resolved; nothing has been changed.**
+
 ### Fazel, Geddes & Kushel (2014) — **[SPECIFIED]**
 Authoritative synthesis of the health burden of homelessness in high-income
 countries; basis for justifying elevated comorbidity prevalence relative to the
