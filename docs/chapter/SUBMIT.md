@@ -12,15 +12,18 @@ it is resolved** — only one item still needs anything from you.
 `Capacity_Is_Not_Access.tex` now reads:
 
 ```latex
-\institute{Fatima Asghar \at Harrisburg University of Science and Technology, Harrisburg, PA, USA}
+\institute{Fatima Asghar \at Harrisburg University of Science and Technology, Harrisburg, PA, USA, \email{fxa28196@hawkmail.hacc.edu}}
 ```
 
-The author confirmed the institution directly. The `fxa28196@hawkmail.hacc.edu`
-address has been **removed everywhere** — it is not an address at this
-institution, and it was never anything but a Nominatim User-Agent contact
-string I found in `scripts/geocode_shelters.py`. Do not reinstate it. The
-earlier "Harrisburg Area Community College" reading, which I inferred from that
-domain, was wrong and is retracted.
+Both values are **author-confirmed** (2026-08-04). Two corrections to earlier
+guesses in this file, so neither gets reintroduced:
+
+- The institution is **Harrisburg University of Science and Technology**. My
+  earlier "Harrisburg Area Community College" reading — inferred from the
+  `hacc.edu` domain — was wrong and is retracted.
+- `fxa28196@hawkmail.hacc.edu` is **correct and current**. It is the author's
+  active research contact address, and it stays. Do not infer the affiliation
+  from it: the domain and the institution are simply not the same thing here.
 
 The REU host institution is **Portland State University** and appears in the
 acknowledgements, which is the correct place for it — the `\institute` line
