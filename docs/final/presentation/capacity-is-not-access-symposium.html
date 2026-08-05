@@ -36,6 +36,10 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .chart{background:var(--card);border:1px solid var(--rule);border-radius:9px;
 padding:.7rem .8rem .4rem;margin:.7rem 0}
 .cap{font-size:.86rem;color:var(--ink2);margin-top:.35rem;max-width:56rem}
+.shot{padding:.45rem .5rem .35rem}
+.shot img{display:block;width:auto;max-width:100%;max-height:56vh;height:auto;
+margin:0 auto;border-radius:5px}
+.shot.big img{max-height:74vh}
 code{font:12.5px ui-monospace,Consolas,monospace;background:var(--card);
 border:1px solid var(--rule);border-radius:3px;padding:.05rem .3rem}
 pre{background:var(--card);border:1px solid var(--rule);border-radius:8px;
@@ -52,6 +56,7 @@ svg text.axis{fill:var(--ink);font-weight:600}
   section{display:flex!important;page-break-after:always;min-height:0;padding:8mm 10mm}
   .ctr{display:none} h1{font-size:26pt} h2{font-size:17pt}
   body{font-size:10.5pt} .chart{break-inside:avoid}
+  .shot img{max-height:104mm} .shot.big img{max-height:150mm}
 }
 </style></head><body>
 
@@ -127,19 +132,23 @@ produced entirely by first-come-first-served admission. Scenario D tests exactly
 counterfactual.</p>
 <div class="src"><b>Implementation:</b> <code>Geography/src/geography/agents/ContextCreator.java</code>
 (model assembly), <code>GisAgent.java</code> (per-person behaviour, one decision per simulated
-minute), <code>routing/StreetNetwork.java</code> (graph + shortest paths).</div></section>
+minute), <code>routing/StreetNetwork.java</code> (graph + shortest paths).
+<b>Second implementation:</b> the same three files now also exist as a TypeScript port that
+runs the model in a browser with no server, gated against these archived runs (slide 21).</div></section>
 
 <!-- 5 ---------------------------------------------------------------->
 <section><div class="tag">Slide 5 · decision 2 — the street network</div>
 <h2>Two defects found in the map, both fixed and re-run</h2>
 <div class="two"><div>
 <h3>Defect 1 — corrupt intersection labels</h3>
-<p>27 intersection IDs appeared at physical locations 9–18.5 km apart, welding distant places
-into one node and creating <b>50 impossible edges</b>. Found because one person walked a
-reported 68.3 km; proved by an independent Python re-implementation of the routing.</p>
-<p><b>Fix:</b> cluster claims by geometry, reattach within 10 m (4 cases) or split to a new
-synthetic node (23 cases). Nothing deleted; every correction written into the run manifest.
-Impossible edges after: <b>0</b>.</p></div><div>
+<p>25 intersection IDs appeared at physical locations
+1.65 to 18.5 km apart, welding distant places into one node
+and creating <b>50 impossible edges</b>. Found because one person walked a reported 68.3 km;
+proved by an independent Python re-implementation of the routing.</p>
+<p><b>Fix:</b> cluster claims by geometry, reattach within 10 m
+(3 cases) or split to a new synthetic node (22 cases).
+Nothing deleted; every correction written into the run manifest. Impossible edges after:
+<b>0</b>; largest endpoint gap after: <b>11.9 m</b>.</p></div><div>
 <h3>Defect 2 — freeways in a walking map</h3>
 <p>The centreline file includes limited-access highways. <b>2,636 freeway-class
 features, 614.1 km</b> — including the Marquam and Fremont bridge decks, which carry no
@@ -155,7 +164,15 @@ the network had been a freeway.</p>
 <div class="src"><b>Code:</b> <code>StreetNetwork.java</code> (node-site validation),
 <code>ContextCreator.java</code> (TYPE filter). <b>Registry row V26</b> records the filter with
 its justification. <b>Independent check:</b> <code>scripts/test_routing.py</code> rebuilds the
-graph and re-runs Dijkstra in Python — five tests, exact agreement on distance.</div></section>
+graph and re-runs Dijkstra in Python — five tests, exact agreement on distance.
+<b>Read the two defects in order.</b> The census above is the <i>post</i>-freeway-filter one,
+25 / 3 / 22, because two of the corrupt identifiers sat on features Defect 2 removes. Earlier
+drafts quote the pre-filter 27 / 4 / 23; those figures are superseded. <b>The census on this
+slide is read out of the run manifest at build time</b> (<code>street_network_validation</code>:
+node-site tolerance 100 m, reattach tolerance 10 m,
+25 corrections listed individually, displacements
+1,654.7 m to 18,562.3 m), which is the same block the live
+model's Provenance screen renders, so the slide and the screen cannot disagree.</div></section>
 
 <!-- 6 ---------------------------------------------------------------->
 <section><div class="tag">Slide 6 · decision 3 — behaviour</div>
@@ -409,7 +426,12 @@ scenario</td></tr>
 <td>population identity, bed sums, unreachable-set identity; suite exits 0</td></tr>
 <tr><td>Provenance flag</td><td>a run cannot silently come from uncommitted code</td>
 <td>an audit found nine such runs; all were re-run from committed code and the detector is now
-permanent</td></tr></table>
+permanent</td></tr>
+<tr><td>Independent second implementation</td><td>the result is a property of the model, not
+of one runtime</td>
+<td>the whole model re-implemented in TypeScript (slide 21): every shelter's final occupancy
+matches the archive at 36 of 36 sites, and 2,060 sheltered / 28
+unreachable came back in 200 of 200 permutation streams</td></tr></table>
 <div class="src"><b>Scripts:</b> <code>verify_2026_runs.py</code>, <code>test_routing.py</code>,
 <code>analyze_run.py</code>, <code>lint_claims.py</code> (a registry of every corrected claim;
 the build fails if a retired sentence returns). <b>The strongest evidence is slide 5:</b> a real
@@ -521,7 +543,261 @@ shorter walk — and only if people know where to walk.</p>
 <div class="src"><b>Next.</b> The human decision layer — awareness, belongings, pets, imperfect
 information about which shelters have room — specified, registered, and built to close the
 1.5–15.6× gap this study measured. <b>Code, data and all 93 run manifests</b> are
-in the project repository, with the analysis pipeline documented end to end.</div></section>
+in the project repository, with the analysis pipeline documented end to end.
+<b>And none of it has to be taken on trust:</b> the model itself now runs in a browser, with
+no server and nothing to install. The next five slides are that.</div></section>
+
+<!-- 21 --------------------------------------------------------------->
+<section><div class="tag">Slide 21 · the port</div>
+<h2>The same model, recompiled to run in your browser</h2>
+<p><b>What it is.</b> The certified Java/Repast model has been re-implemented in TypeScript
+and compiled to a static web page. No server, no account, no upload: the page fetches the
+street graph, the shelter table and the smoke series, then runs the whole 312-hour
+simulation for all 6,842 residents on the viewer's own machine.</p>
+<p><b>Why that matters scientifically.</b> Slide 10 asks you to trust a table. This asks you
+to trust nothing: select arm A, press play, and watch 2,060 arrive. The unit of
+publication stops being my result and becomes my instrument.</p>
+<h3>Why a browser port is hard, and what was built rather than assumed</h3>
+<table><tr><th>Plane</th><th>What was built</th><th>Evidence that it works</th></tr>
+<tr><td>Random numbers</td>
+<td>Bit-exact reimplementations of <code>java.util.Random</code> and colt's
+<code>MersenneTwister</code>, the two generators Repast draws from</td>
+<td><b>100,000,000 draws</b> dumped from real Java (10<sup>7</sup> × 5 seeds × 2 generators).
+All ten sequences matched on the first attempt; no fixture was regenerated to fit the port</td></tr>
+<tr><td>Transcendental maths</td>
+<td>One shared fdlibm module for <code>log</code>, <code>exp</code>, <code>pow</code>,
+<code>sin</code>, <code>cos</code>, <code>atan2</code>, plus an allow-list lint that fails the
+build if engine source touches any host <code>Math</code> routine the language does not
+exactly specify, and bans <code>Math.random</code> outright</td>
+<td>Byte-identical on Chromium 141 (V8), Firefox 142 (SpiderMonkey), WebKit 26
+(JavaScriptCore) and Node 24. The host-<code>Math</code> control in the same corpus returns
+<b>four different digests on four engines</b></td></tr>
+<tr><td>Geodesic distance</td>
+<td>The geodesic solver vendored onto that same module, because it called host
+<code>Math</code> at fifty sites and runs once per agent per tick</td>
+<td>Before: 142 / 126 / 249 of 1,200 doubles differing across the three browsers, agreement
+bounded at 3.2&nbsp;nm. After: <b>0 of 3,600 doubles differ</b>, and the gate changed from a
+tolerance into an equality</td></tr></table>
+<p class="cap"><b>The measurement that settled it.</b> Node 24 and Chromium 141 ship the same
+JavaScript engine, V8, and still disagree on <code>Math.log</code>. Shipping the host
+routines would not merely have differed across vendors; it would have broken silently on a
+Chrome update, in a way no output diff would ever have attributed to arithmetic.</p>
+<div class="src"><b>Speaker note.</b> Say "no server" out loud, then say what it buys: the
+whole thing is a file, so it can be archived, hashed and cited like any other figure, and it
+will still run when the grant does not. <b>What a listener will ask:</b> is this the model,
+or a lookalike? Answer: it is a <i>second implementation</i>, and this deck does not promote
+it. The Java runs stay the certified instrument; the browser has to earn every number
+against them, one configuration at a time, which is slide 23. <b>The residual, stated before
+anyone finds it:</b> across 200 independent within-tick permutation streams the port returns
+<b>2,060 sheltered and 28 unreachable in 200 of 200 runs</b>, so the
+headline reproduces exactly; 114 of 6,842 per-person final-state cells differ, which is the
+31st percentile of that ordering channel's own 94-to-144 spread. It changes <i>who</i> got
+in, never how many. <b>Sources:</b> <code>websim/docs/DR-WP3-cross-engine.md</code>,
+<code>DR-C1-geodesic-fdlibm.md</code>, <code>DR-WP7-order-attribution.md</code>;
+<code>websim/engine/src/rng/</code>, <code>websim/engine/src/mathx/</code>.</div></section>
+
+<!-- 22 --------------------------------------------------------------->
+<section><div class="tag">Slide 22 · provenance, in the interface</div>
+<h2>Two kinds of number, and they are never mixed</h2>
+<p>Selecting a preset renders the certified Java figures <b>instantly, at zero compute</b>,
+under a green <b>"Certified Java run"</b> label, before any simulation starts. The live
+browser run then appears <i>beside</i> them under a blue <b>"Live browser simulation"</b>
+label. It never replaces them, and no figure is ever shown wearing the other class's chip.</p>
+<div class="chart shot"><img src="screenshots/websim-01-arm-a-live-vs-archived.png"
+ alt="The Run screen with arm A selected. The right rail shows a green Certified Java run
+ block carrying arm A's archived figures above a blue Live browser simulation block at hour
+ 96. The map is washed olive by the smoke scrim at 286.5 micrograms per cubic metre. The
+ badge chip reads EXPLORATORY."></div>
+<p class="cap"><b>How to read it.</b> <i>Top bar:</i> the four screens (Run, Compare,
+Archive, Provenance), a "Copy permalink" button that encodes the entire configuration into
+the URL, and the badge chip at the far right, here amber. <i>Left rail:</i> the preset list,
+grouped SCENARIOS / E0 NULL / PHASE E / SCENARIO E SEVERE / WORST-PLAUSIBLE V2, with arm A
+selected; beneath it the parameter drawer, open at Core (scenario, resident count, random
+seed, run window, smoke series, smoke scale multiplier), with Demographics and movement, and
+Shelters and policy, collapsed below. <i>Centre:</i> the RLIS street network in outline; the
+teal semi-transparent squares are the k-anonymised encampment density grid (slide 25) and are
+deliberately never individual campsites; the green circles are the 36 shelters, sized by
+capacity. The legend lists all six resident states (PRE_EVAC, EN_ROUTE, SHELTERED,
+UNREACHABLE, REFUSED_ALL_FULL, UNAWARE) and notes that sheltered residents render as the
+green shelter fill rather than as dots, which is why an emptying map means a filling shelter.
+The whole view is washed olive: that is the smoke scrim, drawn at the hour's measured
+286.5 µg/m³. <i>Right rail, green block:</i> arm A as certified, 2,060 sheltered,
+4,754 turned away, 28 unreachable, 928,917.85 person-hours
+above 55.5 µg/m³, 6,842 agents, named as archived run present-day-three-arm/A-seed42.
+<i>Blue block:</i> the live run at hour 96, 6,264 sheltered, 550 turned away, 28 unreachable,
+with a note that person-hours are not accumulated live and must be exported from the engine's
+own writers. <i>Below those:</i> the stacked-area state census (horizontal axis hour of
+simulation, vertical axis residents) and the smoke chart with its dashed line at 55.5,
+labelled "EPA Unhealthy breakpoint (concentration threshold)". <i>Bottom:</i> the live ticker
+reading "Hour 96: 6,264 sheltered; PM2.5 286.5 ug/m3; paused", the Play button, the clock at
+Day 5 00:00 of Day 14 00:00, the tick scrubber, the speed selector at max, and
+"Compute to end".</p>
+<div class="src"><b>Speaker note.</b> Point at the green block, then the blue block, then the
+badge, in that order. The two disagree, and the screen already says why: the chip above the
+drawer reads "Modified from preset: scenarioCode" and the scenario selector reads 20, not 0.
+So this is not arm A failing to reproduce itself. It is a different shelter network running
+beside arm A's archived result, and the badge dropped to amber the instant the selector
+moved. That is the whole slide. <b>What a listener will wonder:</b> why keep the archived
+block on screen once a live run exists? Because they answer different questions. The green
+block is a fixed, citable fact about a run that already happened on the certified instrument,
+available at zero compute; the blue block is a claim this browser is making right now, and
+nothing has certified it. Collapsing the two into one number is exactly the failure the two
+labels exist to prevent. <b>Say this before anyone asks about the chart:</b> hours with no
+measurement render as gaps, never as zero, because a fabricated zero would read as clean air.
+<b>Sources:</b> the archived figures are read at build time from
+<code>docs/runs/present-day-three-arm/A-seed42/simulation.json</code>, the same file slide 10
+reads. The two label strings are pinned as constants in <code>websim/app/src/index.ts</code>
+and asserted by test, so UI copy cannot drift off them.</div></section>
+
+<!-- 23 --------------------------------------------------------------->
+<section><div class="tag">Slide 23 · the badge machine</div>
+<h2>An interface built so that I cannot pass off a modified run</h2>
+<table><tr><th>Badge</th><th>What it claims</th><th>How it is earned, and how it is lost</th></tr>
+<tr><td><b class="aC">ARCHIVE-VALIDATED</b> (green)</td>
+<td>this configuration is byte-identical to the configuration of a certified archived run</td>
+<td>all 41 parameters diff clean against that run's <i>executed</i> manifest, not against what
+its batch file asked for</td></tr>
+<tr><td><b>ENGINE-CERTIFIED</b></td>
+<td>the in-browser gate subset ran green, but no archived run corresponds to this
+configuration</td>
+<td>carried by the default fresh-run configuration, whose own notes record that it is never
+ARCHIVE-VALIDATED</td></tr>
+<tr><td><b style="color:var(--warn)">EXPLORATORY</b> (amber)</td>
+<td>these numbers are the browser's own and nothing certifies them</td>
+<td>touch any slider and it drops here immediately; set the value back by hand and the badge
+returns, because a badge belongs to the configuration and not to the gesture</td></tr>
+<tr><td><b class="aA">INVALID</b> (red)</td>
+<td>these results cannot support any claim about this configuration</td>
+<td>a hard veto that beats every other signal, including a green archive match: the run window
+ran past the end of the smoke data, or the values the engine <i>executed</i> differ from the
+values that were configured</td></tr></table>
+<p class="cap"><b>The two rules that make this a machine rather than a decoration.</b>
+Unknown evidence never upgrades a badge, because a check that has not run is not a check that
+passed. And a badge is never inherited across an edit: run evidence can only veto, so nothing
+a simulation produces can promote a badge upward.</p>
+<div class="chart shot"><img src="screenshots/websim-03-arm-c-archive-validated.png"
+ alt="The Run screen with arm C selected and unmodified. The badge chip reads
+ ARCHIVE-VALIDATED in green. Thousands of small blue PRE_EVAC dots are spread across the
+ density cells at hour 4, with nothing sheltered yet."></div>
+<p class="cap"><b>How to read it.</b> Arm C is selected and nothing has been touched, so the
+chip top right is green and reads ARCHIVE-VALIDATED, and there is no "Modified from preset"
+chip above the drawer. The scenario selector reads 2, arm C's own code. <i>Green block:</i>
+arm C as certified, 6,570 sheltered, 244 turned away, 28
+unreachable, 59,200.15 person-hours above 55.5 µg/m³, from archived run
+present-day-three-arm/C-seed42. <i>Blue block:</i> the live run at hour 4, every figure still
+zero. The map explains why: those thousands of small blue dots spread across the density cells
+are PRE_EVAC residents, still at their start locations, because the concentration is
+6.8 µg/m³ and the 55.5 departure trigger has not fired. The census chart is one flat blue
+band; the smoke chart's dashed 55.5 line sits above the curve rather than below it. The clock
+reads Day 1 04:00 of Day 14 00:00 and the ticker reads "Hour 4: 0 sheltered; PM2.5 6.8 ug/m3;
+paused". Arm C's 46 sites are the green circles here, against arm A's 36 on the previous
+slide: that difference is the ten extra doors, on the map.</p>
+<div class="src"><b>Speaker note.</b> This is the slide where the audience is invited to
+catch me. Point at the green chip and say precisely what it does and does not claim: it says
+this configuration is byte-identical to the one the certified run executed. It does <i>not</i>
+say the live output has been byte-compared to the archive; that comparison is not wired into
+this build, and the badge machine is explicit that unknown evidence never upgrades anything.
+<b>What a listener will wonder:</b> could a modified run not simply be relabelled? No, and
+the failure is designed to be loud rather than polite. Move one slider and the chip is amber
+before the mouse button is released. Set a run window past the end of the smoke series and
+the badge goes red, because the engine would then be reading fabricated zero concentrations,
+and red beats a green archive match and green gates together. <b>The general point worth
+saying:</b> the interface is not asking the presenter to be honest. It removes the option.
+<b>Sources:</b> <code>websim/app/src/badge/machine.ts</code> (the derivation and its authority
+order), <code>websim/app/src/state/store.ts</code> (badges are config-derived; any parameter
+difference drops them), <code>websim/shared/test/preset-archive-parity.test.ts</code> (each
+preset's parameter block diffed against the archived <code>simulation.json</code>).</div></section>
+
+<!-- 24 --------------------------------------------------------------->
+<section><div class="tag">Slide 24 · the mechanism, made visible</div>
+<h2>Hour 20: what a screening map can never show you</h2>
+<div class="chart shot big"><img src="screenshots/websim-04-arm-c-hour20-evacuation.png"
+ alt="Arm C at hour 20. Orange EN_ROUTE residents are strung out in lines along the street
+ network, walking toward green shelter circles that brighten as they fill. The state census
+ chart shows the blue PRE_EVAC band collapsing into the green SHELTERED band with a thin
+ orange EN_ROUTE band between them."></div>
+<p class="cap"><b>How to read it.</b> Arm C, hour 20, badge still green. The concentration has
+just crossed the trigger (61.4 µg/m³ against 55.5), so departure has fired and the map has
+changed character completely. The orange dots are EN_ROUTE residents, and they are strung out
+in visible <i>lines</i>, because each one is walking the street network rather than flying
+across it: every line is a shortest path being consumed at that person's own walking speed.
+The green circles brighten as they fill, because sheltered residents render as shelter fill
+rather than as dots. In the right rail the live block reads 5,999 sheltered and 0 turned away.
+The stacked-area census below shows the blue PRE_EVAC band collapsing into the green SHELTERED
+band with a thin orange EN_ROUTE band between them: that band is the journey, and its width is
+the exposure. The map is washed a light olive by the smoke scrim at 61.4. The clock reads Day
+1 20:00 of Day 14 00:00, at speed 10x.</p>
+<div class="src"><b>Speaker note.</b> Stop talking and let it run for a few seconds. Then say
+the sentence this whole project exists for: a static screening map can tell you that shelter
+capacity equals demand, and it still cannot tell you this, because whether a bed is reachable
+is a fact about a person's location, their speed and the clock, not a fact about the bed.
+Point at the lines: those are real streets, from the RLIS centreline file with 614 km of
+freeway removed (slide 5). Point at the orange band in the chart: everyone inside it is
+outdoors breathing 61.4 µg/m³, and that band is exactly the quantity slide 8 calls inhaled
+dose. <b>What a listener will wonder:</b> why is nobody turned away here, when arm A refuses
+4,754? Because arm C holds 6,842 spaces across 46 sites and this is only hour 20.
+Refusals are produced by doors filling, and in arm C most of them never do. <b>The caveat to
+say here rather than later:</b> every one of those dots knows where every shelter is and how
+full it is. Slide 19 puts a measured bracket of 1.5 to 15.6 times on what that assumption is
+worth.</div></section>
+
+<!-- 25 --------------------------------------------------------------->
+<section><div class="tag">Slide 25 · disclosure control</div>
+<h2>The map cannot point at anyone, and that is structural</h2>
+<p>The population this model is about is unsheltered. Publishing a zoomable map of where they
+sleep would be a harm this study has no right to cause, so the teal layer on every previous
+slide is not a map of campsites, and it was never built from one.</p>
+<table><tr><th>Control</th><th>What it does</th><th>Measured effect</th></tr>
+<tr><td>k-anonymity floor on every published cell</td>
+<td>no density cell is published holding fewer than 5 reports; a cell that misses the floor is
+merged into its parent, doubling the cell in each direction, and re-tested, up to 4.8 km,
+before anything is dropped</td>
+<td>the first build shipped <b>1,863 cells, 1,773 of them below 5, and 1,100 holding exactly
+one report</b>, which is a campsite located to within a city block. After the floor:
+<b>506 cells, smallest count 5, none below the floor</b>. 3,371 of 3,400
+reports still reach the map, and the 29 that do not are published as a suppression count
+rather than silently dropped</td></tr>
+<tr><td>The raw CSV is not an asset at all</td>
+<td>the raw campsite file is never shipped. The worker's encampment input is
+<i>synthesised</i> at runtime from a public asset carrying street-node-snapped coordinates
+and salted row hashes</td>
+<td>a publication gate greps every built asset for raw coordinate bit patterns, raw coordinate
+text pairs, report ids and salt material, and <b>refuses to pass</b> rather than pass quietly
+when it cannot prove absence</td></tr>
+<tr><td>SHA-256 on every asset</td>
+<td>the manifest is fetched first, and every manifest-listed asset is hash-verified before a
+single byte reaches a caller; a mismatch throws, naming the asset and both digests</td>
+<td>a reader gets the same graph, shelters and smoke series I used, or an error. Never a quiet
+substitution</td></tr></table>
+<div class="chart shot"><img src="screenshots/websim-02-arm-a-run-complete.png"
+ alt="The same run as slide 22, finished at hour 312. The smoke has cleared to 12.7
+ micrograms per cubic metre, so the olive scrim is gone and the k-anonymised density grid
+ reads in blue. The smoke chart shows the full 312-hour curve."></div>
+<p class="cap"><b>How to read it.</b> The same run as slide 22, finished. Hour 312; the ticker
+reads "Hour 312: 6,264 sheltered; PM2.5 12.7 ug/m3; run complete"; the clock reads Day 14
+00:00; and the smoke chart has filled in the whole 312-hour curve, with its early spike, its
+clean gap and its multi-peaked main episode, all against the dashed 55.5 line. Concentration
+is back down to 12.7, so the smoke scrim has lifted and the density grid reads in its own blue
+for the first time. That grid is the point of this slide: aggregated cells of <i>varying
+size</i>, not campsite points, and the varying sizes are the merge levels, cells that had to
+be widened until at least five reports sat inside. The certified arm A block in the right rail
+has not moved, because archived numbers do not change when a live run finishes.</p>
+<div class="src"><b>Speaker note.</b> Point at a large cell, then a small one, and give the
+difference: a big cell is not a big camp, it is a sparse area whose cells had to be merged
+until five reports were inside. <b>What a listener will wonder, and it is the right
+question:</b> is this privacy theatre, given the campsite reports are public open data? The
+honest answer has two halves. The reports are public, so this is not protecting their
+existence; what it removes is a rendered, zoomable map of individual sleeping locations, which
+the raw feed does not itself publish and which this project would otherwise have created. And
+the first version of this layer got it wrong: node-snapping removed the coordinates and the
+fine grid handed the locations straight back. It was caught by reviewing the built bytes, not
+the code, which is the transferable lesson. <b>What is deliberately not claimed:</b> this is
+small-count suppression, not differential privacy. It makes no claim about an adversary who
+already holds another dataset, and the counts are exact rather than noised.
+<b>Sources:</b> <code>websim/docs/DR-Q4-encampment-disclosure.md</code> (the census before and
+after, the merge rule, the salt custody decision), <code>pipeline/scripts/deploy-check.ts</code>
+(the publication gate), <code>websim/app/src/assets/loader.ts</code> (manifest verification),
+<code>websim/app/src/sim/useSimRun.ts</code> (the synthesis).</div></section>
 
 <div class="ctr" id="ctr"></div>
 <script>
