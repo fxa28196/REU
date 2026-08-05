@@ -1,0 +1,257 @@
+/*
+ * theme.css (WP11) — the dark UI palette and the Run-screen grid.
+ *
+ * Palette (project COMMON): bg #14161a, panel #1c1f24, text #e6e8eb,
+ * muted #9aa2ab. Categorical colours elsewhere are Okabe-Ito (colorblind-safe)
+ * and live next to the code that uses them (map/colors.ts, BadgePanel).
+ *
+ * Layout: top bar / content / footer as a column; the Run screen's content is
+ * a grid — left rail 300px (presets over sliders, scrollable), center map
+ * (fills), right rail 360px (live panel, scrollable), bottom bar (scrubber).
+ * The page never scrolls horizontally; wide content scrolls inside its rail.
+ */
+
+:root {
+  --ws-bg: #14161a;
+  --ws-panel: #1c1f24;
+  --ws-text: #e6e8eb;
+  --ws-muted: #9aa2ab;
+  --ws-border: #2a2e35;
+  --ws-archived: #009e73; /* Okabe-Ito bluish green — certified archive */
+  --ws-live: #0072b2; /* Okabe-Ito blue — live browser simulation */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+  background: var(--ws-bg);
+  color: var(--ws-text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+body {
+  overflow-x: hidden; /* the page body never scrolls horizontally */
+}
+
+/* ---- app shell ---------------------------------------------------------- */
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 720px; /* responsive floor; rails clamp below via media queries */
+}
+
+.app-topbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.4rem 0.9rem;
+  background: var(--ws-panel);
+  border-bottom: 1px solid var(--ws-border);
+  flex: 0 0 auto;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.app-tabs {
+  display: flex;
+  gap: 0.25rem;
+  flex: 1 1 auto;
+}
+
+.app-tab {
+  background: var(--ws-bg);
+  color: var(--ws-muted);
+  border: 1px solid var(--ws-border);
+  border-radius: 4px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.app-tab-active {
+  color: var(--ws-text);
+  border-color: #e69f00; /* Okabe-Ito orange accent, matching the controls */
+  box-shadow: inset 0 -2px 0 #e69f00;
+}
+
+.app-topbar-badge {
+  color: var(--ws-bg);
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 2px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.app-content {
+  flex: 1 1 auto;
+  min-height: 0; /* lets the run grid own its scrolling */
+}
+
+.app-footer {
+  flex: 0 0 auto;
+  padding: 0.35rem 0.9rem;
+  background: var(--ws-panel);
+  border-top: 1px solid var(--ws-border);
+  color: var(--ws-muted);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+/* ---- run screen grid ---------------------------------------------------- */
+
+.run-grid {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr) 360px;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  height: 100%;
+  padding: 0.5rem;
+}
+
+.run-left {
+  grid-column: 1;
+  grid-row: 1;
+  overflow-y: auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.run-center {
+  grid-column: 2;
+  grid-row: 1;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--ws-bg);
+}
+
+.run-right {
+  grid-column: 3;
+  grid-row: 1;
+  overflow-y: auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.run-bottom {
+  grid-column: 1 / -1;
+  grid-row: 2;
+}
+
+@media (max-width: 1280px) {
+  .run-grid {
+    grid-template-columns: 260px minmax(0, 1fr) 320px;
+  }
+}
+
+@media (max-width: 1080px) {
+  .run-grid {
+    grid-template-columns: 240px minmax(0, 1fr) 300px;
+  }
+}
+
+/* ---- shared panel chrome ------------------------------------------------- */
+
+.panel {
+  background: var(--ws-panel);
+  color: var(--ws-text);
+  border-radius: 6px;
+  padding: 12px 16px;
+}
+
+.panel-title {
+  margin: 6px 0 2px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.panel-sub {
+  margin: 4px 0;
+  font-size: 0.8rem;
+  color: var(--ws-muted);
+  line-height: 1.4;
+}
+
+.panel-warn {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  color: #d55e00; /* Okabe-Ito vermillion */
+  font-weight: 600;
+}
+
+/* Provenance chips: class labels rendered verbatim, colour-coded but never
+   colour-alone (the text IS the label). */
+.chip {
+  display: inline-block;
+  color: var(--ws-bg);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  padding: 2px 10px;
+  border-radius: 999px;
+}
+
+.chip-archived {
+  background: var(--ws-archived);
+}
+
+.chip-live {
+  background: var(--ws-live);
+}
+
+/* ---- map overlays -------------------------------------------------------- */
+
+.map-overlay-note,
+.map-overlay-error {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  max-width: 80%;
+  background: var(--ws-panel);
+  color: var(--ws-text);
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+.map-overlay-error {
+  border: 1px solid #d55e00;
+  color: #ffd9c4;
+}
+
+/* ---- placeholders -------------------------------------------------------- */
+
+.placeholder-wrap {
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.placeholder-panel {
+  max-width: 46rem;
+}

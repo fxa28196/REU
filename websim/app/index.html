@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Capacity Is Not Access — browser-native agent-based simulation of clean-air shelter access for Portland's unsheltered residents during wildfire smoke. All computation runs locally in your browser."
+    />
+    <title>Capacity Is Not Access — Wildfire Shelter ABM</title>
+    <style>
+      /* Pre-app shell: dark, and honest about what is loading. */
+      html,
+      body,
+      #root {
+        margin: 0;
+        height: 100%;
+        background: #14161a;
+        color: #e6e8eb;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      #boot {
+        display: flex;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: #9aa2ab;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"><div id="boot">Loading the simulation app…</div></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

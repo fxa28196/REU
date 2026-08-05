@@ -9,6 +9,9 @@ coverage/
 # --- generated pipeline assets (rebuilt from scripts + java-exporter) --------
 pipeline/out/
 
+# --- staged copy of pipeline assets for Vite (scripts/stage-assets.ts) -------
+app/public/
+
 # --- curated validation working set payload (plan §5.3, §10 item 3) ----------
 # The MANIFEST (working-set.manifest.json) is committed; the ~40 MB of archived
 # CSVs it describes is NOT. Committing the payload has a repo-size implication
