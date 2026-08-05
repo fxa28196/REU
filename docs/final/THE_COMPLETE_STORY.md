@@ -1672,5 +1672,1799 @@ Consequently the required wording is fixed and used everywhere: *"splitting the 
 across more sites improves outcomes under the modelled assumptions"*, and **never**
 *"recreates what actually happened"*.
 
-<!--PART3-->
+---
+
+## 7. Every figure and chart: why that chart, why those axes, why that scale
+
+This section exists because someone will point at a graph and ask why. Everything below comes
+from the generating code, which is `scripts/make_chapter_figures.py` for the book chapter,
+`scripts/make_2026_results.py` and `scripts/make_readable_results.py` for the plain-language
+result packs, `scripts/make_symposium_deck.py` for the talk, and
+`websim/app/src/charts/` for the browser app. No figure in this project was drawn by hand;
+the deck says so on its own first slide.
+
+### 7.1 The decisions that apply to every chapter figure
+
+**Vector PDF, not EPS.** The script's own docstring gives the reason: PDF is equally vector
+and is the native format of the LaTeX engine used, whereas an earlier EPS set forced a
+conversion step on every single Overleaf compile and blew the free plan's timeout. That is a
+production reason, not an aesthetic one, and it is written down so nobody "improves" it back.
+
+**Every figure must survive black-and-white printing.** Each series carries a distinct hatch
+or marker **as well as** a colour, and every bar is directly labelled with its value. The
+reason is that a conference proceedings volume may print in greyscale at 8.5 by 11 inches,
+and a chart that relies on colour alone becomes unreadable. This is the same principle the
+browser app applies with per-state glyphs.
+
+**The palette is fixed and meaningful.** Arm A is red (`#c4342c`), arm B is blue
+(`#1f6fb2`), arm C is green (`#0f7a5a`), and the hatches are none, `///` and `...`
+respectively. They were chosen to be distinct in colour, distinct in lightness, and distinct
+in texture, which is three independent channels.
+
+**The labels are pinned to the tables.** The generating script carries a comment saying the
+wording must match the chapter's tables exactly, because a reader looking from a table to a
+figure must not see two different names for the same scenario. When the "same beds, better
+placed" slogan was retired after the random-siting control refuted it, the label dictionary
+in the figure script was changed in the same pass, so the figures cannot silently keep saying
+something the text has withdrawn.
+
+**Serif type, thin rules, no top or right spine.** The font stack is Times New Roman with a
+fallback, sizes 8 to 9.5 point, axis lines 0.7 point, and `pdf.fonttype 42` so glyphs embed as
+real TrueType outlines. This is set so the figures sit inside a book page rather than looking
+like software output.
+
+### 7.2 Figure 1, the smoke event
+
+**What it shows.** Measured hourly PM2.5 in Multnomah County from 7 to 19 September 2020,
+averaged across the two in-county regulatory monitors.
+
+**Why hours on the x-axis, and why it is labelled with dates.** The underlying quantity is one
+observation per hour and there are 312 of them, so the natural x is the hour index. But the
+tick labels are dates every two days (`7 Sep`, `9 Sep`, and so on), because an audience reads
+calendar time and an emergency has a calendar. The axis is therefore hour-resolution data with
+human-readable ticks, which is the best of both.
+
+**Why concentration on the y-axis, in µg/m³.** Because that is the physical quantity the model
+integrates and the only one for which a published threshold exists. Converting to an AQI index
+value would have introduced the 24-hour-averaging trap described in Section 3.5.
+
+**Why the y-axis is linear and runs 0 to 610.** Linear, because the reader needs to see that
+the peak is roughly a hundred times the clean baseline **as a distance on the page**; a
+logarithmic axis would compress exactly the thing the figure exists to convey. The upper limit
+of 610 leaves headroom above the 562.7 peak so the annotated peak marker is not jammed against
+the frame. The figure script does not record a written rationale for the specific number 610,
+so that last sentence is an observation about what it does, not a quotation of why.
+
+**Why 55.5 is a dashed horizontal reference line and not a shaded region.** A dashed line is an
+annotation; a shaded band would read as a second data series. It is drawn in the same red as
+arm A, at a lighter weight than the data trace, and is labelled in plain text. There is a
+comment in the script explaining that the label must be plain text because matplotlib is not
+being run through LaTeX here, so TeX quoting and escapes would be drawn literally into the
+image. That is a small thing, but it is the kind of small thing that has embarrassed papers.
+
+**Why the line is labelled a threshold and never an AQI category.** Because of the two traps in
+Section 3.5. The chapter caption, the registry, the code comment, the deck and the browser app
+all use the concentration language, and the browser app's colour module contains an explicit
+instruction that the file must not describe it as an AQI category.
+
+**Why the caption says the field is measured and identical in all three scenarios.** Because a
+reader must not think the smoke is an output. It is the one input the model does not compute,
+and it is the same in every arm, which is what makes arm comparisons clean.
+
+### 7.3 Figure 2, walking speeds
+
+**What it shows.** Three overlapping distributions of sampled comfortable walking speed: no
+mobility limitation and no COPD (mean 1.38), COPD (mean 1.19), and mobility limitation (mean
+0.98).
+
+**Why a histogram rather than three bars or a box plot.** Because the argument is about
+**overlap**. The three groups are not separated; they are shifted distributions that share most
+of their range, and the reader needs to see that a slow unimpaired walker can be slower than a
+fast impaired one. A bar of means would erase that, and a box plot would state it less
+directly.
+
+**Why step outlines rather than filled bars.** Filled histograms occlude each other. Step
+outlines let three distributions sit on the same axes and all remain readable, including in
+greyscale where they are distinguished by line weight and position.
+
+**Why bins are 0.05 m/s wide, spanning 0.30 to 2.20.** The bin width is fine enough to show the
+shape and coarse enough not to be noisy at these sample sizes, and the range is exactly the
+truncation interval of the sampler (V27) plus a little, so a reader can see for themselves that
+nothing piles up at the bounds. It does not; zero of 61,578 sampled speeds ever hit a bound.
+
+**Why asthma appears in no group here, and why the caption says so.** Because the absence is
+the point. The caption states that asthma appears in no group because no published gait-speed
+decrement exists for it, and that this absence propagates directly into the equity result. A
+figure that quietly omitted asthma would look like an oversight; a figure that says why it is
+absent is an argument.
+
+### 7.4 Figure 3, access outcomes
+
+**What it shows.** Two panels: (a) residents reaching a shelter, and (b) spare capacity against
+unmet need, in the same runs.
+
+**Why counts on the y-axis of panel (a) rather than percentages.** Because the panel carries a
+dashed horizontal reference line at **6,842**, labelled "population". With counts, the reader
+can see the bars against the total in one glance and read off both "how many got in" and "how
+big is the shortfall". Each bar is then directly labelled with **both** the count and the
+percentage, so nothing is lost. The y-limit is 8,600, which leaves room above the population
+line for the value labels.
+
+**Why the population reference line at all.** Because 6,264 means nothing without a denominator,
+and putting the denominator on the chart is more honest than putting it in the caption.
+
+**Why panel (b) is a paired bar chart rather than a stacked one.** Because the two quantities,
+spaces left empty and residents turned away, are **not parts of a whole**. Stacking them would
+imply they add up to something meaningful. Side by side, at the same scale, the reader sees the
+comparison the panel exists to make: in arm B the two bars are the same height, and the caption
+immediately says that this equality follows from capacity equalling population rather than from
+a discovery. That is the disclaimer travelling with the picture rather than trailing three
+paragraphs behind it.
+
+**Why the legend sits inside the panel and the bars are labelled.** Same greyscale rule.
+
+### 7.5 Figure 4, the map
+
+**What it shows.** Resident start points in grey against facility locations sized by capacity,
+in (a) today's system and (b) scenario C.
+
+**Why longitude and latitude on the axes and not a projected coordinate system.** The data are
+in WGS84, the model routes in WGS84, and reprojecting for display would introduce a coordinate
+transform whose only purpose is cosmetic. The distortion is handled instead by setting the
+aspect ratio to 1/0.70, which approximately corrects for the fact that at 45.5 degrees north a
+degree of longitude is much shorter on the ground than a degree of latitude.
+
+**Why there is a computed scale bar.** Latitude and longitude ticks do not tell a reader how
+far anything is. So a 2 kilometre bar is drawn, and it is **computed** rather than eyeballed:
+`deg_per_2km = 2000.0 / (111320.0 * cos(radians(45.5)))`. The code comment says the reason
+directly, which is that the bar stays correct if the map extent changes. A hand-placed scale
+bar silently becomes a lie the first time someone adjusts the view.
+
+**Why facility markers are sized by capacity.** Because a scenario comparison about *where the
+spaces are* has to show both position and quantity, and area is the standard channel for
+quantity on a map. Existing facilities are open circles outlined in arm-A red; the ten new
+sites in panel (b) are filled green triangles. Shape as well as colour, again, for greyscale.
+
+**Why the two panels share x and y axes.** Because the whole claim of the figure is that the
+existing 36 facilities **do not move** between panels and only the new capacity is placed. If
+the panels had independent extents, that claim would be unverifiable by eye. The caption states
+it too.
+
+**Why start points are grey and small and rasterised.** They are context, not the subject, so
+they are drawn at 1.4 points, 45% opacity, in a neutral grey, and rasterised so that 6,842
+markers do not turn a vector PDF into a 20 megabyte file.
+
+### 7.6 Figure 5, the race
+
+**What it shows.** For each group, the cumulative share already inside a shelter, plotted
+against minutes since departure. Left panel is arm B; right panel is arm D with the 10%
+reserve.
+
+**Why minutes since departure on the x-axis rather than clock time.** Because in this
+configuration everyone departs on the same tick, so clock time and elapsed time differ only by
+a constant, and elapsed time is what the argument is about. The claim is "the gap is decided in
+the first hour", and an axis starting at the departure instant makes that readable directly.
+
+**Why the x-axis stops at 240 minutes.** Four hours is where the curves have flattened. Showing
+the full 312 hours would compress the informative region into a few pixels at the left edge.
+The deck version puts a dashed vertical line at 60 minutes and labels it, because that is the
+specific claim being made.
+
+**Why cumulative percentage of the group on the y-axis, and why 0 to 100.** Cumulative, because
+the quantity of interest is "how many of this group are already safe by now", which is a
+running total. Percentage of group rather than count, because the two groups are very different
+sizes (5,482 and 1,360 at seed 42) and raw counts would make the comparison meaningless. The
+axis runs the full 0 to 100 and both panels share it, so the left and right panels are directly
+comparable, which is the entire point of putting them side by side.
+
+**Why two panels rather than four lines on one axes.** Four curves on one panel would cross and
+tangle. Two panels with a shared y-axis let the reader see, in one saccade, that two curves
+separate on the left and converge on the right.
+
+### 7.7 The two figures that were cut, and why cutting them was right
+
+The generating script still contains `fig_equity` and `fig_seeds`, and the main block
+deliberately does not call them. The comment says why: the equity figure duplicated the first
+three rows of the mobility-gap table exactly, and the 27-run seed figure showed three near-flat
+lines that said less than the sentence reporting the spread.
+
+That second one is where the project's only **logarithmic** axis lives. `fig_seeds` plots
+residents sheltered against random seed with `ax.set_yscale("log")` and manual ticks at 2,000,
+3,000, 5,000 and 7,000. The reason a log scale was reached for is that arm A sits near 2,060
+while arms B and C sit near 6,300 and 6,570, so on a linear axis arm A's line is squashed
+against the floor and its seed-to-seed variation is invisible. A log axis gives all three arms
+comparable vertical room. The script also carries a comment explaining that the minor tick
+formatter had to be silenced, because left on, matplotlib printed `4x10^3` next to a manually
+formatted `3,000`, so the same axis showed two different number formats.
+
+If someone asks whether this project uses a log scale, the accurate answer is: one figure does,
+it is not in the chapter, and the reason it is not in the chapter is that the finding it showed
+was better carried by a sentence.
+
+### 7.8 The symposium deck's five charts
+
+All five are drawn as inline SVG by JavaScript embedded in
+`docs/final/presentation/capacity-is-not-access-symposium.html`, from a `DATA` object emitted
+by `scripts/make_symposium_deck.py`. Every chart carries a "How to read it" caption naming both
+axes in words, which is a deliberate accessibility and comprehension choice for a live talk.
+
+**The PM2.5 strip.** Horizontal axis is clock time across the 312-hour window with tick labels
+every two days; vertical axis is concentration in µg/m³ with gridlines at 0, 150, 300, 450 and
+600. The dashed reference line is at 55.5 and is annotated with the value followed by the words
+`EPA 'Unhealthy'`. Three shaded bands mark the two-spell structure: hours 16 to 21 labelled
+"spike", hours 22 to 78 labelled "57 clean hours", and hours 79 to 311 labelled "main episode".
+The peak is annotated in place. **The y-axis clamps at 600** via `Math.min(v, mx)`, which is
+above the 562.7 peak so nothing is actually clipped; the clamp is a guard against a future
+series overflowing the frame silently.
+
+**Missing hours are gaps, never zeros.** The path builder is a single line and it is the
+important line: `DATA.pm.forEach(function(v,h){ if(v===null||isNaN(v)) return; ... })`. A
+missing hour contributes no vertex, so the drawn line breaks. The alternative, plotting a
+missing hour as zero, would draw a spike down to the axis and read as "the air was clean",
+which is the opposite of "we do not know". This is the same discipline the Java engine applies:
+`SmokeField` stores missing hours as NaN with the comment that a gap is never silently zero,
+and any lookup that lands outside the loaded window increments `outOfRangeLookups`, which is
+exported in every manifest and **must be 0 for a clean run**
+(`docs/final/TECHNICAL_REFERENCE.md` §7.2). It was that counter that caught the 456-versus-455
+window error described in Section 9.
+
+**The scenario bar chart.** Horizontal axis is scenario; vertical axis is the percentage of the
+6,842 residents admitted, gridded at 0, 25, 50, 75 and 100. Each bar is labelled with its value
+in large type and each has a one-line subtitle saying what the scenario is (`today, 2,234
+spaces`; `spaces = people`; `same total, 10 more doors`; `B + 10% reserve`), so a reader who
+missed the setup slide can still read the chart.
+
+**The bed sweep.** Horizontal axis is total spaces at the existing 36 sites, expressed as a
+multiple of demand; vertical axis is percentage admitted, and here the axis runs **70 to 100
+rather than 0 to 100**. That is a deliberate zoom and it is the one axis choice on the deck
+most worth being ready to defend. Every point in the sweep lies between 73.3% and 99.5%, so a
+0-to-100 axis would compress the entire finding into the top quarter of the frame and the
+crossing points would be indistinguishable. The chart compensates by drawing a horizontal
+dashed line at C's 96.0% and two vertical dashed markers at 7,184 and 7,526 spaces, each
+labelled in words, so the reader is anchored to the two numbers that matter rather than to the
+axis floor.
+
+**The equity dumbbell.** Horizontal axis is the percentage of a group admitted; each row is one
+scenario; an open circle marks residents with no mobility limitation, a filled circle marks
+residents with one, and a connecting bar spans them. The gap in percentage points is printed at
+the right of each row. A dumbbell was chosen over paired bars because the quantity of interest
+is the **distance between two points**, and a dumbbell encodes distance as length, which is the
+most accurately read visual channel there is.
+
+**The race chart.** Horizontal axis is minutes since departure over the first four hours;
+vertical axis is cumulative percentage of the group already sheltered; a dashed vertical line
+marks 60 minutes and is labelled. Three curves rather than four, because the fourth would add
+nothing.
+
+### 7.9 The plain-language result figures
+
+`docs/final/results-2026/figures/` and `docs/final/readable/figures/` carry a parallel set built
+by `scripts/make_2026_results.py` and `scripts/make_readable_results.py`, whose axis labels are
+deliberately written in ordinary words rather than in metric names: "% who got inside",
+"kilometres walked", "people", "micrograms of smoke breathed in", "count". The titles are
+sentences, for example "Empty beds and turned-away people at the same time" and "How far people
+had to walk". These exist because the same result has to be legible to a county staffer and to
+a reviewer, and the honest way to serve both is two renderings of one number, not one rendering
+that compromises.
+
+---
+
+## 8. The web simulation: what it is, why it exists, and what every part of the screen does
+
+### 8.1 What it is
+
+`websim/` is a complete, browser-native TypeScript re-implementation of the Java model, which
+runs the simulation **on your own machine, in a web page, with no server**
+(`websim/docs/IMPLEMENTATION_PLAN.md`). It is not an animation of pre-recorded results. It is
+the model.
+
+### 8.2 Why it exists
+
+Three reasons, in order of importance.
+
+**It makes the work inspectable by anyone.** A Repast Simphony model requires Java, a specific
+toolkit version, a checkout of the repository and a working knowledge of batch parameter files.
+A URL requires none of that. Anyone at a symposium can open the same configuration on a phone
+and see the same numbers.
+
+**It makes a claim falsifiable in public.** The app displays the **archived certified Java
+result** and the **live browser result** side by side, in two separate blocks, and neither ever
+overwrites the other. A viewer can watch the browser reproduce the archive, or watch it fail to.
+
+**It forced a level of verification the Java model never had.** Porting a model is the harshest
+possible audit, because every implicit behaviour has to be made explicit. The port found real
+defects in the shipped assets, which are described in Section 9.
+
+### 8.3 How it proves it is the same model
+
+The claim is stated precisely rather than loosely, and the precision matters. From
+`websim/README.md`: **Java-archive byte identity is not a goal.** Bit-exact reproduction of
+`java.util.Random`, a bit-exact Mersenne Twister, and bit-identical initial-world construction
+**are** goals. The within-tick agent ordering is a **declared, measured divergence**, and the
+project measures it rather than claiming it away.
+
+The verification is a five-tier ladder (`websim/docs/IMPLEMENTATION_PLAN.md` §5.1).
+
+- **Tier 0, component bit-parity.** The random number generators were checked against fixtures
+  dumped from real Java as raw IEEE-754 hexadecimal, never as decimal text: 263 sequences of
+  10,000 draws, which is 2,630,000 draws, all byte-exact, plus a depth tier of
+  **100,000,000** more (`websim/docs/DR-S5-rng.md`).
+- **Tier 1, initial-world identity.** The whole world is built and compared against Java dumps:
+  118 of 118 shelter shortest-path trees, **3,539,712 of 3,539,712** distances and predecessor
+  edges bit-equal, 3,908 of 3,908 snap assignments, 39 of 39 world dumps covering 266,838
+  residents (`websim/docs/DR-WP5-graph-runtime.md`, `DR-F1-world-fixtures.md`). One exception is
+  registered and measured rather than hidden: the geodesic `snap_gap_m` **distance** is
+  tolerance-equal at 1e-8 metres rather than bit-equal, differing in the last bits on 6,390 of
+  6,842 rows with a maximum absolute difference of 3.181e-9 metres. The node **choice**, which
+  is what routing actually reads, is exact.
+- **Tier 2, own-engine null.** The browser's own E0-degenerate run against its own no-layer run,
+  byte-identical on the shared columns. This is the R3 test of Section 5.4, run inside the
+  browser engine.
+- **Tier 3, statistical cross-validation against the archive.** Sheltered counts inside the
+  nine-seed archive bands; the unreachable **id set** identical, not just the count; realised
+  marginals **equal, not close**.
+- **Tier 4, structural identity where the shuffle is inert**, with an honest accounting. 6,546
+  of 6,842 rows, or 95.67%, are byte-identical across 46 shared columns, and 27 of those 46
+  columns are bit-equal on every single row. `final_state` differs on 114 rows, decomposing
+  into 57 lost and 57 gained, which sits at the 31st percentile of a 200-stream permutation
+  distribution (two-sided p = 0.776), exactly as an ordering artefact should. The README
+  explicitly refuses a more flattering framing, noting that counting "27 bit-equal plus 19
+  divergent plus 10 not comparable" to reach a denominator of 56 would flatter the result, and
+  that **the honest figure is 27 of 46**.
+
+Cross-engine determinism is a gate, not an assertion: the same configuration produces
+byte-identical output on Chromium, Firefox, WebKit and Node, checked over 34,869 canonical hex
+tokens across 7 of 7 gated sections. The control for that test is instructive: the host
+platform's own `Math` transcendental functions give **four different digests on four engines**,
+two of which are both V8, which is exactly why the engine routes its own transcendental maths
+through a vendored fdlibm implementation instead. Routing the geodesic library through the same
+module moved it from 142, 126 and 249 of 1,200 doubles differing to **0 of 3,600 differing on
+all three browsers**, and the gate assertion changed from a magnitude bound to an equality
+(`websim/docs/DR-C1-geodesic-fdlibm.md`).
+
+The commit `40aea5e` records the first fully green three-browser matrix: **111 of 111 tests
+passing across 15 files, on all three engines**.
+
+### 8.4 The screen, part by part
+
+All four screenshots below are of the same application. They share a common frame, described
+once here and then not repeated.
+
+**The top bar** carries the title `Capacity Is Not Access` on the left, then four tabs:
+**Run**, **Compare**, **Archive**, **Provenance**. Run is the simulator. Compare puts two
+configurations side by side with delta cards. Archive browses the 154 archived Java runs.
+Provenance shows the variable and assumption registries, the street-network corrections, the
+output-quirk ledger and the prediction scoreboard. On the right sit a **Copy permalink**
+button, which is disabled until a preset is selected because a permalink encodes the difference
+from one, and the **badge chip**.
+
+**The left rail** holds the preset list above a collapsible slider drawer. There are exactly
+**13 shipped presets**, grouped by the prefix of their identifier
+(`websim/shared/src/presets/definitions.ts`, `websim/app/src/controls/paramMeta.ts`):
+
+- **SCENARIOS** (4). "Default", described as a fresh run in the study configuration; "Arm A",
+  described as present-day reality with 36 sites and 2,234 beds; "Arm B", described as capacity
+  meeting demand at real locations with 36 sites and 6,842 beds; and "Arm C", described as
+  expanded capacity plus new sites with 46 sites and 6,842 beds.
+- **E0 NULL** (3). "E0 null", described as the decision layer on with every mechanism
+  degenerate, once each for arm A, arm B and arm C geometry.
+- **PHASE E** (2). "ER baseline-real", described as the sourced decision layer, for arm A and
+  arm C geometry.
+- **SCENARIO E SEVERE** (2). "SE severe v1 (E18)", labelled CONSTRUCTED COUNTERFACTUAL with arm
+  A geometry, and the E19 arm-C equivalent.
+- **WORST-PLAUSIBLE V2** (2). "SE2 worst-plausible v2, draw 1 (E18)" and draw 2, both labelled
+  CONSTRUCTED COUNTERFACTUAL.
+
+The words CONSTRUCTED COUNTERFACTUAL are part of the preset label itself, and the component's
+own header comment forbids shortening them. That is a deliberate design choice: the warning
+cannot be lost by a UI tweak, because it is not a decoration on the label, it **is** the label.
+
+The `Default` preset is annotated in the definitions file as not being an archived
+configuration, so it can earn ENGINE-CERTIFIED but never ARCHIVE-VALIDATED. That is the badge
+machine refusing to over-claim about its own default.
+
+**The slider drawer** exposes 38 of the model's 41 parameters, in five collapsible sections,
+with the first open by default:
+
+1. **Core** (6): Scenario (shelter network), Resident count, Random seed, Run window, Smoke
+   series, Smoke scale multiplier.
+2. **Demographics and movement** (3): Walking speed (uniform, and it is disabled unless
+   heterogeneity is switched off), Resident heterogeneity, Group slowdown per extra member.
+3. **Shelters and policy** (4): Shelter opening dates, Triage reserve fraction (the arm-D
+   lever), Pet policy at unrecorded sites, Shelter CSV variant.
+4. **Decision layer (Phase E)** (19): the master switch plus initial awareness, the three
+   barrier prevalences, outreach rate, information regime, departure model, risk-trait spread,
+   hazard intercept, risk-cue weight, official-cue weight, vulnerability amplification, risk-cue
+   half-life, the three barrier costs, and the two destination-choice weights.
+5. **Closures (Scenario E)** (6): street-closure family, probability of getting stuck, stuck
+   delay, push-through threshold, push burden coupling, and the committed schedule draw (which
+   only becomes enabled when the worst-case family is selected).
+
+Three parameters are deliberately **absent**: the dead arrival-radius parameter that no code
+reads, `minutesPerTick` which is pinned at 1.0, and the 55.5 threshold which is treated as a
+convention constant. Each absence is a decision, not an omission.
+
+One structural constraint deserves naming because it encodes a bug that actually happened:
+**Run window can never exceed the selected smoke series' slice count minus one** (575, 455 and
+455 for the three series). The UI makes the violating value unreachable rather than warning
+about it afterwards. Section 9 explains what happened when that guard did not exist.
+
+Selecting smoke series 1 or 2 renders a banner next to the control reading CONSTRUCTED
+COUNTERFACTUAL, NOT MEASURED DATA, and any parameter that deviates from the loaded preset
+appears by name in a `Modified from preset:` chip.
+
+**The centre map** is deck.gl drawing over a blank MapLibre canvas with a flat dark background,
+opening on Portland at zoom 10.5. Its layers, in draw order:
+
+1. **The street network**, drawn in two weights so that the graph is visible as texture without
+   competing with the agents. The certified graph asset contains **no freeway-class features at
+   all**, because the U-27 filter removes them before export, so there is nothing on this map a
+   pedestrian could not legally use.
+2. **The encampment density grid**, drawn as translucent teal squares. Cell size is 0.005
+   degrees, roughly 390 metres east to west and 560 metres north to south at Portland's
+   latitude, and the grid is anchored at zero degrees latitude and longitude, meaning it is a
+   pure function of the cell size and **never of the data**, so it cannot be nudged to reveal a
+   cluster. Opacity scales with the square root of the count, from alpha 24 up to 120. **The
+   map draws density cells only, never per-report or per-node points**, for the privacy reason
+   in Section 2.3. The output order is an explicit numeric sort so that map iteration order can
+   never reach the display.
+3. **The smoke scrim**, a single county-wide translucent amber polygon whose opacity is a
+   function of the current hour's concentration.
+4. **Shelters**, as two concentric circles: a capacity ring whose radius is
+   `max(60 m, 22 × sqrt(capacity))`, and an occupancy fill whose radius is the capacity radius
+   times the square root of the occupancy fraction, **so that a half-full shelter shows a
+   half-filled ring by area rather than by radius**. A shelter closed at the current tick
+   renders entirely grey.
+5. **Agents**, as small dots coloured by state.
+
+**The six agent states**, with the exact spellings the output files carry, use the Okabe and Ito
+colourblind-safe palette and each also has a distinct glyph in the legend, so colour is never
+the only channel (`websim/app/src/map/colors.ts`):
+
+| State | Colour | Glyph | Meaning |
+|---|---|---|---|
+| `PRE_EVAC` | sky blue | circle | aware, waiting to depart |
+| `EN_ROUTE` | orange | triangle | walking |
+| `SHELTERED` | bluish green | square | inside; the study endpoint |
+| `UNREACHABLE` | vermillion | cross | terminal: nothing reachable on the graph |
+| `REFUSED_ALL_FULL` | reddish purple | diamond | everywhere full right now, and re-checked every tick |
+| `UNAWARE` | grey | dotted circle | not yet reached by outreach |
+
+Black is omitted because it is invisible on a dark theme, and yellow is held in reserve. There
+is a seventh colour that should never appear: an unknown state renders **magenta**, chosen
+precisely because magenta is **not** in the Okabe and Ito set, so a wire-format drift becomes
+visible instead of being quietly recoloured into something plausible.
+
+The map legend carries a note that matters for reading the screen: **SHELTERED residents render
+as the green shelter fill rather than as dots.** They are collapsed to zero opacity as dots on
+purpose, so the growing green disc at a shelter **is** the sheltered population. Without that,
+thousands of dots would pile up invisibly on top of each other at 36 points.
+
+**The right rail** carries the badge panel, then two clearly separated blocks, then the
+export buttons, then two charts.
+
+The **green "Certified Java run" block** shows the archived result for the selected preset: its
+run directory and seed, and its Sheltered, Refused, Unreachable, Person-hours above 55.5, and
+Agents figures. The **blue "Live browser simulation" block** shows the current hour and the
+live counts. **They sit side by side and neither ever overwrites the other.** The live block
+also carries an honest note explaining that person-hours above the threshold are not
+accumulated live and that you must export the run to get them from the engine's own writers,
+rather than showing a plausible-looking approximation.
+
+**Export run** writes the browser's own v2-web outputs. **Parity format** switches the exporter
+to a byte-faithful reproduction of the Java writer, including seven documented output quirks
+such as bare `NaN` tokens in JSON that no standard parser accepts, local time in a field named
+UTC, and Windows line endings. Number values are identical in both; only representation and key
+names differ. Reproducing a quirk deliberately, in a mode labelled "for validation", is what
+keeps the archive diffable while letting ordinary users have clean files.
+
+**The state census chart** is a stacked area chart. The x-axis is `Hour of simulation`; the
+y-axis is `Residents`. Stacking order is the engine's own state order, bottom band first, so a
+reader who knows the state machine can read the chart without a legend. The y-axis runs from
+zero to 1.03 times the maximum. The legend readout **de-stacks**: hovering shows the real count
+of that state, never the cumulative sum that the plotted row happens to hold, because a stacked
+chart that reports its stacked values on hover is a chart that lies on hover. There is a
+`View state census as data table` toggle for screen-reader and keyboard users.
+
+**The smoke chart** plots concentration against `Hour of simulation`. The dashed reference line
+is drawn in neutral chart ink rather than a series colour, because it is an annotation and not
+a second data series, and its label is the exact string
+`55.5 ug/m3 - EPA Unhealthy breakpoint (concentration threshold)`, generated from the engine's
+own constant so the chart cannot drift from the model. The series colour is derived from the
+map's smoke scrim colour, so the chart and the map can never disagree about what smoke looks
+like. Missing hours are `NaN` in the data and are converted to `null` only at the plotting
+boundary, with gap-spanning switched off, **so holes are visible holes and never zeros and
+never interpolated across**. Its data-table caption says the missing hours read "missing".
+
+**The bottom bar** has a live text ticker, which is also an accessibility live region so a
+screen reader announces state changes, a Play control, a day-and-time clock, a tick scrubber,
+a Speed selector offering 1, 10, 60, 600 and max, and a "Compute to end" button.
+
+**The footer** carries the data attribution on every screen, in wording whose exact strength is
+pinned by a code comment: street data credited to the Regional Land Information System (RLIS),
+Oregon Metro; encampment reports credited to the City of Portland's Impact Reduction Program via
+the City open-data ArcGIS service; and derived products described as redistributed with the
+providers' approval **as reported by the researcher**, relayed 2026-08-02, with **no written
+determination on file**. The comment above that string states that saying "with the providers'
+approval" without "as reported by the researcher" would be a stronger claim than the record
+supports.
+
+### 8.5 The badge machine, which is the honesty engine
+
+Four states, and a badge is **earned per configuration, never assumed and never inherited**
+(`websim/app/src/badge/machine.ts`).
+
+| Badge | Colour | Glyph | What it means |
+|---|---|---|---|
+| ARCHIVE-VALIDATED | green | check | This unmodified preset reproduced the certified archive and the in-browser gate subset ran green for it |
+| ENGINE-CERTIFIED | blue | diamond | The gates ran green for this unmodified preset, but no archive comparison confirms it |
+| EXPLORATORY | amber | triangle | Nothing certified applies to this configuration |
+| INVALID | vermillion | cross | A hard fault; the numbers cannot support any claim |
+
+The rules are five lines and they run in order, first match wins:
+
+1. Any out-of-range smoke lookup, **or** any difference between what the engine executed and
+   what the user configured, gives **INVALID**. This is a hard veto that beats an archive match
+   and beats green gates. The reasoning is in the code: each out-of-range lookup fabricated a
+   zero concentration, so any positive count poisons every downstream number; and if the engine
+   executed different values than were configured, the results say nothing about the configured
+   claim.
+2. A modified preset gives **EXPLORATORY**. Certification never survives an edit.
+3. Archive match confirmed **and** gates green gives **ARCHIVE-VALIDATED**.
+4. Gates green alone gives **ENGINE-CERTIFIED**.
+5. Anything else gives **EXPLORATORY**, because **unknown evidence never upgrades a badge**.
+
+That last principle is the one worth saying out loud in a talk. A missing check is treated as
+weaker evidence than a passed check, not as equivalent to one. Every badge also carries exactly
+one plain sentence saying why it is what it is, and those sentences are pinned by tests: one of
+the tests asserts that each explanation is a single sentence, by checking that it ends in a full
+stop and contains no internal sentence break.
+
+The test file `websim/app/test/badge-machine.test.ts` contains 12 derivation cases, including
+"INVALID beats even ARCHIVE-VALIDATED inputs", "green gate without an archive comparison is
+ENGINE-CERTIFIED, not ARCHIVE-VALIDATED", and a totality test asserting the function always
+returns a declared state.
+
+### 8.6 Screenshot 1: arm A, live and archived side by side, in heavy smoke
+
+![The browser app running arm A at hour 96, with an amber EXPLORATORY badge, the whole map washed olive by the smoke scrim at 286.5 micrograms per cubic metre, and the archived Java numbers displayed above the live browser numbers.](presentation/screenshots/websim-01-arm-a-live-vs-archived.png)
+
+**What this screenshot is for: the EXPLORATORY badge, the smoke scrim, and the two-block
+layout.**
+
+The badge at the top right is **amber, reading EXPLORATORY**, and below the preset list a chip
+says `Modified from preset: scenarioCode`. The preset selected is Arm A, but the Scenario
+dropdown in the Core section reads scenario 20, truncated to `E20_se...`, which is a Scenario E
+code. Someone changed
+one parameter, and the moment they did, the badge dropped. Nothing else changed; the run is not
+broken; the numbers are not wrong. They are simply **not the numbers any archived or certified
+result speaks to**, and the app refuses to imply otherwise.
+
+The **green archived block** shows Arm A's certified figures: Sheltered **2,060**, Refused (all
+full) **4,754**, Unreachable **28**, Person-hours above 55.5 µg/m³ **928,917.85**, Agents
+**6,842**, from archived run `present-day-three-arm/A-seed42` at seed 42. Those five figures
+were verified for this document directly against
+`websim/pipeline/out/archive-bundles/present-day-three-arm__A-seed42.json` and they match to the
+digit.
+
+The **blue live block** shows Hour 96, Sheltered **6,264**, Refused **550**, Unreachable **28**.
+Those are not arm A's numbers, and that is exactly the point of the screenshot. Scenario code 20
+reads arm B's shelter file, which holds 6,842 spaces, so the live run produced arm B's outcome
+while the archive block continued to show arm A's. **The two blocks disagree, the disagreement
+is visible, and the badge already told you to expect it.** A design that showed one number would
+have silently presented arm B's result under arm A's heading.
+
+**The smoke scrim.** The entire map is washed in heavy olive amber. The ticker reads
+`Hour 96: 6,264 sheltered; PM2.5 286.5 ug/m3; paused`. That tint is not decoration and it is not
+a plume: it is a county-uniform amber overlay whose opacity is a published function of the
+current concentration, with three anchors (`websim/app/src/map/colors.ts`). At 0 µg/m³ it is
+fully transparent. At **55.5** µg/m³, the model's own threshold constant, it becomes clearly
+visible for the first time. At **562.7** µg/m³, the worst hour of the certified 2020 series
+adopted as the display ceiling, it reaches its heaviest. Between anchors the opacity is linear,
+and above the ceiling it clamps. At 286.5 the scrim is a little past halfway between the second
+and third anchors, which is what you are looking at.
+
+The module's own documentation calls this a **display convention, not science**, and states two
+constraints in the file itself: a data gap (NaN) is fully transparent, **never a fabricated
+tint**, and the scrim is county-uniform because the model's smoke field is a county-uniform
+scalar, so **the tint deliberately renders no spatial structure the model does not have**.
+Making the whole map dirty rather than drawing a pretty plume is the honest rendering of
+assumption A-01.
+
+The clock reads `Day 5 00:00` against an end of `Day 14 00:00`, and the Speed selector is at
+`max`.
+
+### 8.7 Screenshot 2: the same run, finished, with the smoke gone
+
+![The same run at hour 312 and complete. PM2.5 has fallen to 12.7, the smoke scrim has vanished, the map is dark again, the density grid reads blue, and the smoke chart shows the full 312-hour curve with its multiple peaks.](presentation/screenshots/websim-02-arm-a-run-complete.png)
+
+**What this screenshot is for: the scrim is a live variable, and this is the real shape of
+September 2020.**
+
+The ticker reads `Hour 312: 6,264 sheltered; PM2.5 12.7 ug/m3; run complete`. The clock is at
+`Day 14 00:00` and the scrubber is at its end. PM2.5 has fallen to 12.7, which is below the
+first visible anchor, so **the scrim is gone entirely** and the map has returned to its dark
+base. The density grid, which looked muddy olive under the scrim, now reads clearly blue.
+
+Put screenshots 1 and 2 side by side and the point makes itself: **the tint is data**. It rose
+and fell with a measured series, and when the air cleared, the map cleared.
+
+The smoke chart in the right rail now shows the complete 312-hour curve, and its shape is the
+argument of Section 2.2 rendered as a picture. There is an early, short spike. There is a long
+quiet stretch. Then there is the main episode, with **several distinct peaks** rather than one
+smooth hump, because a real smoke event is driven by wind and by fire behaviour and does not
+have a tidy shape. That is what "194 of 312 hours above the threshold, in two spells" looks
+like when you draw it instead of summarising it.
+
+The badge is still amber and the modified-preset chip is still present, because the badge state
+is a property of the configuration and does not improve just because the run finished.
+
+### 8.8 Screenshot 3: arm C, unmodified, and what "before the evacuation" looks like
+
+![Arm C selected and unmodified, so the badge is green and reads ARCHIVE-VALIDATED. The run is at hour 4 with nobody sheltered yet, and thousands of small blue PRE_EVAC dots are spread across the density cells.](presentation/screenshots/websim-03-arm-c-archive-validated.png)
+
+**What this screenshot is for: the badge machine at its strongest state, and the starting
+condition of the model.**
+
+The Arm C preset is selected and **nothing has been touched**. There is no modified-preset chip.
+The Scenario dropdown reads scenario 2, truncated to `C_existin...`, which is what the preset
+itself sets. So rule 2
+of the badge machine does not fire, and rule 3 does: **green, ARCHIVE-VALIDATED**. The
+explanation sentence for that state, pinned by test, is that this unmodified preset reproduced
+the certified archive and the in-browser gate subset ran green for it. Green requires **both**:
+the configuration is unmodified **and** it matched the archive **and** the gates passed. Any one
+of those missing drops it to blue or amber.
+
+The archived block reads Sheltered **6,570**, Refused (all full) **244**, Unreachable **28**,
+Person-hours above 55.5 µg/m³ **59,200.15**, Agents **6,842**, from
+`present-day-three-arm/C-seed42`.
+
+> **The 6,570 figure was verified for this document, as instructed, and it is consistent
+> everywhere it appears.** Read directly out of
+> `websim/pipeline/out/archive-bundles/present-day-three-arm__C-seed42.json`, the `headline`
+> block gives `sheltered: 6570`, `refused_all_full: 244`, `unreachable: 28`,
+> `total_person_hours_above_unhealthy: 59200.15`, `n_agents: 6842`, across 46 shelter sites with
+> a capacity total of 6,842. The same file's first gate, `b_bed_sum_4way`, records the number
+> four independent ways and finds them equal: the sum of per-shelter final occupancy, the
+> manifest's sheltered field, the count of rows with `reached_shelter = yes`, and the count of
+> rows with `final_state = SHELTERED` are all 6,570. Those figures match
+> `docs/final/PRESENT_DAY_THREE_ARM_RESULTS.md`, the chapter's results table, and the symposium
+> deck. **On this number, the repository's documents do not disagree with each other.** The
+> disagreements this document did find are elsewhere and are listed in Sections 6.4, 2.3, 3.7
+> and 12.
+
+The live block reads Hour 4, Sheltered **0**, Refused **0**, Unreachable **0**, and the ticker
+says `Hour 4: 0 sheltered; PM2.5 6.8 ug/m3; paused`. The map is dark, because 6.8 µg/m³ is below
+the scrim's first visible anchor, and it is covered in **thousands of small blue dots**. Those
+are `PRE_EVAC` residents: aware, outdoors, at their real start coordinates, waiting. Nobody has
+moved because the concentration has not reached 55.5 yet. The shelter circles are drawn as thin
+hollow rings with no green fill, because their occupancy is zero.
+
+Two details in this frame are worth pointing out to a questioner. First, `Unreachable` reads
+**0**, not 28, because unreachability is a routing outcome that is only determined once agents
+try to route; the 28 appear later. Second, the state census chart on the right is a single solid
+blue block, which is what a stacked area chart looks like when 6,842 of 6,842 residents are in
+one state.
+
+### 8.9 Screenshot 4: hour 20, mid-evacuation, and the reason the project exists
+
+![Arm C at hour 20 with PM2.5 at 61.4, just over the threshold, so departure has triggered. Orange EN_ROUTE agents are strung out in visible lines along the street network, walking toward green shelter circles, while the stacked-area chart shows the blue PRE_EVAC band collapsing into the green SHELTERED band with a thin orange band between them.](presentation/screenshots/websim-04-arm-c-hour20-evacuation.png)
+
+**This is the frame to put on the slide.**
+
+The ticker reads `Hour 20: 5,999 sheltered; PM2.5 61.4 ug/m3; paused`, the clock reads
+`Day 1 20:00`, the Speed selector is at `10x`, and the badge is still green
+ARCHIVE-VALIDATED because nothing was modified.
+
+61.4 is **just over 55.5**. The threshold crossed at hour 16, departure triggered, and four
+hours later the city is in motion. The scrim has appeared as a faint olive wash, because 61.4 is
+only a little above the first visible anchor, so this is the lightest tint the ramp produces
+while still being visible. Live counts: Sheltered **5,999**, Refused (all full) **0**,
+Unreachable **28**.
+
+**The orange lines are the whole model.** `EN_ROUTE` residents are drawn as orange dots, and
+because every one of them is walking a shortest path over the real street graph, they string out
+into **visible lines that follow actual streets**. You can trace routes across the frame. They
+converge on the green shelter circles, whose fills have grown as occupancy rose. Some run
+north-south along arterials; some cut across the grid. Nobody is on a freeway, because the
+freeways are not in the graph.
+
+**This is the thing a static screening map can never show.** A map can shade a neighbourhood by
+distance to the nearest shelter. It cannot show you 843 people simultaneously in transit along
+particular streets, arriving at particular doors in a particular order, with the door that fills
+first turning away whoever gets there next. That ordering is the mechanism behind the entire
+equity finding of Section 6.4: roughly 80% of the final mobility gap already exists one hour
+after departure, because the race is decided early and the fast win it.
+
+The stacked-area chart in the right rail shows the same event as a census. The blue `PRE_EVAC`
+band is collapsing from its full height toward zero. The green `SHELTERED` band is rising to
+meet it. Between them is a **thin orange `EN_ROUTE` band**, and its thinness is itself a result:
+at any given hour only a small fraction of the population is actually walking, because walks are
+short relative to the event. That same arithmetic, concurrent walkers being small, is precisely
+what produced the measure-zero closure finding of Section 6.10. The chart and the finding are
+the same fact seen twice.
+
+The smoke chart below it shows the curve just beginning its first rise, crossing the dashed
+55.5 line. Four hours of history, and the story about to happen.
+
+---
+
+## 9. Everything we got wrong and fixed, told honestly
+
+Every item below follows the same four beats: what happened, how it was caught, what changed,
+and what it means for the results. The pattern across all of them is worth naming in advance:
+**almost every one was found by a check built to embarrass the author, not by reading code that
+looked correct.**
+
+### 9.1 The wormhole defect in the street graph
+
+**What happened.** The routing code keyed graph nodes by the `PDX_F_NODE` and `PDX_T_NODE`
+attributes in the RLIS file, trusting them as authoritative topology. That seemed like the
+rigorous choice, and it was the wrong one. A small block of those attributes is **corrupt**:
+the same node identifier is claimed at locations up to **18.5 kilometres apart** by different
+features. Twenty-seven identifiers in the raw file, all inside the contiguous block 107657 to
+107723, were claimed at positions 9 to 18.5 kilometres apart across roughly 55 features, which
+were short unnamed road stubs, freeway ramp pieces, and street ends.
+
+Each such feature became a **wormhole edge**: its Dijkstra weight was its short polyline length,
+tens of metres, while its physical span was kilometres. Shortest paths crossed town for free, so
+recorded network distances were **under**-estimates, while walking agents physically traversed
+the gap as long straight off-street legs at 1.3 m/s, **inflating travel time by about 15 times
+and exposure by about 3 times for the affected cohort**, and sometimes changing which shelter
+was judged nearest (`docs/validation/STREET_NETWORK_VALIDATION.md` §1).
+
+**How it was caught.** By a consistency check that had no other purpose than to try to break the
+model. `scripts/analyze_run.py` cross-checks every agent's walked distance against its
+shortest-path distance. In the pre-fix demonstration runs, **22 of 50 agents at seed 42 and 48
+of 100 at another seed** walked discrete, repeatable surpluses, clustered at roughly 1.7, 9.2,
+17.3, 24.5, 40.8 and 65.0 kilometres, and shared by agents starting at completely **different**
+encampments. Repeatable clustering shared across unrelated agents is not noise; it is a
+structure. The measured surpluses then matched the measured attribute displacements almost
+exactly: a surplus of 9,230 metres against a gap of 9,270; 17,260 against 17,219; 24,540 against
+two crossings of a 12,204-metre pair.
+
+A separate probe rebuilt the graph independently from the shapefile and confirmed the same 27
+identifiers, and confirmed the shapefile has **zero multi-part features**, which rules out
+geometry truncation and pins the fault as purely an attribute defect. A legacy-graph audit found
+**50 edges** whose node-to-node span exceeded their polyline length plus 220 metres of slack,
+which is impossible by construction.
+
+**What changed.** The correction happens at load time and the source shapefile is **not
+modified**. Every feature endpoint registers a claim consisting of an attribute identifier and a
+coordinate. Claims of one identifier within `NODE_SITE_TOLERANCE_M = 100 m` form one node site.
+The first site keeps the identifier; every additional site is either **reattached** to an
+existing node within `REATTACH_TOLERANCE_M = 10 m`, meaning it is the same physical junction, or
+**split** into a synthetic node with a negative identifier at its true location. Every correction
+is logged with its kind, identifier, displacement, coordinates and claim count, and exported in
+every run's `simulation.json`.
+
+The 100-metre threshold is not arbitrary and its justification is registered as V-NODETOL:
+legitimate RLIS endpoint scatter is **sub-metre**, and the smallest corrupt displacement observed
+is about **1.65 kilometres**, so 100 metres separates two well-separated regimes with wide
+margin. Behaviour is insensitive anywhere between roughly 1 metre and 1 kilometre.
+
+On the current production graph the result is **25 corrupt identifiers, 3 reattached and 22
+split** (`docs/validation/STREET_NETWORK_VALIDATION.md` §3). The original 2026-07-24 measurement
+on the unfiltered graph was 27 identifiers, 4 reattached and 23 split, and that earlier census
+survives in `docs/runs/final-baseline/simulation.json`. Both numbers are correct for their own
+graph, and the difference is that two of the corrupt identifiers belonged to freeway features
+that the later U-27 filter removes before the graph is built.
+
+**What it means for the results.** Impossible-span edges went from 50 to **zero**. Maximum
+endpoint gap went from about 18,552 metres to **11.9 metres**. Success rates and the fast half of
+the travel distribution were essentially unaffected, with medians moving by 7 minutes or less,
+but the **tails** were substantially corrupted and are now defensible: maximum travel time,
+maximum distance, exposure means, person-hours above the threshold, and the exposure Gini among
+sheltered agents. One detail is worth quoting because it shows the correction working in the
+right direction: the seed-42 Gini **rose** slightly, from 0.80 to 0.82, because the single
+unreachable agent now stands out even more against cheaper sheltered journeys, which is the
+correct equity signal rather than a flattering one.
+
+Three limitations remain and are stated. Twenty-two sites became synthetic nodes, and features
+whose **both** endpoints are corrupt and not coincident with any junction become short isolated
+spurs; they are real street pieces whose true connections are unknowable from the corrupt
+attributes, and **the project does not invent connections**. Two *different* node identifiers at
+the same location remain distinct nodes, which is a pre-existing property of the source. And the
+source file is untouched by design, so **anyone rebuilding a graph from the raw attributes
+without this validation layer re-creates the wormholes**.
+
+### 9.2 The freeway defect, U-27
+
+**What happened.** No street-class filter existed anywhere. `ContextCreator` added every
+multi-line geometry to the network, and the method that added a street took no class attribute at
+all. So 2,636 freeway-class features entered the pedestrian graph, including the Marquam Bridge
+deck and the Fremont Bridge deck, neither of which carries pedestrian access
+(`docs/critique-response/11-ROUND5-REPORT.md`, U-27 verdict).
+
+**How it was caught.** By an external adversarial critique, item U-27 of a 27-item round-4
+review, and then confirmed by reading the code and the source attribute table rather than by
+accepting the claim.
+
+**What changed.** The TYPE filter of Section 2.1, landing after the registry row V26 rather than
+before it, per the project's rule that a variable may not enter the model without a registry row
+in the same commit. Every exclusion is counted into the run manifest. A bridge audit script was
+written to confirm the outcome by name against the pedestrian-legal crossing list.
+
+**What it means for the results.** All 27 production runs were regenerated on the corrected
+graph, and this is the interesting part: **every sheltered count in every arm and every seed is
+unchanged to the digit.** A 30.1%, B 91.6%, C 96.0% all survive. About 12 residents per run whose
+only route used a freeway fragment are reclassified from "turned away" to "could reach nothing",
+which at seed 42 moves 16 to 28, so refusals fall by the same 12 in each arm. Travel medians move
+between −1.9% and +3.2%, and exposure totals move by 0.3% or less.
+
+The random-siting pooled control became **exact** after the correction, reproducing C's sheltered
+counts to the digit in all three draws, which it had not quite done before.
+
+### 9.3 The reproducibility break, and the rule that came out of it
+
+**What happened.** Nine archived runs stamped a commit that contained **neither** the COPD
+walking-speed effect **nor** the third scenario branch, because they had been produced from an
+uncommitted working tree. The results report cited a **third**, different commit. Registry hashes
+were stale, recording 26 variables and 21 assumptions against 27 and 24 actually on disk. And
+`Streets.dbf`, the file holding the node identifiers that build the entire routing graph, was
+**not checksummed** (`docs/final/FINAL_SYSTEM_AUDIT.md` §3).
+
+**How it was caught.** By an audit that tried to reproduce a published number from its manifest
+and could not.
+
+**What changed.** Four things. All code was committed first, then every run was re-executed from
+a clean tree. A `source_integrity` manifest block now checksums **12 files** including all five
+shapefile sidecars, the PM2.5 CSV, all three shelter CSVs, the encampment CSV, and both governance
+registries. A `git_working_tree_dirty` flag was added, so a run from uncommitted code now
+**declares itself** instead of failing silently. And `data_version_tag` was deliberately left
+unchanged, still hashing the four model inputs, so comparability with every earlier archived run
+is preserved and the new block is purely additive.
+
+The rule that came out of it is stated in the Scenario E specification in the plainest possible
+language, and it is labelled as learned the hard way: **never let anything write to the repository
+while runs execute. Commit first, then run, then rename the seed-keyed output directory
+immediately** (`docs/critique-response/14-SCENARIO-E-SPEC.md` §5).
+
+**And it caught a repeat.** During the Phase E cycle, six runs stamped
+`git_working_tree_dirty = true` because agent-authored scripts landed on disk mid-run. The
+verifier caught it and **the whole matrix had to be re-run**. The flag did its job. That is what a
+tripwire looks like when it works.
+
+A related contamination is recorded in the same audit: output directories were keyed on seed
+only, and stale directories from a retired scenario were silently misclassified. It was detected
+and removed, and the operational rule is to archive between runs.
+
+### 9.4 The refusal-state bugs, and the feature that revealed one of them
+
+There are two of these and they are different.
+
+**Bug one, the re-plan origin (Finding A, decision D-6).** A resident refused at a full shelter
+used to re-plan its route from `startNodeId`, which is immutable and points at the **encampment**.
+The agent was standing at the shelter door, so the new route began by walking all the way back to
+where it started (`docs/final/TECHNICAL_REFERENCE.md` §8.6).
+
+*How it was caught.* By an adversarial pre-coding failure-mode analysis, recorded as Finding A in
+`docs/science/phase2-human-agents/10-FAILURE-MODES.md`, and it is worth noticing why it had to be
+caught that way: at the 50-agent demonstration scale **no shelter ever filled**, so no agent was
+ever refused, so the bug was invisible to every byte-identity gate the project had. At production
+scale it would have corrupted the headline distance and dose figures outright.
+
+*What changed.* On refusal the resident now stays at the refusing shelter's street node and plans
+its next leg from there, with full shelters excluded from the next choice, bounded by a retarget
+limit to avoid livelock. It is registered as assumption A-17.
+
+*The guard that keeps it fixed.* Check number 38 in `scripts/analyze_run.py` asserts for **every**
+agent that walked distance is no greater than the planned route plus the snap gap plus 200 metres,
+with `planned_route_m`, `snap_gap_m` and `door_refusals` exported as columns on every agent row.
+In an archived capacity-binding reference run with 250 agents refused at least once, the maximum
+unexplained walked distance was **8.9 metres**.
+
+**Bug two, refusal treated as terminal.** Once real shelter opening dates were honoured, residents
+refused at the Convention Center on 10 September **never tried Charles Jordan when it opened on 11
+September**, leaving 99 real beds at zero occupancy (`docs/final/TECHNICAL_REFERENCE.md` §8.7).
+
+*How it was caught.* By adding a real feature. The opening-date gate was implemented for a
+scientific reason, and it exposed a behavioural assumption that had been invisible while every
+shelter opened at once.
+
+*What changed.* `REFUSED_ALL_FULL` now means "no shelter is available to me **right now**". It is
+re-evaluated every tick and is final only at end of run. The comment in the code carries the
+livelock argument: capacity never increases because no departures are modelled, and each shelter
+opens exactly once, so re-entry is bounded by the number of opening events. It is registered as
+assumption A-21, whose statement is careful about what is still assumed, namely perfect knowledge
+of the opening and willingness to wait outdoors for it.
+
+*Residue, reported not hidden.* The per-agent `door_refusals` counter **under-reports**, because it
+resets when an agent re-enters the waiting state. Shelter-level `refused_count` is correct and is
+what every report quotes. This is documented in the data dictionary rather than quietly worked
+around.
+
+### 9.5 The Repast batch parser silently zeroing negative constants
+
+**What happened.** Every Scenario E configuration paragraph registers `pushThetaThreshold` as
+**−0.25**, and every batch parameter file carries `value="-0.25"`. But **every run manifest records
+the executed value as 0.0** (`docs/critique-response/13-PHASE-E-PREDICTIONS.md`, the appended
+correction of 2026-07-30).
+
+The root cause, probe-verified twice: **Repast's batch parameter parser silently zeroes negative
+constants declared with `constant_type="number"`.** Positive values pass through fine. Declaring
+the same value with `constant_type="double"` executes −0.25 correctly. The parameter generator now
+emits `double` for negative values.
+
+**How it was caught.** By a pre-push audit comparing the **registered** configuration against the
+**executed** configuration recorded in the manifests. That comparison is only possible because the
+manifest records what the engine actually used rather than what the user asked for, which is a
+design decision made years earlier for exactly this class of failure.
+
+**What it means for the results.** **Nothing**, and the reason is specific rather than hopeful.
+The parameter is consulted only at a blockage encounter, and all 24 closure runs recorded **zero**
+blockage events, so the decision rule it governs never executed in any run. The correction is
+appended rather than editing the registered value; the band-anchored derivation of −0.25 stands
+for future sweeps; the executed-config record stands as 0.0; **and the runs are deliberately not
+re-run over a parameter nothing consulted.**
+
+The sentence in the record that best captures the whole practice is: *the manifests were truthful
+throughout, which is how the audit caught it.*
+
+This defect is also why the browser port's badge machine treats any difference between executed
+and configured parameters as a **hard INVALID veto**. The lesson was converted into a gate.
+
+### 9.6 The simulationHours boundary, 456 against 455
+
+**What happened.** The first 18-run Scenario E matrix ran at `simulationHours = 456`. The severe
+smoke series is exactly 456 slices, indexed 0 to 455. The schedule's inclusive final tick reads
+hour index `simulationHours`, so **every outdoor resident's final-tick lookup read one slice past
+the end of the data and got back a fabricated zero**, roughly 11,200 lookups per run
+(`docs/critique-response/13-PHASE-E-PREDICTIONS.md`, the amendment of 2026-07-30).
+
+Numerically this was about one minute of zero concentration and it would have changed nothing
+anyone could measure. That is not the point.
+
+**How it was caught.** By the invariant that the Scenario E specification had itself registered in
+advance: `out_of_range_lookups == 0`. The counter exists precisely because a fabricated zero is a
+fabrication regardless of its size.
+
+**What it means.** The matrix was **stopped, discarded** into a directory named
+`superseded-456h`, never verified and never scored, and re-run at **455 hours**, which is inside
+the specification's registered "no more than 456" and consumes every real slice with zero
+fabrication. No prediction referenced hour 456, so every registered prediction stood unchanged.
+
+The observed 2020 file carries **576** slices against a 312-hour window, which is why no baseline
+run ever tripped this and why it lay dormant until a series was used near its own length.
+
+The rule `simulationHours <= slices - 1` is now one of four **never-regress gotchas** in the
+browser port, enforced structurally in the slider drawer so the violating value is unreachable
+through the interface, and checked as archive gate `gotcha3_hours_le_slices_minus_1` in every
+bundle.
+
+### 9.7 The citation defects, all five of them
+
+This project has been damaged twice by unverifiable numbers, which is why the registry rejects a
+literature value without a resolvable source at load time rather than warning about it. Here is
+the full list of what went wrong.
+
+**One: Di et al. 2017 cannot yield an age contrast.** The slides claimed a relative risk of about
+1.45 for adults aged 65 and over, citing Di et al. 2017 in the New England Journal of Medicine.
+The paper was retrieved and its effect estimates were read. **The entire cohort is aged 65 and
+over**, all 60,925,443 Medicare beneficiaries, so the study is structurally incapable of producing
+a "65 and over versus under 65" multiplier, and no value near 1.45 appears anywhere in it. Caught
+by retrieving the primary source instead of trusting the slide. Result: registry row V2 carries
+the word UNSOURCED and a default of 1.0 (`docs/science/DATA_SOURCES.md` D5).
+
+**Two: "Anderson et al. 2013" does not exist.** The slides claimed a COPD relative risk of 1.80
+citing that reference. No such paper could be located. The nearest match is Anderson, Thundiyil and
+Stolbach, *Clearing the Air*, Journal of Medical Toxicology, **2012**, volume 8 issue 2, pages 166
+to 175, which is a **narrative review**, is the wrong year, and is not a source of a COPD-specific
+relative risk of 1.80. Caught by trying to fetch the citation. Result: registry row V4 carries
+UNSOURCED and a default of 1.0 (`docs/science/DATA_SOURCES.md` D6).
+
+**Three: "Evers et al. 2022" does not exist either, and the real source is Coughlan et al. 2022.**
+Registry row V39, the susceptibility increment in the departure hazard, originally attributed its
+sign anchor to a nonexistent "Evers et al. 2022". A CrossRef sweep found no such work, and every
+substantive detail verified instead against **Coughlan, Huber-Stearns, Clark and Deak 2022,
+*Oregon Wildfire Smoke Communications and Impacts: An Evaluation of the 2020 Wildfire Season*,
+Ecosystem Workforce Program Working Paper 111, University of Oregon and Oregon Health Authority,
+n = 1,200 validated responses, Scholars' Bank handle 1794/27179**, a working paper for which no DOI
+exists. The correction landed 2026-07-30 at commit `e2b3a8e`
+(`Geography/data/registry/variables.csv`, V39). The claim linter enforces the ban on the old name
+across the browser codebase as one of the four never-regress gotchas, so it cannot come back.
+
+**Four: the Pathways pooled sample.** This one is different from the others, because it is not an
+error; it is a deliberate choice that looks like an error until it is explained, which is exactly
+why it is written down. The age bands and chronic-condition prevalence come from The Pathways Study
+(Conte et al. 2026, PSU Homelessness Research and Action Collaborative, published 9 April 2026, no
+DOI, persistent identifier `archives.pdx.edu/ds/psu/44627`). The values are taken from Table 2.1,
+which is the **pooled** analytic sample of N = 541, comprising people living unsheltered, people
+currently in shelter, and people who recently exited homelessness. This model's agents are
+**unsheltered only**, and the report publishes an unsheltered-only breakdown in Table 6.1, with
+N = 192 (`docs/science/DATA_SOURCES.md` D15).
+
+| Quantity | Implemented, Table 2.1 pooled | Table 6.1, unsheltered only |
+|---|---|---|
+| Age 18 to 44 | 52.7% | 53.4% |
+| Age 45 to 64 | 42.3% | 44.0% |
+| Age 65 and over | **5.0%** | **2.6%** |
+| Chronic physical condition | **39.1%** | **31.1%** |
+
+The pooled figures are **older and report more chronic illness**: the share aged 65 and over is
+roughly double, and chronic-condition prevalence is 8 points higher, because the pooled figure
+includes a housed subgroup at 45.3%. This is **not inert**, because age drives walking speed
+through the gait-speed lookup.
+
+The choice is deliberate and author-confirmed as of 2026-08-04, and two reasons are given for
+whoever has to defend it: N = 541 against N = 192 is materially more stable, and the report's own
+framing on its printed page 20 is that the main focus of the report is the full sample. The
+comparison table above is **retained on purpose**, as evidence that the alternative was considered
+rather than missed, because a reviewer who knows the report will look for exactly this. The
+instruction attached is that anything written up must say **"pooled sample"**, never
+**"unsheltered"**, which the chapter's Table 2 now does. The verification also checked provenance by
+hash: the repository's copy of the report is SHA-256 byte-identical to the file served by the
+county, re-fetched on 2026-08-04.
+
+**Five: the EPA resting ventilation rate is not in the cited table.** Covered in full in Section
+3.7. It was found by the same 26-variable primary-source sweep, on 2026-08-04, and V25 was the
+sweep's highest-value target **because the registry itself flagged it**: the uncertainty field
+carried a marker saying the table cells had not been re-read from the primary during
+implementation. They were re-read; the flag was warranted; the walking half verified and the
+resting half did not. It is an **open defect**, recorded with its full blast radius and its
+required decisions, with nothing changed and no run invalidated
+(`docs/science/D16-EFH-VENTILATION-DEFECT.md`).
+
+### 9.8 The wording defects, which are smaller but not trivial
+
+**"Clean-air-capable" was an overstatement and was corrected.** Earlier drafts described the 36
+present-day facilities as clean-air-capable. Nothing in the sources establishes that those
+buildings filter their air, and the model does not simulate indoor air at all, because the study
+endpoint is arrival at the door. They are the county's existing shelter facilities, catalogued for
+a different purpose (`docs/final/PRESENT_DAY_THREE_ARM_RESULTS.md`, wording note).
+
+**"Same beds, better placed" was retired.** Refuted by the random-siting control of Section 4.6,
+replaced by "same total, more doors", and blocked by a linter entry.
+
+**"A free consistency check" was reworded.** The observation that arms A, B and C share an identical
+set of unreachable residents was framed as a consistency check. It is not a check, because A and B
+are forced to agree by construction: same graph, same shelter nodes, same start points. It is now
+described as an optimiser-connectivity diagnostic
+(`docs/critique-response/11-ROUND5-REPORT.md`, U-18).
+
+**A signal-to-noise claim of "28 times" was retired**, and a claim that the second-best
+intervention is free was refuted. Both carry linter entries with status `retired` and `refuted`.
+
+**The claim linter itself** is the mechanism that keeps all of this from creeping back. It is
+`scripts/lint_claims.py` reading a registry of **22 claim entries** at `docs/claims.yaml`, each
+with a pattern, a status drawn from {live, corrected, corrected-pending, refuted, retired}, and, if
+corrected, a mandatory replacement text. It scans ten registered deliverables and exits with status
+1 if any hit is found. It went from a baseline of **50 hits across 10 files** to **exit 0, zero
+hits** (`docs/critique-response/11-ROUND5-REPORT.md`, phase A4). The browser port runs the same
+linter over its entire source tree from its first work package.
+
+### 9.9 Defects the browser port found in the shipped assets
+
+Porting the model was itself an audit, and it found real defects in things that had already
+shipped.
+
+**The encampment display grid was publishing single-report cells.** The privacy policy said
+density-only, never points. The built asset shipped **1,863 cells, of which 1,773 carried fewer
+than 5 reports and 1,100 carried exactly one**. A 150-metre cell containing a count of one is a
+campsite location to within a city block. Node-snapping had removed the coordinate and the grid
+handed the location straight back. The decision record is unsparing about it: the builder **had
+measured this and published anyway, which is worse than not measuring**. Fixed by enforcing
+k-anonymity at k = 5, giving 506 cells with zero below threshold while retaining 99.1% of the
+points (`websim/docs/DR-Q4-encampment-disclosure.md`). It was found by adversarial review of the
+**built bytes** rather than of the code, which is the general lesson.
+
+**A byte-order-mark difference.** The browser's text decoder deletes a leading byte-order mark by
+default and Java does not, which would have made the two parsers disagree on the first field of
+some files (`websim/docs/DR-WP5-graph-runtime.md`, defect WP5-F1).
+
+**A tie-break that was not what anyone assumed.** When two street nodes sit at exactly the same
+coordinate, the Java spatial index breaks the tie by hash-map bucket order, not by lowest node
+identifier as the port had assumed. One encampment in the already-shipped asset had been snapped to
+the wrong node, **across a component boundary**, which means that resident's entire routing
+situation was different. Corrected and regression-locked (defect WP5-F2).
+
+**A test suite with a hole in it.** Every Tier-3 gate was an **aggregate**. Not one test compared a
+single resident's displacement on a single tick against Java. This was proved by injecting a 10%
+error into the movement step length and observing that the entire suite of 68 files and 1,084 tests
+**still passed**. A per-tick movement oracle was then built by calling the certified Java agent step
+in a live headless runtime, after which a **1 unit-in-the-last-place** error in the step length is
+caught (`websim/docs/DR-FIXA-movement-oracle.md`).
+
+**And a screen that was never mounted.** The permalink hook was implemented, tested against 46
+passing tests, and never actually wired into the application, so the codec worked perfectly while
+the product could not read a link. A comment now sits in the app root forbidding removal of the
+call without removing the acceptance clause.
+
+### 9.10 Documentation that has drifted, and is known to have drifted
+
+These are not model defects. They are places where a document says something that was true once.
+They matter because a reader will find them.
+
+**Assumption A-05 is false and is deliberately left unedited.** It states that every mapped street
+centreline is walkable by pedestrians, with the rationale that freeway segments are "not yet
+filtered", and its status is `active`. Both of those are now false: V26 filters them, and the row
+should be retired. There is a decision record explaining that the file is being left unedited on
+purpose and the discrepancy recorded instead, because editing it changes no code and no data
+(`websim/docs/DR-A05-registry-assumption.md`). If a reviewer opens the registry and reads A-05,
+this is the answer.
+
+**Registry row V15 is stale.** It describes `numAgents` as a demonstration value of 50 with
+production runs at 2,037, which was true for the historical study and is not true of the present-day
+one at 6,842.
+
+**`docs/science/DATA_SOURCES.md` does not cover the present-day inputs.** The strings "6,842" and
+"2025 Tri-County Point-in-Time" do not appear in it at all, and neither does the 2026 shelter
+inventory. That provenance lives in `docs/final/TECHNICAL_REFERENCE.md` §3.4 and §4, which reuses
+the label D10 for a different dataset than the D10 in DATA_SOURCES.md. Anyone told "the datasets are
+in DATA_SOURCES.md" will not find the present-day population there.
+
+**Several cross-references point at files that have moved.** `docs/science/DATA_SOURCES.md` and the
+phase-2 specifications link to `docs/science/DESIGN_SPEC.md`, `VARIABLES.md`, `AUDIT.md` and
+`VALIDATION_STRATEGY.md`, all of which now live under `docs/archive/` and are stamped SUPERSEDED.
+
+**The published realised marginals in one place are seed 48, not seed 42.** The values
+0.195/0.147/0.104/0.235/0.259/1.280 appear as though they were seed 42's; seed 42's are
+0.1988/0.1478/0.1079/0.2381/0.2622/1.2805, and the first set is seed 48. This was found by the
+fixture exporter and is recorded as finding F1-F1 (`websim/docs/DR-F1-world-fixtures.md`). The
+archive bundles carry the seed-42 values, which is what this document quotes.
+
+**`docs/final/FINAL_SYSTEM_AUDIT.md` says `agents.csv` carries no start coordinate.** That was true
+at its audit date of 2026-07-26. The present-day output files do carry `Start longitude` and
+`Start latitude` on every row.
+
+**The websim README's status paragraph predates the UI.** It says the entire user interface is still
+not built, and a dated status note further down corrects it: where the README says no screen exists,
+the honest current reading is that the screen exists and its evidence table has not been written yet.
+
+**Governance counts differ between documents.** `FINAL_SYSTEM_AUDIT.md` and
+`CLAIM_VALIDATION_AUDIT.md` record 28 variables and 26 assumptions, which was the state at their
+audit commit. The registries now hold 55 and 35.
+
+---
+
+## 10. What this does not show
+
+These are limitations, and they are strengths of the work rather than apologies, because a model
+whose limitations are enumerated can be reasoned about and a model whose limitations are hidden
+cannot. Every item below is registered somewhere in the repository, not discovered here.
+
+**It does not recreate September 2020, and does not claim to.** The one available observation
+records about 130 of 198 beds occupied; the historical reference configuration fills 198 of 198.
+The honest statement is the censored bracket of **1.5 to 15.6 times over-admission**. Every
+absolute figure in this study is an **upper bound**.
+
+**It does not model transport, and the real response had transport.** The county's own 2020 press
+release describes access via 211 with transport arranged by outreach teams. This model is
+**walk-only**. That omission is the main content of the calibration bracket, and it is quantified
+rather than asserted to be small (`docs/critique-response/11-ROUND5-REPORT.md`, U-10).
+
+**It does not model self-rescue.** The only destination in the state machine is a shelter. There is
+no transit, no exiting the county, no staying with a friend. That is now registered rather than
+implicit (U-17).
+
+**It does not resolve smoke in space.** With two in-county monitors, everyone breathes the same
+concentration at the same hour, so every exposure difference in this study is a **duration**
+difference wearing exposure units. Any Gini coefficient or stratified exposure contrast reported
+here is an access statistic, not an environmental-inequality statistic. That distinction is stated
+in `docs/final/SMOKE_FIELD_AUDIT.md` §4 and is easy to get wrong.
+
+**It does not model health outcomes.** It measures environmental exposure and inhaled particulate
+mass. It does not predict illness, hospitalisation or death, and the risk multiplier is 1.0 for
+every resident precisely so that no result can silently become a health claim.
+
+**Its inhaled dose magnitudes rest on one unverified constant.** See Section 3.7. The direction and
+the mechanism survive any choice of the resting cell; the absolute magnitudes and the published
+walk-to-rest ratio do not.
+
+**Its ten new sites are street-network nodes, not buildings.** No zoning, no ownership, no
+construction cost, no staffing, no accessibility compliance, and no indoor air filtration is
+modelled. The chapter says outright that some of C's site capacities exceed any real facility in
+the county.
+
+**Its expansion factors are policy parameters, not measurements.** B's uniform 3.06 times scale-up
+and C's 1.5 times growth plus ten sites are constructs. The direction of the comparison is what the
+experiment establishes; the magnitudes are conditional on those choices. And the realisability
+problem is stated concretely: at B's scale factor the largest facility goes from 175 to 536 places,
+six motels go from 425 to 1,301 rooms, and sixteen pod villages go from 574 to 1,758 pods, which is
+physically unrealisable in place for most of the inventory (U-24).
+
+**Its optimiser is evaluated on the demand it was fitted to.** All 27 runs use identical resident
+starting coordinates, so the procedure that chooses the ten new sites selects them to serve exactly
+the campsite locations against which scenario C is then measured. C's advantage over B is therefore
+an **upper bound** on what the same procedure would achieve against a distribution it had not seen
+(`docs/chapter/Capacity_Is_Not_Access.tex`).
+
+**Its capacity figure for 2020 is newsroom-sourced.** A-04 is still blocking. The 99-per-site figure
+is consistent across contemporaneous reports and confirmed by no agency document, and the **unit**
+of that 99, whether cots or sleeping positions or persons admitted, is never stated by the source.
+
+**Its admission is order-dependent, and that is an unresolved blocking assumption.** A-16 specified
+order-independent two-phase admission as a prerequisite for any run with more residents than beds,
+and it was never implemented, so the last bed is awarded by the per-tick shuffle. That matters most
+in arm A, where capacity binds hardest.
+
+**Its population geography is a five-year-old proxy with a known bias.** 2025 and 2026
+complaint-driven campsite reports stand in for 2020, and complaint-driven reporting is biased toward
+camps visible from the street. That bias makes access look **easier**, not harder.
+
+**Its demographic vintages are mixed, and every vintage is disclosed.** Smoke is 2020 measured.
+Population count is 2025. Shelter inventory is 2026. Age bands and chronic condition are 2026 local.
+Sex and mobility distributions are **2019**, because no newer local source was found. Asthma and
+COPD prevalence are imported from a **Minnesota** cohort. Mobility's age gradient is imported from
+**California**.
+
+**Its scope is adults only.** Six unsheltered minors were counted in the source, at 0.3%, and every
+mobility and susceptibility parameter adopted is an adult parameter. This coincidentally matches the
+2020 emergency sites' adults-only intake but not the general shelter system.
+
+**Two real facilities and ten day centres are missing.** About 207 people of real capacity, plus an
+unknown daytime capacity, so arm A understates today's system, and understates it most in exactly
+the daytime scenario where day centres would matter most.
+
+**Its Phase E arms are not a placement or triage experiment.** Because only about 1,220 residents
+depart, capacity never binds and no supply-side intervention can register.
+
+**Its Scenario E magnitudes are counterfactual.** They have no observed pre-image and must never be
+quoted as measured quantities.
+
+**Its knife-edge findings are knife-edge findings.** The equity gap and dispersion's headcount value
+are properties of the band where capacity is approximately equal to demand. Both dissolve at 10%
+surplus. This was not predicted and is reported as a prediction miss.
+
+**And there is one thing nobody can enumerate.** Asked what else is wrong that has not been found,
+the presenter's script gives the only honest answer: *"I genuinely don't know, and anyone who says
+otherwise is guessing. What I can tell you is the method that found these, and that the
+infrastructure exists because I assume there are more."*
+
+---
+
+## 11. Questions, with complete answers
+
+### Q1. Isn't this just a made-up city?
+
+No. Every physical component is a real, checksummed dataset. The streets are Oregon Metro's own
+RLIS centreline file, 112,070 features, of which 109,434 are in the pedestrian graph. The smoke is
+4,795 rows of EPA regulatory monitoring data with EPA's own wildfire qualifier set on exactly the
+study window. The shelters are 36 real facilities at geocoded real addresses with capacities
+converted from the county's published list by a documented rule. The start points are 3,400 real
+City of Portland campsite reports. The population count is the county's own published
+Point-in-Time count.
+
+What **is** constructed, and is labelled as constructed everywhere it appears: the ten new sites in
+scenario C, the expansion factors in B and C, the severe smoke series, and the street-closure
+schedules. Every one of those carries a registry row with evidence class A and a sweep range.
+
+### Q2. Why should I believe a browser simulation?
+
+Because it is not asked to be believed; it is asked to be checked, and the checking is the
+product. The browser engine reproduces the certified Java engine's random number generators
+bit-for-bit over 100,000,000 draws. It reproduces the entire initial world bit-for-bit: 118 of 118
+shortest-path trees and 3,539,712 of 3,539,712 distances. It runs on four independent JavaScript
+engines and produces byte-identical output on all of them, verified over 34,869 canonical tokens.
+
+And where it does **not** match, it says so with a number. The residual difference in per-agent rows
+is 27 of 46 columns bit-equal on every row, with `final_state` differing on 114 of 6,842 rows,
+decomposing into 57 lost and 57 gained, sitting at the 31st percentile of a 200-stream permutation
+distribution. That is the signature of a within-tick ordering difference, which is a **declared**
+divergence, and anything not attributable to it is treated as a release-blocking bug.
+
+Finally, the app never lets you mistake exploration for validation. Change one parameter and the
+green badge drops to amber, with a sentence saying why.
+
+### Q3. Your population data is from a different year than your smoke data. Why?
+
+Deliberately, because the question is present-tense policy. The study asks what would happen **if a
+2020-magnitude event hit the system that exists now**. Answering that with a 2019 population would
+understate today's demand by more than a factor of three and would test a shelter inventory that no
+longer exists.
+
+Every vintage is disclosed in one table in every deliverable: smoke 2020 measured, population count
+2025, shelter inventory 2026, age and chronic condition 2026 local, sex and mobility 2019, asthma
+and COPD Minnesota 2025, campsites 2025 to 2026. The weakest links are named rather than buried: the
+2019 sex and mobility distributions, because no newer local source was found, and the Minnesota
+respiratory prevalences.
+
+### Q4. You used a pooled sample for an unsheltered population. Defend that.
+
+Yes, and it is written down at `docs/science/DATA_SOURCES.md` D15 including the comparison table for
+the alternative, because a reviewer who knows the report will look for exactly this.
+
+The Pathways Study intentionally recruited unsheltered people, sheltered people, and people who had
+recently exited homelessness. Table 2.1 is the pooled analytic sample at N = 541. Table 6.1 gives an
+unsheltered-only breakdown at N = 192. The pooled figures give age 65 and over at 5.0% against 2.6%
+unsheltered, and chronic physical condition at 39.1% against 31.1%.
+
+Two reasons for the pooled sample. First, N = 541 against N = 192 is materially more stable, and the
+age bands feed a gait-speed lookup that then feeds every travel time in the model, so estimator
+variance there propagates everywhere. Second, the report's own framing on its printed page 20 is
+that its main focus is the full sample.
+
+And the direction of the bias is stated rather than hidden: the pooled sample is **older and
+sicker**, which makes the modelled population walk slightly slower and therefore makes access look
+slightly **worse**, not better. If this choice biases the headline, it biases it against the
+model's own optimism. The write-up says "pooled sample", never "unsheltered", and the chapter's
+Table 2 already does.
+
+### Q5. Where does 6,842 come from, and are they really all outside at once?
+
+The 2025 Tri-County Point-in-Time count: 10,526 people experiencing homelessness in Multnomah
+County, more than 65% unsheltered. Treating them all as outdoors simultaneously is a **disclosed
+worst-case construct, not a claim about one night**.
+
+If someone objects that the count was administratively augmented, they are right, and the report's
+own authors say so, which is why that caveat travels with the number everywhere it appears. It is
+the best local figure that exists.
+
+If someone asks what happens if only half are outside, the honest answer is that scarcity in arm A
+binds so hard that the ordering survives while absolute counts scale, **and that a presence-fraction
+sweep is registered future work and has not been run**. That is a real gap.
+
+### Q6. Why does everyone leave at the same moment?
+
+Because in the base model departure is a bright-line trigger: the concentration crosses 55.5 and at
+least one shelter is open. On this event that is hour 16. This is registered as assumption A-02 and
+it is a known artefact rather than a claim about behaviour.
+
+Phase E replaces it with a per-agent logistic hazard, and the result is in Section 5.5: departures
+stagger, 22.1% occur before the main episode, and the whole picture changes. So the assumption is
+not left hanging; it was replaced and the replacement was run.
+
+### Q7. Why 55.5 rather than some other number?
+
+Because it is EPA's published lower bound for the *Unhealthy* category, so it is a public standard
+rather than a number chosen by the researcher, and because it is the one breakpoint that is
+**identical under both the pre-2024 and post-2024 tables**. Every category above it moved in the
+2024 revision.
+
+The honest caveat, which the project states first rather than waiting to be asked: AQI breakpoints
+are defined on 24-hour averages, and counting hourly observations above 55.5 measures something
+different from either the AQI category or AirNow's NowCast display. That is why the metric is named
+`hours_above_unhealthy`, defined as a concentration threshold, and never called an AQI category
+anywhere: not in the registry, not in the chapter, not on the charts, and not in the browser app,
+whose colour module contains an explicit instruction to that effect.
+
+### Q8. Why walking only? The county offered rides and a hotline.
+
+It did, and that is stated in the limitations of every deliverable. The county's own 2020 press
+release describes access via 211 with transport arranged by outreach teams, and the technical
+reference records that transport assistance is not modelled.
+
+The size of that omission is not asserted to be small; it is the **main content** of the 1.5 to
+15.6 times calibration bracket. A 211-style channel with uptake as a swept parameter is specified in
+the Phase E design and is gated on sources.
+
+### Q9. Why these ten sites? Does the chooser actually matter?
+
+An algorithm picked them by p-median minimisation over 498 candidate street nodes. Then they were
+re-picked **at random** from the same pool, three independent times, and admissions were identical
+run for run: 6,570, 6,565, 6,566 at seeds 42 to 44.
+
+So for **headcount**, the chooser does nothing. What produces the gain is **more doors**, not
+better-chosen doors. The optimiser earns its credit in walking distance, and that credit is
+conditional on perfect information about where demand is.
+
+That control refuted the project's own preferred story, the slogan was retired, and a linter rule now
+blocks it from reappearing. This is the answer to give if someone suspects the study is
+self-serving: the study built the control most likely to embarrass it, and then reported the
+embarrassment.
+
+### Q10. Isn't 578 equals 550 plus 28 circular?
+
+Yes, and the chapter says so in the same breath. When capacity equals population, empty spaces and
+unsheltered people are the same number counted twice. The near-equality proves nothing.
+
+What is informative is **who** is outside, which is the slowest walkers, and **that anyone was
+refused at all** when supply exactly matched demand. The design exists to remove scarcity as an
+explanation so that whatever failure survives can only be geography.
+
+### Q11. Why did you deliberately build a design where capacity equals demand? Isn't that unrealistic?
+
+It is a design choice, not a forecast, and it was made for the reason in Section 4.1: the previous
+design capped both arms at the same bed count and therefore could not detect anything but the bed
+count.
+
+The bed sweep then puts that choice in its place. Access reaches 99.5% at 1.10 times demand and the
+equity gap vanishes there too, so both headline findings are properties of the narrow band where
+capacity is approximately equal to demand. That band is exactly where a system that sizes capacity
+to counted demand would sit, which is why it is the policy-relevant regime, and calling it a general
+law would be false. We say both.
+
+### Q12. Nine random seeds. Is that enough?
+
+Across nine seeds, admissions move by at most 11 people, while the smallest gap between scenarios is
+306. Those are reported side by side rather than as a ratio, because a seed spread measures only
+random-draw variability.
+
+What seeds do **not** cover is structural and parameter uncertainty, and that is what the capacity
+sweep, the random-siting control, the window arms and the registered sweep ranges exist for. More
+seeds buy precision, not direction. A conclusion would only flip if a gap of hundreds were hiding
+inside a spread of eleven.
+
+### Q13. Who are the 28 who reach nothing, and why is that number the same in every arm?
+
+They are residents whose campsites sit on street fragments with no legal walking path to any
+shelter, which is a consequence of the pedestrian graph having 171 disconnected components. The count
+is identical across arms **by construction**, because it depends only on the network and the start
+points, and this is not merely asserted: the **identity of the individuals** is verified as an
+automated invariant, and the browser port reproduces the same id set exactly.
+
+What helps them is not siting. It is outreach or transport. The model marks them as a floor that no
+bed arrangement reaches, which is itself a policy finding.
+
+### Q14. How do you know the simulation is not simply wrong?
+
+It cannot be proved right. It was made **checkable**: archived manifests recording commit, seed,
+parameters, dataset checksums, registry hashes and a working-tree cleanliness flag; automated
+invariants; independent recomputation of the exposure integral from the raw file; and controls
+designed to embarrass the author.
+
+Has that ever caught anything real? Twice, structurally: the corrupt intersection labels and the
+freeway defect. Both were fixed, everything was re-run, and every headline survived unchanged. It
+also caught a dirty-tree contamination mid-cycle, a fabricated-zero smoke lookup, and a batch parser
+silently zeroing a parameter.
+
+What else is wrong that has not been found is unknown, and the infrastructure exists because the
+assumption is that there is more.
+
+### Q15. What did you get wrong?
+
+Two registered predictions in Phase D, plus a partial miss on travel distances, plus one on the
+Phase E attempt magnitude, plus two in Scenario E. The full ledger is in Section 6.
+
+One claim was **retracted**: a regression coefficient was briefly described as the model
+*discovering* the triage reserve rule. The honest statement is that it **re-found a rule that was
+written by hand**, which is a pipeline sanity check, and its magnitude is not quotable at all because
+three speed-band cells sit at exactly 100% access, which is quasi-separation.
+
+Why advertise mistakes? Because registered predictions mean nothing if only the hits are published,
+and because both Phase D misses made the policy answer **cheaper**, not more expensive.
+
+### Q16. Your title is "Capacity Is Not Access", but your own scenario B shows capacity buying 61
+points. Doesn't the title overclaim?
+
+Capacity buys the first sixty-one points, and the results slide says so in the same breath. What
+capacity alone cannot buy is the last stretch: at capacity exactly equal to demand, 578 spaces sit
+empty while 578 people stand outside, and the ones outside are the slowest walkers.
+
+The title is a question and its answer. Capacity is necessary and, at the margin a county actually
+operates on, not sufficient. "Capacity is most of access" would be a worse title, because the
+marginal decision is precisely the regime where the equivalence breaks.
+
+### Q17. Why does COPD show a large effect and asthma almost none? Isn't that suspicious?
+
+It is the opposite of suspicious; it is the model's own negative control.
+
+A diagnosis can affect an outcome in this model **only** by affecting walking speed, because a
+diagnosis is never a dose multiplier. COPD carries a published gait-speed decrement from a
+meta-analysis of 25 studies. Asthma does not: the literature supports lower physical activity
+volume, which cannot be converted into metres per second without inventing a number.
+
+Borrowing the COPD estimate for asthma to make the treatment symmetric would have manufactured a
+finding. Instead, asthma's sheltered share tracks the population rate within 0.64 standard errors at
+seed 42, and the largest absolute z-score across all 27 runs is 1.80. That is now an automated
+invariant: the difference must stay within two binomial standard errors, every run.
+
+The asymmetry is a gap in the evidence base made visible, and it is evidence that the model is not
+inventing effects.
+
+### Q18. Your dose numbers look enormous. Are those real micrograms?
+
+They are modelled inhaled mass: measured concentration times published breathing rates times time
+outdoors. They are not a health outcome and no output in this project should be read as one.
+
+Two honest caveats. First, they depend on the measuring window, which is why both the 24-hour and
+full-event ratios are reported: short windows are dominated by the walking difference, long windows
+by who is still outside. Second, **the resting ventilation constant is currently an open defect**:
+0.61 m³/h is not in the EPA table it is cited to, and the correction could move the walk-to-rest
+ratio to 2.25 or to 5.40 depending on which real cell is chosen. The **direction** of the finding
+survives any of them, because it depends only on walking ventilation exceeding resting ventilation.
+The absolute magnitudes do not, and until that decision is made, V25 should not be published as
+currently sourced.
+
+### Q19. Two air monitors for a whole county. Isn't that a fatal flaw?
+
+It is a real limitation and it is the reason for a deliberate refusal. With two in-county stations,
+any interpolated surface would be an artefact of the interpolation method and the accident of
+instrument placement, and a kriging variogram cannot be estimated from two points at all. Presenting
+such a surface would make every apparent exposure hot spot a fabrication.
+
+So the field is county-uniform and everything that follows is stated: placement cannot help by
+moving people to cleaner air, because there is no cleaner air, so **every placement benefit reported
+here is a pure travel-time effect and a lower bound** on what placement would achieve in a real,
+spatially varying field. And any Gini coefficient computed on exposure here is an access statistic
+wearing exposure units.
+
+### Q20. Do the monitors under-read?
+
+Probably, and the direction favours caution. All seven use a single instrument type, heated-inlet
+nephelometry, with no method diversity and no co-located reference instrument, and the uncertainty
+column is empty in all 4,795 rows. A heated inlet evaporates semi-volatile organic compounds, which
+are a large mass fraction of fresh wood smoke, so these readings most likely **understate** the true
+PM2.5 during the event. Reality was probably no better than the chart shows.
+
+### Q21. Why parameter 88502 rather than the Federal Reference Method?
+
+Because parameter 88101, the reference-method series, has **no monitors in Multnomah County** in this
+period. In Oregon, only Harney, Klamath and Lane counties reported hourly 88101 in 2020. The trade-off
+is that 88502 is approved for index reporting but is not a reference method, and that trade-off is
+stated in the chapter, in the data README, in the fetch script's own comments, and in the smoke
+audit.
+
+### Q22. What is actually in your shelter capacity number? Beds, rooms, or pods?
+
+Five different units, converted to people by a documented rule, with a range stated wherever the unit
+is ambiguous and the weakest conversion named as the weakest. The total is 2,234 across 36 facilities,
+independently verified as 36 rows summing to exactly that, and every row carries its own conversion
+audit string.
+
+Two real facilities are excluded because neither publishes a street address, together about 207
+people, and ten day centres are excluded because no capacity is published for any of them. Both
+exclusions make today's system look **worse** than it is, and the day-centre exclusion in particular
+cuts against the project's own framing, because in a daytime episode day centres are arguably the
+most relevant clean-air spaces available. The reason for not estimating them is the same standard
+that stopped the model inventing an asthma speed effect.
+
+### Q23. Isn't a 10% triage reserve just discrimination by another name?
+
+It is a prioritisation rule, and it is the same class of rule that triage in an emergency department
+already is. The empirical content is what matters here: it moves mobility-limited access from 72.6%
+to 91.9% at **total admissions identical to arm B's** and at zero capital cost, which means it does
+not reduce how many people get inside; it changes which of them do when a door is contested.
+
+The model also finds its limits, which is the more useful policy result. At 15% the reserve strands
+beds, total admissions fall from 6,264 to 6,087, and the gap over-corrects to −13.3 points. The
+reserve has a right size and "more" is not it.
+
+And the mechanism is understood rather than merely observed: 80% of the final gap exists one hour
+after departure, so the gap is a race, and the reserve works by removing some spaces from the race.
+
+### Q24. If a county had a million dollars tomorrow, what does your model say to do with it?
+
+First the free thing: a 10% reserve at intake, which closes the fairness gap at zero capital cost.
+Then buy slack toward 10% surplus, where the entire failure mode dissolves.
+
+Not new sites, for headcount: 342 additional spaces at existing sites buys the same gain that ten
+optimally chosen new shelters buy. Build new sites for **shorter walks**, and only if there is an
+information system that can route people to them.
+
+What the model cannot tell them is real uptake, and the 1.5 to 15.6 times bracket is the honest size
+of that unknown.
+
+### Q25. Why is the equity result reported three different ways? Isn't that hedging?
+
+It is the opposite of hedging; it is refusing to pick the scale that tells the best story. On a
+percentage-point scale the gap widens from 12.5 to 23.7 and returns to 12.5. On a ratio scale it
+narrows at every step, 1.62 to 1.33 to 1.15. Counting people, the number of mobility-limited
+residents left outside falls at every step, 1,087 to 373 to 190.
+
+They disagree because of a **ceiling effect**: at 96.3% access, the unimpaired group has almost no
+room left to improve, so a percentage-point difference is compressed on one side and not the other.
+Reporting the percentage-point gap alone would present as widening inequality something that is, on
+other defensible scales, narrowing.
+
+The project rejected a published parameter partly because the same data yield different values
+depending on which scale is chosen, so the same standard has to apply to its own results.
+
+### Q26. What is an E0 null and why should I care?
+
+It is the model's own control. Take the new decision layer and set every one of its mechanisms to its
+degenerate value: awareness 1.0, omniscient information, zero barrier costs, zero trait spread. Then
+the layer must reproduce the archived pre-Phase-E results **byte for byte**, not approximately.
+
+It matters because without it, any difference the new layer produces is ambiguous between "the new
+mechanism is real" and "we broke something". With it, every difference is attributable. The
+specification names the three hashes that must be unchanged, and the null was re-proved at each new
+commit before any matrix was run. The switch is built so the null holds by construction, which means
+the degenerate configuration skips the new code entirely rather than merely happening to agree with
+it.
+
+### Q27. What is the "measure-zero" result and why is it interesting?
+
+Scenario E implements a decision for a resident whose route crosses a newly closed street: push
+through and risk being delayed, or reroute. The rule is fully implemented, registered, tested and
+proven inert under the null.
+
+**Across 24 closure runs at two severities, including 72 early closures at the worst verified urban
+smoke concentration on record, it fired exactly zero times.**
+
+The arithmetic is why, and it is a real finding rather than a null result. Under hazard-staggered
+departure, roughly 3 to 8 residents depart per hour while a median walk takes 24 minutes, so about
+**four** of 6,842 residents are mid-walk at any instant. Four walkers against 72 closed edges among
+roughly 110,000 gives an expected event count of order one per run, and zero across fifteen runs says
+it is below that.
+
+So: **street closures in a hazard-staggered population act entirely through rerouted geometry, not
+through face-to-face blockage decisions.** The mechanism becomes testable only where walks and waves
+overlap densely, which is registered as the follow-up sweep rather than quietly substituted.
+
+Everything about it is honest, including the fact that the registered concurrency estimate was itself
+an overestimate.
+
+### Q28. Why is your worst-case scaled to Canberra and not to Fort McMurray, which is worse?
+
+Because Fort McMurray's 5,229 µg/m³ was measured by monitors sitting inside or adjacent to the burn
+perimeter of an **evacuated town**, and this study is about a population sheltering inside an intact
+city. A concentration measured where nobody was sheltering is not a stress test of the same thing.
+So Fort McMurray is cited as the documented all-source ceiling and deliberately not scaled to, and
+the reason is written into the assumption row.
+
+Canberra's 2,496.1 µg/m³ at Florey station on the night of 5 to 6 January 2020 is the worst
+**verified** hourly concentration over an intact, non-evacuated city, computed directly from the ACT
+Government's raw open-data hourly records. The scale factor 4.436 is simply that divided by
+Portland's own 562.7.
+
+Two corrections are baked into the same row, both of which a reviewer might raise: the widely quoted
+Canberra figure of about 5,000 is an **AQI index value, not a concentration**, and the earlier
+justification comparing this to the January 2025 Palisades fires is **false** and is banned by the
+claim linter, because Los Angeles's regulatory hourly maximum was 301.1 µg/m³, which is **below**
+Portland's own observed peak.
+
+### Q29. Why not import a real severe smoke series instead of constructing one?
+
+It was considered and deferred, for a specific reason: the model's smoke field is a **county-uniform
+mean**, so importing a spatially localised plume would dilute it across the whole county and
+**understate the very event it was chosen to represent**. Constructing a transform of the observed
+series preserves the two-spell temporal structure and gives every value an observed pre-image, which
+a foreign import would not.
+
+### Q30. You changed a lot between versions. How do I know the old numbers were not just quietly
+replaced?
+
+Because the corrections are appended, never edited. The Phase E prediction file carries a correction
+block that says the registered arithmetic was wrong, explains exactly why, and states that the
+registered prediction **stands as written and is scored as a miss**. The Scenario E file carries an
+amendment about the 456-hour window that begins by saying the 456 stands as registered. The pre-U-27
+gap values survive in the critique-response files as the historical record of what was being answered.
+The pre-fix graph census survives in an archived manifest.
+
+And the claim linter exists specifically so that superseded numbers cannot leak back into a published
+deliverable: 22 registered patterns, ten scanned deliverables, exit status 1 on any hit, and it went
+from 50 hits to zero.
+
+### Q31. What is the single weakest point in the whole study?
+
+Two candidates, and it is honest to name both.
+
+**Awareness.** A-12 assumes everyone knows the shelters exist, and the one local survey for this
+event says about 65% did not. That single assumption is why every "got inside" figure is an upper
+bound, and it is the main driver of the 1.5 to 15.6 times calibration bracket.
+
+**The resting ventilation constant.** It is not in the source it is cited to, the correction is not a
+small monotone nudge, and until the author decides which real table cell the model's waiting state
+corresponds to, the absolute dose magnitudes are ratio-dependent.
+
+### Q32. If you had to summarise the honest position in one sentence?
+
+The presenter's script already chose it: *"The honest summary is that this model says people are left
+outside, and every assumption I made was one that would tend to make that look better than it is. If
+I'm wrong, I'm wrong in the optimistic direction."*
+
+---
+
+## 12. How to verify any claim in this document yourself
+
+Everything below is a command you can run or a file you can open. Nothing here requires trusting the
+narrative.
+
+### 12.1 The registries, which hold every scientific value
+
+```
+Geography/data/registry/variables.csv      55 rows, 16 columns
+Geography/data/registry/assumptions.csv    35 rows, 8 columns
+docs/science/REGISTRY_SCHEMA.md            what every column means and every validation rule
+```
+
+To reproduce the census quoted in Section 3.1:
+
+```
+python -c "import csv,collections; r=list(csv.DictReader(open('Geography/data/registry/variables.csv',encoding='utf-8'))); print(len(r), collections.Counter(x['evidence_class'] for x in r), collections.Counter(x['status'] for x in r))"
+```
+
+The validation rules are enforced in `Geography/src/geography/science/ScienceRegistry.java` and
+mirrored in `websim/pipeline/src/registry.ts`. A run whose registries fail validation produces no
+output, so any archived run is proof that the registries were valid when it ran.
+
+### 12.2 The archived runs, which hold every reported number
+
+Every reported figure traces to an archived run manifest under `docs/runs/`, and to a machine-readable
+digest of it under `websim/pipeline/out/archive-bundles/`. There are **154** bundles plus an index.
+
+To check any headline number:
+
+```
+python -c "import json; d=json.load(open('websim/pipeline/out/archive-bundles/present-day-three-arm__C-seed42.json')); print(json.dumps(d['headline'], indent=1)[:600]); print(json.dumps(d['gates'], indent=1)[:800])"
+```
+
+Every bundle carries a `gates` array. The first gate, `b_bed_sum_4way`, reconciles the sheltered count
+four independent ways and prints all four. `j_out_of_range_lookups_zero` proves no smoke lookup was
+fabricated. `gotcha3_hours_le_slices_minus_1` proves the run window fits its data. **Zero of the 154
+bundles has a failed gate.**
+
+### 12.3 The verifiers
+
+```
+python scripts/verify_2026_runs.py        the 27-run present-day matrix
+python scripts/verify_E_runs.py           Phase E: 99 invariants
+python scripts/verify_E_runs.py --se      Scenario E: 387 checks (v1), 546 (v2)
+python scripts/analyze_run.py             37+ consistency checks on a single run
+python scripts/test_routing.py            T1 to T5 routing validation, including zero impossible edges
+python scripts/audit_bridges.py           the pedestrian-legal bridge audit
+```
+
+Each of these checks a clean git tree, matching source checksums, and byte-identical populations
+across arms within a seed.
+
+### 12.4 The claim linter
+
+```
+python scripts/lint_claims.py
+```
+
+Reads `docs/claims.yaml`, scans ten registered deliverables for 22 registered patterns, and exits 1
+on any hit. It should exit 0. If it does not, a superseded number has entered a published document.
+
+### 12.5 Regenerating the figures
+
+```
+python scripts/make_chapter_figures.py     the five chapter figures
+python scripts/make_2026_results.py        the results pack
+python scripts/make_readable_results.py    the plain-language pack
+python scripts/make_symposium_deck.py      the deck, including its embedded DATA object
+```
+
+Every axis choice quoted in Section 7 is visible in these files as code and, in most cases, as a
+comment explaining it.
+
+### 12.6 The browser port
+
+```
+cd websim
+npm run build:data -w pipeline    rebuild derived assets from the sources
+npm test                          the full suite
+npm run test:browser              the three-engine matrix
+npm run gate:browser              the WP10 acceptance gate
+npm run lint:claims               the claim linter over the whole websim tree
+npm run ci                        all of the above, in order
+```
+
+After **any** edit to `variables.csv` or `assumptions.csv`, the registry snapshot must be rebuilt, or
+the shipped derived asset and the source will disagree. That is not a matter of remembering: the test
+`websim/pipeline/test/reproducibility.test.ts`, case "reproduces the registry snapshot", compares the
+on-disk asset against a fresh build and fails on the SHA-256.
+
+### 12.7 The chronology
+
+```
+git log --oneline
+```
+
+The commit messages are written as findings rather than as changelogs, and reading them top to bottom
+is the fastest way to reconstruct the order in which everything in this document happened. Key
+waypoints: `3ee2085` the freeway filter, `d486fca` the round-5 report, `c88de56` the Phase E decision
+layer, `2d47d2a` the Scenario E core, `495d845` the 456-to-455 fix, `257017d` the worst-plausible v2,
+`de7c045` the negative-constant parser fix, `5f10415` the browser engine reproducing the Java model
+through arm A, `40aea5e` the first fully green three-browser matrix, `283db99` the D16 ventilation
+finding, and `ae1f9f5` the accessibility gate finding a real keyboard trap.
+
+### 12.8 The places where this repository disagrees with itself
+
+Collected here so they are not scattered. Each is discussed in full in the section named.
+
+| Disagreement | Where | Section |
+|---|---|---|
+| 2,981 versus 2,918 distinct start locations | chapter tex:297 versus `PRESENT_DAY_THREE_ARM_RESULTS.md`:203; both real, different columns | 2.3 |
+| Mobility gap 13.0 / 24.5 / 12.9 versus 12.5 / 23.7 / 12.5 | `docs/critique-response/06-equity-scales.md` and `08-scenario-D.md` versus current deliverables; pre- versus post-U-27 | 6.4 |
+| Arm D's gap −0.4 versus −0.5 | chapter and deck versus `PRESENT_DAY_THREE_ARM_RESULTS.md`; rounding before versus after differencing | 6.4 |
+| 0.61 m³/h called "resting" versus "Light-intensity adult cell" | `variables.csv` V25 and `BIBLIOGRAPHY.md` versus `HEALTH_MODEL_AUDIT.md`:62; neither matches the source table | 3.7 |
+| 790 candidates versus 498 | `FINAL_SYSTEM_AUDIT.md` §5 versus `TECHNICAL_REFERENCE.md` §10.3; different optimisers, different eras | 4.4 |
+| "Scenario C" meaning two different things | `SHELTER_CAPACITY_AUDIT.md` §5 and assumptions A-24/A-26 versus every present-day document | 4.3 |
+| 28 variables / 26 assumptions versus 55 / 35 | `FINAL_SYSTEM_AUDIT.md` and `CLAIM_VALIDATION_AUDIT.md` versus the registries today | 9.10 |
+| A-05 says freeways are not filtered; V26 filters them | `assumptions.csv` versus `variables.csv`; known, and left unedited on purpose | 9.10 |
+| Evidence classes M/L/A/C/P versus M/L/C/A/F | `docs/archive/AUDIT.md` (superseded) versus `REGISTRY_SCHEMA.md` and the Java validator | 3.10 |
+| Realised marginals attributed to seed 42 that are seed 48 | finding F1-F1 | 9.10 |
+| `agents.csv` "carries no start coordinate" | `FINAL_SYSTEM_AUDIT.md` §2, true at its audit date only | 9.10 |
+| DATA_SOURCES.md omits the 2025 population and the 2026 inventory | provenance lives in `TECHNICAL_REFERENCE.md` §3.4 and §4 instead | 9.10 |
+| websim README says the UI is not built | contradicted by its own dated status note further down | 9.10 |
+
+**On the number this document was explicitly asked to check: arm C's 6,570 sheltered.** The
+repository does **not** disagree with itself. The archive bundle, the four-way reconciliation gate
+inside it, the present-day results report, the chapter's results table and the symposium deck all
+give 6,570, with 244 refused, 28 unreachable and 59,200.15 person-hours above the threshold.
+
+
 
