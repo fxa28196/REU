@@ -78,6 +78,22 @@ export const STATE_COLORS: Record<State, RGB> = {
  */
 export const UNKNOWN_STATE_RGBA: RGBA = [255, 0, 255, 255];
 
+/**
+ * Non-colour glyph per agent state (WP13: colour is never the sole channel).
+ * The map legend renders glyph + full state NAME + swatch, so identity is
+ * carried by text and shape as well as hue. Total over `STATES` (a new state
+ * fails the compile here), all six glyphs distinct (pinned in
+ * `app/test/a11y.test.ts`).
+ */
+export const STATE_GLYPHS: Record<State, string> = {
+  PRE_EVAC: "○",
+  EN_ROUTE: "▲",
+  SHELTERED: "■",
+  UNREACHABLE: "✕",
+  REFUSED_ALL_FULL: "◆",
+  UNAWARE: "◌",
+};
+
 /** Streets — the basemap. Muted slate over the #14161a background. */
 export const STREET_RGBA: RGBA = [74, 80, 88, 255];
 

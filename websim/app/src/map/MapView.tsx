@@ -44,6 +44,9 @@ import { MapboxOverlay } from "@deck.gl/mapbox";
 import { PathLayer, PolygonLayer, ScatterplotLayer } from "@deck.gl/layers";
 import type { Layer, LayersList } from "@deck.gl/core";
 import { unpackGeometry, unpackTopology } from "@websim/shared/graph-asset";
+import { STATES } from "@websim/engine/agents";
+
+import { rgbToCss } from "../charts/transforms.js";
 
 import {
   buildAgentLayerData,
@@ -62,6 +65,8 @@ import type {
 import {
   encampmentDensityRGBA,
   smokeScrimRGBA,
+  STATE_COLORS,
+  STATE_GLYPHS,
   STREET_DEEMPHASIZED_RGBA,
   STREET_RGBA,
 } from "./colors.js";
@@ -158,134 +163,152 @@ function asDensityCells(v: unknown): readonly DensityCell[] | null {
     : null;
 }
 
-function buildDeckLayers(
-  streetPaths: StreetPaths | null,
-  densityCells: readonly DensityCell[] | null,
-  shelterData: readonly ShelterDatum[],
-  frame: AgentFrame | null,
-  smokeUgM3: number | null,
-): LayersList {
-  const layers: Layer[] = [];
+// ---------------------------------------------------------------------------
+// Per-group layer builders (WP14 perf split).
+//
+// Layer instances are rebuilt per GROUP, on that group's own inputs, instead
+// of all five groups per frame: streets, shelters and the density grid are
+// memoised in the component (their inputs change on config edits, not per
+// frame), so during streaming playback only the agents layer and the smoke
+// scrim — the two whose inputs actually change every frame — are recreated.
+// The composed stacking order is unchanged (see the module doc): density,
+// streets, smoke scrim, shelters, agents.
+// ---------------------------------------------------------------------------
 
-  if (densityCells !== null && densityCells.length > 0) {
-    let maxCount = 1;
-    for (const c of densityCells) {
-      if (c.count > maxCount) {
-        maxCount = c.count;
-      }
-    }
-    layers.push(
-      new PolygonLayer<DensityCell>({
-        id: "encampment-density",
-        data: densityCells as DensityCell[],
-        getPolygon: (d: DensityCell) => d.polygon,
-        getFillColor: (d: DensityCell) => encampmentDensityRGBA(d.count, maxCount),
-        stroked: false,
-        filled: true,
-        pickable: false,
-      }),
-    );
+function buildDensityLayers(densityCells: readonly DensityCell[] | null): Layer[] {
+  if (densityCells === null || densityCells.length === 0) {
+    return [];
   }
-
-  if (streetPaths !== null) {
-    const de = streetPaths.deEmphasized;
-    if (de !== null) {
-      layers.push(
-        new PathLayer({
-          id: "streets-deemphasized",
-          data: de,
-          _pathType: "open",
-          positionFormat: "XY",
-          widthUnits: "pixels",
-          getWidth: 0.8,
-          getColor: STREET_DEEMPHASIZED_RGBA,
-          jointRounded: false,
-          capRounded: false,
-          pickable: false,
-        }),
-      );
+  let maxCount = 1;
+  for (const c of densityCells) {
+    if (c.count > maxCount) {
+      maxCount = c.count;
     }
+  }
+  return [
+    new PolygonLayer<DensityCell>({
+      id: "encampment-density",
+      data: densityCells as DensityCell[],
+      getPolygon: (d: DensityCell) => d.polygon,
+      getFillColor: (d: DensityCell) => encampmentDensityRGBA(d.count, maxCount),
+      stroked: false,
+      filled: true,
+      pickable: false,
+    }),
+  ];
+}
+
+function buildStreetLayers(streetPaths: StreetPaths | null): Layer[] {
+  if (streetPaths === null) {
+    return [];
+  }
+  const layers: Layer[] = [];
+  const de = streetPaths.deEmphasized;
+  if (de !== null) {
     layers.push(
       new PathLayer({
-        id: "streets",
-        data: streetPaths.streets,
+        id: "streets-deemphasized",
+        data: de,
         _pathType: "open",
         positionFormat: "XY",
         widthUnits: "pixels",
-        getWidth: 1.3,
-        getColor: STREET_RGBA,
+        getWidth: 0.8,
+        getColor: STREET_DEEMPHASIZED_RGBA,
         jointRounded: false,
         capRounded: false,
         pickable: false,
       }),
     );
   }
-
-  if (smokeUgM3 !== null) {
-    const rgba = smokeScrimRGBA(smokeUgM3);
-    if (rgba[3] > 0) {
-      layers.push(
-        new PolygonLayer<[number, number][]>({
-          id: "smoke-scrim",
-          data: [SCRIM_POLYGON],
-          getPolygon: (d: [number, number][]) => d,
-          getFillColor: rgba,
-          stroked: false,
-          filled: true,
-          pickable: false,
-        }),
-      );
-    }
-  }
-
-  if (shelterData.length > 0) {
-    layers.push(
-      new ScatterplotLayer<ShelterDatum>({
-        id: "shelter-capacity-ring",
-        data: shelterData as ShelterDatum[],
-        getPosition: (d: ShelterDatum) => d.position,
-        getRadius: (d: ShelterDatum) => d.capacityRadiusM,
-        radiusUnits: "meters",
-        radiusMinPixels: 4,
-        stroked: true,
-        filled: false,
-        getLineColor: (d: ShelterDatum) => d.ringColor,
-        lineWidthUnits: "pixels",
-        getLineWidth: 2,
-        pickable: false,
-      }),
-      new ScatterplotLayer<ShelterDatum>({
-        id: "shelter-occupancy-fill",
-        data: shelterData as ShelterDatum[],
-        getPosition: (d: ShelterDatum) => d.position,
-        getRadius: (d: ShelterDatum) => d.occupancyRadiusM,
-        radiusUnits: "meters",
-        stroked: false,
-        filled: true,
-        getFillColor: (d: ShelterDatum) => d.fillColor,
-        pickable: false,
-      }),
-    );
-  }
-
-  if (frame !== null && frame.residentCount > 0) {
-    const agents = buildAgentLayerData(frame);
-    layers.push(
-      new ScatterplotLayer({
-        id: "agents",
-        data: agents.data,
-        getFillColor: agents.getFillColor,
-        radiusUnits: "pixels",
-        getRadius: 2.2,
-        stroked: false,
-        filled: true,
-        pickable: false,
-        updateTriggers: { getFillColor: agents.updateTriggers.getFillColor },
-      }),
-    );
-  }
-
+  layers.push(
+    new PathLayer({
+      id: "streets",
+      data: streetPaths.streets,
+      _pathType: "open",
+      positionFormat: "XY",
+      widthUnits: "pixels",
+      getWidth: 1.3,
+      getColor: STREET_RGBA,
+      jointRounded: false,
+      capRounded: false,
+      pickable: false,
+    }),
+  );
   return layers;
+}
+
+function buildSmokeLayers(smokeUgM3: number | null): Layer[] {
+  if (smokeUgM3 === null) {
+    return [];
+  }
+  const rgba = smokeScrimRGBA(smokeUgM3);
+  if (rgba[3] <= 0) {
+    return [];
+  }
+  return [
+    new PolygonLayer<[number, number][]>({
+      id: "smoke-scrim",
+      data: [SCRIM_POLYGON],
+      getPolygon: (d: [number, number][]) => d,
+      getFillColor: rgba,
+      stroked: false,
+      filled: true,
+      pickable: false,
+    }),
+  ];
+}
+
+function buildShelterLayers(shelterData: readonly ShelterDatum[]): Layer[] {
+  if (shelterData.length === 0) {
+    return [];
+  }
+  return [
+    new ScatterplotLayer<ShelterDatum>({
+      id: "shelter-capacity-ring",
+      data: shelterData as ShelterDatum[],
+      getPosition: (d: ShelterDatum) => d.position,
+      getRadius: (d: ShelterDatum) => d.capacityRadiusM,
+      radiusUnits: "meters",
+      radiusMinPixels: 4,
+      stroked: true,
+      filled: false,
+      getLineColor: (d: ShelterDatum) => d.ringColor,
+      lineWidthUnits: "pixels",
+      getLineWidth: 2,
+      pickable: false,
+    }),
+    new ScatterplotLayer<ShelterDatum>({
+      id: "shelter-occupancy-fill",
+      data: shelterData as ShelterDatum[],
+      getPosition: (d: ShelterDatum) => d.position,
+      getRadius: (d: ShelterDatum) => d.occupancyRadiusM,
+      radiusUnits: "meters",
+      stroked: false,
+      filled: true,
+      getFillColor: (d: ShelterDatum) => d.fillColor,
+      pickable: false,
+    }),
+  ];
+}
+
+function buildAgentLayers(frame: AgentFrame | null): Layer[] {
+  if (frame === null || frame.residentCount === 0) {
+    return [];
+  }
+  const agents = buildAgentLayerData(frame);
+  return [
+    new ScatterplotLayer({
+      id: "agents",
+      data: agents.data,
+      getFillColor: agents.getFillColor,
+      radiusUnits: "pixels",
+      getRadius: 2.2,
+      stroked: false,
+      filled: true,
+      pickable: false,
+      updateTriggers: { getFillColor: agents.updateTriggers.getFillColor },
+    }),
+  ];
 }
 
 export function MapView({
@@ -311,6 +334,17 @@ export function MapView({
   }, [encampmentDensity]);
 
   const shelterData = useMemo(() => buildShelterData(shelters), [shelters]);
+
+  // WP14 perf: the static layer groups are memoised on their OWN inputs, so a
+  // 60 fps frame stream recreates only the agents layer and the smoke scrim.
+  // Deck.gl still diffs internally, but constructing PathLayers over 109k
+  // street paths per frame was measurable work on the UI thread.
+  const densityLayers = useMemo(() => buildDensityLayers(densityCells), [densityCells]);
+  const streetLayers = useMemo(
+    () => buildStreetLayers(decoded === null ? null : decoded.streetPaths),
+    [decoded],
+  );
+  const shelterLayers = useMemo(() => buildShelterLayers(shelterData), [shelterData]);
 
   // Map + overlay lifecycle. Declared before the layers effect so the overlay
   // exists by the time the first layers effect runs in the same commit.
@@ -343,22 +377,44 @@ export function MapView({
     if (overlay === null) {
       return;
     }
-    overlay.setProps({
-      layers: buildDeckLayers(
-        decoded === null ? null : decoded.streetPaths,
-        densityCells,
-        shelterData,
-        frame,
-        smokeUgM3,
-      ),
-    });
-  }, [decoded, densityCells, shelterData, frame, smokeUgM3]);
+    // Only these two groups are rebuilt per frame; the memoised groups above
+    // are reused by identity. Stacking order per the module doc: density,
+    // streets, smoke scrim, shelters, agents.
+    const layers: LayersList = [
+      ...densityLayers,
+      ...streetLayers,
+      ...buildSmokeLayers(smokeUgM3),
+      ...shelterLayers,
+      ...buildAgentLayers(frame),
+    ];
+    overlay.setProps({ layers });
+  }, [densityLayers, streetLayers, shelterLayers, frame, smokeUgM3]);
 
   const decodeError = decoded === null ? null : decoded.error;
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%", background: "#14161a" }}>
       <div ref={containerRef} style={{ position: "absolute", inset: 0 }} />
+      {/* WP13: colour is never the sole channel — each state carries its NAME
+          and a distinct glyph alongside the swatch. */}
+      <ul className="map-legend" aria-label="Agent state legend">
+        {STATES.map((state) => (
+          <li key={state}>
+            <span
+              className="map-legend-swatch"
+              style={{ background: rgbToCss(STATE_COLORS[state]) }}
+              aria-hidden="true"
+            />
+            <span className="map-legend-glyph" aria-hidden="true">
+              {STATE_GLYPHS[state]}
+            </span>
+            {state}
+          </li>
+        ))}
+        <li className="map-legend-note">
+          SHELTERED residents render as the green shelter fill, not as dots.
+        </li>
+      </ul>
       {decodeError !== null ? (
         <div
           style={{

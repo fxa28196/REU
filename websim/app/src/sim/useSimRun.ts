@@ -54,6 +54,7 @@ import type { PresetDefinition } from "@websim/shared/presets/definitions";
 import { STATES } from "@websim/engine/agents";
 import { ENCAMPMENTS_CSV, resolveClosuresCsv, resolveScenario, ticksPerHour } from "@websim/engine/world";
 import type { InitPayload, RunPhase, RunSummary, WaveProgressEvent } from "@websim/engine/worker";
+import type { OutputFlavour } from "@websim/engine/output";
 
 import type { BadgeState } from "../index.js";
 import { badgeExplanation, deriveBadge, type BadgeInput } from "../badge/machine.js";
@@ -66,6 +67,7 @@ import type {
   EncampmentDisplay,
 } from "../assets/loader.js";
 import { loadAppAssets } from "../assets/loader.js";
+import { downloadRunOutputs } from "../export/download.js";
 import useAppStore from "../state/store.js";
 import type { MetricSeries } from "../state/stream.js";
 // TYPE-ONLY on purpose — see the module doc. The value is dynamic-imported.
@@ -569,6 +571,20 @@ export interface SimRunHandle {
   readonly pause: () => Promise<void>;
   /** Resume a paused run to the end of the window ("compute to end"). */
   readonly resumeToEnd: () => Promise<void>;
+  /**
+   * Save the v2-web (or parity) export bundle for the run currently in the
+   * worker: agents.csv, shelters.csv, simulation.v2.json, the executed
+   * manifest and the replay token.
+   *
+   * It lives on the handle rather than the screen because the screen has no
+   * `SimWorkerClient` — the session is deliberately module-private. The
+   * acceptance gate of 2026-08-04 found `downloadRunOutputs` fully implemented,
+   * 21 tests green, and reachable from NOWHERE in the UI; this is the caller
+   * that closes that.
+   *
+   * Returns the bundle's `sim_id` so the caller can show what was saved.
+   */
+  readonly exportRun: (flavour: OutputFlavour) => Promise<string>;
 }
 
 export function useSimRun(): SimRunHandle {
@@ -712,6 +728,25 @@ export function useSimRun(): SimRunHandle {
     }
   }, [runLeg]);
 
+  const exportRun = useCallback(async (flavour: OutputFlavour): Promise<string> => {
+    const session = sessionRef.current;
+    if (session === null) {
+      throw new Error("no simulation has been built yet — press Play first, then export");
+    }
+    const store = useAppStore.getState();
+    // The CONFIGURED side of the executed-vs-configured diff is the config the
+    // last run actually executed, not whatever the sliders now read: exporting
+    // after someone nudged a slider must not label the old run with the new
+    // parameters. `lastRunConfig` is set by `markRunStarting`.
+    const configured = store.lastRunConfig ?? store.config;
+    const bundle = await downloadRunOutputs(session.client, {
+      flavour,
+      configured,
+      assets: session.assets.manifest,
+    });
+    return bundle.simId;
+  }, []);
+
   return {
     ready,
     running: runLaneBusy(runInFlight, runPhase),
@@ -721,5 +756,6 @@ export function useSimRun(): SimRunHandle {
     start,
     pause,
     resumeToEnd,
+    exportRun,
   };
 }

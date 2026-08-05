@@ -21,16 +21,24 @@
     "test:browser": "vitest run --config engine/vitest.browser.config.ts",
     "gate:browser": "tsx tools/browser-gate.ts",
     "typecheck": "npm run typecheck --workspaces && tsc -p tools --noEmit",
+    "lint": "eslint .",
     "lint:claims": "tsx tools/lint-claims.ts",
     "check:scratch": "tsx tools/check-scratch.ts",
-    "ci": "npm run gate:browser -- --probe && npm run typecheck && npm test && npm run check:scratch && npm run lint:claims && npm run gate:browser"
+    "deploy-check": "tsx tools/deploy-check.ts",
+    "ci": "npm run gate:browser -- --probe && npm run typecheck && npm run lint && npm test && npm run check:scratch && npm run lint:claims && npm run gate:browser"
   },
   "devDependencies": {
+    "@eslint/js": "^9.17.0",
     "@types/node": "^22.10.0",
     "@vitest/browser": "3.2.7",
+    "eslint": "^9.17.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "globals": "^15.14.0",
     "playwright": "1.56.1",
     "tsx": "^4.19.2",
     "typescript": "~5.6.3",
+    "typescript-eslint": "^8.19.0",
     "vitest": "^3.2.4"
   }
 }

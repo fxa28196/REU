@@ -16,6 +16,7 @@
  *    differ from the active preset, straight from the store.
  */
 
+import { memo } from "react";
 import type { ChangeEvent, CSSProperties, JSX } from "react";
 
 import type { RunConfig } from "@websim/shared/config";
@@ -181,7 +182,13 @@ function ParamControl(props: {
   );
 }
 
-export function SliderDrawer(): JSX.Element {
+/**
+ * WP14 perf: memoised — the Run screen re-renders up to 60×/s while a run
+ * streams frames, and this subtree depends only on its own store selectors
+ * (config / setParam / modifiedFromPreset), which still trigger their own
+ * re-renders when a parameter changes.
+ */
+export const SliderDrawer = memo(function SliderDrawer(): JSX.Element {
   const config = useAppStore((s: SliderDrawerSlice) => s.config);
   const setParam = useAppStore((s: SliderDrawerSlice) => s.setParam);
   const modifiedFromPreset = useAppStore((s: SliderDrawerSlice) => s.modifiedFromPreset);
@@ -203,4 +210,4 @@ export function SliderDrawer(): JSX.Element {
       ))}
     </div>
   );
-}
+});
