@@ -1,5 +1,5 @@
 # Presenter's Script — *Capacity Is Not Access*
-### More beds, or better beds? · 20 slides
+### More beds, or better beds? · 20 slides + a live browser demo
 
 **Timing, measured not guessed.** The per-slide targets in the headings sum to
 **24.5 minutes** if you narrate every line, and the full text (excluding the
@@ -16,6 +16,16 @@ Whatever the length: **never cut slide 11** (the control that refutes the
 placement attribution) **or slide 16** (the registered misses). Those two are
 what make the rest credible.
 
+**The live demo is a separate 3:00 block that sits between slide 15 and slide
+16.** It is not a deck slide: you leave the deck, drive the browser, and come
+back. Buy the three minutes for it by dropping the *[cut for time]* paragraphs
+on slides 2, 3 and 8. At **15 min** run it short, steps 1 to 4 only, no
+Provenance tab. At **10 min** do not run it live at all: put up
+`websim-03-arm-c-archive-validated.png` and
+`websim-04-arm-c-hour20-evacuation.png` as two images and say the lines under
+FALLBACK 2 and FALLBACK 3. **A demo you rehearsed and chose not to run costs
+you nothing. A demo you run and cannot rescue costs you the talk.**
+
 *Read this once slowly, then twice out loud. **Bold** lines are the ones to say
 more or less as written. Paragraphs marked **[cut for time]** can go without
 leaving a hole. Everything else is answer-bank material — it is here so that
@@ -24,6 +34,9 @@ when someone interrupts, you already have the answer.*
 **Deck:** `docs/final/presentation/capacity-is-not-access-symposium.html`
 (arrow keys advance; Ctrl/Cmd-P → *Save as PDF* prints one slide per page).
 **This script:** print the same way from `PRESENTER_SCRIPT_REFORMAT.html`.
+**The live model:** the browser build of this same simulation. Launch and
+rehearsal instructions are in the demo block between slides 15 and 16; the four
+fallback images live in `docs/final/presentation/screenshots/`.
 
 ---
 
@@ -61,6 +74,9 @@ when someone interrupts, you already have the answer.*
 | **emergent** | "Nobody programmed it. It falls out of the rules." |
 | **survivorship bias** | "You only measure the winners." |
 | **binding constraint** | "The thing actually causing the failure." |
+| **certified run** (the archive) | "A run that was executed, checked, and stored together with its inputs, its code version and a fingerprint of every data file. The number is fixed, and anyone can re-derive it." |
+| **archive-validated** (green badge) | "This exact configuration is the one that reproduces a stored certified run. Change one setting and the badge drops." |
+| **exploratory** (amber badge) | "You are looking at something I have not certified. It may be interesting; it is not a result." |
 
 **Pronunciation.** Mult-NO-mah · "P-M two point five" · "micrograms per cubic
 metre" · REE-past SIM-fon-ee (Repast Simphony) · dyke-STRA (Dijkstra) ·
@@ -112,6 +128,40 @@ number I could not trace.
 the unhealthy line. 28 = people who can reach no shelter. 562.7 = micrograms
 per cubic metre at the peak, never a headcount. 6,842 = people, and in
 scenario B also spaces.
+
+---
+
+## THE CREDITS, AND THE DATA-RIGHTS SENTENCE
+
+*Say these exactly. They are the two places where an imprecise word costs more
+than a wrong number would.*
+
+**The credits, for slide 1 and for anyone who asks afterwards.** The work was
+done at **Portland State University** as an NSF Research Experiences for
+Undergraduates site, under **Prof. Christof Teuscher**, and supported by **NSF
+award 2244551**. Your home institution is **Harrisburg University of Science
+and Technology**. Say the award number if the deck shows it; do not round it,
+paraphrase it, or attach it to the wrong body.
+
+**The data-rights sentence, if anyone asks whether you are allowed to publish
+the map or the campsite layer.** The street network is **Oregon Metro's
+Regional Land Information System, RLIS** (an Oregon Metro programme, not a City
+of Portland one). The campsite layer derives from the **City of Portland's
+Impact Reduction Program campsite reports**. **Both bodies approved
+redistribution of the derived products, relayed on 2 August 2026.** Then the
+half-sentence that has to follow it: **"That approval is my own attested report
+of it. There is no written licence grant on file, no reference number and no
+licence name, so I credit both providers and I do not claim more than that."**
+
+> **Words to avoid on that answer:** "licensed", "we have a licence from
+> Metro", "permission in writing", "cleared by legal". None of those is
+> supported by the record, and the repository's own claim linter blocks several
+> of them. **Credit both providers, state the approval, state its form.**
+>
+> **The related one, if human-subjects review comes up:** the faculty mentor
+> determined that **no IRB review is required** (no human subjects, and not yet
+> a real-world application), relayed on the same date and also verbally. **Do
+> not say "IRB-exempt".** That is a specific determination nobody issued.
 
 ---
 
@@ -481,6 +531,28 @@ be slipped in silently.**
 > auditable location. **And the 1.0 is printed into every exported row, so a
 > reader sees the switch position rather than taking my word for it.**
 
+**[Presenter note on the two breathing rates. Read before the talk; say none of
+it unless you are pushed.]** Give the two constants the way the model uses them
+and describe them as **walking against waiting**. **Do not volunteer the ratio,
+and do not say "2.7 times".** A primary-source verification sweep on 4 August
+2026 re-read the EPA Exposure Factors Handbook chapter these are credited to and
+found **the 1.62 walking value exactly where it is credited** (Table 6-2,
+moderate intensity) **and could not find the 0.61 waiting value in that chapter
+at all**. The nearest real cells are about 0.72 for light activity and 0.25 to
+0.30 for sedentary, so a correction could move the ratio down to about 2.25 or
+up to about 5.4. Nothing has been changed on the strength of that yet; the
+defect is written up in `docs/science/D16-EFH-VENTILATION-DEFECT.md`.
+
+**What is robust is the direction, and it is robust for every candidate cell in
+that table: walking ventilation exceeds resting ventilation. That is the whole
+load-bearing claim, and it is why removing walking time cuts dose by more than
+it cuts exposure.** If someone asks you for the multiple: *"The walking rate is
+verified against the primary source. The resting rate is under review, because
+I went back to the handbook and could not find it in the chapter it is credited
+to, so I am not going to quote you a ratio built on it. What survives is the
+direction, and the direction holds for every cell in the table."* **That answer
+is stronger than the number would have been.**
+
 ---
 
 ### SLIDE 9 — The four scenarios · *1:15*
@@ -711,6 +783,10 @@ of this table is a check built so that it could fail loudly.**
   detector, re-ran all nine from committed code, and left the flag permanently
   in the output.**
 
+(look up) **And there is one more check I can run standing here. The whole model
+now runs in a browser, so I can recompute one of those certified runs in front
+of you and put the two numbers side by side. That is the next three minutes.**
+
 > **"You found nine bad runs in your own archive. Why trust the rest?"**
 > **Because I found them myself, with a check designed to embarrass me, and then
 > re-ran every one.** That is the argument for the system, not against it. **An
@@ -728,6 +804,327 @@ of this table is a check built so that it could fail loudly.**
 > registry ships with the model, and where a value was verified through a
 > secondary source rather than the original paper, the code says so at that
 > spot.
+
+---
+
+### THE LIVE DEMO: between slides 15 and 16 · *3:00*
+
+*Not a deck slide. The deck still has twenty slides and they are still numbered
+the way they always were; you leave it here, drive the browser, and come back to
+slide 16. **Bold** is what to say. Square brackets are what to do. **Read the
+FALLBACK at the bottom of this block before you read anything above it.** It is
+the part that decides whether these three minutes are an asset or a liability.*
+
+#### BEFORE YOU WALK ON
+
+1. **Open the browser build in one tab and leave it there.** A local copy beats
+   the venue's Wi-Fi every time: from `websim/`, `npm run build -w app`, then
+   `npm run preview -w app`. Write the URL you actually rehearsed on here:
+   `______________________`
+2. **Press Play once during setup and let it finish.** That warms the assets and
+   answers the device dialog for the rest of the browser session, so the dialog
+   cannot surprise you on stage. Reloading the tab does not undo it.
+3. **Reload, then click Arm C**, so the screen you switch to is already the
+   screen you want.
+4. **Time one complete Arm C run on the actual machine and write it here:
+   `______` seconds.** Everything below is paced off that number. Do not guess
+   it. The header of this script promises timings that were measured rather than
+   guessed, and this is no different: expect somewhere between about fifteen
+   seconds and a minute depending on the laptop, and know which.
+5. **Open the four fallback images in a second window**, in this order:
+   `websim-03-arm-c-archive-validated.png`,
+   `websim-04-arm-c-hour20-evacuation.png`,
+   `websim-02-arm-a-run-complete.png`,
+   `websim-01-arm-a-live-vs-archived.png`.
+   All four are in `docs/final/presentation/screenshots/`. If your venue lets
+   you, also drop them into the back of the deck as four extra pages, so the
+   fallback is one arrow key away rather than one window switch away.
+6. **Close every other tab and turn off notifications.**
+
+#### THE SWITCH · *0:10*
+
+[Leave the deck. Bring up the browser tab.]
+
+**Everything I have shown you so far was computed in Java on a laptop and
+stored. This is the same model, ported to run inside a browser tab, and this is
+the copy on this machine right now.**
+
+#### 1. SELECT ARM C, AND WATCH THE ARCHIVE ARRIVE · *0:30*
+
+[CLICK] Left rail, under **SCENARIOS**: **"Arm C — expanded capacity plus new
+sites (46 sites, 6,842 beds)"**.
+
+[Two things happen at the same instant. Point at both of them.]
+
+**Top right, the badge turns green and says ARCHIVE-VALIDATED. That means this
+exact configuration is the one that reproduces a stored, certified run. Hold on
+to that, because I am going to break it deliberately in a moment.**
+
+**And the right-hand column has already filled in, with no computation at all.
+Sheltered, 6,570. Refused because every shelter was full, 244. Unreachable, 28.
+Person-hours above 55.5 micrograms, 59,200.15. Out of 6,842 residents.** (pause)
+**The browser did not just work those out. They are the archived result of the
+certified Java run, and the interface labels that block "Certified Java run" so
+it cannot be mistaken for anything else.**
+
+#### 2. PRESS PLAY · *0:40 of talking, over `______` seconds of compute*
+
+[CLICK] **Play**, bottom bar.
+
+[If the device dialog appears (it will, unless you cleared it in setup), it is
+headed *"Run this simulation on your device?"* and offers three buttons. Take
+**"Start live run (6,842 residents)"**. Say this while you do it, because it is
+worth saying.]
+
+**It asks first. This is real computation on this machine, so the interface says
+so before it spends your battery, and it always offers to show you the archived
+numbers instead.**
+
+[Now narrate the map, in this order. Do not rush it; this is the part the
+audience will remember.]
+
+**Every blue dot is one person, at a real reported campsite location.** (The
+teal squares underneath are a density grid rather than individual points:
+campsite locations are aggregated before anything is published.) **Nobody is
+moving. The smoke has not crossed the line yet, and the rule from slide 6 is
+that people leave when it does.**
+
+[Watch the smoke chart on the right. The dashed line across it is 55.5.]
+
+**There. The concentration has just crossed 55.5, and the orange is people
+walking. Those are real street paths: the shortest route the network allows, on
+the map I spent two slides repairing.**
+
+**Now watch the chart above it. The blue band is people still outside; the green
+band is people inside. What you are watching is blue collapsing into green, and
+the thin orange band between them is the walk itself.**
+
+**And notice that nobody vanishes on arrival. People become part of the green
+fill of the shelter they entered. That is deliberate: deleting everyone who
+arrived is exactly the defect I took out of the inherited code, and it is why
+every fairness number in this talk is computed over all 6,842 people instead of
+over the ones who made it.**
+
+#### WHAT TO SAY WHILE IT COMPUTES
+
+*This is the dead air, and it is the most valuable thirty seconds in the talk
+because everyone is watching the screen instead of you. Take these in order and
+stop the moment the run finishes. Any one of them is worth more than filler.*
+
+**One. This is not a video and it is not a re-skin. It is the same model: the
+same street graph, the same population sampler, the same random number streams.
+The port was checked against the original by drawing a hundred million random
+numbers on both engines and comparing them bit for bit.**
+
+**Two. Nothing here is being sent anywhere. There is no server. The whole
+simulation is running in this tab, on this machine, which is exactly why it
+asked permission before it started.**
+
+**Three. This is what reproducibility looks like when it stops being a paragraph
+in a methods section. Every number I have claimed today is one you can watch
+being produced.**
+
+[If it is still going, take the fourth.]
+
+**Four. And it was worth doing for a reason that has nothing to do with the
+demo: a model nobody can run is a model nobody can check. This one now opens in
+a browser, from a link, with no install.**
+
+#### 3. THE TWO COLUMNS · *0:30*
+
+[The run finishes. The ticker reads "run complete". The live numbers appear
+**beside** the archived ones, under **"Live browser simulation"**, and the
+archived block above is untouched.]
+
+(slow down) **The new numbers did not replace the old ones. They sat down next
+to them. Sheltered, refused, unreachable: the same three numbers the certified
+Java run produced, recomputed in this room while I was talking.**
+
+**That is the whole validation story in one screen. Same model, two engines, two
+languages, two machines, and one answer. And the interface will never let me show you one of those
+columns pretending to be the other.**
+
+> **The one honest caveat, and volunteer it if anyone is reading closely:** the
+> live column does not carry the person-hours figure. **The browser does not
+> accumulate that during a run; you get it out of the export, from the engine's
+> own writers.** So the certified 59,200.15 has no live twin on screen, and I am
+> not going to let it look as if it does. **The three counts are the comparison.
+> If someone asks, the Export run button next to that panel produces the full
+> row-per-person file and the manifest that goes with it.**
+
+> **If the live numbers do NOT match:** say so, immediately, out loud, before
+> anyone else does. **"That is not what the archive says, and that matters more
+> than the demo does. I will find out why and I will publish what I find."**
+> Then move to slide 16. A presenter who catches their own mismatch in public
+> has just demonstrated the entire argument of slide 15. A presenter who talks
+> over it has thrown that argument away.
+
+#### 4. BREAK IT ON PURPOSE · *0:25*
+
+[CLICK] Left rail, slider drawer, any slider. **Smoke scale multiplier** is the
+most legible; **Resident count** works too.
+
+**Watch the badge.** (pause) **Green to amber, instantly, and it now says
+EXPLORATORY and names what I changed.**
+
+**I have not run anything. I moved one slider, and the interface immediately
+stopped certifying the configuration. That is the point of building it this way:
+it is not possible to stand here and present a modified setup as though it were
+a certified result, because the moment I touch it, the screen says so, in front
+of you.**
+
+**That is a governance rule made physical. It is the same discipline as the
+registry gate on the last slide, except this one is enforced by the interface
+rather than by my good intentions.**
+
+#### 5. THE PROVENANCE TAB · *0:30, only if you are ahead of the clock*
+
+[CLICK] **Provenance**, top bar.
+
+**Three things live here.** [Scroll past each.] **The governance registry, every
+variable with its evidence class and its identifier, which is the gate from the
+last slide. The asset manifest, every input file with its SHA-256 fingerprint,
+re-checked in the browser at load, so a stale file fails loudly instead of
+quietly. And "configured versus executed", which compares what I asked for
+against what the engine actually ran, because a run that silently substituted a
+parameter is worse than a run that crashed.**
+
+> **[Presenter note. Know this before you open that tab.]** It also shows the
+> **street graph corruption-correction census**, and the census on screen reads
+> **25 corrected identifiers: 3 reattached and 22 split**. **Slide 5 of the deck
+> says 27, four and twenty-three.** The archive agrees with the screen, not with
+> the slide. If you open this tab, either say the screen's numbers, or do not
+> open this tab. **If anyone catches the difference: "The screen is right and
+> the slide is stale. The corrected census is 25, three reattached and 22 split.
+> The conclusion is unchanged: impossible connections after the fix, zero."**
+> Better still, get the slide corrected before you present, and delete this note.
+
+#### THE RETURN · *0:05*
+
+[Back to the deck, slide 16. Do not narrate the switch.]
+
+---
+
+### THE FALLBACK, if the demo fails · *2:00*
+
+*Assume it will. Machines fail on stage; that is what stages are for. This
+fallback delivers the same four points from four still images, and it is quick
+enough that you can also just choose it, deliberately, if you are behind the
+clock.*
+
+**The rule that makes it invisible: you never narrate the failure.** Do not say
+"it seems to be stuck", do not say "this worked earlier", do not apologise, do
+not touch the machine twice. **Give it five seconds. Then switch to the images
+and say "These are captures from the browser build."** That sentence is true,
+it is calm, and it reads as material you always intended to show. An audience
+takes its cue entirely from you; a presenter who does not treat something as a
+disaster has not had one.
+
+**FALLBACK 1. Switch, and reset the frame.** [Bring up
+`websim-03-arm-c-archive-validated.png`.]
+
+**These are captures from the browser build. This is Arm C selected, and this is
+the moment I wanted you to see: the badge, top right, is green, and it says
+ARCHIVE-VALIDATED.**
+
+**FALLBACK 2. The archive arrives with no compute.** [Point at the right-hand
+column of the same image.]
+
+**That column filled in instantly, with no computation at all. Sheltered 6,570,
+refused 244, unreachable 28, person-hours above 55.5 micrograms 59,200.15, out
+of 6,842 residents. It is labelled "Certified Java run", because that is what it
+is: the archived result, not something the browser worked out.**
+
+**And down here the clock says hour four and nobody is sheltered yet. Every one
+of those blue dots is a person at a real reported campsite location, and not one
+of them has moved. The smoke has not crossed the line.**
+
+**FALLBACK 3. The evacuation. This is the one image to show if you only show
+one.** [Bring up `websim-04-arm-c-hour20-evacuation.png`.]
+
+**Sixteen hours later. The concentration has reached 61.4 micrograms, just past
+the 55.5 trigger, and this is what the rule produces.** [Point at the orange.]
+**Those lines are people walking, and they are lines because they are on real
+streets: shortest paths through the network I spent two slides repairing.**
+
+**5,999 people are already inside and nobody has been refused yet, because at
+hour twenty the doors are still open. Look at the chart on the right: the blue
+band is people outside, the green band is people inside, and the thin orange
+band between them is the walk. Blue collapsing into green is the whole event.**
+
+**And nobody disappears when they arrive. Sheltered residents render as the
+green fill of the shelter they entered, because deleting everyone who got
+indoors is exactly the defect I removed from the inherited code.**
+
+**FALLBACK 4. A finished run, and the badge doing its job.** [Bring up
+`websim-02-arm-a-run-complete.png`.] **Read the presenter note below this line
+before you use this image.**
+
+**Here is a completed run: hour 312, the end of the window, PM2.5 back down to
+12.7 so the smoke haze over the map is gone, and the smoke chart showing the
+whole two-week curve with both of its peaks. The live numbers sit beside the
+archived ones and never replace them.**
+
+(slow down) **And this capture happens to show you the fourth thing I wanted to
+demonstrate. Look at the badge: it is amber, and it says EXPLORATORY, because I
+had changed one setting. So the archived block still shows the certified Arm A
+result and the live block shows what I actually ran, and they do not match, and
+they should not match. That is the interface refusing to let me present a
+modified configuration as a certified one. It is a governance rule made
+physical, and it is the reason you can trust the green badge on the previous
+image.**
+
+> **[Presenter note. This matters more than anything else in the fallback.]**
+> **`websim-02` and `websim-01` are NOT clean Arm A runs.** The scenario code was
+> modified, which is why the badge is amber and the chip reads "Modified from
+> preset: scenarioCode". The archived block shows certified **Arm A** (2,060
+> sheltered, 4,754 refused, 28 unreachable); the live block shows **6,264 / 550
+> / 28**, which is arm B's geometry. **Do not point at either image and say "the
+> two columns agree."** They do not, they are not supposed to, and a
+> methodologist in the second row will read the chip. **Use these two images for
+> the badge story only. The agreement story belongs to `websim-03`, whose badge
+> is green.**
+
+**FALLBACK 5. Optional colour, only if you have the time.** [Bring up
+`websim-01-arm-a-live-vs-archived.png`.]
+
+**Mid-run, hour 96, day five of fourteen. The whole map has gone that olive
+colour because the concentration is 286.5 micrograms: the interface tints the
+map with the smoke, so you can see the hazard sitting on top of the geography
+rather than only reading it off a chart.**
+
+**FALLBACK 6. Land it and leave.**
+
+**Everything I just showed you is in a browser tab, on a laptop, from a link. I
+could not do that when I wrote the rest of this talk, and it is the difference
+between a model you have to take my word for and a model you can check.**
+
+[Straight to slide 16. No apology, no explanation, no return to the machine.]
+
+> **"Can I try it?"** Yes. It is a static page, it runs entirely in your
+> browser, there is no server and nothing is uploaded. **Copy permalink** encodes
+> the whole configuration into the link, so anything I show you, you can
+> reproduce exactly.
+>
+> **"How do you know the browser version is the same model and not an
+> approximation?"** Because that was the hard part, and it was tested rather
+> than asserted. **The random number generators were compared against the Java
+> originals over a hundred million draws, bit for bit.** The engine's own
+> arithmetic was checked across four different JavaScript engines (Chrome,
+> Firefox, Safari and Node) and is byte-identical on all four. **And the badge
+> you saw is the standing claim: an unmodified preset is only allowed to show
+> green because its output was checked against the archived certified run.**
+>
+> **"So which one is the real result, the Java run or the browser run?"** The
+> archived Java run is the citable result, and it stays the citable result. **The
+> browser is the check on it, not a replacement for it.** That is precisely why
+> the interface keeps the two in separate blocks with separate labels rather
+> than averaging them or overwriting one with the other.
+>
+> **"Does it run on a phone?"** It displays archived results on anything. A live
+> run asks your device first and tells you what it measured before you commit
+> to it, **and the archived path is never gated, because reading a certified
+> result should not depend on owning a fast laptop.**
 
 ---
 
@@ -923,6 +1320,15 @@ population sampler, the street routing graph, the smoke field, the data loader,
 the results exporter, and the governance registry.** Say the Java figure first,
 or a 1,500-line inheritance and a 3,000-line removal sound contradictory.
 
+**And one more, after the numbers were frozen, which changes nothing and proves
+everything.** The whole model was ported to run in a browser: the same street
+graph, the same population sampler, the same random streams, reproducing the
+archived Java runs. **The port is not a new result. It is the old results, made
+recomputable by anyone with a laptop, including in this room**, which is what
+the demo block between slides 15 and 16 does. **If you are asked what you would
+have done with another month, this is the honest answer to point at: I spent it
+on making the work checkable rather than on making it bigger.**
+
 ---
 
 ## A NOTE ON TOOLING
@@ -1094,6 +1500,23 @@ is necessary and, at the margin a county actually operates on, not sufficient.
 → *"Why not 'capacity is most of access'?"* Because the marginal decision is
 exactly the regime where the equivalence breaks — the title names the
 decision-relevant finding.
+
+**16. "You ran that in a browser. Is that the model, or a demo of the model?"**
+It is the model. The port carries the same street graph, the same population
+sampler and the same random streams, and it reproduces the archived Java runs;
+the archived run stays the citable result and the browser is the check on it.
+→ *"How was that verified?"* The random generators were compared against the
+Java originals over a hundred million draws, bit for bit, and the engine's own
+arithmetic is byte-identical across four JavaScript engines. The green badge is
+the standing claim: an unmodified preset shows green only because its output was
+checked against the certified archive.
+→ *"What is not identical?"* Anything the port delegates rather than computes
+itself. The geodesic library and the host's own transcendental functions differ
+between browsers, which is why those were vendored onto the port's own
+arithmetic rather than trusted. That is a measurement, not a hope.
+→ *"Why bother?"* Because a model nobody can run is a model nobody can check.
+This one opens from a link, with no install, and the permalink encodes the exact
+configuration.
 
 ---
 
