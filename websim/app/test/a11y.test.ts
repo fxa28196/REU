@@ -6,11 +6,23 @@
  * reduced-motion decision, the scrubber's spoken value, and the non-colour
  * glyph channels (badge + state legend).
  */
+import { readFileSync } from "node:fs";
+
 import { describe, expect, it } from "vitest";
 
 import { STATES } from "@websim/engine/agents";
 
 import { BADGE_STATES, CONSTRUCTED_SERIES_LABEL } from "../src/index.js";
+import {
+  AA_NORMAL_TEXT,
+  INK_DARK,
+  INK_LIGHT,
+  LIVE_TEXT,
+  WARN_TEXT,
+  contrastRatio,
+  inkOn,
+  relativeLuminance,
+} from "../src/a11y/contrast.js";
 import {
   CHART_EMPTY_SUMMARY,
   TICKER_EMPTY_TEXT,
@@ -22,7 +34,7 @@ import {
 import type { TickerWave } from "../src/a11y/announce.js";
 import { MISSING_CELL, censusTableModel, smokeTableModel } from "../src/a11y/DataTable.js";
 import { REDUCED_MOTION_QUERY, runCenterMode } from "../src/a11y/useReducedMotion.js";
-import { BADGE_GLYPHS, badgeGlyph } from "../src/badge/BadgePanel.js";
+import { BADGE_COLORS, BADGE_GLYPHS, badgeGlyph } from "../src/badge/BadgePanel.js";
 import { scrubberValueText } from "../src/controls/Scrubber.js";
 import { STATE_GLYPHS } from "../src/map/colors.js";
 import type { MetricSeries } from "../src/state/stream.js";
@@ -46,6 +58,10 @@ function twoRowSeries(): MetricSeries {
 }
 
 const EMPTY: MetricSeries = { hours: [], smokeUgM3: [], stateCensus: [], meanExposureUgM3h: [] };
+
+/** The two dark surfaces every contrast measurement below is taken against. */
+const WS_PANEL = "#1c1f24";
+const WS_BG = "#14161a";
 
 const WAVE_AT_79: TickerWave = { phase: "start", wave: 1, hour: 79 };
 
@@ -241,5 +257,102 @@ describe("non-colour channels (WP13: colour is never the sole channel)", () => {
     expect(glyphs).toEqual(BADGE_STATES.map((b) => BADGE_GLYPHS[b]));
     expect(glyphs.every((g) => typeof g === "string" && g.length > 0)).toBe(true);
     expect(new Set(glyphs).size).toBe(BADGE_STATES.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Contrast (WP13 axe remediation, 2026-08-05)
+//
+// The first real axe-core run over the built app (`npm run axe`) returned six
+// `color-contrast` violations at `serious`, all of them the same mistake: an
+// Okabe-Ito hex used as TEXT on a dark surface. `src/a11y/contrast.ts` fixes it
+// and quotes measured ratios in its documentation; these tests are what makes
+// those quotes claims rather than assertions.
+// ---------------------------------------------------------------------------
+
+describe("WCAG contrast math", () => {
+  it("is the WCAG formula: black on white is the maximum 21:1", () => {
+    expect(contrastRatio("#000000", "#ffffff")).toBeCloseTo(21, 6);
+    expect(contrastRatio("#ffffff", "#ffffff")).toBeCloseTo(1, 6);
+  });
+
+  it("is order-independent and accepts the 3-digit form", () => {
+    expect(contrastRatio("#fff", "#000")).toBeCloseTo(contrastRatio("#000000", "#ffffff"), 9);
+  });
+
+  it("refuses an unparseable colour rather than defaulting to black", () => {
+    // A mis-typed hex silently becoming #000000 would report a flattering
+    // ratio about a colour that does not exist — the exact false green this
+    // whole remediation exists to prevent.
+    expect(() => relativeLuminance("rebeccapurple")).toThrow(/not a hex colour/);
+    expect(() => relativeLuminance("#12345")).toThrow(/not a hex colour/);
+  });
+
+  it("reproduces the ratios axe measured on the two failing surfaces", () => {
+    // axe reported 4.27 and 3.19 (2 d.p.) for these on --ws-panel.
+    expect(contrastRatio("#d55e00", WS_PANEL)).toBeCloseTo(4.27, 2);
+    expect(contrastRatio("#0072b2", WS_PANEL)).toBeCloseTo(3.19, 2);
+    // ...and 3.49 for dark ink on the ENGINE-CERTIFIED blue chip.
+    expect(contrastRatio("#0072b2", INK_DARK)).toBeCloseTo(3.49, 2);
+  });
+});
+
+describe("inkOn — ink chosen per swatch, not assumed", () => {
+  it("clears AA on every badge fill", () => {
+    for (const badge of BADGE_STATES) {
+      const fill = BADGE_COLORS[badge];
+      expect(contrastRatio(fill, inkOn(fill))).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
+    }
+  });
+
+  it("keeps dark ink on green/amber/vermillion and switches to white on blue", () => {
+    // The switch IS the fix: dark ink on #0072b2 was the axe violation present
+    // on .app-topbar-badge, the BadgePanel chip and .chip-live.
+    expect(inkOn("#009E73")).toBe(INK_DARK);
+    expect(inkOn("#E69F00")).toBe(INK_DARK);
+    expect(inkOn("#D55E00")).toBe(INK_DARK);
+    expect(inkOn("#0072B2")).toBe(INK_LIGHT);
+  });
+
+  it("leaves the Okabe-Ito fills themselves untouched", () => {
+    // The colourblind-safety argument is about the marks; the remediation must
+    // not have quietly moved them.
+    expect(BADGE_COLORS).toEqual({
+      "ARCHIVE-VALIDATED": "#009E73",
+      "ENGINE-CERTIFIED": "#0072B2",
+      EXPLORATORY: "#E69F00",
+      INVALID: "#D55E00",
+    });
+  });
+});
+
+describe("coloured-text tokens", () => {
+  it("clear AA on both dark surfaces, unlike the raw hues they replace", () => {
+    for (const surface of [WS_PANEL, WS_BG]) {
+      expect(contrastRatio(WARN_TEXT, surface)).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
+      expect(contrastRatio(LIVE_TEXT, surface)).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
+    }
+    expect(contrastRatio("#d55e00", WS_PANEL)).toBeLessThan(AA_NORMAL_TEXT);
+    expect(contrastRatio("#0072b2", WS_PANEL)).toBeLessThan(AA_NORMAL_TEXT);
+  });
+
+  it("are the same values theme.css serves — the CSS and TS cannot drift", () => {
+    // contrast.ts documents itself as "mirrored in theme.css". A mirror that is
+    // only claimed is not a mirror: half the app reads these through CSS custom
+    // properties and half through the imported constants, so a one-sided edit
+    // would reintroduce the violation on exactly the half nobody re-scanned.
+    const css = readFileSync(new URL("../src/theme.css", import.meta.url), "utf8");
+    const cssVar = (name: string): string => {
+      const match = new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{3,8})\\s*;`).exec(css);
+      if (match === null || match[1] === undefined) {
+        throw new Error(`theme.css does not define --${name}`);
+      }
+      return match[1].toLowerCase();
+    };
+    expect(cssVar("ws-warn-text")).toBe(WARN_TEXT.toLowerCase());
+    expect(cssVar("ws-live-text")).toBe(LIVE_TEXT.toLowerCase());
+    // ...and the two surfaces these were measured against.
+    expect(cssVar("ws-panel")).toBe(WS_PANEL);
+    expect(cssVar("ws-bg")).toBe(WS_BG);
   });
 });

@@ -13,6 +13,7 @@ import type { ReactElement } from "react";
 import { DATA_ATTRIBUTION_LINE, SCREENS } from "./index.js";
 import type { Screen } from "./index.js";
 import { ErrorBoundary } from "./ErrorBoundary.js";
+import { inkOn } from "./a11y/contrast.js";
 import { badgeColor, badgeGlyph } from "./badge/BadgePanel.js";
 import { Archive } from "./screens/Archive.js";
 import { Compare } from "./screens/Compare.js";
@@ -124,7 +125,10 @@ export function App(): ReactElement {
         </button>
         <span
           className="app-topbar-badge"
-          style={{ background: badgeColor(badge) }}
+          // The ink is computed from the swatch, not fixed: see a11y/contrast.ts
+          // (`.app-topbar-badge` was the axe color-contrast violation present on
+          // all four screens — dark ink on the blue chip measured 3.49:1).
+          style={{ background: badgeColor(badge), color: inkOn(badgeColor(badge)) }}
           title="Badge for the current configuration — details in the Run screen's badge panel"
         >
           <span aria-hidden="true">{badgeGlyph(badge)} </span>

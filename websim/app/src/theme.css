@@ -19,6 +19,16 @@
   --ws-border: #2a2e35;
   --ws-archived: #009e73; /* Okabe-Ito bluish green — certified archive */
   --ws-live: #0072b2; /* Okabe-Ito blue — live browser simulation */
+
+  /* TEXT variants of two Okabe-Ito entries (WP13 axe remediation 2026-08-05).
+     Okabe-Ito is a palette for data MARKS and makes no contrast promise as
+     small text: raw #d55e00 measures 4.27:1 on --ws-panel and raw #0072b2
+     measures 3.19:1, both under the 4.5:1 WCAG 1.4.3 AA requires. These
+     lightened tints of the same hues measure 5.01:1 and 4.98:1. The raw hexes
+     are UNCHANGED wherever they are fills. Mirrored, with the measurement, in
+     src/a11y/contrast.ts (WARN_TEXT / LIVE_TEXT), which the Node tests pin. */
+  --ws-warn-text: #da711f;
+  --ws-live-text: #4095c5;
 }
 
 * {
@@ -260,7 +270,7 @@ body {
 .panel-warn {
   margin: 6px 0 0;
   font-size: 0.8rem;
-  color: #d55e00; /* Okabe-Ito vermillion */
+  color: var(--ws-warn-text); /* Okabe-Ito vermillion, lightened for AA as text */
   font-weight: 600;
 }
 
@@ -278,10 +288,14 @@ body {
 
 .chip-archived {
   background: var(--ws-archived);
+  /* dark ink on the bluish green measures 5.29:1 — .chip's default is correct */
 }
 
 .chip-live {
   background: var(--ws-live);
+  /* ...but on the blue it measures only 3.49:1 (the axe finding on this exact
+     selector). White reaches 5.19:1, so this chip overrides the shared ink. */
+  color: #ffffff;
 }
 
 /* ---- map overlays -------------------------------------------------------- */

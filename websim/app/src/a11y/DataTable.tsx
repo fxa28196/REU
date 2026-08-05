@@ -19,6 +19,7 @@ import type { ReactElement } from "react";
 
 import { STATES } from "@websim/engine/agents";
 
+import { ScrollRegion } from "./ScrollRegion.js";
 import type { MetricSeries } from "../state/stream.js";
 
 // ---------------------------------------------------------------------------
@@ -143,7 +144,16 @@ export function DataTableToggle({ chartName, caption, model }: DataTableTogglePr
       >
         {open ? `Hide ${chartName} data table` : `View ${chartName} as data table`}
       </button>
-      <div id={regionId} hidden={!open} className="data-table-wrap">
+      {/* ScrollRegion, not a div: `.data-table-wrap` scrolls and holds no
+          focusable content, so without a tab stop a keyboard-only user could
+          open the table and then not be able to scroll it (axe
+          `scrollable-region-focusable`, WCAG 2.1.1). */}
+      <ScrollRegion
+        id={regionId}
+        hidden={!open}
+        label={`${chartName} data table`}
+        className="data-table-wrap"
+      >
         {model.rows.length === 0 ? (
           <p className="panel-sub">
             No rows yet — press Play to run this configuration; the table fills as hourly
@@ -152,7 +162,7 @@ export function DataTableToggle({ chartName, caption, model }: DataTableTogglePr
         ) : (
           <DataTable caption={caption} model={model} />
         )}
-      </div>
+      </ScrollRegion>
     </div>
   );
 }

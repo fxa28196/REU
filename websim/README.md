@@ -55,6 +55,13 @@ npm run gate:browser  # the WP10 browser matrix, artifact-gated on the Playwrigh
 npm run ci        # all of the above, in that order — the gate
 npm run test:strict  # same suite, but artifact-gated skips become failures (§8.1)
 npm run deploy-check # WP14 publish gate over app/dist (see "Deploying" below)
+npm run axe          # WP13 accessibility gate: axe-core over the BUILT app, 6 scans
+                     # needs `npm run build -w app` first + `npx playwright install chromium`.
+                     # NOT in `npm run ci` — it is green today, but wiring it in is a
+                     # decision about a fresh clone's first CI run, not about its verdict.
+                     # It covers only the automated half of WCAG: the manual
+                     # keyboard/screen-reader script in docs/WP13-a11y-evidence.md §4 is a
+                     # SEPARATE, still-unexecuted obligation.
 
 # `npm run ci` needs the Playwright browsers (~400 MB, `npx playwright install
 # chromium firefox webkit`). It probes for them FIRST and, if they are absent, fails

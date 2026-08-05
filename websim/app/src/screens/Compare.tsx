@@ -39,6 +39,8 @@ import { provenanceQuirk } from "@websim/shared";
 import type { PresetId } from "@websim/shared/presets/definitions";
 
 import { CONSTRUCTED_SERIES_LABEL, PROVENANCE_CLASSES } from "../index.js";
+import { LIVE_TEXT, WARN_TEXT } from "../a11y/contrast.js";
+import { ScrollRegion } from "../a11y/ScrollRegion.js";
 import { isConstructedSeries } from "../controls/paramMeta.js";
 import useAppStore, { presetDefinition } from "../state/store.js";
 import { archiveBundleEntryFor, formatCount, sameRunConfig, useSimRun } from "../sim/useSimRun.js";
@@ -94,9 +96,24 @@ function ProvenanceChip({ kind }: { readonly kind: "archived" | "live" }): React
   );
 }
 
-/** Okabe-Ito blue/vermillion — colorblind-safe, and never the only channel. */
+/**
+ * Okabe-Ito blue/vermillion — colorblind-safe, and never the only channel.
+ * These are the BAR fills and stay exactly as the palette specifies.
+ */
 const DELTA_POSITIVE = "#0072B2";
 const DELTA_NEGATIVE = "#D55E00";
+
+/**
+ * The same two hues as small TEXT (the signed delta numbers). Okabe-Ito makes
+ * no contrast promise as text on a dark surface — raw #0072b2 measures 3.19:1
+ * and raw #d55e00 4.27:1 against `--ws-panel`, both under WCAG 1.4.3 AA's
+ * 4.5:1. The lightened tints measure 4.98:1 and 5.01:1. This is the same defect
+ * the 2026-08-05 axe run found on the badge chips and `.panel-warn`; it is
+ * fixed here too because these cards are simply not reachable until a live
+ * comparison has run, so the scanner could not see them.
+ */
+const DELTA_POSITIVE_TEXT = LIVE_TEXT;
+const DELTA_NEGATIVE_TEXT = WARN_TEXT;
 
 // ---------------------------------------------------------------------------
 // Archived-slot state
@@ -316,7 +333,10 @@ export function Compare(): ReactElement {
                   {archived.presentation.drawCount === 0 ? (
                     <p className="panel-sub">No draw bundles are available for this family.</p>
                   ) : (
-                    <div style={{ overflowX: "auto" }}>
+                    <ScrollRegion
+                      label="Archived family range across closure draws"
+                      style={{ overflowX: "auto" }}
+                    >
                       <table style={{ width: "100%", fontSize: "0.8rem", borderCollapse: "collapse" }}>
                         <thead>
                           <tr>
@@ -350,7 +370,7 @@ export function Compare(): ReactElement {
                           })}
                         </tbody>
                       </table>
-                    </div>
+                    </ScrollRegion>
                   )}
                   {archived.missingDraws.length > 0 ? (
                     <p className="panel-warn">
@@ -465,7 +485,12 @@ export function Compare(): ReactElement {
                   <span
                     style={{
                       fontVariantNumeric: "tabular-nums",
-                      color: card.delta === 0 ? undefined : card.delta > 0 ? DELTA_POSITIVE : DELTA_NEGATIVE,
+                      color:
+                        card.delta === 0
+                          ? undefined
+                          : card.delta > 0
+                            ? DELTA_POSITIVE_TEXT
+                            : DELTA_NEGATIVE_TEXT,
                     }}
                   >
                     {formatSigned(card.delta, HEADLINE_METRIC_DECIMALS[card.metric])}{" "}

@@ -23,6 +23,7 @@ import { useEffect, useState } from "react";
 import type { CSSProperties, ReactElement } from "react";
 
 import { PROVENANCE_CLASSES } from "../index.js";
+import { WARN_TEXT } from "../a11y/contrast.js";
 import type { ArchiveBundleEntry, ArchiveIndex } from "../assets/loader.js";
 import useAppStore from "../state/store.js";
 import { archiveHeadline, formatCount } from "../sim/useSimRun.js";
@@ -38,7 +39,11 @@ import {
 } from "../provenance/registry.js";
 import type { BundleLineage, GateRow } from "../provenance/registry.js";
 
-const FAILED_RED = "#d55e00"; // Okabe-Ito vermillion, matching .panel-warn
+// Okabe-Ito vermillion lightened for AA as TEXT, matching .panel-warn. Raw
+// #d55e00 measures 4.27:1 on the panel surface, under WCAG 1.4.3 AA's 4.5:1 —
+// the same axe color-contrast defect found on the Provenance screen; these
+// rows are only reachable once a bundle with a failed gate is on screen.
+const FAILED_RED = WARN_TEXT;
 
 const pageStyle: CSSProperties = {
   height: "100%",
