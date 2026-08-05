@@ -44,6 +44,17 @@
  * beside a passing `expect(longTasks).toBe(0)` — two assertions about the same
  * threshold returning opposite verdicts on the same sample. Observed on WebKit.
  *
+ * ## Where the budget is gated (clause 2a vs 2b — decision record)
+ *
+ * Per `docs/DR-WP10-clause2-decision.md` (researcher sign-off 2026-08-04), the
+ * two criterion assertions execute on **Chromium only** (clause 2a). Firefox and
+ * WebKit run the identical measurement and print the identical distribution but
+ * do not gate on it (clause 2b): their failing numbers reproduce on a cold page
+ * with no worker and nothing under test (`DR-WP10-uithread-perf` §6.3c), so a
+ * budget asserted there measures the browser, not this code. Everything else in
+ * this file — the positive control, transfer semantics, pause latency,
+ * non-vacuity, the instrument-consistency guard — still gates in all three.
+ *
  * It failed *safe* (red where the clause was in fact satisfied), which is why it
  * survived; a gate that contradicts itself is still a broken gate, because the
  * next reader cannot tell which half to believe. The rounded value is now
@@ -58,7 +69,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { StreamMessage } from "../../src/worker/protocol.js";
-import { ENGINE_LABEL, initPayload, startWorker } from "./harness.js";
+import { ENGINE_LABEL, GATES_LONG_TASK_BUDGET, initPayload, startWorker } from "./harness.js";
 
 interface Distribution {
   readonly samples: number;
@@ -284,18 +295,31 @@ describe(`UI-thread responsiveness at max speed [${ENGINE_LABEL}]`, () => {
           "threshold. The count and the maximum must be read off the same number.",
       ).toBe(dist.maxExactMs < LONG_TASK_MS);
 
-      // --- the criterion ----------------------------------------------------
-      expect(
-        dist.longTasks,
-        `${ENGINE_LABEL}: ${dist.longTasks} main-thread gap(s) >= ${LONG_TASK_MS} ms while ` +
-          `streaming ${framesSeen} frames (max ${dist.maxMs} ms, p99 ${dist.p99Ms} ms)`,
-      ).toBe(0);
-      // `maxExactMs`, never the rounded `maxMs` — a 49.9951 ms worst gap is not
-      // a long task and must not be rounded into one (header note, defect G1).
-      expect(
-        dist.maxExactMs,
-        `${ENGINE_LABEL}: worst main-thread gap ${dist.maxMs} ms`,
-      ).toBeLessThan(LONG_TASK_MS);
+      // --- the criterion (clause 2a: gated on Chromium only) ----------------
+      // Firefox/WebKit reach here too — everything above asserted — but report
+      // instead of gate, per docs/DR-WP10-clause2-decision.md (researcher
+      // sign-off 2026-08-04): their red numbers reproduce with nothing under
+      // test, so a budget asserted there measures the browser, not this code.
+      if (GATES_LONG_TASK_BUDGET) {
+        expect(
+          dist.longTasks,
+          `${ENGINE_LABEL}: ${dist.longTasks} main-thread gap(s) >= ${LONG_TASK_MS} ms while ` +
+            `streaming ${framesSeen} frames (max ${dist.maxMs} ms, p99 ${dist.p99Ms} ms)`,
+        ).toBe(0);
+        // `maxExactMs`, never the rounded `maxMs` — a 49.9951 ms worst gap is not
+        // a long task and must not be rounded into one (header note, defect G1).
+        expect(
+          dist.maxExactMs,
+          `${ENGINE_LABEL}: worst main-thread gap ${dist.maxMs} ms`,
+        ).toBeLessThan(LONG_TASK_MS);
+      } else {
+        // eslint-disable-next-line no-console -- clause 2b: reported, not gated.
+        console.log(
+          `[wp10-uithread] ${ENGINE_LABEL} clause 2b (reported, ungated): ` +
+            `${dist.longTasks} gap(s) >= ${LONG_TASK_MS} ms, max ${dist.maxMs} ms — ` +
+            `see docs/DR-WP10-clause2-decision.md`,
+        );
+      }
     } finally {
       w.terminate();
     }

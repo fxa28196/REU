@@ -104,8 +104,10 @@ export function browserGateSpec(artifacts: readonly ArtifactRef[] = browserArtif
     suite: "the WP10 browser acceptance matrix (npm run test:browser)",
     evidence:
       "every WP10 acceptance clause — snapshot-replay byte identity IN A WORKER, the UI-thread " +
-      "long-task budget at 800 and at 6,842 residents, Compare's two synced workers — plus the " +
-      "three-engine cross-engine determinism digests. None of it is measured anywhere else.",
+      "long-task budget at 800 and at 6,842 residents (clause 2a, GATED on Chromium; measured and " +
+      "reported ungated on Firefox/WebKit as clause 2b per docs/DR-WP10-clause2-decision.md), " +
+      "Compare's two synced workers — plus the three-engine cross-engine determinism digests. " +
+      "None of it is measured anywhere else.",
     artifacts,
     text: {
       strictHead:

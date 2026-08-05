@@ -122,6 +122,15 @@
  * renegotiation of a WP10 acceptance criterion and needs sign-off under plan
  * §9.3, not an edit made inside this file.
  *
+ * **That sign-off has now happened: `docs/DR-WP10-clause2-decision.md`,
+ * researcher decision 2026-08-04.** The clause is restated as 2a (budget gated,
+ * Chromium only) and 2b (measured and reported, ungated, Firefox and WebKit).
+ * This file implements exactly that: the criterion assertions below execute when
+ * `GATES_LONG_TASK_BUDGET` is true; every other assertion — non-vacuity, the
+ * positive control, the probe-tail guard — still gates in all three engines. The
+ * measurements and history in this header are retained untouched because they
+ * are the evidence the decision was made on.
+ *
  * One consequence follows immediately and is not optional: **this gate is
  * non-deterministic.** Of five isolated Firefox runs of the gated configuration
  * on 2026-08-03, three were red and two would have passed. Isolated re-runs on
@@ -166,7 +175,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { RunStatus, StreamMessage } from "../../src/worker/protocol.js";
-import { ENGINE_LABEL, initPayload, startWorker } from "./harness.js";
+import { ENGINE_LABEL, GATES_LONG_TASK_BUDGET, initPayload, startWorker } from "./harness.js";
 import { LongTaskProbe } from "./probe.js";
 
 /** The shipping population (plan §3.3: n = 6,842) and the longest horizon. */
@@ -341,32 +350,46 @@ describe(`UI-thread responsiveness at PRODUCTION scale [${ENGINE_LABEL}]`, () =>
         0,
       );
 
-      // --- the criterion -----------------------------------------------------
-      // STILL RED: Firefox always (2 long tasks, 150-206 ms isolated on
-      // 2026-08-03), WebKit whenever the box is shared. The header's original
-      // attribution to the snapshot ring is WITHDRAWN; DR-WP10-uithread-perf
-      // §6.3 reproduces the same 138-143 ms signature on a cold Firefox page
-      // with no worker and nothing under test, so this assertion is measuring
-      // the browser as much as the code.
+      // --- the criterion (clause 2a: gated on Chromium only) -----------------
+      // History, kept because the numbers justify the gating: Firefox was red
+      // always (2 long tasks, 150-206 ms isolated on 2026-08-03), WebKit
+      // whenever the box was shared. The header's original attribution to the
+      // snapshot ring is WITHDRAWN; DR-WP10-uithread-perf §6.3 reproduces the
+      // same 138-143 ms signature on a cold Firefox page with no worker and
+      // nothing under test, so this assertion was measuring the browser as much
+      // as the code.
       //
-      // That is an argument for making the clause DIFFERENTIAL against an
-      // empty-page control (DR §8.1) — which is a renegotiation of a WP10
-      // acceptance criterion and needs sign-off under plan §9.3. It is NOT an
-      // argument for widening the threshold, shrinking the population,
-      // shortening the horizon, capping the frame rate, or narrowing the clause
-      // to Chromium. All five are available, all five would be dishonest, and
-      // DR §6.3 shows the first three would not even work.
-      expect(
-        dist.longTasks,
-        `${ENGINE_LABEL}: ${dist.longTasks} main-thread gap(s) >= ${LONG_TASK_MS} ms at ` +
-          `${RESIDENTS} residents / ${HOURS} h (max ${dist.maxMs} ms, p99.9 ${dist.p999Ms} ms, ` +
-          `worst: ${dist.worstMs.join(", ")} ms). The WP10 clause "UI thread long-task-free ` +
-          `(< 50 ms) at max speed" does not hold at production scale in this engine.`,
-      ).toBe(0);
-      expect(
-        dist.maxMs,
-        `${ENGINE_LABEL}: worst main-thread gap ${dist.maxMs} ms at production scale`,
-      ).toBeLessThan(LONG_TASK_MS);
+      // An earlier revision of this comment listed "narrowing the clause to
+      // Chromium" among five dishonest moves. The dishonest version was
+      // narrowing it SILENTLY, inside this file. What happened instead is the
+      // §9.3 route this comment demanded: docs/DR-WP10-clause2-decision.md,
+      // researcher sign-off 2026-08-04 — budget gated on Chromium (2a), the
+      // identical measurement still taken and PRINTED on Firefox and WebKit
+      // (2b), thresholds/population/horizon/probe untouched, and the
+      // three-engine determinism matrix deliberately kept. The differential
+      // empty-page control (DR §8.1) was considered and not chosen: both of its
+      // arms sit on a positional, bimodal cold-start event, so it is
+      // noise-dominated in exactly the runs that matter.
+      if (GATES_LONG_TASK_BUDGET) {
+        expect(
+          dist.longTasks,
+          `${ENGINE_LABEL}: ${dist.longTasks} main-thread gap(s) >= ${LONG_TASK_MS} ms at ` +
+            `${RESIDENTS} residents / ${HOURS} h (max ${dist.maxMs} ms, p99.9 ${dist.p999Ms} ms, ` +
+            `worst: ${dist.worstMs.join(", ")} ms). The WP10 clause 2a "UI thread long-task-free ` +
+            `(< 50 ms) at max speed, on Chromium" does not hold at production scale.`,
+        ).toBe(0);
+        expect(
+          dist.maxMs,
+          `${ENGINE_LABEL}: worst main-thread gap ${dist.maxMs} ms at production scale`,
+        ).toBeLessThan(LONG_TASK_MS);
+      } else {
+        // eslint-disable-next-line no-console -- clause 2b: reported, not gated.
+        console.log(
+          `[wp10-uithread-scale] ${ENGINE_LABEL} clause 2b (reported, ungated): ` +
+            `${dist.longTasks} gap(s) >= ${LONG_TASK_MS} ms, max ${dist.maxMs} ms, ` +
+            `worst: ${dist.worstMs.join(", ")} ms — see docs/DR-WP10-clause2-decision.md`,
+        );
+      }
     } finally {
       w.terminate();
     }

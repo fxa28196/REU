@@ -56,6 +56,37 @@ export const ENGINE_LABEL: string =
   (globalThis as { navigator?: { userAgent?: string } }).navigator?.userAgent ?? "unknown-engine";
 
 /**
+ * Which engine this run is in — for the ONE place gating differs by engine.
+ *
+ * Per `docs/DR-WP10-clause2-decision.md` (researcher sign-off, 2026-08-04), the
+ * UI-thread long-task budget (clause 2a) is asserted on Chromium only; Firefox
+ * and WebKit run the identical measurement and report it ungated (clause 2b),
+ * because their red numbers reproduce on a cold page with nothing under test.
+ * Every OTHER gate — determinism digests, snapshot replay, transfer semantics,
+ * non-vacuity, positive controls — runs unconditionally in all three engines.
+ *
+ * Order matters: Chromium's UA contains `AppleWebKit` too, and everything
+ * contains `Mozilla`, so Firefox is tested first, then Chrome, then bare WebKit.
+ */
+export const ENGINE_KIND: "chromium" | "firefox" | "webkit" | "unknown" = ENGINE_LABEL.includes("Firefox")
+  ? "firefox"
+  : ENGINE_LABEL.includes("Chrome")
+    ? "chromium"
+    : ENGINE_LABEL.includes("AppleWebKit")
+      ? "webkit"
+      : "unknown";
+
+/**
+ * Whether this engine GATES the long-task budget, or only reports it.
+ *
+ * Deliberately `!== firefox && !== webkit` rather than `=== chromium`: if a UA
+ * string ever changes shape and detection returns `"unknown"`, the budget is
+ * asserted — a possible false red that names itself — instead of the only gated
+ * engine silently joining the report-only set. Fail loud, never un-gate quietly.
+ */
+export const GATES_LONG_TASK_BUDGET: boolean = ENGINE_KIND !== "firefox" && ENGINE_KIND !== "webkit";
+
+/**
  * Start a worker, subscribe to its stream, and load the synthetic graph.
  *
  * `onMessage` runs on the UI thread for every stream message, which is where the
