@@ -19,11 +19,75 @@ import type { ChangeEvent, CSSProperties, JSX } from "react";
 // Pure logic (exported for tests)
 // ---------------------------------------------------------------------------
 
-/** Playback speeds: simulated minutes per wall second, or "max" (unpaced). */
-export const SPEED_SETTINGS = [1, 10, 60, 600, "max"] as const;
+/**
+ * Playback speeds: **simulated minutes per wall-clock second**, or `"max"`
+ * (unpaced, run as fast as the worker can).
+ *
+ * One tick is one simulated minute, so a setting of `1` advances one tick per
+ * second and `0.1` advances one tick every ten seconds.
+ *
+ * The five settings at or below `1` were added 2026-08-05 because the previous
+ * scale bottomed out at "one simulated minute per second" and, more to the
+ * point, **nothing was paced at all**: `useSimRun` called `runFreely()` with no
+ * bound, so every setting including `1` ran flat out and a 312-hour run
+ * finished in about five seconds. The selector was cosmetic. It is now wired
+ * (see `PACING_FRAME_MS` and `pacingFor`), and the slow half exists so the
+ * evacuation is actually watchable: at `0.1` a resident takes a visible step
+ * every ten seconds, which is the scale at which street-by-street routing can
+ * be followed by eye.
+ *
+ * Ordered slowest to fastest so the select reads like a dial, and deliberately
+ * SYMMETRIC about `1`: five settings slower than one simulated minute per
+ * second and five faster, so "as many ways to go slow as to go fast" is a
+ * property of the list rather than a wish. `app/test/param-meta.test.ts`
+ * asserts that symmetry, so adding a fast setting without a slow one fails.
+ */
+export const SPEED_SETTINGS = [0.02, 0.05, 0.1, 0.2, 0.5, 1, 5, 10, 60, 600, 3600, "max"] as const;
 export type SpeedSetting = (typeof SPEED_SETTINGS)[number];
 
 export const MINUTES_PER_DAY = 1440;
+
+/**
+ * The pacing loop's wall-clock step, in milliseconds.
+ *
+ * 100 ms rather than one animation frame: the loop is a chain of worker
+ * round-trips, and asking for 60 of those a second spends more time in
+ * `postMessage` than in the model. At 100 ms the fastest paced setting still
+ * gets ten batches a second, which the display ceiling
+ * (`FREE_RUN_MAX_FPS = 60`) is already well above.
+ */
+export const PACING_FRAME_MS = 100;
+
+export interface PacingStep {
+  /** Ticks to advance in one step. Always at least 1: a step that advanced
+   *  nothing would spin the worker without moving the simulation. */
+  readonly ticks: number;
+  /** Wall-clock milliseconds to wait AFTER that step. */
+  readonly waitMs: number;
+}
+
+/**
+ * Translate a speed setting into "advance N ticks, then wait M ms".
+ *
+ * Two regimes, and the split is the reason this is a function rather than a
+ * multiplication:
+ *
+ *  - **Slower than one tick per frame** (below 10 sim-min/s): advance exactly
+ *    one tick and wait `1000 / speed` ms. Fractional ticks do not exist, so the
+ *    only honest way to go slower is to wait longer.
+ *  - **Faster**: advance a whole frame's worth and wait one frame. Rounding is
+ *    `max(1, round(...))`, so the rate is approximate at the boundary and
+ *    exact everywhere it matters.
+ *
+ * Pure and exported so the arithmetic is tested without a worker.
+ */
+export function pacingFor(speed: Exclude<SpeedSetting, "max">): PacingStep {
+  const msPerTick = 1000 / speed;
+  if (msPerTick >= PACING_FRAME_MS) {
+    return { ticks: 1, waitMs: msPerTick };
+  }
+  return { ticks: Math.max(1, Math.round((speed * PACING_FRAME_MS) / 1000)), waitMs: PACING_FRAME_MS };
+}
 
 /**
  * Format a tick as a simulated wall clock: `"Day D HH:MM"`.
@@ -62,8 +126,52 @@ export function parseSpeedSetting(raw: string): SpeedSetting {
   return 1;
 }
 
+/**
+ * Label a speed in the unit a viewer can actually reason about.
+ *
+ * `"1x"` meant nothing here: one times WHAT? These say how much simulated time
+ * passes per real second, which is the only question a viewer is asking when
+ * they reach for this control. Below one simulated minute per second the rate
+ * is inverted into "one minute per N seconds", because "0.1 min/s" is a worse
+ * way of saying "a minute every ten seconds".
+ */
 export function speedLabel(setting: SpeedSetting): string {
-  return setting === "max" ? "max" : `${setting}x`;
+  if (setting === "max") {
+    return "max (unpaced)";
+  }
+  if (setting < 1) {
+    return `1 sim-min / ${Math.round(1 / setting)}s`;
+  }
+  if (setting < 60) {
+    return `${setting} sim-min / s`;
+  }
+  const hours = setting / 60;
+  return `${Number.isInteger(hours) ? hours : hours.toFixed(1)} sim-h / s`;
+}
+
+/**
+ * How long a full run takes at a given speed, in wall-clock seconds.
+ *
+ * Rendered beside the selector so nobody picks the slowest setting on a
+ * 455-hour run without being told that is a three-day wait. `null` for `"max"`,
+ * which is bounded by the machine and not by the clock.
+ */
+export function estimatedRunSeconds(setting: SpeedSetting, endTick: number): number | null {
+  return setting === "max" ? null : endTick / setting;
+}
+
+/** `estimatedRunSeconds` rendered for humans: "about 4 min", "about 2.3 days". */
+export function formatDuration(seconds: number): string {
+  if (seconds < 90) {
+    return `about ${Math.round(seconds)} s`;
+  }
+  if (seconds < 5400) {
+    return `about ${Math.round(seconds / 60)} min`;
+  }
+  if (seconds < 172_800) {
+    return `about ${(seconds / 3600).toFixed(1)} h`;
+  }
+  return `about ${(seconds / 86_400).toFixed(1)} days`;
 }
 
 /**
@@ -177,6 +285,8 @@ export function Scrubber(props: ScrubberProps): JSX.Element {
     onScrub(Number(event.currentTarget.value));
   };
 
+  const estimatedSeconds = estimatedRunSeconds(speed, endTick);
+
   const handleSpeed = (event: ChangeEvent<HTMLSelectElement>): void => {
     onSpeed(parseSpeedSetting(event.currentTarget.value));
   };
@@ -250,6 +360,17 @@ export function Scrubber(props: ScrubberProps): JSX.Element {
           ))}
         </select>
       </label>
+      {/* The honest cost of the choice, live. The slowest setting on a 455-hour
+          run is a multi-day wait, and a viewer should learn that from the
+          control rather than from waiting. */}
+      {estimatedSeconds === null ? null : (
+        <span
+          style={{ color: "var(--ws-muted)", fontSize: "0.72rem", whiteSpace: "nowrap" }}
+          title="Wall-clock time for the FULL run window at this speed, if left to play"
+        >
+          full run: {formatDuration(estimatedSeconds)}
+        </span>
+      )}
 
       <button
         type="button"

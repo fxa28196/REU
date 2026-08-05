@@ -64,6 +64,7 @@ import type { ParamName } from "@websim/shared/schema";
 import { PARAM_META, WORST_FAMILY_CLOSURES_CODE, maxSimulationHours } from "@websim/shared/schema";
 import type { RunPhase, RunStatus, RunSummary, StreamMessage, WaveProgressEvent } from "@websim/engine/worker";
 
+import type { SpeedSetting } from "../controls/Scrubber.js";
 import type { BadgeState, ProvenanceClass, Screen } from "../index.js";
 import type { FrameSnapshot, MetricSeries } from "./stream.js";
 import { appendMetrics, emptyMetricSeries, latestFrameOf } from "./stream.js";
@@ -225,6 +226,18 @@ export function reduceStream(state: RunStreamState, message: StreamMessage): Run
 export interface AppStore {
   screen: Screen;
   setScreen(screen: Screen): void;
+  /**
+   * Playback pacing, in simulated minutes per wall-clock second (or `"max"`).
+   *
+   * It lives in the store rather than in the Run screen's local state for one
+   * reason: the pacing loop in `useSimRun` re-reads it between legs, so moving
+   * the selector DURING a run takes effect at the next leg instead of at the
+   * next run. Kept out of `RunConfig` deliberately: it is a property of
+   * watching, not of the experiment, and it must never reach the executed
+   * manifest or a permalink diff.
+   */
+  speed: SpeedSetting;
+  setSpeed(speed: SpeedSetting): void;
   presetId: PresetId | null;
   /**
    * Mirror of {@link presetId} under the name sibling WP11 components consume.
@@ -289,6 +302,12 @@ export const INITIAL_PRESET_ID: PresetId = "default_fresh_run";
 
 export const useAppStore = create<AppStore>()((set, get) => ({
   screen: "run",
+  // Default "max" preserves the behaviour every existing run and test assumes;
+  // the slow settings are opt-in.
+  speed: "max",
+  setSpeed: (speed) => {
+    set({ speed });
+  },
   setScreen: (screen) => {
     set({ screen });
   },

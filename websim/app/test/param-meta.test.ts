@@ -32,7 +32,11 @@ import {
   presetGroupLabel,
 } from "../src/controls/paramMeta.js";
 import {
+  PACING_FRAME_MS,
   SPEED_SETTINGS,
+  estimatedRunSeconds,
+  formatDuration,
+  pacingFor,
   formatTickClock,
   markerLeftPercent,
   parseSpeedSetting,
@@ -238,12 +242,91 @@ describe("Scrubber pure helpers", () => {
   });
 
   it("round-trips every speed setting through its select value", () => {
-    expect([...SPEED_SETTINGS]).toEqual([1, 10, 60, 600, "max"]);
+    expect([...SPEED_SETTINGS]).toEqual([0.02, 0.05, 0.1, 0.2, 0.5, 1, 5, 10, 60, 600, 3600, "max"]);
     for (const setting of SPEED_SETTINGS) {
       expect(parseSpeedSetting(String(setting))).toBe(setting);
     }
     expect(parseSpeedSetting("garbage")).toBe(1);
-    expect(speedLabel(60)).toBe("60x");
-    expect(speedLabel("max")).toBe("max");
+  });
+
+  it("offers as many settings BELOW real-time as above it", () => {
+    // The user-facing requirement that produced the slow half: "as many as
+    // there are to go fast, make that to go slow at those speed intervals".
+    // `1` (one simulated minute per second) is the pivot.
+    const paced: number[] = SPEED_SETTINGS.flatMap((s) => (typeof s === "number" ? [s] : []));
+    const slower = paced.filter((s) => s < 1);
+    const faster = paced.filter((s) => s > 1);
+    expect(slower.length, "no slow settings").toBeGreaterThan(0);
+    expect(slower.length, "asymmetric: add a slow setting for every fast one").toBe(faster.length);
+    expect(paced).toEqual([...paced].sort((a, b) => a - b)); // reads like a dial
+  });
+
+  it("labels a speed in units a viewer can reason about", () => {
+    // Sub-real-time rates invert: "a minute every 10 seconds" beats "0.1 min/s".
+    expect(speedLabel(0.02)).toBe("1 sim-min / 50s");
+    expect(speedLabel(0.05)).toBe("1 sim-min / 20s");
+    expect(speedLabel(0.1)).toBe("1 sim-min / 10s");
+    expect(speedLabel(0.2)).toBe("1 sim-min / 5s");
+    expect(speedLabel(0.5)).toBe("1 sim-min / 2s");
+    expect(speedLabel(1)).toBe("1 sim-min / s");
+    expect(speedLabel(10)).toBe("10 sim-min / s");
+    expect(speedLabel(60)).toBe("1 sim-h / s");
+    expect(speedLabel(600)).toBe("10 sim-h / s");
+    expect(speedLabel(3600)).toBe("60 sim-h / s");
+    expect(speedLabel("max")).toBe("max (unpaced)");
+  });
+
+  it("paces a run without ever advancing zero ticks", () => {
+    // The whole defect this replaced was that NOTHING was paced. The one thing
+    // a pacing function must never do is return 0 ticks, which would spin the
+    // worker forever without moving the simulation.
+    for (const setting of SPEED_SETTINGS) {
+      if (setting === "max") {
+        continue;
+      }
+      const step = pacingFor(setting);
+      expect(step.ticks, `speed ${setting} advanced no ticks`).toBeGreaterThanOrEqual(1);
+      expect(Number.isInteger(step.ticks), `speed ${setting} advanced a fractional tick`).toBe(true);
+      expect(step.waitMs, `speed ${setting} did not wait`).toBeGreaterThan(0);
+    }
+  });
+
+  it("goes slower by WAITING longer, not by advancing fractional ticks", () => {
+    // Below one tick per frame the only honest way to slow down is to wait.
+    expect(pacingFor(0.02)).toEqual({ ticks: 1, waitMs: 50_000 });
+    expect(pacingFor(0.1)).toEqual({ ticks: 1, waitMs: 10_000 });
+    expect(pacingFor(0.2)).toEqual({ ticks: 1, waitMs: 5_000 });
+    expect(pacingFor(0.5)).toEqual({ ticks: 1, waitMs: 2_000 });
+    expect(pacingFor(1)).toEqual({ ticks: 1, waitMs: 1_000 });
+    // At and above one tick per frame it batches a frame's worth instead.
+    expect(pacingFor(10)).toEqual({ ticks: 1, waitMs: PACING_FRAME_MS });
+    expect(pacingFor(60)).toEqual({ ticks: 6, waitMs: PACING_FRAME_MS });
+    expect(pacingFor(3600)).toEqual({ ticks: 360, waitMs: PACING_FRAME_MS });
+  });
+
+  it("delivers the rate it advertises", () => {
+    // ticks-per-second implied by the pacing must match the setting itself,
+    // which is the only thing the label is promising the viewer.
+    for (const setting of SPEED_SETTINGS) {
+      if (setting === "max") {
+        continue;
+      }
+      const { ticks, waitMs } = pacingFor(setting);
+      expect((ticks * 1000) / waitMs, `speed ${setting} does not deliver its rate`).toBeCloseTo(
+        setting,
+        6,
+      );
+    }
+  });
+
+  it("tells the viewer how long a run will actually take", () => {
+    // 312 h = 18,720 ticks. Picking the slowest setting on a full run is a
+    // multi-day wait and the UI must say so rather than let someone discover it.
+    expect(estimatedRunSeconds("max", 18_720)).toBeNull();
+    expect(estimatedRunSeconds(1, 18_720)).toBe(18_720);
+    expect(formatDuration(18_720)).toBe("about 5.2 h");
+    expect(formatDuration(187_200)).toBe("about 2.2 days");
+    expect(formatDuration(45)).toBe("about 45 s");
+    expect(formatDuration(600)).toBe("about 10 min");
   });
 });
