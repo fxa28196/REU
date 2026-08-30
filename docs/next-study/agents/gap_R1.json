@@ -1,0 +1,107 @@
+{
+ "key": "R1",
+ "title": "Independent shelter-use observations",
+ "analysis": {
+  "requirement": "R1 — Independent shelter-use observations: multi-shelter, multi-period collection of hourly capacity/occupancy, arrival/departure times, turnaways and refusal reasons, transportation requests/trips, outreach contacts and communication timing, awareness, privacy-protected origin, mobility/access barriers, opening hours and staffing interruptions; model finalized on one period and tested frozen on a later smoke period.",
+  "exists_defensible": [
+   "The one contemporaneous occupancy observation, honestly framed: Street Roots 2020-09-16, ~90 at Oregon Convention Center + ~40 at Charles Jordan (~130 of 198 beds), stated as a censored bracket 1.5-15.6x over-admission with 1.52x as the uncensored lower edge (docs/final/README_RESULTS.md:237-262; docs/science/phase2-human-agents/04-DECISION.md:65-80). Model side verified: sheltered=198, refused_all_full=1822 in docs/runs/historical-reference/histref-n2037-seed42/simulation.json:111.",
+   "Machine enforcement of honest calibration wording: claims linter regex fails any '1.52x over-predict' sentence lacking '15.6' on the same line (docs/claims.yaml:129-151; scripts/lint_claims.py), preventing regression to a naked point claim.",
+   "One event-specific behavioral survey, correctly caveated: PSU 'Stories from the Outside' (Hines et al. 2021), N=73 Portland unhoused adults about THIS event — 65% never heard of the shelters (26/73 aware -> pAwareInit=0.356), 10/26 of the aware attempted access (04-DECISION.md:42-63; consumed by Geography/data/registry/variables.csv rows V29-V30). Caveats (n=73, ~9-month retrospective, non-probability sample) are recorded in-repo.",
+   "One communication-timing datum, labeled as such: 211 waits >1 hour and only 21 clean-air-shelter calls on Sept 15, from the same Street Roots article (04-DECISION.md:71).",
+   "Daily-resolution opening/closing dates for the 2020 shelters from JOHS releases, carried into the model input with per-row provenance including the admission that capacity 99 is 'nightly_cap_newsroom_unconfirmed' (Geography/data/shelters/shelters_2020-09.csv:2-4) — partial, daily-only coverage of the 'opening hours/temporary closures' item.",
+   "An explicit ledger of what is NOT observed: assumptions.csv A-04 (capacity unconfirmed, blocking), A-12 (universal awareness contradicted by the 65% figure, blocking), A-31/V41 ('a real outreach-contact rate for this event does not exist in the record') (Geography/data/registry/assumptions.csv; variables.csv row V41).",
+   "The repo's own candid verdict that the two occupancy numbers are 'the only quantitative behavioural calibration targets this project has' and that the derived ~6-7% uptake is a derivation, not a statistic (04-DECISION.md:74-80).",
+   "The manuscript's calibration section concedes the requirement's core point in plain terms: 'The model is not calibrated against observed shelter occupancy, because no suitable record exists... this chapter reports model-to-model comparisons rather than predictions' (docs/chapter/Capacity_Is_Not_Access.tex:929-935).",
+   "Non-event present-day aggregates exist as transcriptions (ASR FY25 88% average nightly occupancy, 6,731 individuals served; Pathways 2026: 67% used a shelter in 6 months) — weak but real context anchors (docs/evidence-package-2026/DATA_PROVENANCE.md:132,214-232) [REPORTED: source PDFs not opened by this audit]."
+  ],
+  "missing": [
+   "Hourly (or any sub-nightly) shelter occupancy time series — ABSENT for the 2020 event, for any later smoke period, and for the present-day system (ASR 88% is one annual average; the county dashboard was not machine-readable per docs/final/SHELTER_CAPACITY_AUDIT.md as quoted in the evidence inventory).",
+   "Arrival/departure time records — ABSENT; every arrival time in docs/runs/ is model output.",
+   "Turnaway counts and refusal reasons — ABSENT; the 550/244 refusal figures are entirely model output with zero observed turnaway records anywhere in the repo.",
+   "Transportation request/trip data — ABSENT; one JOHS press-release sentence that transport was arranged via 211 (docs/science/DATA_SOURCES.md:62-64 per evidence inventory); the model itself contains no transport mechanism at all.",
+   "Outreach contact logs — ABSENT; registry V41 states explicitly that no real outreach-contact rate for this event exists (Geography/data/registry/variables.csv row V41).",
+   "Communication-timing dataset — ABSENT beyond the single one-day 211 sentence (04-DECISION.md:71).",
+   "Origin areas of actual shelter users — ABSENT at any resolution; the encampment CSV is complaint reports about campsites, not shelter-user origins.",
+   "Mobility-limitation and access-barrier measurements among actual event shelter users — ABSENT; barriers documented only qualitatively, and 'no study anywhere provides a fitted quantitative choice model for unsheltered people and shelters' (04-DECISION.md:82-89).",
+   "Staffing-interruption / intra-period closure records — ABSENT; staffing-as-constraint is recorded as inference, not source (SHELTER_CAPACITY_AUDIT.md:163-166 per evidence inventory).",
+   "A second smoke period with any shelter-use observation — ABSENT; the project has one county, one event, one observation night. Out-of-sample temporal validation does not exist.",
+   "A frozen-model prospective test — ABSENT; no freeze protocol, no held-out period, and the E9 occupancy calibration that would even fit the model to the ONE observation is deferred with no run archive (no E9 family in docs/runs/).",
+   "Primary agency record of Sept-2020 capacity or occupancy — ABSENT; A-04 remains blocking and the after-action report was never obtained.",
+   "Awareness measured contemporaneously (rather than 9 months retrospectively) — ABSENT."
+  ],
+  "implementable_with_existing_data": [
+   "Formal censored-data calibration from the existing single observation: treat OCC ~90 as right-censored at 99 and CJ ~40 as observed, build a censored likelihood over (pAware, pAttempt|aware) with Beta priors from the Hines survey counts (26/73, 10/26 — Geography/data/registry/variables.csv rows V29-V30; 04-DECISION.md:42-80), and propagate capacity-unit uncertainty from A-04. Inputs all in-repo: Geography/data/shelters/shelters_2020-09.csv, docs/runs/historical-reference/histref-n2037-seed42/simulation.json, the registry CSVs. This converts the ad-hoc 1.5-15.6x bracket into a defensible censored-calibration statement (still one data point — it cannot substitute for R1's new observations).",
+   "Internal-consistency test of the two independent behavioral anchors: derived uptake 130/~2,000 ≈ 6-7% vs survey-implied aware-x-attempt 0.356 x 0.385 ≈ 13.7% (both already documented, 04-DECISION.md:74-76) — quantify the tension, with sampling uncertainty, as a published triangulation exercise.",
+   "Temporal stability split of the encampment input: irp_campsite_reports_sample.csv carries per-row inc_date spanning 2025-01..2026-07 (header verified), so an early/late split can test whether the spatial demand surface (and hence C's site choices and all access figures) is stable over ~18 months — a proxy robustness check on the origin-distribution input, NOT shelter-use validation.",
+   "Execute the deferred E9 occupancy calibration: fit alphaHazard so the decision-layer historical run reproduces ~130 rather than 198, then re-derive the bracket — model + target + registered protocol all exist in-repo (docs/critique-response/13-PHASE-E-PREDICTIONS.md records alphaHazard=-8.0 as a scored MISS with corrected ~-8.7 noted, not adopted). Requires model runs (out of scope for this read-only audit) but no new data.",
+   "Manuscript repair implementable today: reconcile Capacity_Is_Not_Access.tex:74-76 (abstract bracket) with tex:929-935 (no record exists), import the Street Roots/README_RESULTS provenance into the manuscript, and fix the stale md abstract claim at capacity-is-not-access-source.md:27.",
+   "Coarse present-day sanity anchor: compare arm-A modeled steady occupancy fraction against the ASR FY25 88% average nightly occupancy transcription (docs/evidence-package-2026/DATA_PROVENANCE.md) — unit- and period-mismatched, publishable only as a labeled plausibility check."
+  ],
+  "needs_new_empirical_data": [
+   "Hourly occupancy + capacity census at multiple shelters during a future smoke activation — instrument: standardized hourly headcount log at each intake desk, operator-completed, aggregate-only (no identities).",
+   "Arrival/departure timestamps — instrument: door log recording entry/exit time to the hour; or timestamped bed-assignment records.",
+   "Turnaway tally with refusal-reason taxonomy (capacity / pets / belongings / dependents / behavioral / other) — instrument: one-page tick-sheet at the door per shift.",
+   "Transportation requests vs completed trips — instrument: dispatch log kept by 211/outreach teams recording request time, pickup, completion.",
+   "Outreach contact log — instrument: per-contact form (timestamp, coarse location, information delivered, transport offered), giving the currently unsourced lambdaOutreachPerDay (A-31) a measured value.",
+   "Contemporaneous awareness survey — instrument: brief intercept survey during/immediately after the event replicating Hines 2021 prospectively at larger N with a defined sampling frame.",
+   "Origin area at privacy-protecting resolution — instrument: one intake question coded to coarse zones with k>=5 per cell, consistent with the project's k=5 reporting posture (never point coordinates).",
+   "Mobility-limitation and access-barrier screener at intake — instrument: 3-5 item self-report (mobility aid, walking-distance limit, barrier encountered en route).",
+   "Opening hours, staffing interruptions, temporary closures — instrument: operator event log (open/close/interruption timestamps, cause).",
+   "All of the above repeated across at least two smoke periods, with the model parameter-frozen after period 1 — this is the only way to satisfy the requirement's frozen-later-period clause; no amount of 2020 archival recovery alone can."
+  ],
+  "needs_external_acquisition": [
+   "Multnomah County JOHS after-action report and clean-air shelter activation records for Sept 2020 — candidate source: JOHS / Multnomah County Emergency Management; the repo records these were never obtained and A-04 remains blocking (SHELTER_CAPACITY_AUDIT.md:158-166 per evidence inventory).",
+   "Primary capacity documentation resolving the 99-'bed' unit (cots vs positions vs persons) — candidate source: county press office records, Oregon Convention Center / Portland Parks operating agreements (capacity_basis is 'nightly_cap_newsroom_unconfirmed' in Geography/data/shelters/shelters_2020-09.csv:2-3).",
+   "211info call logs for Sept 2020 (call volumes, wait times, shelter-referral counts by day) — candidate source: 211info; would replace the single-sentence communication-timing evidence base.",
+   "Per-facility nightly occupancy underlying the county shelter dashboard — candidate source: JOHS data team (the repo states the Tableau dashboard was not machine-readable).",
+   "HMIS (Homeless Management Information System) de-identified stay records for the event window and for later smoke periods — candidate source: Multnomah County HMIS lead agency; would yield arrival/departure distributions and repeat-stay structure.",
+   "Red Cross / national shelter system records if the 2020 sites were registered there — candidate source: American Red Cross National Shelter System (availability unchecked).",
+   "Records of any later clean-air shelter activations in Multnomah County (post-2020 smoke episodes) — candidate source: JOHS; whether such activations occurred and were logged is UNKNOWN from the repo, but they are the only route to a same-city second-period test without waiting for a future event.",
+   "Shelter operator incident/staffing logs for Sept 2020 — candidate source: the two operating venues' managing agencies."
+  ],
+  "claims_exceeding_evidence": [
+   {
+    "claim": "Abstract: 'Compared against the one (approximate) observed occupancy record, the model over-admits by a censored bracket of 1.5–15.6x, so all absolute access figures are upper bounds.'",
+    "location": "docs/chapter/Capacity_Is_Not_Access.tex:74-76",
+    "why": "The manuscript's own Calibration subsection (tex:929-935, read directly) states no suitable occupancy record exists and none was located — the abstract asserts a calibration comparison the body denies, and the ~130/198 provenance (Street Roots 2020-09-16) appears nowhere in the manuscript, so a reviewer cannot verify the bracket from the submission alone. One of the two passages must change."
+   },
+   {
+    "claim": "'No observational occupancy record could be located, so these are model-to-model comparisons.'",
+    "location": "docs/chapter/capacity-is-not-access-source.md:27 (and md:287)",
+    "why": "Overreach in the opposite direction: the repo demonstrably possesses the Street Roots occupancy record and uses it as its calibration target (docs/final/README_RESULTS.md:252-259; 04-DECISION.md:65-80). The statement is stale against the project's own evidence base."
+   },
+   {
+    "claim": "'The present 36-facility system shelters 30.1% of residents' (present tense, unconditioned).",
+    "location": "docs/chapter/capacity-is-not-access-source.md:27, md:315",
+    "why": "With an admitted 1.5-15.6x over-admission against the only observation, and universal-awareness acknowledged as an upper-bound generator (tex:937-946), any present-tense absolute claim about the real system exceeds what one censored one-night newsroom count can support."
+   },
+   {
+    "claim": "'the same 6,842 spaces more than halve refusals depending only on placement' — refusal counts stated as system behavior.",
+    "location": "docs/chapter/capacity-is-not-access-source.md:319",
+    "why": "Zero observed turnaway records exist anywhere in the repo (ABSENT); every refusal count is model output under first-come-first-served admission with order-dependence itself an open blocking assumption (A-16). Refusal magnitudes have no empirical anchor at all."
+   },
+   {
+    "claim": "The historical reference run's 'only job is calibration.'",
+    "location": "docs/final/README_RESULTS.md:250",
+    "why": "No parameter was ever fit to the observation — the E9 occupancy calibration is deferred with no run archive, and alphaHazard was set by registered arithmetic and scored a MISS (docs/critique-response/13-PHASE-E-PREDICTIONS.md). What exists is a one-point comparison, not calibration; calling it calibration overstates the procedure."
+   },
+   {
+    "claim": "The sanctioned bracket wording treats 1.52x as a firm lower edge.",
+    "location": "docs/claims.yaml:129-151; docs/final/README_RESULTS.md:252-259",
+    "why": "The bracket's denominator rests on the newsroom-unconfirmed 99-per-site capacity with unstated units (capacity_basis='nightly_cap_newsroom_unconfirmed', Geography/data/shelters/shelters_2020-09.csv:2-3; A-04 blocking) and a single-night snapshot from one article. That uncertainty is not propagated into the bracket, and the manuscript's calibration discussion never carries the unit caveat."
+   }
+  ],
+  "proposed_methods": [
+   "Censored-likelihood calibration of the existing single observation: model OCC as right-censored at capacity, CJ as point-observed, with Beta priors on awareness (26/73) and attempt-given-aware (10/26) from Hines 2021; estimate via simulation-based inference (ABC or synthetic likelihood over the ABM), propagating A-04 capacity-unit uncertainty as an interval on the denominator — replaces the ad-hoc 1.5-15.6x bracket with a posterior.",
+   "Two-period freeze-and-test design: finalize all behavioral parameters (awareness, hazard coefficients, barrier costs, choice weights) on period-1 data, register the frozen configuration by commit hash (the project's existing pre-registration + claims-linter infrastructure in docs/critique-response/12- and 13-PREDICTIONS and scripts/lint_claims.py extends naturally), then score frozen predictions of period-2 hourly occupancy with proper scoring rules (CRPS/log score) and pre-declared pass/fail bands.",
+   "Time-to-event validation of the departure/arrival process: Kaplan-Meier curves of observed arrivals vs modeled arrivals; discrete-time logistic hazard regression with hourly PM2.5 as a time-varying covariate, directly testable against the model's Phase-E logistic hazard form (GisAgent hazard, V35-V41).",
+   "Turnaway-process validation: compare observed refusal counts and reason mix against modeled policy-vs-capacity refusals (the model already exports refused_count and policy_refused separately per OutcomeLogger), with an order-independent two-phase admission implementation first (closing A-16) so refusal magnitudes are not RNG-order artifacts.",
+   "Privacy-protecting origin analysis: hex-bin or neighborhood-level origin capture with k>=5 per cell; compare observed origin-to-shelter flow matrix against modeled flows via chi-square / earth-mover distance at the coarse resolution only, consistent with the project's k=5 reporting posture.",
+   "Measurement-error and sensitivity propagation: treat shelter capacity, the ~130 count, and the ~2,000 countywide denominator as intervals; report calibration ratios under all interpretations (interval arithmetic or Monte Carlo), so no single unverified newsroom number is load-bearing.",
+   "Hierarchical multi-event model once a second period exists: shelter-level and event-level random effects with partial pooling, so per-shelter occupancy curves inform a transferable uptake distribution rather than a single-event fit.",
+   "Triangulation test between independent anchors: formal comparison of survey-implied attempt share (0.356 x 0.385) vs occupancy-derived uptake (~6-7%), with binomial sampling uncertainty on both, published as a consistency statistic rather than resolved silently.",
+   "Encampment temporal-split robustness check (existing data): early-vs-late inc_date halves of irp_campsite_reports_sample.csv, re-running placement and access metrics to bound demand-surface drift — supporting, not substituting for, external validation."
+  ],
+  "priority_rationale": "This requirement is the project's single most load-bearing external-validity gap, and the repo knows it: 04-DECISION.md:78-80 states the two occupancy numbers (~90/99 and ~40/99, one night, one newspaper) are 'the only quantitative behavioural calibration targets this project has', and the manuscript's calibration section concedes the model 'is not calibrated against observed shelter occupancy' (tex:929-935). Everything absolute in the deliverables — 30.1%/91.6%/96.0% access, 550/244 refusals, the mobility-gap trajectory, all dose figures — sits inside an admitted 1.5-15.6x over-admission bracket whose lower edge itself rests on a newsroom-unconfirmed capacity with unstated units (A-04, blocking, shelters_2020-09.csv). The comparative claims (B vs C, scenario D triage, the knife-edge sweep) survive only under the untested assumption that behavioral error cancels across arms — an assumption no same-event data can test and only a frozen later-period design can. Until R1 is met, the work is defensible solely as a geographic upper-bound/counterfactual analysis, which the calibration section correctly claims but the tex abstract (tex:74-76), the md abstract's present-tense 30.1% sentence, and the refusal-count headlines all exceed. R1 also gates policy relevance directly: refusal and turnaway findings cannot inform county siting or triage decisions while zero observed turnaway, arrival, transport, or outreach records exist anywhere. Immediate sequencing: (1) fix the tex-internal calibration contradiction and import the Street Roots provenance into the manuscript (editing, zero new data); (2) attempt archival acquisition (JOHS after-action, 211info logs, HMIS extracts) to thicken the 2020 anchor and resolve A-04; (3) stand up the prospective multi-shelter protocol with a pre-registered freeze, because no amount of 2020 archival recovery can satisfy the later-period frozen-test clause."
+ }
+}

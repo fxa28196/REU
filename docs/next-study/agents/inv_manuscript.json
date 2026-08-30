@@ -1,0 +1,262 @@
+{
+ "summary": "The manuscript exists in two diverging forms. docs/chapter/capacity-is-not-access-source.md declares itself superseded (line 1) by docs/chapter/Capacity_Is_Not_Access.tex, and the two differ materially: the tex adds a scenario D (10% triage reserve), a capacity sweep, a first-hour \"race\" figure, and a calibration bracket in its abstract; the md has none of these and its abstract states \"No observational occupancy record could be located\" (md:27). Critically, the tex is internally contradictory: its abstract says the model \"over-admits by a censored bracket of 1.5–15.6x\" against \"the one (approximate) observed occupancy record\" (tex:75-76), while its own Calibration subsection still says no suitable record exists (tex:929-932). The observed record is documented only outside the manuscript: Street Roots, 16 Sept 2020, ~90 + ~40 = ~130 people, vs 198 modeled (both 99-bed shelters fill), 1.52x uncensored lower edge, bracket 1.5–15.6x, final value pending the U-12 recalibration (docs/final/README_RESULTS.md:246-262). The 198 is verifiable in a run artifact (histref-n2037-seed42 manifest, population.sheltered=198); the ~130 is a repo-asserted external observation. Of the other reviewer numbers: 63.1% is NOT in the manuscript — it is the symposium deck's optimizer-vs-random-pool walking edge (5,537 m vs 15,011 m), not a B-to-C reduction (which is 25.2%); 175-to-536 is NOT in the manuscript — it is THE_COMPLETE_STORY's U-24 realisability example (the tex uses a different example, pod village 66-to-202). County-uniform PM2.5 and street-network-node candidate sites are both stated plainly in the manuscript, with correct hedges. The manuscript's headline access numbers (30.1%/91.6%/96.0%, 550/244 refusals, mobility gap 12.5-to-23.7-to-12.5 pp) are all MODEL-OUTPUT, generally well hedged (identity-not-discovery, dispersion-not-optimizer, upper-bound-under-universal-awareness, scale-dependent equity, knife-edge sweep with disclosed failed predictions), but present-tense phrasings like \"The present 36-facility system shelters 30.1% of residents\" (md:27, md:315) read as claims about the real system. Two consistency defects survive into the manuscript: both md and tex still call the 36 facilities \"clean-air-capable,\" wording the results doc explicitly retracts as an overstatement; and the 0.61 m3/h resting inhalation rate is cited to the EPA Exposure Factors Handbook although THE_COMPLETE_STORY documents it as absent from that source (open defect affecting dose magnitudes, not direction). docs/final/FINAL_PRESENTATION_SUMMARY.md does not exist at the stated path; a superseded copy in docs/archive describes an obsolete model (2,037 residents, different scenario letters) and must not be quoted.",
+ "items": [
+  {
+   "name": "(a) ~130 observed vs 198 modeled, 1.52x ratio",
+   "detail": "Historical reference run (two 2020 shelters, 99 beds each) fills both: 198 sheltered. One contemporaneous observation (Street Roots, 2020-09-16): ~90 at Oregon Convention Center + ~40 at Charles Jordan, ~130 total. Stated as censored bracket 1.5-15.6x over-prediction; 1.52x is the uncensored lower edge; final value pending U-12 recalibration. Basis: MODEL-OUTPUT (198) vs EXTERNAL-OBS (~130). 198 verified in run manifest docs/runs/historical-reference/histref-n2037-seed42/simulation.json (population.sheltered=198; run uses 2020-vintage n=2037 per U-12). Also docs/critique-response/03-data.md:234-240, 00-RESPONSE.md:279, claims.yaml:129-150 (linter rule enforcing bracket wording). NOT in the manuscript body: md:287 and tex:929-932 say no record could be located.",
+   "source": "docs/final/README_RESULTS.md:252-259",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "(a-cont) Calibration bracket in manuscript abstract only — internal contradiction",
+   "detail": "Tex abstract: 'Compared against the one (approximate) observed occupancy record, the model over-admits by a censored bracket of 1.5–15.6x, so all absolute access figures are upper bounds' (tex:75-76). But tex Calibration subsection: 'not calibrated against observed shelter occupancy, because no suitable record exists... unable to locate a systematic record from any other source' (tex:929-932). The ~130/198/1.52 numbers appear nowhere in the tex. The md abstract still says 'No observational occupancy record could be located, so these are model-to-model comparisons' (md:27) — stale against the repo's own evidence.",
+   "source": "docs/chapter/Capacity_Is_Not_Access.tex:75-76 vs 929-932",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "(b) 63.1% walking-distance reduction",
+   "detail": "NOT in the manuscript (neither md nor tex). It is the symposium deck's attribution number: 'The optimiser contributes zero to headcount and 63.1% shorter walks' — optimizer sites vs random-pool control sites (C 3-seed mean walk 5,537 m vs random-pool 15,011 m; PRESENTATION_PROVENANCE.md:57-59, deck_numbers.json walk_saving_optimizer_pct=63.1). It is NOT the B-to-C walk reduction (25.2%, PRESENT_DAY_THREE_ARM_RESULTS.md:93) nor A-to-C (67.6%/'68%', md:236). Basis: MODEL-OUTPUT (control comparison). A reviewer citing it read the deck, not the chapter.",
+   "source": "docs/final/presentation/capacity-is-not-access-symposium.html:335",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "(c) Beds going from 175 to 536",
+   "detail": "NOT-FOUND in the manuscript (md or tex). Appears once, in the U-24 realisability critique: 'at B's scale factor the largest facility goes from 175 to 536 places, six motels go from 425 to 1,301 rooms, and sixteen pod villages go from 574 to 1,758 pods, which is physically unrealisable in place'. The tex carries the same limitation with a different concrete example: 'motel shelters would need to triple their rooms; the largest pod village would grow from 66 to 202 pods — B is a diagnostic bound, not a plan' (tex:1017-1020). Basis: MODEL-OUTPUT (arithmetic on scenario B scale-up) framed as limitation.",
+   "source": "docs/final/THE_COMPLETE_STORY.md:2862",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "(d) PM2.5 is county-uniform",
+   "detail": "Stated three times in the manuscript. Eq. 1 defines C(t) as 'the countywide PM2.5 concentration at hour t' (md:119). Results caution: 'Because the PM2.5 field is spatially uniform in this model, all four [exposure measures] are time spent outdoors multiplied by a constant, so they must move together' (md:210; tex:674). Limitations: 'The PM2.5 field is spatially uniform, because with two in-county monitors any interpolation would manufacture gradients the data cannot support; one consequence is that placement can help only by reducing time outdoors, never by moving people into cleaner air' (md:307; tex:998-1001). Basis: ASSUMPTION, correctly disclosed with its consequence.",
+   "source": "docs/chapter/capacity-is-not-access-source.md:210,307",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "(e) Candidate shelter sites are street-network nodes",
+   "detail": "Manuscript scenario C definition: 'ten new facilities at algorithmically chosen street-network nodes' (md:184; tex:589), chosen by capacitated greedy p-median over candidates thinned to one per 600 m grid cell, 'a heuristic... a good placement, not a provably optimal one' (md:188). Results doc limitation 1: 'C's 10 new sites are street-network nodes, not real venues... no siting, zoning, construction cost or staffing is modelled' (PRESENT_DAY_THREE_ARM_RESULTS.md:265-267). SUBMIT.md reviewer-prep: 'Are the ten new sites real? No.' (SUBMIT.md:302). Basis: ASSUMPTION/design choice, disclosed.",
+   "source": "docs/chapter/capacity-is-not-access-source.md:184,188",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Scenario A access: 2,060 of 6,842 sheltered (30.1%)",
+   "detail": "Seed 42, range [2,053-2,064] across 9 seeds; 4,754 turned away; 33 of 36 facilities finish at capacity (md:208, Table 3 md:218-226). Basis: MODEL-OUTPUT. Caveat stated at md:289: universal-awareness assumption makes every access figure an upper bound. But abstract and summary phrase it present-tense as fact about the real system: 'The present 36-facility system shelters 30.1% of residents' (md:27, md:315).",
+   "source": "docs/chapter/capacity-is-not-access-source.md:208",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Scenario B: 91.6% sheltered, 550 refused at one-space-per-person",
+   "detail": "6,264 sheltered [6,257-6,268], factor 3.04 over A; 550 refused, 578 spaces empty, 28 unreachable; 578=550+28 explicitly labeled 'equal by arithmetic, not by discovery' (md:232-234). Basis: MODEL-OUTPUT with correct identity hedge. This is named the central result (md:45).",
+   "source": "docs/chapter/capacity-is-not-access-source.md:232-234",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Scenario C: 96.0% sheltered, refusals cut to 244",
+   "detail": "6,570 [6,563-6,574]; empties 578-to-272; walk falls further 25%; exposure further 50.7%; dose 3,056-to-1,536 ug; vs A: 3.19x sheltered, exposure -93.7%, person-hours -93.6%, walk -68% (md:236). Basis: MODEL-OUTPUT. Attribution hedge follows immediately (md:238).",
+   "source": "docs/chapter/capacity-is-not-access-source.md:236",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Dispersion-not-optimizer attribution (random-pool control)",
+   "detail": "'Ten sites drawn uniformly at random from the same 498-node candidate pool... reproduce C's sheltered count exactly, in every seed. The headcount gain over B is therefore dispersion... siting optimization earns its credit on walking distance alone, and that credit is conditional on residents knowing where every facility is'; plus min-cost-flow bound showing C at coordination optimum; ends 'None of this shows that these are the refusal counts a real expansion would produce' (md:238; tex:749-764). Basis: MODEL-OUTPUT (control experiment), exemplary hedging.",
+   "source": "docs/chapter/capacity-is-not-access-source.md:238",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "A-to-B exposure reduction 87.3% and the four-measures caution",
+   "detail": "Four exposure measures fall 87.3/87.1/86.9/87.1% and are declared non-independent because the PM2.5 field is uniform — 'reported separately because different audiences use different units, not because they provide separate evidence' (md:208-210). Basis: MODEL-OUTPUT, correctly hedged.",
+   "source": "docs/chapter/capacity-is-not-access-source.md:210",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Mobility equity gap: 12.5 → 23.7 → 12.5 pp; ratio 1.62 → 1.33 → 1.15; 1,087 → 373 → 190 left outside",
+   "detail": "Three measures reported because direction is scale-dependent (ceiling effect at 96.3% unimpaired access); percentage-point gap alone 'would present as widening inequality what is, on other defensible scales, a narrowing one' (md:258-271, Tables 4-5 md:246-269). Basis: MODEL-OUTPUT with strong measurement hedge.",
+   "source": "docs/chapter/capacity-is-not-access-source.md:258",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Mobility-limited worst-served under every scenario; 23%/65%/70% of the excluded vs 19.9% population share",
+   "detail": "One of three equity statements claimed to 'survive every measure' (md:273, md:317). B-to-C: mobility access +13.4 pp vs +2.2 for everyone else; 14.0% still outside in C. Explicitly conditioned on first-come-first-served admission (md:301). Basis: MODEL-OUTPUT, conditional wording present.",
+   "source": "docs/chapter/capacity-is-not-access-source.md:273",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Scenario D triage reserve closes the gap (tex only)",
+   "detail": "Tex adds scenario D: 10% per-facility reserve for mobility-limited arrivals moves their access 72.6%-to-91.9% (above unimpaired 91.5%) at total admissions identical to B and zero capital cost; abstract states gap moves 'from roughly +24 to 0 percentage points' (tex:66-70, 784-801, 855-862). Supported outside: README_RESULTS.md:67-72 (gap +23.7 to -0.5 at seed 42; -0.1/+1.5 at seeds 43/44); 15% reserve overshoots (PRESENT_DAY_THREE_ARM_RESULTS.md:178-184). ABSENT from the md manuscript source. Basis: MODEL-OUTPUT.",
+   "source": "docs/chapter/Capacity_Is_Not_Access.tex:855-862",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Knife-edge capacity sweep (tex only): 1.05x matches C, 1.1x dissolves the gap",
+   "detail": "'1.05x demand (342 surplus spaces) already matches C's admissions --- without closing the gap (15.0 pp) --- and at 1.1x (684 spaces) every reachable resident is admitted and the gap vanishes. We predicted the crossing would require 1.4-1.6x... both predictions were wrong' (tex:864-874; summary tex:1060-1066: 'C's siting advantage on headcount is worth at most about 342 spaces'). Registered-prediction misses P-3c/P-3d disclosed (PRESENT_DAY_THREE_ARM_RESULTS.md:186-195,293-301). Note the results doc states the sweep differently: 'access reaches 99.5% already at 1.2x demand... gap vanishes at any surplus tested' vs tex's 1.1x threshold — sweep grid values differ across docs (PRESENTATION_PROVENANCE.md:60 shows acc 99.51 from 1.1x upward). Basis: MODEL-OUTPUT.",
+   "source": "docs/chapter/Capacity_Is_Not_Access.tex:864-874",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "First-hour race: ~80% of final mobility gap exists one hour after departure (tex only)",
+   "detail": "'survival analysis shows that in B roughly 80% of the final mobility gap already exists one hour after departure (Fig. 5)' (tex:860-862); provenance: first_hour_share=80 from B-seed42 agents.csv (PRESENTATION_PROVENANCE.md:55). ABSENT from md. Basis: MODEL-OUTPUT.",
+   "source": "docs/chapter/Capacity_Is_Not_Access.tex:860-862",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Robustness: max seed spread 11 vs min between-scenario gap 306; freeway re-run unchanged",
+   "detail": "'largest seed-to-seed spread within a scenario is 11 residents... smallest difference between two scenarios at the same seed is 306' — reported side by side, not as a ratio, because 'seed spread bounds only Monte-Carlo variability, not structural or parametric uncertainty'; freeway removal (2,636 features, 614 km) left all sheltered counts 'unchanged to the digit' (md:281). Basis: MODEL-OUTPUT, correctly hedged.",
+   "source": "docs/chapter/capacity-is-not-access-source.md:281",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "28 residents unreachable, identical across scenarios",
+   "detail": "Same individuals in all three scenarios per seed; on street-graph fragments connected only via freeway; framed as internal consistency check — 'It is not a check on external accuracy' (md:283; tex:918-924). Basis: MODEL-OUTPUT.",
+   "source": "docs/chapter/capacity-is-not-access-source.md:283",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Smoke event: peak 562.7 ug/m3, 194 of 312 hours above Unhealthy",
+   "detail": "Measured EPA AQS parameter 88502, two in-county monitors averaged; 4,795 records; 1,576 wildfire-flagged (md:33, 83, 87). Independently recomputed: full-window exposure 54,002.7 (Python) vs 54,002.8 (model), mean 173.09, peak 562.7, 194.0 h (md:198). Basis: EXTERNAL-OBS (measured input, not model output), with monitors' understatement caveat (md:85). Underlying EPA files not re-derived by this audit — the recomputation claim itself is REPORTED.",
+   "source": "docs/chapter/capacity-is-not-access-source.md:33,198",
+   "status": "REPORTED"
+  },
+  {
+   "name": "Population 6,842 unsheltered",
+   "detail": "2025 Tri-County PIT: 10,526 experiencing homelessness in Multnomah County, ~65% unsheltered → 6,842; PIT chosen over the 6,731 annual service count; report's own caution about 2019-2025 comparability carried (md:77, 91). Basis: EXTERNAL-OBS/LIT-TRANSFER (survey input).",
+   "source": "docs/chapter/capacity-is-not-access-source.md:91",
+   "status": "REPORTED"
+  },
+  {
+   "name": "Shelter capacity 2,234 spaces across 36 facilities",
+   "detail": "Derived by author-chosen unit conversions (bed=1; motel room 1.0-1.5; village unit 1.0-1.2; family unit 2.5-4.0 'weakest'; unitless counts taken as persons), midpoints applied (md:97). ~207 real spaces missing (Clinton Triangle 160, Multnomah SRV 28, no published addresses); ten day centers excluded for no published capacity (md:101). 3 of 36 coordinates block/intersection-level (md:99). Basis: ASSUMPTION layered on EXTERNAL inventory; disclosed.",
+   "source": "docs/chapter/capacity-is-not-access-source.md:97-101",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Campsite start locations: 3,400 reports, 2,981 used, as 2020 proxy",
+   "detail": "City of Portland complaint-driven reports from a recent rolling window; 2025-26 locations serve as geographic stand-in for 2020, with visibility bias acknowledged and a warning printed at every run start (md:93). Basis: EXTERNAL data + ASSUMPTION (temporal proxy), disclosed. (Coordinates not reproduced here per sensitivity rules.)",
+   "source": "docs/chapter/capacity-is-not-access-source.md:93",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Walking-speed model parameters",
+   "detail": "Age/sex means from Bohannon & Williams Andrews meta-analysis (23,111 participants); within-group SD 13% from Bohannon 1997; COPD decrement -0.19 m/s (Buekers 2024, low-quality evidence, CI 11-28 cm/s); mobility-limited N(0.95, 0.32) spanning Boyce impairment categories, replacing not adjusting; truncation to 0.4-2.2 m/s (md:139-146, Eq. 2). No asthma gait decrement exists, so asthma gets none — asymmetry reported as evidence of non-invention (md:275). Basis: LIT-TRANSFER, with truncation bounds and the mobility distribution's construction as ASSUMPTION.",
+   "source": "docs/chapter/capacity-is-not-access-source.md:139",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Inhalation rates 1.62 / 0.61 m3/h — cited constant not in its source",
+   "detail": "Manuscript cites EPA Exposure Factors Handbook for IR = 1.62 walking, 0.61 otherwise (md:168; Eq. 4). THE_COMPLETE_STORY documents an open defect: 'The resting rate is not in the source... A regex scan of all 96 pages for 0.61 returns only unrelated cells' (THE_COMPLETE_STORY.md:746-749, 3153: correction could move the walk-to-rest ratio; 2850: 'inhaled dose magnitudes rest on one unverified constant'). Basis: LIT-TRANSFER whose citation fails verification for the 0.61 cell; dose direction unaffected, magnitudes affected. Unfixed per repo docs; decision is the author's.",
+   "source": "docs/final/THE_COMPLETE_STORY.md:746-749",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Removed risk-weighting (1.45 / 1.80) and w=1.0 by design",
+   "detail": "Original design's weights failed audit: Di et al. reports HR 1.073 per 10 ug/m3 and its cohort is entirely 65+ (cannot yield an age contrast); 'Anderson et al. 2013' does not exist (nearest is Atkinson 2013, cardiovascular, no COPD effect-modification); multiplying exposure by a relative risk is a category error. All susceptibility weights set to 1.0; equity handled by stratified reporting; breathing rate held constant across health status (md:174-176). Basis: ASSUMPTION by design, extensively justified.",
+   "source": "docs/chapter/capacity-is-not-access-source.md:174-176",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Departure threshold 55.5 ug/m3",
+   "detail": "Lower boundary of EPA Unhealthy category, chosen for stability across pre/post-2024 breakpoint tables; hourly-vs-24h-average mismatch acknowledged, so results never described in AQI categories (md:119). Basis: LIT-TRANSFER with disclosed category caveat.",
+   "source": "docs/chapter/capacity-is-not-access-source.md:119",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Street-graph defect and correction (25 duplicate identifiers)",
+   "detail": "25 intersection ids claimed by multiple features 1.65-18.5 km apart; in a 50-agent test, 22 of 50 journeys corrupted, distances up to 15x, doses 3x, some different shelters chosen; correction: 3 reattached, 22 new nodes; inconsistent-length segments 50-to-0, largest endpoint gap 18.5 km-to-11.9 m, connectivity unchanged (md:156-158). Basis: MODEL-OUTPUT diagnostics of a data defect; matches the memory-noted post-U-27 3/22 census.",
+   "source": "docs/chapter/capacity-is-not-access-source.md:156-158",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Refused-agent re-plan bug and walk-length invariant",
+   "detail": "Refused residents originally re-planned from their immutable start node (walked home first), invisible at 50-agent scale; post-fix invariant walked <= planned + snap gap + 200 m; in a 400-resident reference run with 250 refused at least once, largest unexplained distance 8.9 m (md:200). Basis: MODEL-OUTPUT verification.",
+   "source": "docs/chapter/capacity-is-not-access-source.md:200",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "27-run integrity checks",
+   "detail": "Six checks hold in all 27 runs: manifest seed/scenario match, clean working tree, identical data version per scenario, identical source checksums across runs, exactly 6,842 records exported, byte-identical population across scenarios within seed via SHA-256 (md:202). Basis: MODEL-OUTPUT/reproducibility apparatus (asserted; not re-executed by this audit).",
+   "source": "docs/chapter/capacity-is-not-access-source.md:202",
+   "status": "REPORTED"
+  },
+  {
+   "name": "'Clean-air-capable' wording retained despite documented retraction",
+   "detail": "Both manuscript forms still say '36 clean-air-capable facilities' (md:97, md:182; tex:315, tex:582). The results doc retracts this: 'earlier drafts called these clean-air-capable... That was an overstatement... Nothing in the sources establishes that these buildings filter their air, and the model does not simulate indoor air at all — the study endpoint is arrival at the door' (PRESENT_DAY_THREE_ARM_RESULTS.md:15-20). Basis: wording inconsistency between manuscript and its own results documentation.",
+   "source": "docs/final/PRESENT_DAY_THREE_ARM_RESULTS.md:15-20",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Awareness assumption and the 65% survey figure",
+   "detail": "Manuscript hedges that universal awareness makes every access figure an upper bound (md:289; tex:937-946) but never cites the local evidence quantifying it. The 65%-never-heard figure (attributed to a Portland State survey during the real 2020 event) appears only in README_RESULTS.md:217-219 and SUBMIT.md:298; the tex's only 65% instances are the PIT unsheltered share (tex:283) and the excluded-share statistic (tex:851). Basis: ASSUMPTION hedged in manuscript; supporting EXTERNAL-OBS uncited there.",
+   "source": "docs/final/README_RESULTS.md:217-219",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Limitation bullet 1 — optimizer evaluated on fitted demand",
+   "detail": "All 27 runs use identical start coordinates, so the 10-site procedure serves exactly the 2,981 campsites it is measured against; C's advantage over B is an upper bound vs unseen distributions (md:297; tex:958-963).",
+   "source": "docs/chapter/capacity-is-not-access-source.md:297",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Limitation bullet 2 — policy parameters, not measurements",
+   "detail": "1.5x expansion factor, choice of ten sites, B's uniform 3.06x scale-up all author-selected; comparison establishes direction only; ten new sites average ~349 spaces, larger than any real facility (md:299; tex:965-970).",
+   "source": "docs/chapter/capacity-is-not-access-source.md:299",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Limitation bullet 3 — arrival-order admission",
+   "detail": "Shuffle-order service; mechanism behind mobility-limited concentration among the excluded; equity findings conditional on first-come-first-served; md says a needs-based rule 'would likely change that result' (md:301), while tex upgrades this to a tested lever via scenario D (tex:972-981).",
+   "source": "docs/chapter/capacity-is-not-access-source.md:301",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Limitation bullet 4 — equity downstream of movement model",
+   "detail": "Walking speed is the only outcome-affecting attribute; distributions from published meta-analyses; no local validation of walking speeds among unsheltered residents was possible (md:303; tex:983-987).",
+   "source": "docs/chapter/capacity-is-not-access-source.md:303",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Limitation bullet 5 — conservative omissions",
+   "detail": "Ten day centers excluded (no published capacity) though plausibly most relevant daytime spaces, so A understates the baseline; every mobility-limited resident assigned the fastest impaired-movement category; ~207 real spaces missing entirely (md:305; tex:989-996).",
+   "source": "docs/chapter/capacity-is-not-access-source.md:305",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Limitation bullet 6 — input limits",
+   "detail": "Spatially uniform PM2.5 (placement helps only via time outdoors); non-reference monitors likely understate wood-smoke PM2.5; encampment locations 2025-26 complaint-driven proxy for 2020; sex/mobility distributions 2019; asthma/COPD prevalences imported from a Minnesota cohort (md:307; tex:998-1006).",
+   "source": "docs/chapter/capacity-is-not-access-source.md:307",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Limitation bullets 7-8 (tex only) — behavioral scope and scope narrowing",
+   "detail": "Tex adds: real 2020 access was partly dispatcher-mediated via 211 with rides (neither modeled); no self-rescue or leaving the county; adults-only; Mount Scott standby activation not modeled; B physically unrealizable in place; asymmetric evidentiary bar acknowledged (real day centers excluded for missing capacities while C's hypothetical sites carry invented 349-space capacities) (tex:1008-1024). Both forms note the project narrowed from five scenarios + future smoke + weighting question (md:309; tex:1026-1033).",
+   "source": "docs/chapter/Capacity_Is_Not_Access.tex:1008-1024",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Headline sentences that read as claims about real behavior",
+   "detail": "Present-tense declaratives without in-sentence conditioning: 'The present 36-facility system shelters 30.1% of residents' (md:27 abstract; md:315); 'It cannot report that 550 people were refused shelter during an event in which the system held exactly one space per person, which is the central result here' (md:45); 'the same 6,842 spaces more than halve refusals depending only on placement' (md:319). Each is MODEL-OUTPUT and hedged elsewhere (md:287-289, md:295), but the sentences themselves carry no scenario conditioning — the main residual framing risk for a journal reviewer.",
+   "source": "docs/chapter/capacity-is-not-access-source.md:27,45,315,319",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "docs/final/FINAL_PRESENTATION_SUMMARY.md",
+   "detail": "Does not exist at the path given in the task. A superseded copy sits at docs/archive/FINAL_PRESENTATION_SUMMARY.md, banner-marked 'SUPERSEDED — HISTORICAL RECORD ONLY': it describes an obsolete model state (2,037 residents, 198 beds, 9.7% access, scenario B = optimized placement of 198 beds) whose scenario letters mean different things than the current A/B/C/D. Its numbers must not be cited as current results.",
+   "source": "docs/archive/FINAL_PRESENTATION_SUMMARY.md:1-9",
+   "status": "ABSENT"
+  },
+  {
+   "name": "Sweep-threshold discrepancy between manuscript tex and results docs",
+   "detail": "Tex: at 1.1x demand (684 surplus spaces) every reachable resident is admitted and the gap vanishes (tex:869, 1062-1064). Results docs: 'access reaches 99.5% already at 1.2x demand' and gap vanishes at every surplus tested 1.2x-1.6x (PRESENT_DAY_THREE_ARM_RESULTS.md:187-190; README_RESULTS.md:228-230). PRESENTATION_PROVENANCE.md:60-63 sweep table shows acc=99.51/gap ~0 from s=1.1 (BS110) onward, supporting the tex; the results docs' '1.2x' understates where the plateau starts. Sub-claims consistent with provenance but stated inconsistently across docs.",
+   "source": "docs/PRESENTATION_PROVENANCE.md:60-63",
+   "status": "VERIFIED"
+  }
+ ],
+ "gaps": [
+  "The md manuscript source is a declared superseded working copy (md:1) that diverges from the authoritative tex on submission-critical content: the tex has scenario D, the capacity sweep, Fig. 5 (race), sex rows in Table 4, and the abstract calibration bracket; the md has none, and its abstract asserts no occupancy record could be located. Any audit or lint that reads only the md misses the current claims.",
+  "The tex is internally contradictory on calibration: abstract (tex:75-76) invokes 'the one (approximate) observed occupancy record' and the 1.5-15.6x over-admission bracket, while sec:calibration (tex:929-935) still states no suitable record exists and frames everything as model-to-model. One of the two must change before submission; the ~130/198 provenance (Street Roots 2020-09-16) exists only in docs/final/README_RESULTS.md and critique-response files, never in the manuscript.",
+  "U-12 recalibration status is ambiguous: README_RESULTS.md:241 and claims.yaml:136-139 say the final calibration value is 'pending the U-12 recalibration', yet an archived recalibrated reference run exists (histref-n2037-seed42, 2020-vintage population, sheltered=198). No doc read states whether the pending flag is now resolved.",
+  "The 2020 99-beds-per-site capacity is newsroom-sourced with unstated units ('cots or sleeping positions or persons admitted') per THE_COMPLETE_STORY.md:2867-2869 (A-04 'still blocking'); this uncertainty is not carried in the manuscript's calibration discussion.",
+  "The 0.61 m3/h resting inhalation rate is cited to an EPA source that does not contain it (THE_COMPLETE_STORY.md:746-749); the manuscript cites the Handbook without flagging the defect. Dose magnitudes and the walk-to-rest ratio depend on it.",
+  "63.1% and the 175-to-536 realisability numbers are not in the manuscript at all — a reviewer citing them is reading the symposium deck / THE_COMPLETE_STORY. If those artifacts circulate with the submission, their claims (esp. 63.1% optimizer credit) should be reconciled with the chapter's wording, which never quantifies the walking edge.",
+  "'Clean-air-capable' is retracted as an overstatement in PRESENT_DAY_THREE_ARM_RESULTS.md:15-20 but persists in both manuscript forms (tex:315,582); relatedly, nothing verifies air filtration at any facility and the model endpoint is arrival at the door.",
+  "Verification claims (byte-identical re-runs, SHA-256 population identity, 54,002.7-vs-54,002.8 recomputation) were read but not re-executed by this read-only audit; they rest on repo-asserted run manifests and scripts (scripts/verify_2026_runs.py, lint_claims.py).",
+  "Sweep plateau start is stated as 1.1x in the tex but 1.2x in the two results docs; provenance table supports 1.1x."
+ ]
+}

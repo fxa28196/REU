@@ -1,0 +1,100 @@
+{
+ "key": "R5",
+ "title": "Feasible candidate facilities",
+ "analysis": {
+  "requirement": "R5 — Feasible candidate facilities: Scenario C selects street-network nodes, not usable buildings, so the siting findings cannot function as implementable policy. Build a verified candidate-facility dataset (building/parcel, legal floor area, occupancy limit, filtration, accessibility/restrooms, staffing, ownership/availability, opening delay, transport access, capital/operating costs, pet/belongings/service-population restrictions); do not treat proportional capacity increases as physically feasible; report a cost-access-equity frontier, not only the mathematically optimal geography.",
+  "exists_defensible": [
+   "Full, repeated disclosure that C's 10 sites are not real venues: manuscript defines them as 'algorithmically chosen street-network nodes' (docs/chapter/capacity-is-not-access-source.md:184,188; docs/chapter/Capacity_Is_Not_Access.tex:589); results doc limitation 1 states 'street-network nodes, not real venues... no siting, zoning, construction cost or staffing is modelled' (docs/final/PRESENT_DAY_THREE_ARM_RESULTS.md:265-267); SUBMIT.md reviewer-prep answers 'Are the ten new sites real? No.' (per evidence inventory, docs/chapter/SUBMIT.md:302).",
+   "The data files themselves refuse to overstate: every new-site row carries coord_source='greedy_capacity_aware_p_median_over_rlis_graph', coord_confidence='theoretical_site_not_a_real_facility', provider='PROPOSED_NOT_A_REAL_FACILITY' (Geography/data/shelters/shelters_2026_expanded_plus_new_sites.csv:38-47, read directly).",
+   "A genuine partial candidate-facility dataset for EXISTING facilities: shelters_multnomah_2026.csv (48 rows, read rows 1-15) carries real street address, city, facility_type (congregate/motel/village/family), capacity with explicit capacity_unit, population_served (service-population restrictions, e.g. 'men', 'women non-binary couples and pets'), provider/operator, status and closure_date (availability), priority_vulnerable, and pets_allowed flags. This covers R5's ownership, availability, pet-restriction, and service-population fields for the real inventory.",
+   "Defensible occupancy-limit treatment for existing facilities: the unit-conversion table with per-unit ranges and named weakest link (family units 2.5-4.0) in docs/final/SHELTER_CAPACITY_AUDIT.md:56-98, yielding the bracketed 1,885-2,224-person county total rather than a false point value.",
+   "The physical-unrealisability critique is already on record in the authoritative manuscript: 'Scenario B's uniform scale-up is physically unrealizable for much of the inventory (motel shelters would need to triple their rooms; the largest pod village would grow from 66 to 202 pods) --- B is a diagnostic bound, not a plan', plus the explicitly acknowledged asymmetric evidentiary bar (real day centers excluded for missing capacity while C's hypothetical sites carry invented 349-space capacities) (docs/chapter/Capacity_Is_Not_Access.tex:1017-1024, read directly). The 175-to-536 example lives in docs/final/THE_COMPLETE_STORY.md:2862 (per evidence inventory).",
+   "The manuscript already flags that the ten new sites 'average about 349 spaces each, larger than any facility in the real inventory' (docs/chapter/capacity-is-not-access-source.md:299, read directly).",
+   "Real deployment-delay data exists for the 2020 historical arms: OCC opened 2020-09-10 and Charles Jordan 2020-09-11 against a smoke episode beginning ~09-07, giving two empirical activation lags (Geography/data/shelters/shelters_2020-09.csv rows 2-3, per data-reader verification; opening-date gating implemented in Shelter.java per model reader).",
+   "The random-pool control materially reduces R5's stakes for the headline: ten random sites from the same 498-node pool reproduce C's sheltered count in every seed, so headcount credit is dispersion, not the specific optimal nodes (docs/chapter/capacity-is-not-access-source.md:238; docs/final/PRESENT_DAY_THREE_ARM_RESULTS.md:255-257, read directly) — any feasible dispersed candidate set would likely preserve the headcount finding."
+  ],
+  "missing": [
+   "ABSENT: any building/parcel/zoning dataset. Repo-wide grep for parcel/building footprint/floor area/zoning/fire code/occupancy limit hits only disclaimers and websim UI code — no data file of parcels, footprints, floor areas, or zoning exists anywhere in Geography/data or docs.",
+   "ABSENT: filtration/clean-air performance for ANY facility, existing or proposed. The results doc explicitly retracts 'clean-air-capable' as an overstatement ('Nothing in the sources establishes that these buildings filter their air, and the model does not simulate indoor air at all', docs/final/PRESENT_DAY_THREE_ARM_RESULTS.md:15-20 per evidence inventory); indoor PM2.5 is deliberately unmodelled — the study endpoint is arrival at the door.",
+   "ABSENT: accessibility, restroom, and sanitation attributes for all 48 facilities and all hypothetical sites.",
+   "ABSENT: staffing requirements or staffing data of any kind; the only staffing content in the repo is inference recorded as inference (SHELTER_CAPACITY_AUDIT.md, per data reader: '99 was plainly an operational/staffing limit... but that reasoning is inference, not a source').",
+   "ABSENT: capital or operating costs — no cost figure for any facility type anywhere; grep for frontier/pareto/cost-access across docs returns only scenario D's reserve-fraction 'Pareto point' (docs/critique-response/08-scenario-D.md:133) and time-budget text. No cost-access-equity frontier exists; the reported optimization output is a single geography plus a random-pool control.",
+   "ABSENT: deployment delay for the 2026 arms — all present-day scenario rows hard-code opened=2020-09-07, i.e. open from simulation start with zero activation lag (shelters_2026_expanded_plus_new_sites.csv rows 2-5, read directly).",
+   "ABSENT: any feasibility screen in the candidate pool — the pool is purely geometric: street-graph nodes thinned to one per 600 m grid cell, MAX_CANDIDATES=500, no land-use, ownership, or building filter (scripts/build_scenario_c_2026.py:37-41,60-71, read directly).",
+   "ABSENT: per-facility physical expansion ceilings — B's uniform 3.0627x and C's 1.5x scale-ups apply to every facility regardless of type (md:183-184); motel rooms and pods cannot scale, which the tex concedes but no run enforces.",
+   "ABSENT: transportation-access attributes (transit proximity, vehicle access) for any site; the model has no transport mode of any kind (model reader: grep of Geography/src returns no transport code path).",
+   "ABSENT: per-facility belongings-storage policy; belongings exist only as an agent-side departure cost.",
+   "ABSENT: the 11 day centers (the most plausible real daytime candidates) as candidate rows — excluded entirely because none publishes capacity (docs/final/SHELTER_CAPACITY_AUDIT.md:44-47, read directly); their names/addresses are not transcribed into any repo data file."
+  ],
+  "implementable_with_existing_data": [
+   "Publish the existing-facility candidate table now: shelters_multnomah_2026.csv (48 rows: address, type, capacity+unit, population_served, provider, status, closure_date, pets_allowed) joined with the unit-conversion ranges of docs/final/SHELTER_CAPACITY_AUDIT.md:62-71 and the geocodes in shelters_2026_current_placement.csv — a defensible 'verified existing candidates' appendix table requiring zero new data.",
+   "Feasibility-capped re-optimization: modify scripts/build_scenario_c_2026.py to (a) cap each new site at the largest real facility (175 beds, Bybee Lakes, shelters_multnomah_2026.csv:3) instead of ~349, and (b) apply facility-type-specific expansion caps (motels/pods 1.0x, congregate flexible) using the facility_type and capacity_unit columns already present. This directly tests whether the C-beats-B walking result survives realistic capacities.",
+   "Restrict the candidate pool to real venues already in repo: re-run the p-median with candidates = the 48 known facilities (including the 12 closing/excluded ones as reopening candidates) instead of 498 street nodes — the addresses and geocode cache (geocode_cache_2026.json) already exist.",
+   "An access-vs-surplus frontier (cost axis excluded) from archived runs: the BS080-BS160 bed sweep (docs/runs/phaseD-bed-sweep, 7 levels x 3 seeds), B/C/CR/CP arms, and scenario D runs already span capacity, placement, and admission-rule variation; their sheltered counts, mean walks, and mobility gaps can be plotted as a three-axis (capacity, access, equity) trade-off surface today — an honest partial frontier, explicitly labeled as lacking the cost dimension.",
+   "Deployment-delay sensitivity using the two empirical 2020 lags: shelters_2020-09.csv shows OCC and CJ opened 3-4 days into the episode; running the 2026 arms with opened dates offset by those observed lags (a one-column CSV edit per arm) quantifies how much of the first-hour race and access results depend on the zero-delay assumption.",
+   "Demand-resampling robustness with inc_date: the encampment CSV's per-row inc_date column (verified spanning 2025-01..2026-07) supports temporal split/bootstrap resampling of demand, addressing the optimizer-fitted-to-its-own-demand limitation (md:297) jointly with R5."
+  ],
+  "needs_new_empirical_data": [
+   "Facility walk-through audit of the 48 existing shelters + 11 day centers: structured site-visit instrument recording usable floor area, posted fire-code occupancy, restroom count, ADA entry/path-of-travel, HVAC filtration (MERV rating or portable HEPA count), and belongings-storage space.",
+   "Operator interviews (Transition Projects, Do Good Multnomah, Helping Hands Reentry, Our Just Future — all named in shelters_multnomah_2026.csv): semi-structured protocol on smoke-event activation time, staffing ratios and surge staffing, pet/belongings handling in practice, and willingness to serve as respite sites.",
+   "Day-center capacity measurement: since none publishes capacity (SHELTER_CAPACITY_AUDIT.md:44-47), a simple site census or operator questionnaire is the only route to including the most relevant real daytime candidates."
+  ],
+  "needs_external_acquisition": [
+   "Metro RLIS taxlot and building-footprint layers (candidate source: Oregon Metro RLIS Discovery / PortlandMaps) — parcel geometry, building area, and ownership class for candidate screening; the project already uses RLIS streets so the licensing relationship exists, though the repo notes no written redistribution determination is on file.",
+   "City of Portland zoning GIS layer (candidate source: Portland Bureau of Planning and Sustainability open data) — legal-use screening of candidates.",
+   "Public-facility inventories usable as cleaner-air candidates: community centers, libraries, schools (candidate sources: Portland Parks & Recreation, Multnomah County Library, Portland Public Schools facility lists) — the 2020 event itself used a convention center and a community center, both facility types absent from the candidate pool.",
+   "Certificate-of-occupancy / fire-marshal occupancy loads per building (candidate source: Portland Bureau of Development Services permit records; Portland Fire & Rescue).",
+   "Per-bed capital and operating cost benchmarks by shelter type (candidate source: Multnomah County adopted budget and JOHS budget documents; note the repo already holds Adult-Shelter-Review-FY25.pdf and the City FY23-24 shelter report unopened by this audit — they may contain cost content and should be mined first).",
+   "Cleaner-air-space design standards (candidate source: EPA interim guidance on cleaner air shelters; Oregon Health Authority wildfire smoke toolkit) — converts 'filtration performance' from an attribute into a checklist.",
+   "TriMet GTFS feed (candidate source: TriMet developer resources) — transit-proximity scoring for the transportation-access attribute.",
+   "Primary 2020 activation records (JOHS after-action report, OCC activation agreement) — already identified as never-obtained in SHELTER_CAPACITY_AUDIT.md; would also resolve blocking assumption A-04 (99-bed unit)."
+  ],
+  "claims_exceeding_evidence": [
+   {
+    "claim": "\"C is a buildable proposal, not a thought experiment.\"",
+    "location": "scripts/build_scenario_c_2026.py:4 (read directly)",
+    "why": "Directly contradicted 18 lines later in the same docstring ('New sites are street-network nodes: theoretical locations, NOT verified venues') and by every deliverable limitation. Nothing about buildings, zoning, staffing, or cost is verified for any new site; 'buildable' has no evidentiary basis anywhere in the repo."
+   },
+   {
+    "claim": "\"36 clean-air-capable facilities\"",
+    "location": "docs/chapter/capacity-is-not-access-source.md:97,182 and docs/chapter/Capacity_Is_Not_Access.tex:315,582 (grep-verified in both)",
+    "why": "The project's own results doc retracts this wording as an overstatement (PRESENT_DAY_THREE_ARM_RESULTS.md:15-20): no source establishes filtration at any facility and indoor air is unmodelled. This is R5's filtration field failing in the manuscript's own headline framing — the retraction never propagated to either manuscript form."
+   },
+   {
+    "claim": "\"the same 6,842 spaces more than halve refusals depending only on placement\"",
+    "location": "docs/chapter/capacity-is-not-access-source.md:319 (read directly); echoed at Capacity_Is_Not_Access.tex:1053",
+    "why": "Implies capacity is freely relocatable. C's relocated capacity materializes as ten invented 349-space facilities, each larger than any real facility in the county (md:299), with no building, staff, cost, or activation path. The sentence carries no in-sentence feasibility conditioning."
+   },
+   {
+    "claim": "\"The present 36-facility system shelters 30.1% of residents\" (present tense, about the real system)",
+    "location": "docs/chapter/capacity-is-not-access-source.md:27,315",
+    "why": "The 2,234-space denominator is author-converted from five incompatible units using midpoints of ranges (SHELTER_CAPACITY_AUDIT.md:62-71), ~207 real spaces and 11 day centers are missing, and the figure is a model output under universal awareness. Hedged elsewhere (md:289) but not where stated — a reviewer enforcing R5 will read it as an unverified claim about real facilities."
+   },
+   {
+    "claim": "Deck: scenario C \"the remainder opens as ten new ~349-space sites\"",
+    "location": "docs/final/presentation/capacity-is-not-access-symposium.html:276 (read directly)",
+    "why": "'Opens' asserts deployability in a one-line scenario table with no feasibility caveat on the slide; the sites have no buildings and capacities exceeding any real facility."
+   },
+   {
+    "claim": "The md manuscript omits B's physical unrealisability entirely",
+    "location": "docs/chapter/capacity-is-not-access-source.md:299 vs Capacity_Is_Not_Access.tex:1017-1020 (both read directly)",
+    "why": "The md's limitation calls B's 3.06x scale-up only a 'policy choice'; the statement that it is 'physically unrealizable for much of the inventory... a diagnostic bound, not a plan' exists only in the tex. Whichever form circulates without that sentence lets 91.6% read as an achievable target."
+   },
+   {
+    "claim": "\"Ten day centers are excluded\"",
+    "location": "docs/chapter/capacity-is-not-access-source.md:305 vs docs/final/SHELTER_CAPACITY_AUDIT.md:44 (both read directly)",
+    "why": "Minor count inconsistency: the audit that is the source of the exclusion records 11 day centers listed, the manuscript says ten. Trivial but exactly the kind of inventory sloppiness an R5-enforcing reviewer probes."
+   }
+  ],
+  "proposed_methods": [
+   "Candidate-set construction by spatial overlay: building footprints joined to taxlots, filtered to public/institutional ownership and shelter-compatible zoning, floor area converted to occupancy via a stated planning standard (e.g. fire-code occupant-load factors), then attribute-screened for restrooms/ADA from facility inventories — producing a verified candidate table replacing the 498 geometric nodes.",
+   "Reformulate siting as capacitated facility location with fixed charges (MILP: maximal-covering or p-median with per-site capacity caps = fire-code occupancy and per-site opening costs), solved exactly at this problem size instead of the current greedy heuristic (scripts/build_scenario_c_2026.py), removing both the no-optimality-guarantee caveat (md:188) and the infeasible-capacity defect at once.",
+   "Multi-objective frontier: epsilon-constraint (or weighted-sum) over cost (capital+operating), access (sheltered fraction), and equity (mobility percentage-point gap), evaluating frontier candidates through the existing ABM; report the Pareto set, not the single optimum. The archived BS-sweep + B/C/CR/D runs already prototype the access-equity plane; the cost axis enters once unit costs are acquired.",
+   "Feasibility-capped sensitivity re-runs with the existing harness: per-facility-type expansion ceilings and a 175-bed cap on new sites, re-proving (or bounding) the 25.2% B-to-C walk reduction and the knife-edge result (C ~ B + 342 spaces) under realistic capacities.",
+   "Deployment-delay modeling: per-site activation lags sampled from the two observed 2020 lags (shelters_2020-09.csv) and operator-interview distributions, interacted with the tex's first-hour-race finding (80% of the mobility gap forms in hour one) — opening delay plausibly dominates siting for early outcomes.",
+   "Spatial block cross-validation of siting: split the 3,400 campsite reports by inc_date (column verified present) or spatial blocks, fit the optimizer on one fold and evaluate on the other, converting the disclosed in-sample-optimism limitation (md:297) into a measured quantity.",
+   "Cost-effectiveness reporting: cost per additional person sheltered and per unit exposure averted, by intervention type (new site vs expansion vs triage reserve vs awareness/outreach), so scenario D's zero-capital reserve result and C's siting result become commensurable for policy."
+  ],
+  "priority_rationale": "R5 is decisive for the policy translation layer but not for the scientific core, and the repo's own control experiments make it unusually tractable. The comparative-diagnostic claims (capacity binds in A; dispersion rather than optimal geometry drives C's headcount; the equity gap is admission-rule- and scale-sensitive) are already framed as identity/direction results and survive without any feasible-facility dataset. What does NOT survive is every prescriptive reading: the present-tense abstract sentences, 'more than halve refusals depending only on placement' (md:319), the deck's 'opens ten new ~349-space sites', and the retained 'clean-air-capable' label — all rest on facilities with no building, no floor area, no filtration, no staff, no cost, no activation path, and capacities larger than anything real in the county. Two verified findings lower the repair cost: (1) the random-pool control shows ANY ten dispersed sites from the pool reproduce C's headcount exactly (md:238), so a feasibility-screened candidate set would very likely preserve the headline access result and change only the walking-distance credit — R5 threatens the magnitude of the siting bonus, not the capacity-vs-geography thesis; (2) the knife-edge sweep (C's siting worth at most ~342 spaces; gap gone at 1.1x) means modest feasible capacity additions substitute for optimal geography, which is itself a feasibility-friendly policy message the paper could foreground. Priority ordering: first purge the three overreaching wordings (buildable, clean-air-capable, present-tense system claims) — zero-cost, blocks the likeliest rejection quotes; second, ship the existing-facility candidate table and feasibility-capped re-runs, which need only files already in the repo; third, acquire parcels/zoning/costs for a true frontier, which is a full follow-on study and should be scoped as such rather than promised."
+ }
+}
