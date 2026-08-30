@@ -1,10 +1,29 @@
 <!-- Generated from next-study-audit.html (the published artifact source).
      Canonical rendered copy: https://claude.ai/code/artifact/91b8197c-8b27-4e28-85e6-e33f6b9f5f4e -->
 
-Capacity vs. Evidence
+# Capacity vs. Evidence
 
-- Audit · Wildfire-Smoke Shelter ABM · Multnomah County # Capacity vs. Evidence A requirement-by-requirement audit of the *Capacity Is Not Access* project against eight journal-grade validation requirements (IJGIS / ERL), with a concrete next-study plan. Read-only: no repository file was modified. 2026-08-21branch websim-port @ 4ca0c6c17 audit agents · 387 tool calls~2.0M audit tokens **Verdict.** The project's *internal* validity apparatus is unusually strong — byte-identity regressions, registered predictions with scored misses, negative controls, a claims linter, and an honest 55-row parameter registry. Its *external* validity rests on exactly two event observations: one newspaper occupancy snapshot (~130 of 198 beds, one night) and one N=73 retrospective survey. Every headline access number is a model output under universal awareness — an assumption the repo's own archived runs contradict (measured awareness 0.356 → ~17.8% sheltered across all arms, and the placement effect disappears). The manuscript does not disclose those runs. The path forward is unusually tractable: most of the repair is text, in-repo computation, and one well-precedented public-records request. ### Contents [Exists & defensible](#s1)
+*Audit · Wildfire-Smoke Shelter ABM · Multnomah County*
 
+A requirement-by-requirement audit of the *Capacity Is Not Access* project against eight
+journal-grade validation requirements (IJGIS / ERL), with a concrete next-study plan.
+**Read-only: no repository file was modified.**
+
+`2026-08-21` · `branch websim-port @ 4ca0c6c` · `17 audit agents` · `387 tool calls` · `~2.0M audit tokens`
+
+> **Verdict.** The project's *internal* validity apparatus is unusually strong — byte-identity
+> regressions, registered predictions with scored misses, negative controls, a claims linter, and an
+> honest 55-row parameter registry. Its *external* validity rests on exactly two event observations:
+> one newspaper occupancy snapshot (~130 of 198 beds, one night) and one N=73 retrospective survey.
+> Every headline access number is a model output under universal awareness — an assumption the repo's
+> own archived runs contradict (measured awareness 0.356 leads to ~17.8% sheltered across all arms,
+> and the placement effect disappears). The manuscript does not disclose those runs. The path forward
+> is unusually tractable: most of the repair is text, in-repo computation, and one well-precedented
+> public-records request.
+
+### Contents
+
+- [Exists & defensible](#s1)
 - [Missing](#s2)
 
 - [Implementable with existing data](#s3)
