@@ -158,3 +158,29 @@ The symposium dry-run, executed against the real deployed URL — not localhost:
 
 A failed step blocks the announcement, not the retrospective: the deploy is rolled
 back first and diagnosed second.
+
+## 6. MCECS personal web space (the symposium host)
+
+The site is also served from the author's Portland State MCECS account, which is
+plain static hosting and needs nothing the GitHub Pages path does not:
+
+- **URL:** `https://web.cecs.pdx.edu/~<mcecs-user>/reu/` — landing page, with the
+  simulation at `reu/sim/` and the deck and presenter script at `reu/deck/`.
+- **Mechanics:** files under `~/public_html/` on the campus Linux hosts
+  (`websftp.cecs.pdx.edu` for SFTP/scp, `linux.cecs.pdx.edu` for a shell). The CAT
+  documentation prescribes directories `711` and files `600`; the web server reads
+  them as the account owner. The app's relative base path (§3) means `sim/` works at
+  that nested path without a rebuild; permalinks stay in the hash fragment.
+- **Procedure:** build and run both §2 gates, then
+  `powershell -File scripts\deploy-mcecs.ps1 -User <mcecs-user>` from the repo root.
+  The script re-runs `deploy-check`, stages a copy, uploads it beside the live tree
+  and swaps it in, so a failed upload never leaves a half-replaced site. It stores no
+  credentials; OpenSSH prompts for the account password.
+- **Graph assets:** `pipeline/out/` is git-ignored (§4). If the four `graph-*.bin`
+  files are missing, regenerate them before building: `run-export.ps1` (the certified
+  Java exporter), `npm run build:graph -w @websim/pipeline`, then
+  `npm run build:checksums -w @websim/pipeline` so the asset manifest matches the
+  packed bytes. The topology container embeds the exporter's census, which carries
+  a timing field, so its hash differs between exports while the graph is identical;
+  the packer's census assertion and the geometry/names hashes are the equality check.
+- **Dry run:** §5 applies unchanged, against the MCECS URL.
