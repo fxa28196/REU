@@ -135,6 +135,15 @@ file anywhere in this repository**, and no reference number, contact name,
 approval date, licence name, licence version or licence URL is claimed here,
 because none has been recorded.
 
+**Full-feed snapshot (D2b, 2026-10-02).** Because the feed keeps no history,
+the entire feed (189,899 records, 71,722 non-duplicate, 2025-01-01 ..
+2026-10-01) was captured on 2026-10-02 by `scripts/snapshot-encampments.ps1`
+into `Geography/data/encampments/snapshots/`, with a manifest and SHA-256. It
+is an archival capture for the next study, not a model input; the archived
+runs still read the 2026-07-24 sample. Full record in
+[`../../Geography/data/README.md`](../../Geography/data/README.md) §2d. Same
+credit as above.
+
 ---
 
 ## D3 — Hourly PM2.5 observations · **ACQUIRED**
@@ -148,6 +157,16 @@ Key limitations carried forward: non-FRM/FEM instruments (possible bias under
 dense wood smoke); **2 monitors inside Multnomah County** — far too sparse to
 resolve intra-urban gradients on its own (see D4 and the interpolation
 discussion in DESIGN_SPEC V5).
+
+**August 2026, provisional (D3, retrieved 2026-10-02).** The AQS pull for
+2026-08 returned no Oregon rows (EPA posts certified data months later), so the
+month was captured from **EPA AirNow**'s public hourly files instead
+(`scripts/fetch-airnow-hourly.ps1`): 6 monitors, 4,426 hourly rows, all 744
+hourly files present, public domain, SHA-256 recorded. AirNow values are
+preliminary and may be revised; the AQS file replaces this one when posted.
+Only one of the six monitors is inside Multnomah County. Full record in
+[`../../Geography/data/README.md`](../../Geography/data/README.md) §2e. Not
+wired into the model.
 
 ---
 

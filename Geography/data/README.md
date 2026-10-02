@@ -173,6 +173,35 @@ System (AQS) pre-generated hourly data files, parameter 88502, 2020.* Retrieved
 | Other limitations | Complaint-driven (311/web reports) → biased toward visible, complained-about camps; not a census of unsheltered people. Paging a live feed is not byte-reproducible — the *spatial distribution* is the reproducible quantity, not the exact rows (see the fetch script). |
 | Transformations before use | `ContextCreator` samples `numAgents` points uniformly at random (seeded by `randomSeed`), snaps each to the nearest street-graph node, and records the report `inc_id` as the resident's `encampment_id`. No coordinate modification. |
 
+## 2d. `encampments/snapshots/irp_campsite_reports_full_2026-10-02.csv` — full feed snapshot (**archival capture; not a model input**)
+
+| Field | Value |
+|---|---|
+| File | `encampments/snapshots/irp_campsite_reports_full_2026-10-02.csv` (189,899 records; SHA-256 `88F242A2514514AE2071B1024FBCC387AE783502EE509C9B91E4C9DF98719730`) with manifest `irp_campsite_reports_full_2026-10-02.json` (retrieval time, counts, hash) |
+| Source | Same service as §2c: **City of Portland IRP Campsite Reports**, open-data ArcGIS Feature Service `COP_OpenData_Miscellaneous/MapServer/1396`; DATA_SOURCES D2b |
+| Retrieved | **2026-10-02** via `scripts/snapshot-encampments.ps1` — every record the feed held that day (`where=1=1`, all fields, paged by OBJECTID), not a sample |
+| Why it exists | The feed keeps only a rolling window and no history; a snapshot not taken is lost. The next-study audit (`docs/next-study/STATUS.md`, Phase 1) asked for one now and then weekly through fire season. This is the first. |
+| Attribution / redistribution | As §2c: credit as *City of Portland, Impact Reduction Program campsite reports* (obtained via the City's open-data ArcGIS service); the redistribution approval is recorded in §2c exactly as strongly as the record supports and no more. |
+| Fields | `OBJECTID`, `report_id`, `inc_id`, `inc_date_create` (ISO 8601 UTC, from the service's epoch-millisecond date field), `item_date_create` (ISO 8601 **without zone** — the service stores it as a `yyyyMMddHHmmss` integer and does not state the zone; it runs about 7 h behind `inc_date_create`, consistent with Pacific local time), `duplicate` (0/1), `IS_VEHICLE` (Yes/No), `lon`, `lat` (WGS84, 6 dp) |
+| Coverage | 189,899 records: 71,722 non-duplicate reports and 118,177 flagged duplicates; 65,158 vehicle-flagged. `inc_date_create` **2025-01-01 .. 2026-10-01**. lon −123.00..−122.47, lat 45.43..45.65. No record lacks geometry. |
+| Relation to the model input | **None at run time.** The model still reads §2c (`irp_campsite_reports_sample.csv`, SHA unchanged, 3,400 points) and every archived manifest still checksums that file. This snapshot is kept for the next study's temporal and spatial comparisons. |
+| Limitations | Everything in §2c (complaint-driven, visible-camp bias, 2025–26 not 2020). A snapshot is byte-reproducible only on the day it was taken; the manifest records the feed's own count at retrieval. |
+
+## 2e. `airnow/airnow_hourly_pm25_portland_2026-08.csv` — hourly PM2.5, August 2026 (**provisional AirNow series; not a model input**)
+
+| Field | Value |
+|---|---|
+| File | `airnow/airnow_hourly_pm25_portland_2026-08.csv` (530,065 B; 4,426 rows; SHA-256 `7014191C8B2CAE25AD991E9B9683AC16B87AD1B300308F6C0786661D6C3B78A7`) with manifest `airnow_hourly_pm25_portland_2026-08.json` |
+| Source organisation | **U.S. Environmental Protection Agency, AirNow program** — public hourly data files `https://files.airnowtech.org/airnow/2026/<yyyymmdd>/HourlyData_<yyyymmddhh>.dat`; the readings are from **Oregon Department of Environmental Quality** monitors, as the file's agency column states |
+| Retrieved | **2026-10-02** via `scripts/fetch-airnow-hourly.ps1 -Year 2026 -Month 08` — 744 of 744 hourly files fetched, none missing |
+| Why AirNow and not AQS | `scripts/fetch-aqs-pm25.ps1 -Year 2026 -Month 08` was run first the same day. EPA's pre-generated `hourly_88502_2026.zip` (2,734,020 B, SHA-256 `9BB0D9E363E83BEF1FC88EDE96F2F86134DD7B80CA09D4EF812C49143F35389E`) held **no Oregon rows for August 2026**: agencies submit and certify AQS data months after the fact. AirNow carries the preliminary real-time series from the same monitors. Re-run the AQS script when EPA posts the month and treat that as the record of reference. |
+| Licence | **U.S. federal government work — public domain.** EPA asks that AirNow be acknowledged and states that AirNow data are preliminary and may be revised. |
+| Geographic coverage | **6 monitors**: Multnomah `410510080` Portland – SE Lafayette (the only Multnomah site reporting PM2.5 to AirNow that month); Washington `410670004` Hillsboro – Hare Field, `410670005` Portland Near Road, `410670111` Beaverton – Highland; Clackamas `410050004` Portland – Spangler, `410050102` Multorpor. Site names are truncated to 20 characters by AirNow. |
+| Temporal coverage | 2026-08-01 00:00 .. 2026-08-31 23:00 **GMT** (`gmt_offset` −8 carried per row); 4,426 of 4,464 possible monitor-hours |
+| Fields | `date_gmt` (MM/DD/YY), `time_gmt` (HH:MM), `aqsid`, `site_name`, `gmt_offset`, `parameter` (PM2.5), `units` (UG/M3), `value`, `agency` |
+| Observed range | Hourly values 1.2 .. 533.4 µg/m³; the peak is at Multorpor (Clackamas). Not interpreted anywhere in this repository yet. |
+| Uncertainty | Provisional, not quality-assured, non-FRM continuous instruments as in §2; **not** regulatory-grade. Not wired into the model. |
+
 ## 3. Stock Repast Simphony demo data (**not used by the model; retained**)
 
 `Agents2.*`, `CookCounty.*`, `WaterLines.*`, `Zones2.*`, `RGBTestPattern.*`,

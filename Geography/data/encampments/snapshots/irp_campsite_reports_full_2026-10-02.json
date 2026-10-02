@@ -1,0 +1,22 @@
+﻿{
+    "dataset":  "City of Portland IRP Campsite Reports (PortlandMaps open data, layer 1396)",
+    "service":  "https://www.portlandmaps.com/od/rest/services/COP_OpenData_Miscellaneous/MapServer/1396",
+    "retrieved_utc":  "2026-10-02T22:25:06Z",
+    "feed_reported_count":  189899,
+    "rows_written":  189899,
+    "earliest_inc_date":  "2025-01-01T00:08:04Z",
+    "latest_inc_date":  "2026-10-01T09:51:09Z",
+    "fields":  [
+                   "OBJECTID",
+                   "report_id",
+                   "inc_id",
+                   "inc_date_create",
+                   "item_date_create",
+                   "duplicate",
+                   "IS_VEHICLE",
+                   "lon",
+                   "lat"
+               ],
+    "sha256":  "88F242A2514514AE2071B1024FBCC387AE783502EE509C9B91E4C9DF98719730",
+    "note":  "Full feed snapshot. The feed keeps no history; this file is the only record of its contents on this date. Not a model input."
+}

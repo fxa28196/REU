@@ -1,0 +1,24 @@
+﻿{
+    "dataset":  "U.S. EPA AirNow hourly observations (files.airnowtech.org, HourlyData_*.dat), provisional",
+    "period":  "2026-08",
+    "counties":  "Multnomah (41051), Washington (41067), Clackamas (41005), Oregon",
+    "parameter":  "PM2.5",
+    "retrieved_utc":  "2026-10-02T22:24:27Z",
+    "hourly_files_expected":  744,
+    "hourly_files_fetched":  744,
+    "hourly_files_missing":  [
+
+                             ],
+    "rows":  4426,
+    "monitors":  6,
+    "monitor_aqsids":  [
+                           "410050004",
+                           "410050102",
+                           "410670004",
+                           "410670005",
+                           "410670111",
+                           "410510080"
+                       ],
+    "sha256":  "7014191C8B2CAE25AD991E9B9683AC16B87AD1B300308F6C0786661D6C3B78A7",
+    "note":  "Provisional real-time values, not the certified AQS record. Re-run fetch-aqs-pm25.ps1 for this month once EPA posts it."
+}
