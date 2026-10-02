@@ -84,18 +84,18 @@ before use):**
   documented as a separate, checksummed step, not improvised in code.
 - **Uncertainty:** the 99-capacity figure comes from a newsroom, not from JOHS
   directly; it is plausible (COVID-era distancing caps) but **must be
-  confirmed** — likely candidates: a JOHS public-records request, or the
-  county's 2020–21 shelter reports.
+  confirmed** against a published county source — the county's 2020–21
+  shelter reports are the likely candidate.
 - **Limitations for modelling:** capacity 99 is a *nightly* cap, not a
   throughput; the model's capacity semantics must state which is meant.
   Mount Scott's standby status means a faithful "status quo" scenario has
   **two** operating sites, not three.
 
-**Acquisition plan:** (1) request the JOHS after-action/shelter log for
-Sept 2020 (public records); (2) geocode the three facilities from the official
-City parks facility dataset + OCC address; (3) commit as
+**Acquisition plan:** (1) geocode the three facilities from the official
+City parks facility dataset + OCC address; (2) commit as
 `Geography/data/shelters/shelters_2020-09.csv` with a per-row `source` and
-`source_date` column.
+`source_date` column; (3) confirm the capacity figure against a published
+county source when one appears.
 
 ---
 

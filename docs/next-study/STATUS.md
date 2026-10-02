@@ -69,9 +69,12 @@ Thirteen further wording/scoping defects (W1-W13) are tabulated in `AUDIT_REPORT
    smoke exposure (5), global sensitivity (6), manuscript rewrite (7).
 2. **Phase 0 truth-repairs not applied** — S1, S2, S3 and W1-W13 are all still live in the manuscript.
    This is intentional: the brief forbade modification.
-3. **Three time-sensitive captures not executed** (verified: no new files under `Geography/data`,
-   working tree clean): encampment feed snapshot, Aug-2026 AQS pull, Sept-2020 records request.
-   Both fetch scripts exist (`scripts/fetch-encampments.ps1`, `scripts/fetch-aqs-pm25.ps1`).
+3. **Time-sensitive captures — executed 2026-10-02.** The full encampment feed was snapshotted
+   (`scripts/snapshot-encampments.ps1`; 189,899 records, manifest and SHA-256 under
+   `Geography/data/encampments/snapshots/`). The Aug-2026 AQS pull returned no Oregon rows (EPA
+   posts certified data months later), so the month was captured from EPA AirNow's public hourly
+   files instead (`scripts/fetch-airnow-hourly.ps1`; 6 monitors, 4,426 rows, provisional until AQS
+   posts). Both are credited in `Geography/data/README.md` §2d–2e. Neither is a model input.
 4. **Two open author decisions:** whether Phase-0 repairs land before or after the camera-ready,
    and which branch hosts next-study work.
 
@@ -122,8 +125,9 @@ recondition the S3 present-tense sentences; clear W1, W2, W10, W11, W12; propaga
 to the results doc, README, `scenario_c_report.json` and the deck; harmonise the 1.1x/1.2x knife-edge;
 add an executed-sweep run-family column to the registry; extend `claims.yaml` with the new linter rules.
 
-**In parallel, three user-owned actions that expire:** snapshot the encampment feed (it retains no
-history), file the Sept-2020 records request, pull Aug-2026 AQS hourly PM2.5. Agents never contact agencies.
+**In parallel, the two captures that expire** (snapshot the encampment feed, which retains no history;
+pull Aug-2026 hourly PM2.5) were executed on 2026-10-02; see "Unfinished work" item 3. The feed
+snapshot should be repeated weekly through fire season.
 
 **Then Chunk 2 (behavioral model), gated on one decision:** the E9 rule says the single 2020 occupancy
 record may serve calibration **or** validation, never both. The audit recommends keeping alphaHazard

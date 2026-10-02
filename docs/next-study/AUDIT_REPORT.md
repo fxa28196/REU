@@ -199,11 +199,9 @@ Consolidated across the eight requirement analyses; deduplicated. The three stru
 
 ### Phase 1 — Time-sensitive captures (this week; user-owned)
 
-- Snapshot the encampment feed now and weekly during fire season (`fetch-encampments.ps1`).
+- Snapshot the encampment feed now and weekly during fire season (`snapshot-encampments.ps1`, which writes a dated full-feed file beside the archived model input). *Executed 2026-10-02.*
 
-- File the Sept-2020 records request (occupancy logs, activation agreements, after-action material — could resolve A-04 if the records state capacity and its unit, and possibly enlarges the 2020 observation set). Prepare the parallel Aug-2026 request for when records close.
-
-- Pull Aug-2026 AQS hourly PM2.5 (`fetch-aqs-pm25.ps1 -Year 2026 -Month 08`); query the PurpleAir sensor census for Portland Sept 2020 and Aug 2026.
+- Pull Aug-2026 hourly PM2.5 (`fetch-aqs-pm25.ps1 -Year 2026 -Month 08`; until EPA posts the certified month, `fetch-airnow-hourly.ps1` captures the provisional AirNow series). *Executed 2026-10-02 (AirNow; AQS had no Oregon rows yet).* The PurpleAir sensor census for Portland Sept 2020 and Aug 2026 remains open.
 
 ### Phase 2 — In-repo computation (weeks; no new data; §3 items in dependency order)
 
