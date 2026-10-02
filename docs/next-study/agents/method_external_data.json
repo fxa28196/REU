@@ -1,0 +1,219 @@
+{
+ "sources_found": [
+  {
+   "name": "DEQ Wildfire Smoke Trends and the AQI (May 2023 report)",
+   "url": "https://www.oregon.gov/deq/wildfires/Documents/WildfireSmokeTrendsReport.pdf",
+   "what": "Official per-city inventory of wildfire-smoke AQI days. Portland: zero unhealthy-or-worse days 1985-2014; 2015-2022 = 26 days >=USG; the ONLY very-unhealthy (3) and hazardous (5) days all occurred in 2020; 2022 had three >=USG days from the Nakia Creek Fire, which made 'smokey conditions for around a week' in the Portland metro (Oct 2022).",
+   "coverage": "Oregon statewide, 1985-2022; Portland-specific trend section",
+   "access": "open download (PDF)",
+   "verified": "FETCHED"
+  },
+  {
+   "name": "DEQ Wildfire Smoke Trends report, data 2000-2025",
+   "url": "https://www.oregon.gov/deq/wildfires/Documents/wf2024wfTrendsRep.pdf",
+   "what": "Updated inventory: Portland 2013-2025 = 29 days >=USG; largest impacts 2017 (8 d), 2018 (6 d), 2020 (9 d incl. all very-unhealthy/hazardous days); zero >=USG days in 2025. Derived arithmetic from the two DEQ reports: 2021 had zero >=USG days and 2023+2024 combined had at most 1 — i.e., NO post-2020 Portland episode approaches Sept 2020 severity.",
+   "coverage": "Oregon statewide, 2000-2025",
+   "access": "open download (PDF)",
+   "verified": "FETCHED"
+  },
+  {
+   "name": "JOHS daily smoke-shelter news releases, Sept 2020 (e.g., Sept 18 'ninth day' release)",
+   "url": "https://multco.us/news/friday-sept-18-joint-office-offers-9th-day-smoke-shelter-likely-last-day-now-sign-211-alerts",
+   "what": "Day-by-day operational record of the two cleaner-air shelters: Oregon Convention Center from Sept 10, Charles Jordan CC from Sept 11, Mt. Scott CC on standby; 9 consecutive days ending ~Sept 18-19; context of ~1,400 year-round beds; 211info alert signup (text 'pdxshelter' to 898211). CRITICAL ABSENCE: none of the releases (Sept 14 and Sept 18 fetched in full) report occupancy or guest counts.",
+   "coverage": "Sept 10-19, 2020, Multnomah County",
+   "access": "open web pages; one release per day Sept 12-18 confirmed to exist",
+   "verified": "FETCHED"
+  },
+  {
+   "name": "Multnomah County January 2024 Severe Winter Weather After Action Report",
+   "url": "https://multco.us/file/january_2024_severe_winter_weather_preliminary_findings_and_action_steps-0/download",
+   "what": "44-page county AAR containing 'Figure 1: Daily Peak Numbers by facility' with per-facility nightly Guests/Capacity (nightly totals 276, 761, 1,076, 1,253, 1,292, 1,356), plus staffing, transports, health-impact counts. PROVES the county tabulates per-facility nightly occupancy for emergency shelter activations — exactly the record type a public-records request for Sept 2020 would target.",
+   "coverage": "Jan 12-21, 2024 winter event, Multnomah County",
+   "access": "open download (PDF)",
+   "verified": "FETCHED"
+  },
+  {
+   "name": "Multnomah County severe-weather shelter usage news releases (winter events)",
+   "url": "https://multco.us/news/news-release-severe-weather-shelters-serve-200-people-multnomah-county-wednesday-night",
+   "what": "Fetched Feb 15, 2024 release: 'About 200 people stayed in the 480 additional severe weather beds ... last night'; names 5 shelters; 211info coordinated 51 rides. Search results show the same nightly-count practice for Feb 2025 (684 people in seasonal+severe-weather spaces) and winter 2021-22 (2,377 bed nights over an 11-day cold event). These are aggregate nightly totals, published only for COLD events — no equivalent releases exist for smoke events.",
+   "coverage": "winter activations ~2021-2025, Multnomah County",
+   "access": "open news pages",
+   "verified": "FETCHED"
+  },
+  {
+   "name": "Multnomah County Public Records Requests (Oregon Public Records Law route)",
+   "url": "https://multco.us/services/public-records-requests",
+   "what": "County page: requests governed by 'ORS 192.311 to 192.431'; submitted via the online Public Records Request Portal (manage request, pay invoices, download records); fees for staff research with advance notice; fee waiver/reduction 'if your request is in the public interest.' Route (describe only, not filed): request to the Homeless Services Department (JOHS successor) for nightly guest counts / shelter logs for the Sept 10-19, 2020 cleaner-air shelter activation — the Jan 2024 AAR shows this record type is compiled.",
+   "coverage": "all county departments incl. Homeless Services",
+   "access": "records request (online portal)",
+   "verified": "FETCHED"
+  },
+  {
+   "name": "HSD Emergency Shelter Report page + HSD Data Dashboard",
+   "url": "https://hsd.multco.us/data-dashboard/",
+   "what": "Emergency Shelter Report (Mar 31, 2025) is a best-practices review, no occupancy data. The HSD Data Dashboard is a MONTHLY Tableau tool (people experiencing homelessness; served with housing/shelter/prevention) — system-level, not per-facility or nightly, and no severe-weather/smoke module visible on the page.",
+   "coverage": "Multnomah County homeless services system, monthly",
+   "access": "open dashboard (Tableau)",
+   "verified": "FETCHED"
+  },
+  {
+   "name": "Stories from the Outside: Oregon Wildfires 2020 (PSU HRAC)",
+   "url": "https://www.pdx.edu/homelessness/stories-outside-oregon-wildfires-2020",
+   "what": "The n=73 survey already used by the study — page confirmed live (HTTP 200). Search-level detail: surveyed June 2021 with Street Roots Ambassadors; 75% received no information about support during the wildfire event; 69% received no help; 15% went to hospital.",
+   "coverage": "Portland area, 2020 wildfire event, n=73",
+   "access": "open web page + PDF",
+   "verified": "FETCHED"
+  },
+  {
+   "name": "The Pathways Study (PSU HRAC for Multnomah County HSD, published Apr 9, 2026)",
+   "url": "https://hsd.multco.us/wp-content/uploads/2026/04/Pathways-Survey-Findings-Published-4.9.2026.pdf",
+   "what": "NEW post-2020 survey of 541 people experiencing homelessness in Multnomah County (~10 months of surveying) on how they perceive, access, and navigate services incl. shelter; guided by lived-experience committee (TREES); funded by HSD. PDF exists (HTTP 200, 4.5 MB — content not read). Candidate updated source for awareness/shelter-choice parameters; smoke-specific content UNKNOWN.",
+   "coverage": "Multnomah County, surveys ~2025-2026, n=541",
+   "access": "open download (PDF)",
+   "verified": "FETCHED"
+  },
+  {
+   "name": "211info",
+   "url": "https://www.211info.org/",
+   "what": "211 was the official signup channel for shelter alerts in Sept 2020 (per fetched JOHS release) and coordinates severe-weather shelter transportation (51 rides Feb 2024, 112 rides Feb 2025 per county releases). Search-level: 2024 volume 522,877 requests incl. 255,505 calls; a Data Team produces reports for stakeholders; quarterly reports page exists but returned 403 to automated fetch. NO open contact-volume dataset found; category/date-level contact data would require asking 211info's data team (do not contact — route only). NOTE: the data.oregon.gov 'Volume of Requests' dataset (ppyw-yvxy) is DEQ records-request stats, NOT 211info — verified by fetching its API metadata.",
+   "coverage": "Oregon + SW Washington; volumes cited for 2024",
+   "access": "reports pages open; raw contact data = data request to 211info",
+   "verified": "SEARCH-RESULT-ONLY"
+  },
+  {
+   "name": "EPA AirData pre-generated AQS files (monitor census + daily PM2.5)",
+   "url": "https://aqs.epa.gov/aqsweb/airdata/annual_conc_by_monitor_2020.zip",
+   "what": "Downloaded and parsed annual_conc_by_monitor_2020: Multnomah County had exactly TWO PM2.5 sites reporting to AQS in 2020 — 41-051-0080 Portland SE Lafayette (FRM 88101 + 88502) and 41-051-2011 Portland Helensview School (88502 only). daily_88101_2020.zip also confirmed available (HTTP 200). Consequence: the regulatory network alone gives essentially no intra-county spatial resolution for Sept 2020.",
+   "coverage": "US, annual + daily files, 1980s-present; 2020 file verified",
+   "access": "open bulk download, no API key needed",
+   "verified": "FETCHED"
+  },
+  {
+   "name": "PurpleAir historical API + Data Download Tool",
+   "url": "https://community.purpleair.com/t/api-pricing/4523",
+   "what": "Historical sensor data retrievable for any time period via API (points-based billing, 100,000 points/$1; free access possible for own sensors; open-source Data Download Tool requires no programming). Public data licensed for private/educational/commercial tiers. Portland sensor count in Sept 2020 NOT established (needs an API query).",
+   "coverage": "per-sensor history back to installation; Portland 2020 density UNKNOWN",
+   "access": "API (key + points purchase); small-area event pulls likely cheap",
+   "verified": "SEARCH-RESULT-ONLY"
+  },
+  {
+   "name": "NOAA HMS smoke polygons archive",
+   "url": "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2020/09/hms_smoke20200912.zip",
+   "what": "Daily analyst-drawn smoke plume shapefiles with Light/Medium/Heavy density classes at predictable date URLs; the Sept 12, 2020 file verified present (HTTP 200, zip). Gives daily smoke-extent context, not surface PM2.5.",
+   "coverage": "CONUS daily, incl. all of Sept 2020",
+   "access": "open download, predictable URLs",
+   "verified": "FETCHED"
+  },
+  {
+   "name": "Childs et al. daily wildfire smoke PM2.5 (Stanford ECHO Lab)",
+   "url": "https://www.stanfordecholab.com/wildfire_smoke",
+   "what": "THE spatially-resolved smoke-PM2.5 product covering Sept 2020: v1.0 (ES&T 2022) daily smoke PM2.5 for 2006-2020 at 10 km grid AND county, census-tract, and ZIP level (2 GB tract file); v2.0 beta extends 2006-2023. Open via Dropbox/Harvard Dataverse, replication code on GitHub.",
+   "coverage": "contiguous US, daily, 2006-2020 (v1) / 2006-2023 (v2 beta); tract-level",
+   "access": "open download",
+   "verified": "FETCHED"
+  },
+  {
+   "name": "MAIAC MCD19A2 v6.1 AOD",
+   "url": "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/maiac/MCD19A2",
+   "what": "Daily 1-km Terra+Aqua MAIAC aerosol optical depth (incl. smoke injection height and AOD QA layers); distributed via LAADS DAAC and Google Earth Engine; product line covers Sept 2020. Caveat: AOD is not surface PM2.5, and retrieval completeness under the extremely dense Sept 2020 plume was not verified.",
+   "coverage": "global land, daily 1 km, 2000-present",
+   "access": "open (NASA Earthdata login)",
+   "verified": "SEARCH-RESULT-ONLY"
+  },
+  {
+   "name": "EPA EQUATES (CMAQ modeled air quality)",
+   "url": "https://catalog.data.gov/dataset/data-for-epas-air-quality-time-series-project-equates-version-1",
+   "what": "12-km CONUS CMAQ daily surfaces — but spans 2002-2019 ONLY, so it does NOT cover Sept 2020. ABSENT for the study event. (Access when relevant: CMAS Data Warehouse, AWS Open Data, EPA RSIG.)",
+   "coverage": "CONUS 12 km, 2002-2019 — event NOT covered",
+   "access": "open download",
+   "verified": "SEARCH-RESULT-ONLY"
+  },
+  {
+   "name": "Metro RLIS Building Footprint Database + RLIS open data",
+   "url": "https://rlisdiscovery.oregonmetro.gov/datasets/drcMetro::building-footprint-database",
+   "what": "Regional building footprints compiled from jurisdictions and lidar with average building heights; ODbL open license; last updated 2026-04-20; bulk download available (RLIS Discovery is a JS app — full metadata fetch was blocked, details from search captures). Taxlot/parcel layers also on RLIS; PortlandMaps ArcGIS REST (COP_OpenData) and gis-pdx.opendata.arcgis.com serve city layers.",
+   "coverage": "Portland metro region",
+   "access": "open download (ODbL)",
+   "verified": "SEARCH-RESULT-ONLY"
+  },
+  {
+   "name": "Portland Parks & Recreation community centers",
+   "url": "https://www.portland.gov/parks/recreation/community-centers",
+   "what": "PP&R operates nine community centers and two arts centers (incl. Charles Jordan and Mt. Scott, both used in the 2020 smoke response). A candidate-facility inventory can be assembled from this list + RLIS footprints/heights; NO public floor-area or HVAC/filtration dataset found (see not_found).",
+   "coverage": "City of Portland facilities, current",
+   "access": "open web page; facility attributes would need assembly or records request",
+   "verified": "SEARCH-RESULT-ONLY"
+  },
+  {
+   "name": "Seattle/King County second-city package (SoDo 'healthy air center', Sept 2020)",
+   "url": "https://humaninterests.seattle.gov/2020/09/11/new-healthy-air-center-to-open-for-people-experiencing-homelessness/",
+   "what": "Fetched city blog (Sept 11, 2020): SoDo healthy air center at 1045 6th Ave S, open Sept 11 3pm, extended to Wed Sept 16 morning; staffed by Salvation Army with King County DCHS; existing smoke-capable shelters Fisher Pavilion (cap. 80) and Exhibition Hall (cap. 130) 'with air filtration systems.' Search-level: county release says ~80 people served; King County press releases of Sept 11 and Sept 14, 2020 exist (old URLs now 404 — archived/records request). Data plausibility: STRONGEST second city — paired Sept 2020 smoke event + dedicated homeless smoke shelter + mature data infrastructure (King County Homelessness Data Hub HMIS case study on HUD Exchange; KCRHA dashboards and severe-weather program; Public Health smoke guidance for homeless providers; Bolt Creek fire smoke Sept-Oct 2022 as a second local episode).",
+   "coverage": "Seattle/King County, Sept 2020 + 2022",
+   "access": "open pages + archives; occupancy detail likely via WA Public Records Act request",
+   "verified": "FETCHED"
+  },
+  {
+   "name": "Spokane second-city sketch",
+   "url": "https://spokanecleanair.org/2010-2020-wildfire-seasons-a-10-year-comparison/",
+   "what": "Sept 2020 was Spokane's first event with 24-hr averages in the hazardous range on four consecutive days (Spokane Regional Clean Air Agency); city opened a safer-air center at the Spokane Convention Center, 24/7 while AQI >250 (Spokesman-Review, Sept 13, 2020); later-year 'regional temporary safer air center' activations reported (KREM, incl. Trent Resource and Assistance Center). Homeless-services data infrastructure not researched in depth — plausibility moderate: severe event + shelter activations, but no occupancy data located.",
+   "coverage": "Spokane, Sept 2020 + later seasons",
+   "access": "news/agency pages open; shelter records unclear",
+   "verified": "SEARCH-RESULT-ONLY"
+  },
+  {
+   "name": "Sacramento second-city sketch",
+   "url": "https://www.caloes.ca.gov/wp-content/uploads/Preparedness/Documents/FINAL-AAR-2018-Camp-Fire-508-Clean-Copy-11.17.25.pdf",
+   "what": "Camp Fire (Nov 2018) spread smoke over the Sacramento Valley; Cal OES Camp Fire After Action Report exists (evacuation/sheltering focus, ~32,000 sheltered — evacuees, not smoke-respite for unhoused). Sacramento is NOW converting Pannell Community Center into an emergency clean-air shelter (CBS Sacramento). No 2018 smoke-specific homeless shelter records found — plausibility weak-to-moderate: the 2018 event predates clean-air-shelter practice there.",
+   "coverage": "Sacramento region, Nov 2018 + current initiatives",
+   "access": "AAR open PDF; local shelter records unclear",
+   "verified": "SEARCH-RESULT-ONLY"
+  },
+  {
+   "name": "Oregon 2020 Labor Day Wildfires After Action Report (state DMTF)",
+   "url": "https://wildfire-auth.oregon.gov/Documents/DMTF%20After%20Action%20Report.pdf",
+   "what": "Statewide after-action report on the 2020 Labor Day fires — existence verified (HTTP 200, 32 MB PDF; content not reviewed). Focus is expected to be fire/evacuation response, not Multnomah smoke-shelter occupancy; no Multnomah-specific smoke AAR found.",
+   "coverage": "Oregon statewide, Sept 2020",
+   "access": "open download (PDF)",
+   "verified": "FETCHED"
+  },
+  {
+   "name": "Portland smoke episodes after the study event — news layer",
+   "url": "https://www.opb.org/article/2026/08/04/air-quality-advisory-oregon-wildfires-portland-fire/",
+   "what": "Oct 2022: DEQ advisory extended through the weekend; county's 3rd red-day wood-burning restriction that month (Oct 14, 2022). Aug 2023: brief unhealthy air in east Portland from the Camp Creek Fire near the Bull Run reservoirs. Aug 2026 (ONGOING this month): DEQ advisory from Mon Aug 3; Portland ranked most-polluted major world city Aug 5, 2026 (IQAir), metro AQI ~160 'unhealthy'; county wood-burning restriction from Aug 3; county pointed residents to libraries/community centers as cooling + cleaner-air spaces rather than opening dedicated shelters (per multco.us program pages). The Aug 2026 event is the only live opportunity to collect a second-episode dataset in near-real-time.",
+   "coverage": "Portland metro, Oct 2022 / Aug 2023 / Aug 2026",
+   "access": "open news + agency pages",
+   "verified": "SEARCH-RESULT-ONLY"
+  },
+  {
+   "name": "IJGIS aims and scope",
+   "url": "https://www.tandfonline.com/journals/tgis20/about-this-journal",
+   "what": "Publisher page returned 403; text obtained from a third-party reproduction (myhuiban.com/journal/129) matching the T&F search capture: 'The aim of International Journal of Geographical Information Science is to provide a forum for the exchange of original ideas, approaches, methods and experiences in the field of GIScience.' Coverage bullets: 'Innovations and novel applications of GIScience in natural resources, social systems and the built environment'; 'Fundamental and computational issues of geographic information'; 'The design, implementation and use of geographical information for monitoring, prediction and decision making'; 'Novel geospatial approaches to address one or more of the UN SDGs.' Implication: an application must carry a methodological/GIScience contribution ('original ideas, approaches, methods'), not only a case study.",
+   "coverage": "journal scope, current",
+   "access": "open (via reproduction; publisher page blocks bots)",
+   "verified": "FETCHED"
+  },
+  {
+   "name": "Environmental Research Letters scope and publication criteria (IOP Publishing Support)",
+   "url": "https://publishingsupport.iopscience.iop.org/journals/environmental-research-letters/about-environmental-research-letters/",
+   "what": "Verbatim: ERL is 'the meeting place of research and policy communities concerned with the impact and outcomes of environmental change'; 'We expect the significance and impact of findings to be clearly communicated, demonstrating why the work is timely, requires urgent attention by a global audience, and demands rapid publication.' Decisive for this study — ERL will NOT accept: 'Local case studies (city-scale and smaller) which do not adequately show how results/findings are timely and significant in a broader context outside of the study area.' Letters max ~4,000 words; also discourages 'highly specialized or technical methodological research which is not accessible to a broad, multidisciplinary audience' (search capture of same support pages).",
+   "coverage": "journal scope, current",
+   "access": "open web page",
+   "verified": "FETCHED"
+  }
+ ],
+ "not_found": [
+  "Occupancy/guest counts for the Sept 10-19, 2020 Multnomah cleaner-air shelters (Oregon Convention Center, Charles Jordan): NOT published anywhere located — the county's own daily releases (two fetched in full) contain zero counts; only route is an Oregon Public Records Law request to the Homeless Services Department (the Jan 2024 winter AAR proves per-facility nightly Guests/Capacity tables are compiled for such activations).",
+  "A Multnomah County-specific after-action report for the Sept 2020 SMOKE episode: none found (county AARs located only for winter events; the state DMTF Labor Day AAR is fire/evacuation-focused).",
+  "Facility-level HVAC/filtration data (MERV ratings, filtration capacity) for Portland community centers or county facilities: ABSENT publicly — targeted search returned only commercial HVAC content; the only public filtration statements are qualitative (Seattle's Fisher Pavilion/Exhibition Hall 'air filtration systems'; Multnomah's 2026 East County Library 'modern cooling and filtration systems').",
+  "An open 211info contact-volume dataset: none — the data.oregon.gov 'Volume of Requests' dataset (ppyw-yvxy) was checked and is DEQ public-records-request statistics, not 211info; 211info category/county call data would require a data request to 211info (not filed, per instructions).",
+  "A public dataset of county facility floor areas: not located (RLIS footprints + lidar heights are the assembly route).",
+  "Any post-2020 Portland smoke episode of comparable severity to Sept 2020: DOES NOT EXIST through 2025 per DEQ's own trend reports — all very-unhealthy/hazardous Portland days on record occurred in 2020; Oct 2022 (3 days >=USG) and the ongoing Aug 2026 event (~AQI 160, unhealthy) are the only multi-day candidates, both in a far milder regime, and no dedicated Multnomah cleaner-air shelter activation was found for either — so a second Portland validation period lacks BOTH severity-matched exposure and shelter-use observations unless the Aug 2026 county response produces records.",
+  "Denver as a second city: no dedicated smoke-shelter or homeless smoke-response records found for 2020-2021 — weak candidate.",
+  "IJGIS aims-and-scope direct from Taylor & Francis: page returns 403 to automated fetch (text recovered via search capture + third-party reproduction).",
+  "PurpleAir sensor count/coverage in Portland during Sept 2020: not established (requires a PurpleAir API query).",
+  "An ongoing open dashboard of per-facility nightly severe-weather shelter occupancy in Multnomah County: none — the HSD Tableau dashboard is monthly and system-level; nightly counts appear only in news releases (totals) and after-action reports (per-facility).",
+  "Di et al. / other ~1-km ML PM2.5 surfaces covering Sept 2020: not verified in this pass (Childs et al. 10-km/tract product is the verified spatial smoke-PM2.5 coverage of the event).",
+  "Multnomah severe-weather/cleaner-air records specifically tied to smoke AFTER 2020: no smoke-shelter activation records found for 2021-2026; county guidance routes people to libraries/community centers as cleaner-air spaces."
+ ],
+ "notes": "Method: WebSearch + WebFetch only; PDFs that WebFetch could not parse were downloaded and text-extracted locally with pypdf (files kept in the session scratchpad: deq_smoke_trends.txt, deq_smoke_trends_2025.txt, jan2024_aar.txt); no repo files were touched, no person or agency contacted, no forms submitted. Labeling: FETCHED = content opened/parsed or existence verified by direct HTTP request (HEAD-only cases are flagged in the entry); SEARCH-RESULT-ONLY = asserted by search captures I did not open. Key syntheses for the caller: (1) Independent Sept 2020 shelter-use observations exist only as unreleased county records — the records-request route is concrete and well-precedented (ORS 192.311-192.431, county portal, public-interest fee waiver; Jan 2024 AAR shows per-facility nightly Guests/Capacity is a record type the county produces). (2) Temporal out-of-sample validation inside Portland is severity-limited: DEQ's own record shows no post-2020 episode above 'unhealthy'; the honest framing is a milder-regime transfer test (Oct 2022) or a prospective test on the live Aug 2026 episode, whose operational records will be requestable soon. (3) Spatially-resolved PM2.5 for Sept 2020: 2 AQS sites county-wide (verified from EPA's file) make the regulatory network insufficient; the workable stack is PurpleAir (paid API), Childs et al. daily 10-km/tract smoke PM2.5 (open, covers event), NOAA HMS polygons (open), MAIAC 1-km AOD (open, caveats); EQUATES ends 2019 and is out. (4) Candidate facilities: RLIS footprints+heights (ODbL) + PP&R center list assemble an inventory; floor area partial, HVAC data absent. (5) Second city: Seattle/King County dominates (same Sept 2020 event, a dedicated healthy-air center with a reported ~80 served, HMIS/data-hub infrastructure, 2022 Bolt Creek repeat episode); Spokane moderate; Sacramento weak for 2018 but building clean-air shelters now; Denver effectively absent. (6) Journal fit: IJGIS requires a GIScience methods contribution ('original ideas, approaches, methods'); ERL explicitly rejects city-scale case studies that do not show significance 'in a broader context outside of the study area' — the quoted sentences are in the two journal entries. Caution on one derived number: 'at most 1 >=USG Portland day across 2023-2024' is arithmetic across the two DEQ reports' totals (26 days 2015-2022; 29 days 2013-2025 with 2 before 2015-era recount and 0 in 2025), not a sentence either report states."
+}

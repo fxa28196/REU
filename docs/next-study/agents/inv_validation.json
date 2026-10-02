@@ -1,0 +1,218 @@
+{
+ "summary": "Validation actually performed centers on internal consistency, registered prediction discipline, and one external observation point — not statistical validation against independent data. VERIFIED-in-repo: (1) a claims linter (scripts/lint_claims.py + docs/claims.yaml) that I executed — exit 0, 0 hits across 10 deliverables — which structurally blocks refuted/retired wordings (POOL-refuted placement attribution, \"37/37 checks\", \"held exactly\" 0.192, the naked 1.52x calibration point); (2) determinism (bit-for-bit seed-42 re-run; per-seed populations byte-identical across arms, hash-checked by verify_2026_runs.py) over a 9-seed A/B/C matrix archived in docs/runs/; (3) the R3 byte-identity regression: an E0-null degenerate decision-layer run must reproduce the archived arm run byte-for-byte on shared columns (verify_E_runs.py --null), archived three times and re-proved before each Scenario-E matrix; (4) pre-registered directional predictions with scored MISSES kept as misses (Phase D: P-3c, P-3d wrong — surplus beats optimal placement and dissolves the equity gap; Phase E: P-E1 magnitude miss with an appended alphaHazard arithmetic correction; Scenario E: P-SE1 band miss, P-SE10 draw-dependent reversal); (5) negative controls: asthma/chronic-physical null enforced per-run and pooled, Wachinger non-departure check, registered-inert triage arms, closure-free control arms, and the CR/CP POOL control that reproduced C's headcount exactly (attribution demoted to dispersion). External calibration is exactly ONE contemporaneous occupancy observation (Street Roots 2020-09-16, ~90+~40 of 198 beds); the model fills 198/198 (OCC ~1.1x right-censored, Charles Jordan ~2.5x); deliverables must use the censored bracket 1.5–15.6x (15.6x = unconstrained demand 2,022), enforced by a linter regex that fails any 1.52x-over-predict sentence lacking \"15.6\" on the same line; the required framing is \"improves outcomes under the modelled assumptions\", never \"recreates what happened\". The EPA-AQS ratio-1.0000 check validates exposure arithmetic, not behavior. One-dimensional sensitivity exists and is archived: bed sweep BS080–BS160 (7 levels x 3 seeds; knife-edge: +5% beds matches C, +10% erases the equity gap), window arms W24/W72 x A/B/C x 3 seeds, three closure draws (sign of the refusal-redistribution effect flips by draw), and two smoke series (1.75x and Canberra 4.436x). NOT done, candidly per the repo's own documents: out-of-sample temporal validation (one observation, one event), spatial cross-validation of the optimizer (fitted and evaluated on the same 6,842 coordinates — \"no hold-out, no resampling\"), smoke-field LOOCV (unexecutable with 2 monitors), joint/global uncertainty propagation (all sweeps one-factor), local estimation of behavioral coefficients (E9 occupancy fit deferred; alphaHazard set by registered arithmetic and scored a MISS), presence-fraction sweep, node-site-tolerance sweep (falsely claimed once, now linter-refuted), and any second-event or second-city transfer. Open publication-relevant defects: V25 resting ventilation 0.61 m3/h absent from its EPA source (touches every dose figure and the 2.7x ratio; author decision pending), A-04 blocking (99-bed unit unconfirmed), A-16 unmet, U-12 recalibration pending, D15 residuals (V33 caretaker provenance), graph-census prose now mostly corrected to 3/22 but with one muddled mixed-vintage row, TR's internal test_routing contradiction, and user-owned camera-ready items.",
+ "items": [
+  {
+   "name": "Claims linter (executed this audit)",
+   "detail": "python scripts/lint_claims.py returned '0 hit(s) in 0 file(s); 10 deliverable file(s) scanned', exit 0. Registry docs/claims.yaml holds statuses live/corrected/corrected-pending/refuted/retired; linter flags every non-live pattern in 10 registered deliverables. Baseline was RED 50 hits/10 files, GREEN since commit 080a803.",
+   "source": "scripts/lint_claims.py:1-220; docs/claims.yaml:1-160; docs/critique-response/11-ROUND5-REPORT.md:15",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Determinism / seed stability",
+   "detail": "Re-run at seed 42 bit-for-bit identical; heterogeneity-layer baseline invariance byte-identical on 25 shared columns. 9-seed (42-50) A/B/C matrix with per-run seed-robustness table; verify_2026_runs.py hash-asserts per-seed population byte-identity across arms and identical unreachable id sets (U-27 invariant). Run archives exist in docs/runs/present-day-three-arm (A/B/C x seeds 42-50).",
+   "source": "docs/final/TECHNICAL_REFERENCE.md:2314-2315; scripts/verify_2026_runs.py:1-26,93-96,128-132,156-161; docs/runs/present-day-three-arm/ (dir listing)",
+   "status": "VERIFIED (mechanism+archives); numeric outcomes REPORTED"
+  },
+  {
+   "name": "R3 byte-identity regression",
+   "detail": "E0-null configuration (decision layer ON, every mechanism degenerate: aware=1, L0, latch, sigma=0, barriers=0, pets admitted) must reproduce the archived arm run byte-identically over all shared agents.csv/shelters.csv columns. E0null-A/B/C-seed42 archived under docs/runs/phase-e/, scenario-e/, and scenario-e-v2/; 'R3 re-proved at this commit before the matrix' for v2 (commit 257017d).",
+   "source": "scripts/verify_E_runs.py:10-33; docs/runs/phase-e, scenario-e, scenario-e-v2 (dir listings); docs/critique-response/13-PHASE-E-PREDICTIONS.md:348-353",
+   "status": "VERIFIED (mechanism+archives); byte-pass REPORTED"
+  },
+  {
+   "name": "Registered predictions with scored misses — Phase D",
+   "detail": "Registered 2026-07-28 20:49 before launch (one smoke-test run disclosed as OBSERVED). Outcomes: P-1a/b/c/d/e/g, P-2a/b, P-3a/b HIT; P-1f PARTIAL MISS (8/54 runs travel median >2%, max +3.2%); P-3c MISS (B crosses C's access at 1.2x, not 1.4-1.6x); P-3d MISS (mobility gap vanishes at any surplus). Misses reported as the disconfirming-results section and reframed the headline.",
+   "source": "docs/critique-response/12-PHASE-D-PREDICTIONS.md:1-69; docs/critique-response/11-ROUND5-REPORT.md:142-180",
+   "status": "VERIFIED (registration+scoring documents)"
+  },
+  {
+   "name": "Registered predictions with scored misses — Phase E / Scenario E",
+   "detail": "P-E1 MISS on magnitude (predicted 10-15% sheltered; observed 17.8% post-pet-correction) with alphaHazard=-8.0 arithmetic error appended as CORRECTION, never edited; P-E4 confirmed via its pre-registered disconfirmation clause (arm D inert, 0 capacity refusals). Scenario E v1: P-SE1 MISS on attempt band (0.52 vs registered 0.55-0.75); P-SE3/P-SE5 NOT EVALUABLE (zero blockage events — emptiness reported as the finding). v2: P-SE10 MISS as registered (refusal-redistribution sign reverses for draw r1); P-SE7/8/9/11 confirmed. pushThetaThreshold executed as 0.0 not -0.25 (Repast negative-number parser bug) — caught by pre-push audit, impact none (parameter never consulted).",
+   "source": "docs/critique-response/13-PHASE-E-PREDICTIONS.md:28-41,88-133,235-301,348-415",
+   "status": "VERIFIED (registration+scoring documents)"
+  },
+  {
+   "name": "Negative controls",
+   "detail": "(a) U-19 asthma + chronic_physical access-rate null: per-run 3-SE and pooled 9-seed 2-SE tests in the invariant gate; (b) regression asthma null in every arm; (c) verify_E checks: asthma speed/dose null (0.02 m/s, 3 SE), Wachinger high-barrier non-departure, UNAWARE immobility; (d) registered-inert arms P-SE4/ER-D (zero capacity refusals stated in advance); (e) closure-free control arms SEnc/SE2nc archived for smoke-vs-obstacle separation.",
+   "source": "scripts/verify_2026_runs.py:105-126,162-173; docs/final/TECHNICAL_REFERENCE.md:2213-2219; scripts/verify_E_runs.py:37-64; docs/critique-response/13-PHASE-E-PREDICTIONS.md:211-215,269-271; docs/runs/scenario-e + scenario-e-v2 (dir listings)",
+   "status": "VERIFIED (mechanisms+archives)"
+  },
+  {
+   "name": "Attribution control (CR random sites / CP POOL)",
+   "detail": "Ten random sites from the same 498-node candidate pool reproduce C's sheltered count run-for-run (6,570/6,565/6,566; post-U-27 'POOL null now exact'), refuting the optimized-placement attribution for headcount; siting credit survives only on walking distance. 18 control runs archived (CR2026r1-3, CP2026r4-6 x seeds 42-44).",
+   "source": "docs/claims.yaml:45-60; docs/critique-response/11-ROUND5-REPORT.md:49-52; docs/runs/scenario-crandom-2026 (dir listing)",
+   "status": "VERIFIED (archives+registry); counts REPORTED"
+  },
+  {
+   "name": "External calibration against observation",
+   "detail": "Exactly ONE behavioral observation point: Street Roots, night of 2020-09-15 (published 09-16) — ~90 occupants Oregon Convention Center + ~40 Charles Jordan ≈ 130 of 198 beds, a single newsroom count. Historical-reference run (n=2,037, 2x99 beds) fills 198/198 at both sites; per-site OCC ~1.1x (right-censored), CJ ~2.5x; unconstrained demand 2,022 gives the 15.6x upper edge. Direction attributed to A-12 universal awareness vs local survey (65% never heard of the shelters). U-12 recalibration still pending.",
+   "source": "docs/final/TECHNICAL_REFERENCE.md:2151-2163; docs/critique-response/03-data.md:220-246; docs/science/DATA_SOURCES.md:482-485",
+   "status": "VERIFIED (documents); the observation itself is a REPORTED newsroom figure"
+  },
+  {
+   "name": "Calibration bracket + enforced wording",
+   "detail": "Deliverables must state the D7-censored bracket 1.5-15.6x with 1.52x as 'the uncensored lower edge'. claims.yaml entry calibration-1-52-overpredict (status corrected-pending) uses a regex that flags any 1.52/over-predict pairing UNLESS '15.6' appears within 100 same-line characters, so the sanctioned bracket sentence passes and the naked point claim fails. Fixed framing wording: 'improves outcomes under the modelled assumptions', never 'recreates what actually happened'.",
+   "source": "docs/claims.yaml:129-151; docs/final/TECHNICAL_REFERENCE.md:2158-2170; docs/chapter/SUBMIT.md:298",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Exposure-engine arithmetic check vs EPA AQS",
+   "detail": "Sigma C·dt recomputed in Python from the raw AQS CSV independently of the model: 54,002.7 vs model 54,002.8 ug·m-3·h, ratio 1.0000. This validates the integration arithmetic against the model's own input series — it is not calibration against independent exposure observations.",
+   "source": "docs/final/TECHNICAL_REFERENCE.md:190,2311",
+   "status": "REPORTED"
+  },
+  {
+   "name": "Independent route-length validation (test_routing.py)",
+   "detail": "Python Dijkstra reimplementation, tests T1-T5. TR's verification table now candidly states it 'Fails on current output by design' (V11 network_dist_to_shelter_m stale for retargeted agents since fix D-6). However TR:824-827 still says it 'reproduces the Java distances exactly... All pass' without a vintage label — an unresolved internal contradiction within TECHNICAL_REFERENCE.md.",
+   "source": "docs/final/TECHNICAL_REFERENCE.md:824-827 vs 2312",
+   "status": "VERIFIED (contradiction observed in file)"
+  },
+  {
+   "name": "Independent reimplementation (websim TypeScript port)",
+   "detail": "Tier 0-4 fidelity ladder: RNG bit-parity (2.63M draws + 100M depth tier), initial-world identity (3,539,712 distances bit-equal; snap_gap_m tolerance-equal at 1e-8 m on 6,390/6,842 rows), own-engine R3 null, statistical cross-validation vs archive (unreachable id set identical, marginals equal), Tier-4 structural identity 6,546/6,842 rows byte-identical, final_state 114-row divergence at permutation p=0.776. Cross-engine byte-identity on Chromium/Firefox/WebKit/Node.",
+   "source": "docs/final/THE_COMPLETE_STORY.md:1988-2022",
+   "status": "REPORTED (test suite in websim/ not executed by this audit)"
+  },
+  {
+   "name": "Invariant gates (pass counts)",
+   "detail": "verify_2026_runs.py: manifest seed/scenario/numAgents, clean-tree flag, data_version_tag identity, source-integrity checksum identity, U-03 bed sums, U-19 controls, U-27 id-set identity, plus 55 extended-family runs (histref, D, CR, CP, BS, W). verify_E_runs.py: 99/99 ER checks; 387/387 (--se, v1); 546/546 (v2). 54-run U-27 re-run matrix exit 0 at deddfca.",
+   "source": "scripts/verify_2026_runs.py:1-218; docs/critique-response/13-PHASE-E-PREDICTIONS.md:89-91,238-240,350-352; docs/critique-response/11-ROUND5-REPORT.md:49-56",
+   "status": "VERIFIED (scripts); pass counts REPORTED"
+  },
+  {
+   "name": "Sensitivity: bed-equivalence sweep BS080-BS160",
+   "detail": "One-dimensional capacity sweep at B's 36 real sites, s in {0.8,1.0,1.05,1.10,1.15,1.2,1.4,1.6} x demand, seeds 42-44 (21 archived runs + B itself). Result: 73.3% -> 91.5% -> 96.0-96.1% (=C at 1.05x, so C's siting is worth at most ~342 beds) -> 99.5% plateau from 1.10x; mobility gap 28.3 -> 23.5 -> 14.9 -> -0.0 pp from 1.10x.",
+   "source": "docs/runs/phaseD-bed-sweep (dir listing: BS080/105/110/115/120/140/160 x 3 seeds); docs/final/TECHNICAL_REFERENCE.md:2185-2205; scripts/verify_2026_runs.py:187-192",
+   "status": "VERIFIED (archives); numbers REPORTED"
+  },
+  {
+   "name": "Sensitivity: window arms W24/W72",
+   "detail": "From-start observation windows 24/72/312 h x arms A/B/C x seeds 42-44 (18 archived runs). B/C mean-dose ratio 1.29 -> 1.33 -> 1.98; walking's share of C's dose benefit 100% -> 83% -> 4.5%. Episode-aligned (hour-79) window arm deliberately NOT run (needs SIM_START code change; descoped on record).",
+   "source": "docs/runs/phaseD-windows (dir listing); docs/final/TECHNICAL_REFERENCE.md:2207-2211; docs/critique-response/12-PHASE-D-PREDICTIONS.md:61-65",
+   "status": "VERIFIED (archives); numbers REPORTED"
+  },
+  {
+   "name": "Sensitivity: closure draws and smoke series",
+   "detail": "Scenario-E v2 runs E18 across three committed closure draws r1-r3 (A-34 range protocol); the refusal-redistribution sign flips by draw (P-SE10 miss), demonstrating why single-schedule designs mislead. Two smoke severities run: v1 baked 1.75x transform, v2 Canberra-anchored 4.436x (peak 2,496.1). The registered smokeScale sweep (0.857/1.143) did NOT run — superlinearity clause explicitly untested.",
+   "source": "docs/critique-response/13-PHASE-E-PREDICTIONS.md:305-313,376-390,253-257; docs/runs/scenario-e-v2 (dir listing)",
+   "status": "VERIFIED (archives+scoring); smokeScale sweep ABSENT"
+  },
+  {
+   "name": "Sensitivity: ventilation-rate sweep",
+   "detail": "Registry sweep 0.4-0.8 m3/h on the resting rate is recorded as done ('sensitivity-swept'), but D16 shows it fails to bracket the EPA table's own candidate cells (Light 0.72-0.78; Sedentary 0.25-0.30) — the sweep excludes the sedentary range entirely.",
+   "source": "docs/final/FINAL_DATA_VALIDATION_REPORT.md:165; docs/science/D16-EFH-VENTILATION-DEFECT.md:104-107",
+   "status": "REPORTED, with a VERIFIED documented inadequacy"
+  },
+  {
+   "name": "Out-of-sample temporal validation",
+   "detail": "Does not exist. The only behavioral observation is the single 2020-09-16 occupancy record; no second event, no held-out time period, no occupancy time series. The repo states the record is 'a single newsroom observation on one night'.",
+   "source": "docs/science/DATA_SOURCES.md:483-485; docs/final/TECHNICAL_REFERENCE.md:2151-2156",
+   "status": "ABSENT"
+  },
+  {
+   "name": "Spatial cross-validation / optimizer hold-out",
+   "detail": "Does not exist, by the repo's own adversarial review: the optimizer is fitted and evaluated on the same B2026-n6842-seed42/agents.csv coordinates — 'no hold-out, no resampling of campsite locations, no spatial cross-validation'; C's 96.0% vs B's 91.6% is an in-sample upper bound. Disclosed as the chapter's first limitation (tex:861).",
+   "source": "docs/critique-response/02-parameters.md:332-389",
+   "status": "ABSENT (candidly documented)"
+  },
+  {
+   "name": "Smoke-field leave-one-out cross-validation",
+   "detail": "Specified as the decision test for uniform-vs-IDW (DESIGN_SPEC V5) but never executed; SMOKE_FIELD_AUDIT states LOOCV with 2 in-county stations leaves one — 'a test with essentially no power. The specified decision test is therefore not executable as written, which is itself the finding.' A-01 spatially-uniform field remains an active assumption.",
+   "source": "docs/final/SMOKE_FIELD_AUDIT.md:114; Geography/data/registry/assumptions.csv:2 (A-01)",
+   "status": "ABSENT (specified, not executable)"
+  },
+  {
+   "name": "Global / joint parameter uncertainty propagation",
+   "detail": "No joint or global sensitivity/uncertainty analysis exists anywhere in docs/runs/ or the reports; every executed sweep varies one factor (beds, window, smoke series, closure draw). The science tier proposes 'a one-at-a-time or fractional-factorial' design as future work only. No Monte Carlo propagation of parameter uncertainty through model outputs was found.",
+   "source": "docs/science/phase2-human-agents/04-DECISION.md:223; docs/runs/ (dir enumeration — no such family)",
+   "status": "ABSENT"
+  },
+  {
+   "name": "Local estimation of behavioral coefficients",
+   "detail": "Not done. Phase-E behavioral parameters (V35-V43) are pre-registered literature midpoints; alphaHazard=-8.0 was 'calibration-by-arithmetic', registered, and scored a MISS (realized attempt share 0.502 vs targeted 0.385; corrected value ~-8.7 noted, not adopted). The E9 occupancy calibration that would fit it to the historical record is explicitly deferred and no E9 run archive exists.",
+   "source": "docs/critique-response/13-PHASE-E-PREDICTIONS.md:9-44,80-86; docs/runs/ (no E9 family)",
+   "status": "ABSENT (deferred on record)"
+  },
+  {
+   "name": "Second-event / second-city transfer",
+   "detail": "No transfer test of any kind: one county (Multnomah), one event (Sept 2020 smoke), one street network. Nothing in docs/runs/, the chapter, or the critique responses claims or attempts generalization to another city or episode; Scenario-E severities are counterfactual transforms of the same event (A-33).",
+   "source": "docs/runs/ (dir enumeration); docs/critique-response/13-PHASE-E-PREDICTIONS.md:294-301",
+   "status": "ABSENT"
+  },
+  {
+   "name": "Presence-fraction sweep (U-14)",
+   "detail": "The 2025 PIT administrative-augmentation caveat is carried verbatim in deliverables but never operationalized: 'no presence-fraction sweep exists anywhere, and verify_2026_runs.py hard-asserts n==6842'. Also the 2,419 street-verified figure was not verifiable in-repo.",
+   "source": "docs/critique-response/11-ROUND5-REPORT.md:78 (U-14 row); scripts/verify_2026_runs.py:79-80",
+   "status": "ABSENT"
+  },
+  {
+   "name": "Node-site tolerance sensitivity (falsely claimed, now blocked)",
+   "detail": "The presentation once claimed a 'registered sensitivity test' of NODE_SITE_TOLERANCE_M=100 that was never executed (hard-coded static final, identical in all 101 manifests). Registered as refuted in claims.yaml; the linter blocks the phrasing. The test itself remains not run. Also deferred: TYPE-1200/A11 street-class sensitivity (Ross Island Bridge coding).",
+   "source": "docs/claims.yaml:153-160; docs/critique-response/09-SYSTEM-AUDIT.md:113-116; docs/critique-response/11-ROUND5-REPORT.md:44-46,258",
+   "status": "ABSENT (claim retracted)"
+  },
+  {
+   "name": "Other deferred arms on record",
+   "detail": "Episode-aligned window arm (SIM_START code change), D3 equity-objective placement, D5 information ablation, arm-B baseline-real, +AWARE/+INFO(L2)/+RIDES/+BARRIER intervention arms, 9-seed E extension, L3 word-of-mouth, U-17 exit-option sensitivity (g in {0,0.1,0.25}) — all listed as deferred/descoped, none run.",
+   "source": "docs/critique-response/11-ROUND5-REPORT.md:254-260; docs/critique-response/13-PHASE-E-PREDICTIONS.md:80-86; docs/critique-response/11-ROUND5-REPORT.md:81 (U-17 row)",
+   "status": "ABSENT (recorded as deferred)"
+  },
+  {
+   "name": "OPEN DEFECT: V25 resting ventilation rate",
+   "detail": "0.61 m3/h 'resting' rate does NOT appear in the cited EPA EFH 2011 Ch.6 Table 6-2 (Light 0.72-0.78, Sedentary 0.25-0.30 straddle it); walking 1.62 is confirmed but is one age cell (31-<41), not an adult aggregate (adult-weighted ~1.59). Blast radius: every cumulative_dose_ug column in every archived run, the published 2.7x ratio (5 deliverable locations), V50's rationale, and websim golden checks keyed on 0.6100. Qualitative finding survives (any candidate cell keeps IR_walk > IR_rest); absolute doses and the ratio do not (2.25x-5.40x depending on cell). Author decision required; explicitly not fixed as of 2026-08-04.",
+   "source": "docs/science/D16-EFH-VENTILATION-DEFECT.md:1-133",
+   "status": "VERIFIED (open defect)"
+  },
+  {
+   "name": "Graph-census prose status",
+   "detail": "The headline stale figures are now corrected in the current tree: TR's fix table reads 3 reattached / 22 split and variables.csv V-REATTACH reads '3 of 25 corrections'. Pre-U-27 4/23 figures survive only vintage-labeled (STREET_NETWORK_VALIDATION.md:11 'pre-U-27 unfiltered graph (27 corrupt IDs -> 4 reattached / 23 split') and in the archived final-baseline manifest. Residual muddle: TR:808 labels 171/59,725 components as post-U-27 manifest values while TR:814's table row says 'measured pre-U-27, not re-measured on the freeway-filtered graph' — the two sentences cannot both be right as written.",
+   "source": "docs/final/TECHNICAL_REFERENCE.md:806-819; Geography/data/registry/variables.csv:20; docs/validation/STREET_NETWORK_VALIDATION.md:11; docs/runs/final-baseline/simulation.json:29",
+   "status": "VERIFIED (mostly corrected; one residual internal inconsistency)"
+  },
+  {
+   "name": "OPEN QUESTION: Pathways pooled-vs-unsheltered demographics (D15)",
+   "detail": "Age bands and chronic-condition prevalence are the POOLED Table 2.1 sample (N=541), not the unsheltered-only Table 6.1 (N=192): 65+ 5.0% vs 2.6%, chronic 39.1% vs 31.1% — not inert, since age drives walking speed. Documented as a deliberate, author-confirmed choice with defense (stability, source's own framing); deliverables must say 'pooled sample'. Residual open items: V33's '0.022 caretaker rate' provenance does not match the source as stated, and V22's gloss overstates a self-identified disability question.",
+   "source": "docs/science/DATA_SOURCES.md:427-468",
+   "status": "VERIFIED (choice disclosed; two residual discrepancies open)"
+  },
+  {
+   "name": "OPEN DEFECT: A-04 unconfirmed 2020 shelter capacity",
+   "detail": "The 99-per-site nightly capacity is newsroom-sourced, never confirmed by a primary agency document, and the unit (cots/positions/persons) is unstated; classified BLOCKING in the registry and 'the single largest driver of the headline result' since sheltered==capacity exactly in every historical-reference run. Sensitivity plan (confirm + sweep) not executed.",
+   "source": "Geography/data/registry/assumptions.csv:5; docs/science/DATA_SOURCES.md:482-485",
+   "status": "VERIFIED (open, blocking)"
+  },
+  {
+   "name": "OPEN DEFECT: A-16 order-dependent admission",
+   "detail": "Order-independent two-phase admission was specified as prerequisite for any n>beds run and never implemented; the last bed is awarded by the per-tick RNG shuffle. Approved wording downgrades scarce-capacity subgroup magnitudes to 'indicative'; FDVR notes it becomes MORE material once capacity binds hard.",
+   "source": "docs/final/CLAIM_VALIDATION_AUDIT.md:158-177; docs/final/FINAL_DATA_VALIDATION_REPORT.md:297-298",
+   "status": "VERIFIED (open)"
+  },
+  {
+   "name": "OPEN: U-12 recalibration + U-01 marginal re-derivation",
+   "detail": "The calibration claim is registry-status 'corrected-pending' — final point value awaits the U-12 population recalibration, which was descoped in round 5. U-01: the published 0.192 mobility marginal is analytically unreachable (coded expectation 0.2033; pooled 9-seed 0.2038); the 'held exactly' phrasing is linter-refuted and gone, but whether the sampler constants were re-derived and runs repeated is not evidenced anywhere I read.",
+   "source": "docs/claims.yaml:75-89,129-151; docs/critique-response/11-ROUND5-REPORT.md:65,254-258; docs/critique-response/09-SYSTEM-AUDIT.md:84-91",
+   "status": "VERIFIED (open); re-derivation status UNKNOWN"
+  },
+  {
+   "name": "Open user-owned camera-ready items",
+   "detail": "NSF award number, affiliation confirmation (normalized text is email-domain-consistent, 'not a verified fact'), Zenodo DOI / repo visibility — flagged in SUBMIT.md section 0 and the round-5 report. Additionally (from project memory, not re-verified this audit): websim merge to main, ORCA acknowledgement deletion before 2026-08-23, manual keyboard/screen-reader script, and the public GitHub remote already carrying the raw campsite CSV (data-disclosure posture).",
+   "source": "docs/critique-response/11-ROUND5-REPORT.md:17,213-215,249-253; project memory notes",
+   "status": "REPORTED"
+  },
+  {
+   "name": "Open data-coverage limitations",
+   "detail": "Clinton Triangle (160 units) and Multnomah SRV (28) have no locatable address and are absent (~207 people of real capacity); 10 day centres excluded with unpublished capacity though arguably the most relevant daytime clean-air spaces; sex and mobility distributions are 2019-vintage inside a 2026 study; asthma/COPD prevalences imported from Minnesota EHR; three village addresses block/intersection-level; 2019->2025 PIT is not a clean time series.",
+   "source": "docs/final/FINAL_DATA_VALIDATION_REPORT.md:44-58,67-77,284-296",
+   "status": "VERIFIED (disclosed limitations)"
+  }
+ ],
+ "gaps": [
+  "I did not execute verify_2026_runs.py or verify_E_runs.py (the former writes docs/final/results-2026/6_SEED_ROBUSTNESS.csv, violating the read-only constraint; both need local Geography/output/ artifacts) — their pass counts (exit 0, 99/99, 387/387, 546/546) are taken from the reports, not reproduced.",
+  "I did not recompute any statistic from the archived agents.csv/simulation.json files; all run numbers (sheltered counts, doses, gaps, POOL identity) are REPORTED from the audited documents.",
+  "The websim test suite (2,176 tests green, cross-engine byte-identity) was not executed; its Tier 0-4 evidence is cited from THE_COMPLETE_STORY.md and websim DR docs, not re-run.",
+  "Whether the U-01 sampler constants were re-derived (vs merely reworded) after round 5 is UNKNOWN — no re-run evidence found, and the round-5 action offered either path.",
+  "The current status of the E9 occupancy calibration beyond 'deferred' is unverified — no E9 run archive exists in docs/runs/, which I treat as ABSENT as of the tree at HEAD 4ca0c6c.",
+  "The data-disclosure posture (public remote carrying the raw campsite CSV) comes from project memory and the websim memory note; I did not inspect the remote.",
+  "I did not read HEALTH_MODEL_AUDIT.md, SHELTER_CAPACITY_AUDIT.md, or the chapter .tex end-to-end; citations to them are second-hand via the documents that quote them."
+ ]
+}

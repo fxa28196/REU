@@ -1,0 +1,177 @@
+{
+ "summary": "The repo's empirical base is thin and honestly documented. Real model inputs: (1) RLIS Portland street centerlines, 112,070 polylines, vintage UNKNOWN (predates version control — flagged provenance gap); (2) EPA AQS hourly PM2.5, parameter 88502, 7 monitors tri-county (only 2 inside Multnomah), 4,795 rows for Sept 2020, public domain; (3) a 3-row Sept-2020 shelter file (2 operating sites at newsroom-sourced capacity 99 each, 1 standby — assumption A-04 blocking); (4) a 48-facility July-2026 HSD shelter transcription plus ~20 derived 36/46-row scenario variants; (5) 3,400 encampment complaint reports dated 2025-01-08..2026-07-23 used as a spatial proxy for the Sept-2020 population — the largest vintage mismatch, flagged with a runtime warning. Constructed (non-data) inputs: two synthetic severe-smoke counterfactuals (4.436x scaled, fully labeled with provenance JSONs) and five Scenario-E closure schedules. Three source PDFs sit in the evidence package (Adult Shelter Review FY25, Pathways Study 2026, City Shelter Services FY23-24). docs/runs/ holds 15 model-output archives, not observations. THE KEY ANSWER: independent observations of actual shelter use during the modelled event reduce to exactly what the task suspected — one newspaper occupancy snapshot (Street Roots 2020-09-16: ~90 of 99 at Oregon Convention Center, 40 of 99 at Charles Jordan, one night) plus one small retrospective awareness survey (PSU Stories from the Outside, N=73: 26/73 aware, 10/26 of the aware attempted access), with a single same-article 211 datum (waits >1 h; 21 clean-air-shelter calls on Sept 15). The repo itself states these two occupancy numbers are \"the only quantitative behavioural calibration targets this project has.\" Non-event, present-day system aggregates also exist (ASR FY25: 88% average nightly occupancy, 6,731 individuals served; City FY24: 1,800 served; Pathways 2026: 67% used a shelter in 6 months / 34% most often; 2019 PIT: 1,459 in emergency shelter on count night), but no per-facility occupancy time series, arrival records, or turnaway logs exist anywhere. All modelled turnaways/arrival times are outputs, not data. Task-6 sweep: outreach-contact logs ABSENT (registry explicitly: \"a real outreach-contact rate for this event does not exist in the record\"); communication-timing data ABSENT beyond the one 211 sentence; transportation logs ABSENT (one JOHS press-release sentence that transport was arranged); staffing-interruption data ABSENT (staffing-as-constraint is recorded as inference); indoor PM2.5 ABSENT (indoor air deliberately unmodelled). Smoke spatial resolution: the model applies a county-uniform 2-monitor hourly mean; the repo's own assessment is that 2 in-county monitors are \"far too sparse to resolve intra-urban gradients,\" so the raw data cannot support a spatially resolved intra-urban surface (7 tri-county monitors could at best give a coarse regional gradient; meteorology D4 deliberately deferred). Encampment rows carry an inc_date column, so temporal splitting is supportable within 2025-26; rows are reports with unique incident ids, not deduplicated sites. Root zips: \"Geography (1).zip\" is the stock Repast demo scaffold (verified from its 197-entry listing); Streets.zip is the gitignored RLIS source archive whose size and SHA are recorded in the registry.",
+ "items": [
+  {
+   "name": "Streets.* — RLIS Portland street centerlines (model input)",
+   "detail": "112,070 polylines; 109,434 routable after U-27 freeway filter (2,636 features / 614 km removed); graph 88,100 nodes / 109,434 edges; EPSG:3857 reprojected to 4326 at load. Vintage UNKNOWN — 'Original download date and RLIS release version are unknown — predates this repository's version control'; flagged as open provenance gap. License posture: redistribution approval only RELAYED by the researcher (2026-08-02), 'no written determination from Metro is on file anywhere in this repository'.",
+   "source": "Geography/data/README.md:22-64; docs/science/DATA_SOURCES.md:21-52",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "airnow/aqs_hourly_pm25_portland_2020-09.csv — observed PM2.5 (model input)",
+   "detail": "EPA AQS parameter 88502 (non-FRM continuous, not regulatory-grade), 7 monitors (2 Multnomah, 3 Washington, 2 Clackamas), hourly 2020-09-01..30, 4,795 data rows (header verified: 24 EPA columns unchanged), 1,454 Multnomah rows, 312/312 sim-window hours no gaps. Public domain (US federal work). Retrieved 2026-07-24, SHA-256 recorded, reproducible via scripts/fetch-aqs-pm25.ps1. Vintage matches the simulated event exactly (EPA 'IT' wildfire qualifier spans 2020-09-07..19).",
+   "source": "Geography/data/README.md:68-146; docs/final/SMOKE_FIELD_AUDIT.md:34-60; header/rowcount verified from file",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Smoke spatial resolution — would the raw data support a non-uniform surface?",
+   "detail": "NO for intra-urban resolution, per the repo's own assessment: model uses unweighted mean of the 2 in-county monitors, one scalar county-wide per hour ('we do not interpolate. There is no spatial model'); D3 states 2 Multnomah monitors are 'far too sparse to resolve intra-urban gradients on its own'. 7 tri-county monitors could support only a coarse regional gradient; meteorology (D4) deliberately deferred pending leave-one-out failure of the smooth field.",
+   "source": "docs/final/SMOKE_FIELD_AUDIT.md:7-29; docs/science/DATA_SOURCES.md:140-162",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "airnow synthetic severe v1/v2 — constructed counterfactual, NOT data",
+   "detail": "3,890 data rows each, deterministic transform of the observed file: scale 4.436 (anchored to 2,496.1 ug/m3 Canberra verified hourly max), episode stretched 188h to 284h. Provenance JSON labels it 'CONSTRUCTED COUNTERFACTUAL — NOT MEASURED DATA' with 19 PASS checks. Counts as zero independent observations.",
+   "source": "Geography/data/airnow/aqs_hourly_pm25_synthetic_severe_v2.provenance.json (read in full); rowcounts verified",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "shelters/shelters_2020-09.csv — Sept-2020 clean-air shelters (model input)",
+   "detail": "3 rows: OCC (opened 2020-09-10) and Charles Jordan (2020-09-11) capacity 99 each with capacity_basis='nightly_cap_newsroom_unconfirmed', Mount Scott standby capacity blank. Coordinates geocoded from official addresses (Census + Esri geocoders, per-row coord_source). Capacity 99 is newsroom-sourced (Street Roots), NOT confirmed by any agency document — assumption A-04 remains blocking; SHELTER_CAPACITY_AUDIT could neither confirm nor refute it from county sources.",
+   "source": "Geography/data/shelters/shelters_2020-09.csv (read); Geography/data/README.md:149-160; docs/final/SHELTER_CAPACITY_AUDIT.md:14-25,102-117",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "shelters_multnomah_2026.csv — HSD July-2026 inventory transcription",
+   "detail": "48 data rows transcribed facility-by-facility from the HSD shelter list (updated July 2026) + City report; columns include capacity_unit and source ('hsd_list_2026-07'). Mixes 5 incompatible units (beds/motel rooms/village units/family units/unstated) — conversion rules documented with ranges (county-wide ~1,885-2,224 people).",
+   "source": "file header + rowcount verified; docs/evidence-package-2026/DATA_PROVENANCE.md:53-66; docs/final/SHELTER_CAPACITY_AUDIT.md:56-98",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "shelters_2026_* scenario variants (~20 files)",
+   "detail": "current_placement (36 rows, geocoded via Nominatim from HSD 2026 addresses, capacity_basis records unit conversion per row), expanded_capacity, expanded_plus_new_sites (46 rows), random_sites_r1-r6 (46 rows), bsweep_s080-s160 (36 rows), _elayer variants, retired/ A-B files (2-3 rows), geocode_cache_2026.json. These are derived model-input constructs from the 2026 inventory, not independent observations. Present-day arms run the 2026 network under the 2020 smoke series (rows carry opened=2020-09-07) — a deliberate, documented vintage hybrid.",
+   "source": "Glob + rowcounts verified; header of shelters_2026_current_placement.csv read; docs/final/FINAL_DATA_VALIDATION_REPORT.md:28-33,173-206",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "encampments/irp_campsite_reports_sample.csv — spatial proxy (model input)",
+   "detail": "3,400 report rows; header: lon, lat, inc_date, inc_id, is_vehicle. Verified in aggregate: inc_date spans 2025-01-08..2026-07-23; is_vehicle Yes=1,283 / No=2,117; all 3,400 inc_id values distinct (rows are individual complaint REPORTS, not deduplicated sites). Source: City of Portland IRP campsite reports via open-data ArcGIS. VINTAGE MISMATCH (flagged): 'ZERO records for 2020' — 2025-26 reports used as spatial-distribution proxy for the Sept-2020 population, with runtime warning. Complaint-driven bias documented. Redistribution approval relayed only; no written determination on file.",
+   "source": "file header + aggregate stats computed; Geography/data/README.md:162-174",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Encampment temporal splitting — is an incident-date column present?",
+   "detail": "YES: inc_date is a per-row column covering ~18.5 months (2025-01..2026-07), so temporal splitting/holdout within the 2025-26 window is mechanically supportable. It cannot, however, reach the simulated event: no 2020 rows exist in the public feed at all.",
+   "source": "header verified from file; Geography/data/README.md:171-172",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "closures/closures_E_*.csv — Scenario E street-closure schedules",
+   "detail": "5 files, 18-72 data rows each, columns node_a,node_b,activation_hour,label,kind (bridge closures etc.). Constructed scenario inputs, not observed road-closure records.",
+   "source": "headers + rowcounts verified from files",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Evidence-package source PDFs (in repo)",
+   "detail": "3 PDFs: Adult-Shelter-Review-FY25.pdf (175 pp per registry), Pathways-Survey-Findings-Published-4_9_2026.pdf (149 pp; SHA-256 verified byte-identical to hsd.multco.us copy per D15), ShelterServices_AnnualReport2024_ADA.pdf. Plus Repast stock demo shapefiles in Geography/data (Agents2/CookCounty/WaterLines/Zones2/GeoTIFFs) — 'Not loaded by any code path', retained from upstream.",
+   "source": "docs/evidence-package-2026/source-pdfs/ (glob); docs/science/DATA_SOURCES.md:409-413; Geography/data/README.md:176-187",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "KEY QUESTION — event-specific shelter-use observation #1: Street Roots occupancy snapshot",
+   "detail": "One night (Tuesday, article dated 2020-09-16): ~90 occupants at Oregon Convention Center, 40 at Charles Jordan (~130 of 198 beds), against ~2,000 sleeping unsheltered countywide. The repo states these 'are the ONLY quantitative behavioural calibration targets this project has' (D14: 'The only quantitative behavioural calibration target the project possesses'). Model over-predicts it 1.52x. A single newsroom observation; the unit of '99' (cots/persons) is never stated by the source.",
+   "source": "docs/science/phase2-human-agents/04-DECISION.md:65-80; docs/science/DATA_SOURCES.md:472-486",
+   "status": "REPORTED"
+  },
+  {
+   "name": "KEY QUESTION — event-specific observation #2: PSU awareness survey (Hines et al. 2021)",
+   "detail": "'Stories from the Outside: Oregon Wildfires 2020', PSU HRAC, N=73 unhoused Portland-area adults surveyed June 2021 about the Sept-2020 event (PDXScholar hrac_pub/27): 65% did not hear about the shelters (aware 26/73 = 0.356 → V29 pAwareInit); 10 of the 26 aware attempted access (0.385 → V30 calibration target); 75% received no information; 68.5% no help; 50% health impacted; 37% breathing difficulty; 15% went to hospital. Caveats recorded: n=73, retrospective ~9 months, non-probability sample.",
+   "source": "docs/science/phase2-human-agents/04-DECISION.md:42-63; Geography/data/registry/variables.csv rows V29-V30 (read)",
+   "status": "REPORTED"
+  },
+  {
+   "name": "KEY QUESTION — event-specific observation #3: 211 hotline datum (single day)",
+   "detail": "From the same Street Roots article: 211 waits > 1 hour; only 21 clean-air-shelter calls on Sept 15. This is the entire communication-timing evidence base for the event — one sentence, one day.",
+   "source": "docs/science/phase2-human-agents/04-DECISION.md:71",
+   "status": "REPORTED"
+  },
+  {
+   "name": "KEY QUESTION — JOHS press releases Sept 10-18, 2020 (operational metadata, not use counts)",
+   "detail": "Establish: shelter opened night of Sep 10, 24-h operation, 9 consecutive days ending morning Sep 19, access via 211 with transport arranged by outreach teams, 40,000 KN95 masks distributed, ~1,400 pre-existing year-round beds, 27 outreach/mutual-aid partners. NO occupancy counts, arrival times, or turnaway numbers in any release as recorded here.",
+   "source": "docs/science/DATA_SOURCES.md:62-64",
+   "status": "REPORTED"
+  },
+  {
+   "name": "KEY QUESTION — non-event, present-day shelter-use aggregates",
+   "detail": "ASR FY2025: '88% average nightly occupancy rate' [transcribed] and 6,731 unique individuals served (adult programs, FY25); City FY2023-24 report: 1,800 served; Pathways 2026 (N=360 subset): 67% stayed in a shelter at least once in last 6 months, 34% shelter-most-often, 48% multi-shelter, 58% of N=204 mostly-negative experience; 2019 PIT count night: 1,459 in emergency shelter. Annual/6-month aggregates for the year-round system — none specific to any smoke event, no per-facility time series.",
+   "source": "docs/evidence-package-2026/DATA_PROVENANCE.md:132,214-232; docs/evidence-package-2026/grounded_parameters.py:91-93; docs/science/DATA_SOURCES.md:110",
+   "status": "REPORTED"
+  },
+  {
+   "name": "KEY QUESTION — verdict",
+   "detail": "For the modelled event the answer is exactly the suspected one: one newspaper-reported one-night occupancy snapshot plus one small retrospective awareness survey (26/73 aware; 10/26 attempted), with a single same-article 211 call count. The 6-7% uptake figure is a DERIVATION from two documented numbers (130/~2,000), not a published statistic — the repo says to cite it that way. No agency occupancy log, arrival record, or turnaway record for Sept 2020 exists in the repo; all turnaway/arrival numbers in docs/runs are model outputs.",
+   "source": "docs/science/phase2-human-agents/04-DECISION.md:74-80; docs/final/SHELTER_CAPACITY_AUDIT.md:158-166",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Outreach-contact data",
+   "detail": "ABSENT. The registry is explicit: V41 lambdaOutreachPerDay is 'UNSOURCED — declared assumption (A-31)... a real outreach-contact rate for this event does not exist in the record'; swept 0-0.2/day including 0.",
+   "source": "Geography/data/registry/variables.csv row V41 (read); assumptions.csv A-31 (read)",
+   "status": "ABSENT"
+  },
+  {
+   "name": "Communication-timing data",
+   "detail": "ABSENT as a dataset. Sole datum: 211 waits >1 h and 21 clean-air calls on one day (Sept 15), from a newspaper. No call logs, alert timestamps, or message-diffusion data anywhere.",
+   "source": "docs/science/phase2-human-agents/04-DECISION.md:71; no other hits in repo docs",
+   "status": "ABSENT"
+  },
+  {
+   "name": "Transportation-request data",
+   "detail": "ABSENT. Only a JOHS press-release sentence that transport was 'arranged by outreach teams' via 211. No trip logs, request counts, or vehicle records.",
+   "source": "docs/science/DATA_SOURCES.md:63; grep of docs/science found no other transport data",
+   "status": "ABSENT"
+  },
+  {
+   "name": "Staffing-interruption data",
+   "detail": "ABSENT. The only staffing content is inference recorded as such: '99 was plainly an operational/staffing limit rather than a physical one — but that reasoning is inference, not a source'. No staffing rosters or interruption records.",
+   "source": "docs/final/SHELTER_CAPACITY_AUDIT.md:163-166",
+   "status": "ABSENT"
+  },
+  {
+   "name": "Indoor PM2.5 data",
+   "detail": "ABSENT. No indoor measurements anywhere; indoor air quality is deliberately outside the model ('the study endpoint is ARRIVAL AT SHELTER; indoor air quality is not modelled'; SMOKE_FIELD_AUDIT: 'No street-canyon, plume, indoor-infiltration or breathing-height adjustment').",
+   "source": "docs/archive/DESIGN_SPEC.md:49,206; docs/final/SMOKE_FIELD_AUDIT.md:21",
+   "status": "ABSENT"
+  },
+  {
+   "name": "Vintage mismatches (enumerated)",
+   "detail": "(1) Encampments 2025-26 proxying Sept-2020 population — flagged CRITICAL, runtime warning; (2) Streets vintage unknown entirely; (3) 2019 PIT n=2,037 used for the 2020 event (20 months prior), later replaced by 2025 PIT ~6,842 for present-day arms — and 2019→2025 'not a clean time series' (methodology change); (4) sex (68.5/29.3/2.3%) and mobility (19.2%) distributions are 2019 inside a 2026 study — flagged stale; (5) asthma 15.0%/COPD 10.5% imported from Minnesota 2025 EHR; (6) CASPEH age-gradient ratio from California 2021-22; (7) 2026 shelter network simulated under the 2020 smoke series (deliberate, documented); (8) EPA EFH 2011 ventilation rates, with resting 0.61 m3/h NOT in the source (open defect D16); (9) AQI breakpoint 2024 revision trap documented (D9); (10) Boyce 1999 impaired speeds verified only in secondary.",
+   "source": "Geography/data/README.md:171-172; docs/final/FINAL_DATA_VALIDATION_REPORT.md:94-170,290-296; docs/science/DATA_SOURCES.md:322-388",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Geography (1).zip (repo root, untracked '??')",
+   "detail": "1,595,961 B, 197 entries. Verified from its listing: stock Repast Simphony 'Geography' GIS demo scaffold — Chicago-area demo data (CookCounty, WaterLines, Zones2, Agents2, GeoTIFF test patterns), compiled bin/geography/*.class files (ContextCreator, GisAgent, RadioTower, ZoneAgent, styles), stock batch_params.xml. No wildfire-project content observed in the first 60 entries. Matches the inherited-upstream demo described in README §3.",
+   "source": "zip entry listing read via System.IO.Compression; Geography/data/README.md:176-187",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Streets.zip (repo root, untracked via .gitignore:28)",
+   "detail": "16,219,928 B on disk — exactly matches the size the registry records for the inherited RLIS source archive (SHA-256 DA047372... recorded there; extracted unmodified to Geography/data/Streets.*). Not shown in git status because gitignored, unlike 'Geography (1).zip' which shows as ??.",
+   "source": "root listing + git check-ignore verified; Geography/data/README.md:28",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "docs/runs/ — run archives (outputs, not data)",
+   "detail": "15 directories (final-baseline, historical-reference, phase-e, phaseD-bed-sweep, phaseD-windows, present-day-three-arm, scenario-b/c/crandom/d/e variants), each with agents.csv, shelters.csv, simulation.json, summary.json, analysis-report.md, figures/*.png. Per project memory the public GitHub remote already carries agents.csv (136 agents) and the raw campsite CSV — a disclosure posture concern, not an observation source.",
+   "source": "docs/runs directory structure listed (contents of agents.csv not read)",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Registry files — assumptions.csv and variables.csv",
+   "detail": "variables.csv: 55 variable rows with evidence_class (L/C/A/M), source, DOI, sweep ranges. assumptions.csv: A-02 (simultaneous departure), A-04 (capacity newsroom-sourced, blocking), A-12 (universal awareness — blocking, contradicted by the 65%-never-heard record), A-21 (wait-and-retry), A-28 (attribute independence), A-31 (outreach rate unsourced). These are the honest ledger of what is NOT observed.",
+   "source": "Geography/data/registry/variables.csv, assumptions.csv (rows read)",
+   "status": "VERIFIED"
+  }
+ ],
+ "gaps": [
+  "No primary agency (JOHS/county) record of Sept-2020 clean-air shelter capacity or occupancy exists in the repo; A-04 remains blocking and the after-action report / activation agreements were never obtained (docs/final/SHELTER_CAPACITY_AUDIT.md:158-166).",
+  "No 2020-vintage encampment records exist anywhere — the public feed retains only a rolling recent window, so the spatial proxy cannot be validated against the event year (Geography/data/README.md:172).",
+  "No per-facility occupancy time series for any period, event or year-round: the ASR 88% figure is a single annual average, and the county Tableau dashboard was not machine-readable (SHELTER_CAPACITY_AUDIT.md:50-53,161).",
+  "No fitted quantitative choice model for unsheltered people and shelters exists in any literature the project found — barriers documented qualitatively only (04-DECISION.md:84-89).",
+  "Streets release version/vintage unrecovered; no written redistribution determinations from Oregon Metro or the City of Portland are on file (README.md:29-30,169).",
+  "Clinton Triangle (160 units) and Multnomah SRV (28) have no published address; 10 day centers have no published capacity (FINAL_DATA_VALIDATION_REPORT.md:47-54,67-77).",
+  "I did not open the three source PDFs themselves (ASR/Pathways/City reports) — figures attributed to them are as transcribed by the repo's provenance docs; nor did I read agents.csv contents (per task instruction).",
+  "Only the first 60 of 197 entries of 'Geography (1).zip' were listed; the remaining entries were not inspected (all inspected entries are stock demo scaffold)."
+ ]
+}

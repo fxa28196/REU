@@ -1,0 +1,194 @@
+{
+ "summary": "The Java model (Geography/src/geography/) implements a walking-only evacuation ABM: residents start at real Portland campsite-report points, accrue county-uniform hourly PM2.5 exposure while outside, depart either by a bright-line latch (PM2.5 >= 55.5 AND a shelter open) or, with the Phase-E layer on, by an hourly logistic hazard u = alpha + bRisk(1+gammaVuln*vuln)z_R + wOfficial*1{open} + sigmaTheta*thetaZ - c_i; they walk Dijkstra shortest paths to shelters chosen either omnisciently-nearest (L0) or by utility V_j = -betaT*walkTime + betaS*ln(capacity) under L1 locations-only information. Barriers are pet policy and adults-only gates at the door, plus log-odds departure costs for belongings/pet/dependents and a group-pace slowdown for dependents. No transport assistance of any kind exists (ABSENT — walking is the only mode). Arrival at a shelter is the study endpoint; refused residents wait at the refusing door and retry; capacity is hard, monotone (no departures), with an optional mobility-only triage reserve (arm D). Exposure accounting keeps three deliberately separated quantities: concentration-time integral, activity-weighted inhaled dose (1.62/0.61 m3/h walking/resting — the 0.61 is an admitted open defect, not in its EPA source), and a health-risk multiplier hardwired to 1.0. Real 2020 opening dates (OCC 09-10, CJ 09-11, both to 09-19) gate departure and admission. Scenario-E adds scaled counterfactual smoke and scheduled street-closure waves with an unsourced push-through/stuck rule. Provenance: registry variables.csv has 55 rows — evidence census M=15, L=11, A=29, C=0, F=0 (script-verified). Classifying the behavioral/exposure coefficients: ~11 are LOCAL (Portland/Multnomah measurements: age bands, sex, mobility marginal, chronic-physical, awareness 0.356, attempt share 0.385, dependents 0.0044, opening dates, smoke field, start locations, the unconfirmed 99-bed capacity), ~10 are TRANSFERRED (walking-speed tables, asthma/COPD prevalences from Minnesota EHR, COPD speed delta, EPA inhalation rates, pet prevalence from LA County, group-speed delta, barrier-cost anchors, the EPA threshold convention, Boyce impaired speeds, the CASPEH age-gradient ratio), and ~15 are ASSUMED (belongings midpoint, all six hazard coefficients, outreach rate, both choice-utility weights, all three blockage parameters, the three susceptibility placeholders pinned 1.0, plus two numerical guards). Four assumptions are flagged blocking: A-04, A-09, A-12, A-16. Registry-vs-code contradictions found: A-05 still claims freeways are unfiltered (the code filters them), A-15 still claims no breathing rate is modelled (inhaled dose is implemented), A-12 remains blocking though V29 awareness is implemented in E arms, all of V29–V51 carry status \"specified\" though the mechanisms are present in code, and a GisAgent comment about the EFH primary is stale against the registry's 2026-08-04 re-read.",
+ "items": [
+  {
+   "name": "Awareness (V29 pAwareInit)",
+   "detail": "Bernoulli(pAwareInit) drawn per resident at build by ELayerSampler (fixed draw order aware->belongings->pet->dependents->theta); unaware residents start in State.UNAWARE and sit at the encampment accruing exposure. Default 1.0 (legacy byte-identity); sourced value 0.356 = 26/73 from Hines et al. 2021 'Stories from the Outside' (N=73 Portland unhoused adults, THIS event), Wilson CI 0.25-0.47. Class L, LOCAL. Conversion channel: outreach only, hourly Bernoulli(lambdaOutreachPerDay/24) on the per-agent decision stream; lambda default 0.0, swept 0-0.2/day, UNSOURCED (A-31, ASSUMED).",
+   "source": "Geography/src/geography/agents/ELayerSampler.java:39-46,164; Geography/src/geography/agents/GisAgent.java:384-393,953-958; Geography/data/registry/variables.csv:34,46",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Departure decision — legacy latch",
+   "detail": "Every tick while PRE_EVAC: depart iff C(t) >= evacuationThresholdUgM3 (default 55.5 ug/m3, EPA 'Unhealthy' AQI breakpoint lower bound, D9 — a convention, TRANSFERRED, class L) AND anyShelterOpen (A-02 mitigation). Runs verbatim when decision layer off or enableHazardDeparture=0 (the R3 null).",
+   "source": "Geography/src/geography/agents/GisAgent.java:422-447; Geography/data/registry/variables.csv:4",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Departure decision — Phase-E logistic hazard (V35-V41)",
+   "detail": "Hourly, gated on an open shelter: u = alphaHazard + bRisk*(1+(vulnerable?gammaVuln:0))*z_R + wOfficial*1{open} + sigmaTheta*thetaZ - c_i; p=1/(1+exp(-u)); depart iff open && decisionRng<p. z_R = cumulative unhealthy-exposure DAYS with exponential decay: z_R <- z_R*2^(-1/riskHalfLifeH) + 1{c>=55.5}/24 (form from Castillo 2023, magnitude unsourced). Coefficients (batch defaults / baseline-real): alphaHazard -8.0 provisional pending E9 calibration (A-30, ASSUMED); bRisk 0.4 swept 0.25-0.55 (ASSUMED, class A); wOfficial 1.1 swept 0.6-1.7 (ASSUMED, anchored to Tanim 2022 pooled OR 4.21 -> ln 1.44); gammaVuln 0/0.25 swept 0-0.5 (ASSUMED, sign anchor Coughlan 2022 — citation corrected from nonexistent 'Evers'); sigmaTheta 0/1.0 swept 0.5-1.5 (ASSUMED, Kincade variance-ratio anchor); riskHalfLifeH 48 swept 12-72; vulnerable = copd|asthma|age>=65|mobilityLimited.",
+   "source": "Geography/src/geography/agents/GisAgent.java:369-421; Geography/src/geography/agents/ContextCreator.java:278-289; Geography/data/registry/variables.csv:40-46",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Barrier cost c_i (V40)",
+   "detail": "Precomputed at setDecisionLayer: c_i = barrierBelongings*heavy + barrierPet*pet*1{world default refuses pets} + barrierDependents*dependents; enters the hazard negatively (suppresses/delays departure; Wachinger risk-perception-paradox constraint). Baseline-real value 0.26 per barrier, swept 0.10-0.42 (anchors from Tanim 2022 meta-analysis — TRANSFERRED anchors, value choice within bracket). Never a walking-speed penalty (Bastien 2005 negative result).",
+   "source": "Geography/src/geography/agents/GisAgent.java:934-944; Geography/data/registry/variables.csv:45; websim/docs/PORT_MAP.md:369-371",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Destination choice — L0 omniscient (legacy)",
+   "detail": "chooseNetworkNearestShelter: among operating, open, reachable shelters with live hasSpaceFor(priority), pick minimum street-network distance from currentNodeId (Dijkstra tree per shelter, geodesic edge weights); ties broken by context iteration order. Post-refusal re-plans start from the refusing shelter's node (A-17), never the encampment.",
+   "source": "Geography/src/geography/agents/GisAgent.java:604-652",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Destination choice — L1 utility (V42/V43)",
+   "detail": "chooseShelterByUtility: V_j = -betaTravelTime*(distM/(ownSpeed*3600)) + betaCapacityPrior*ln(max(1,cap_j)) over operating/open/reachable sites NOT in believedFull; deliberately NO live-occupancy filter (fullness discovered at the door); uncapped sites use ln-cap 10000; exact ties -> lexicographically smallest shelter id. betaT 1.0, betaS 0 default / 0.2 baseline-real, swept 1-2 orders of magnitude — both ASSUMED (A-32; impedance dominance verified in Cheng 2008, the ln(capacity) size-prior form is a declared stand-in). betaS=0 reduces to nearest-reachable.",
+   "source": "Geography/src/geography/agents/GisAgent.java:679-743; Geography/data/registry/variables.csv:47-48; Geography/data/registry/assumptions.csv:33",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Barrier — pet policy gate (V32/A-29)",
+   "detail": "At the door: hasPet && !petAdmittedAt(shelter) -> policy refusal (counted separately via recordPolicyRefusal). Per-site pet_intake from the _elayer CSV variant when shelterPolicyVariant=1 (4 of 48 present-day facilities record admit, 422 beds); unrecorded sites take run-wide petPolicyDefault (1=admit inert default; baseline-real arms set 0=refuse, the conservative A-29 reading — 48.1% of owners ever turned away, Henwood 2020). Prevalence pHasPet 0.117 (Henwood 2020, LA County counts — class L, TRANSFERRED; floor 0.055 Cronley 2009).",
+   "source": "Geography/src/geography/agents/GisAgent.java:551-576,670-674; Geography/src/geography/agents/Shelter.java:70-79,171-189; Geography/data/registry/assumptions.csv:30",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Barrier — adults-only gate (V33)",
+   "detail": "hasDependents && shelter.isAdultsOnly() -> policy refusal at the door. adults_only read from an optional CSV column; PORT_MAP notes no committed shelter file carries it, so the gate is currently exercised only via the departure-cost and group-speed channels. Prevalence pHasDependents 0.0044 = 30/6831 (HUD 2025 PIT CoC OR-501 — class M, LOCAL; adults-only 2020 intake verified via Street Roots). Dependents also slow the group: v = max(0.40, v - groupSpeedDeltaMps), delta sourced 0.06 m/s swept 0.04-0.08 (Moussaid 2010 pedestrian-group experiments — class L, TRANSFERRED); sampled individual speed never mutated.",
+   "source": "Geography/src/geography/agents/GisAgent.java:320-324,551-553; Geography/src/geography/agents/Shelter.java:76-79; Geography/src/geography/agents/ContextCreator.java:577-582; websim/docs/PORT_MAP.md:470",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Barrier — heavy belongings (V31)",
+   "detail": "Departure-cost channel only (enters c_i); explicitly never a speed penalty. Prevalence 0.284 = declared midpoint (A-27, ASSUMED) of a sourced bracket: floor 0.108 (Ozarks 2024 unsheltered PIT N=138), ceiling 0.42-0.46 (CASPEH 2023 / Herring 2020); swept over the full bracket.",
+   "source": "Geography/src/geography/agents/ELayerSampler.java:48-56; Geography/data/registry/assumptions.csv:28",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Barrier — mobility limitation (V20)",
+   "detail": "Three mechanical roles: (1) speed REPLACEMENT with Boyce 1999 ambulant-impaired N(0.95,0.32) m/s (TRANSFERRED, verified-in-secondary via Tinaburri 2018 — primary paywalled); (2) sole priority-admission criterion under arm D triage; (3) +1.0 penalty in the Scenario-E push threshold. Prevalence: local marginal 0.192 (2019 Multnomah PIT 391/2037, LOWER BOUND — LOCAL, class M) with age-gradient ratio ~2.29 donor-imputed from CASPEH California (TRANSFERRED component, A-18): P=0.152163 under 55 / 0.347802 at 55+. All limited residents get the FASTEST impaired category (A-19, conservative).",
+   "source": "Geography/src/geography/agents/PopulationSampler.java:74-107,169-176,271-292; Geography/src/geography/agents/GisAgent.java:882-884,797-801",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Transportation assistance",
+   "detail": "No transport mechanism of any kind exists: no bus, vehicle, shuttle, ride, or assisted-movement code path anywhere in Geography/src (grep for transport|bus|transit|vehicle|ride|drive|car returns only comments and @Override noise). Walking on the street graph is the only movement mode; step length = v*60*minutesPerTick metres of geodesic arc per tick.",
+   "source": "ABSENT",
+   "status": "ABSENT"
+  },
+  {
+   "name": "Smoke input — spatial structure (V5)",
+   "detail": "County-uniform hourly PM2.5: per-hour mean over ALL in-county Multnomah AQS monitors/POCs (EPA AQS parameter 88502), applied uniformly in space — with 2 in-county regulatory monitors any interpolant would 'fit two points' (A-01). Missing hours stay NaN; lookups beyond data/gaps return 0.0 and increment outOfRangeLookups (manifest-reported). Observed peak 562.7 ug/m3 (2-monitor mean). Scenario-E: smokeSeriesCode selects synthetic severe v1 (embedded 1.75x, peak 984.75) or worst-case v2 (4.436x, peak 2496.1, Canberra Florey-anchored, A-33); smokeScale multiplies every real hourly value once at construction. LOCAL measured data (class M) for series 0; declared counterfactual for 1/2.",
+   "source": "Geography/src/geography/env/SmokeField.java:17-30,60-147; Geography/src/geography/agents/ContextCreator.java:510-535; Geography/data/registry/assumptions.csv:2,34",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Exposure and inhaled-dose accounting (V6/V7/V8/V25)",
+   "detail": "Three deliberately separated quantities, accrued every tick while state != SHELTERED (arrival is the study endpoint and stops accrual forever): (1) exposureUgM3h += C*dt (physics of the air); (2) inhaledDoseUg += C*IR(activity)*dt with IR = 1.62 m3/h walking / 0.61 resting — activity only, never diagnosis (V25, EPA Exposure Factors Handbook 2011, TRANSFERRED; registry records the 2026-08-04 primary re-read: walking 1.62 CONFIRMED as the moderate-intensity ages-31-41 cell, resting 0.61 IS NOT IN THE SOURCE — open defect D16, unfixed, sweep should widen to ~0.25-0.80); (3) healthRiskMultiplier hardwired 1.0 for everyone (no defensible susceptibility coefficient exists; A-09/A-22). vweUgM3h = C*RR_age*RR_com*dt with both RRs pinned 1.0 (V2/V4/V7 placeholders — the slide-cited 1.45/1.80 are unsourced/nonexistent). hoursAboveUnhealthy counts dt where C > 55.5 (strict >; the z_R cue uses >=, deliberate). airVolumeBreathedM3 exported so dose decomposes. Stuck Scenario-E residents breathe at resting rate.",
+   "source": "Geography/src/geography/agents/GisAgent.java:54-88,332-359,1020-1032; Geography/data/registry/variables.csv:10-14,30",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Capacity / refusal / re-entry mechanics (V12, A-17, A-21)",
+   "detail": "admit() increments occupancy while occupancy < capacity (null capacity = unlimited standby); full -> refusedCount++ and the resident REMAINS at the refusing shelter's street node, re-planning from there next tick (A-17, Finding A — never walks back to the encampment). Arm D: reservedForPriority = floor(capacity*triageReserveFraction) held for mobility-limited arrivals; non-priority see capacity-reserve; 0 = FCFS bit-identical. L0 retry cap MAX_RETARGETS=8 (reset on re-entry); L1 uncapped, bounded by the monotone believedFull set (refusals never expire — occupancy is monotone, no shelter departures modelled, A-07). REFUSED_ALL_FULL is re-evaluated every tick and non-terminal (a later opening re-activates the resident); UNREACHABLE is terminal. Capacity 99/site for 2020 is newsroom-sourced, unconfirmed — blocking A-04. LOCAL record, class A.",
+   "source": "Geography/src/geography/agents/Shelter.java:95-141; Geography/src/geography/agents/GisAgent.java:226,459-478,545-592; Geography/src/geography/agents/ContextCreator.java:565-568",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Shelter opening dates (V23)",
+   "detail": "Real dates from the shelter CSV: OCC opened 2020-09-10, CJ 2020-09-11, both closed 2020-09-19 (verified in shelters_2020-09.csv rows 2-3; MSCC is a standby site). Gate active only when respectShelterOpeningDates=1: openTick = 00:00 local on the opened date (earliest defensible reading, A-20 — understates pre-opening exposure), closeTick = start of day AFTER the closed date (+1 day offset). Gate off = always open (the A-02 counterfactual, runtime-warned). 2026 arm files carry opened=2020-09-07 (open from sim start). LOCAL, class M.",
+   "source": "Geography/data/shelters/shelters_2020-09.csv:2-3; Geography/src/geography/agents/Shelter.java:31-43,147-149; Geography/src/geography/agents/ContextCreator.java:555-559,900-918",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Scenario-E closures and push-through (V48-V51)",
+   "detail": "Constructed closure schedules (A-34 — no Portland-core 2020 record exists) applied as one-shot waves at FIRST_PRIORITY; blocked edges leave the Dijkstra relaxation; every shelter tree recomputed once per wave; connectivity check guarantees no shelter isolated. Mid-walk agents re-scan their remaining node chain once per wave: push iff thetaScaled >= pushThetaThreshold + kPush*(barrierCost + mobilityPenalty) — coefficients UNSOURCED (A-35), aggregate disciplined against the 55-75% fire-incident continue band (Wood 1972/Bryan 1977/Jin 1997, all indoor smoke — transferability itself assumed). Push -> Bernoulli(pStuck=0.3, ASSUMED, no analog anywhere) -> stuckDelayH=3h delay at resting ventilation (ASSUMED, vehicular-only anchors); reroute -> re-plan from last reached node. All defaults inert without a closure wave. PORT_MAP additionally reports pushThetaThreshold executed as 0.0 in archived runs (batch parser zeroes negative 'number' constants — inert defect).",
+   "source": "Geography/src/geography/agents/GisAgent.java:484-504,745-841; Geography/src/geography/routing/StreetNetwork.java:479-547,631-637; Geography/src/geography/agents/ContextCreator.java:629-707,927-972; websim/docs/PORT_MAP.md:389",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Walking speed provenance (V10/V18/V19/V24/V27)",
+   "detail": "Heterogeneity on: per-agent truncated normal N(mu, 0.13*mu) on [0.40,2.20] m/s; mu from Bohannon & Williams Andrews 2011 age-decade-by-sex grand means (men 1.358..0.968, women 1.341..0.943 — TRANSFERRED, 41 studies n=23,111); CV 0.13 from Bohannon 1997 (TRANSFERRED); COPD subtracts 0.19 m/s additively (Buekers 2024 meta-analysis, -0.28..-0.11 CI, evidence rated LOW — TRANSFERRED, class L); mobility-limited replaced by Boyce N(0.95,0.32) with COPD delta deliberately NOT stacked. Age bands {0.527,0.423,0.050} over 18-44/45-64/65+ from Pathways 2026 Multnomah N=541 pooled sample (LOCAL, class M, supersedes 2019 PIT); sex weights {0.68432,0.29271,0.02297} from 2019 Multnomah PIT (LOCAL); OTHER sex takes the mean of the two columns. Bounds/ceiling (0.40/2.20; age cap 90) are ASSUMED numerical guards, verified inert. Heterogeneity off: run-wide 1.30 m/s (below 10 of 12 Bohannon 1997 cells).",
+   "source": "Geography/src/geography/agents/PopulationSampler.java:30-207,260-335; Geography/data/registry/variables.csv:3,22-24,29,32-33",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Respiratory/chronic prevalences (V21a/V21b/V22)",
+   "detail": "asthma ~ Bernoulli(0.15), copd ~ Bernoulli(0.105) — Zellmer 2025 Minnesota EHR n=20,139 recent-homelessness (TRANSFERRED, class L; no local estimate exists at all; ACS/BRFSS/NHIS deliberately rejected — sampling frames exclude unsheltered people); sampled independent of age (evidence-based: Brown 2017 26.3% at 50+ vs CASPEH 25% overall). Asthma has NO speed and NO dose effect (D-3, A-23); COPD has the one speed effect; both enter the hazard's vulnerable flag. chronicPhysical ~ Bernoulli(0.391) Pathways 2026 (LOCAL, class M) — reporting stratum only. Vulnerable reporting union: age55+|mobility|asthma|copd|chronicPhysical, explicitly a stratum not a risk score.",
+   "source": "Geography/src/geography/agents/PopulationSampler.java:109-147,276-278; Geography/src/geography/output/OutcomeLogger.java:609-628",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Parameter-provenance bucket counts",
+   "detail": "Registry evidence-class census over all 55 variable rows (script-verified): M=15, L=11, A=29, C=0, F=0; statuses: implemented=28, specified=23, placeholder=3 (V7/V2/V4), deprecated=1 (V-ARRIVAL). My behavioral/exposure-coefficient bucket classification (criteria: inputs that shape behavior or exposure, excluding pure infrastructure/derived outputs): LOCAL=11 (V18 age, V19 sex, V20 mobility marginal, V22 chronic, V29 aware 0.356, V30 attempt 0.385, V33 dependents 0.0044, V23 opening dates, V5 smoke field, V-STARTLOC start locations [2025-26 temporal proxy, A-03], V12 capacity 99 [local newsroom, unconfirmed, blocking A-04]); TRANSFERRED=10 (V10+Bohannon tables+CV+Boyce impaired speeds, V21a asthma MN, V21b COPD MN, V24 COPD delta, V25 inhalation rates, V32 pet LA, V34 group delta, V40 barrier anchors, V-EVAC 55.5 convention, V20's CASPEH age-gradient ratio); ASSUMED=15 (V31 belongings midpoint, V35 sigmaTheta, V36 bRisk+halfLife, V37 wOfficial, V38 alphaHazard, V39 gammaVuln, V41 outreach, V43 betaT+betaS, V49 pStuck, V50 stuckDelayH, V51 threshold+kPush, V2/V4/V7 weights pinned 1.0, V27 speed bounds, V28 age ceiling). Every hazard-departure coefficient and every blockage coefficient is ASSUMED; every awareness/demographic marginal except pets and belongings is LOCAL.",
+   "source": "Geography/data/registry/variables.csv:1-56 (census script run 2026-08-21)",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Blocking assumption A-04",
+   "detail": "'Each operating shelter has a nightly capacity of 99' — newsroom-sourced, unconfirmed by a primary agency document; now the single largest driver of the headline result (number sheltered = total capacity exactly). Status: blocking. Plan: confirm against a primary source and sweep capacity while refusal counts are quoted.",
+   "source": "Geography/data/registry/assumptions.csv:5",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Blocking assumption A-09",
+   "detail": "'Susceptibility weights are 1.0 so the Exposure Burden Index equals raw exposure' — the slide-cited RRs could not be verified and the multiplicative formulation is a category error. Status: blocking. Plan: report stratified exposure as primary; sweep weights 1.0-2.5 only as a labelled equivalent-dose sensitivity.",
+   "source": "Geography/data/registry/assumptions.csv:10",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Blocking assumption A-12",
+   "detail": "'All residents know the shelters exist and where they are' — placeholder contradicted by the local record (65% never heard of the shelters). Status: blocking. Plan: replace with awareness Bernoulli 0.35, sweep 0.25-0.45. NOTE: exactly this replacement is implemented (V29/ELayerSampler/UNAWARE state) for decision-layer arms, but the row has not been retired — it remains true only of legacy arms.",
+   "source": "Geography/data/registry/assumptions.csv:13",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Blocking assumption A-16",
+   "detail": "'Agent execution order within a tick does not affect outcomes' — true only while capacity never binds; the seed-driven per-tick shuffle decides who gets the last bed at production scale. Status: blocking. Plan: order-independent two-phase admission before any run with more agents than beds, then confirm seed-order invariance.",
+   "source": "Geography/data/registry/assumptions.csv:18",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Contradiction: A-05 vs freeway filter",
+   "detail": "assumptions.csv A-05 (status active) states freeway/ramp segments are 'not yet filtered from the pedestrian graph' — but ContextCreator excludes RLIS TYPE {1110,1120,1121,1122,1123} from graph AND display (U-27), and registry row V26 records the same filter as status=implemented. The assumption row is stale; the code contradicts it.",
+   "source": "Geography/data/registry/assumptions.csv:6 vs Geography/src/geography/agents/ContextCreator.java:66-76,462-469 and Geography/data/registry/variables.csv:31",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Contradiction: A-15 vs inhaled dose",
+   "detail": "assumptions.csv A-15 (status active) states 'No breathing rate or particle deposition is modelled, so the quantity is a time-integrated concentration and not a mass inhaled' — but GisAgent implements the ventilation-rate inhaled-dose chain (inhaledDoseUg += C*IR(activity)*dt) and registry V25 records it as implemented. True for V6 as headline metric; the categorical 'no breathing rate is modelled' statement is contradicted by the code.",
+   "source": "Geography/data/registry/assumptions.csv:16 vs Geography/src/geography/agents/GisAgent.java:344-348 and Geography/data/registry/variables.csv:30",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Mismatch: V29-V51 status 'specified' vs implemented code",
+   "detail": "All 23 Phase-E/Scenario-E registry rows (V29-V51) carry status='specified', yet the mechanisms are present and executable in the code I read (ELayerSampler, GisAgent hazard/choosers/blockage logic, StreetNetwork closures, ContextCreator wiring) and each row's implementation column names those real code paths. Conservative labeling or a stale status field — either way the registry status does not match the code state.",
+   "source": "Geography/data/registry/variables.csv:34-56 vs Geography/src/geography/agents/GisAgent.java:369-841",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Stale code comment: EFH primary re-read",
+   "detail": "GisAgent's INHALATION_WALKING_M3H comment claims 'the EFH table cell was not re-read from the primary during this implementation' — but registry V25 records 'RE-READ FROM PRIMARY 2026-08-04, SPLIT RESULT' (walking confirmed, resting 0.61 absent from Table 6-2, open defect D16). The comment predates the citation sweep and now understates what is known (in both directions).",
+   "source": "Geography/src/geography/agents/GisAgent.java:69-82 vs Geography/data/registry/variables.csv:30",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "V30 pAttemptGivenAware",
+   "detail": "0.385 = 10/26 (same Hines 2021 survey, LOCAL, class L) — consumed only as the E9 calibration target for alphaHazard; the registry states 'not read by any code path' and no code reads it (grep of GisAgent/ContextCreator shows only alphaHazard's default -8.0 chosen so implied attempt share matches 0.356*0.385=0.137).",
+   "source": "Geography/data/registry/variables.csv:35; Geography/src/geography/agents/ContextCreator.java:279-282",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Movement mechanics",
+   "detail": "Deterministic: stepLengthM = v*60*minutesPerTick geodesic metres per tick along the Dijkstra polyline (Karney/GeographicLib WGS84, not haversine); partial segments via Geodesic.Direct; snapGapM books the real off-network metres from encampment to first waypoint; plannedRouteM accumulates every planned leg for the A-17 walked-vs-planned QC check. Graph: undirected (A-06), corrupt-node-ID correction with NODE_SITE_TOLERANCE 100 m / REATTACH 10 m, zero RNG anywhere in routing.",
+   "source": "Geography/src/geography/agents/GisAgent.java:522-543; Geography/src/geography/routing/StreetNetwork.java:65-80,244-256,609-673",
+   "status": "VERIFIED"
+  },
+  {
+   "name": "Output/equity accounting (V14)",
+   "detail": "OutcomeLogger exports 59-column agents.csv, 12-column shelters.csv (refused_count includes policy refusals; policy_refused the auditable subset), and hand-assembled simulation.json with the 41-name parameter manifest, exposure stats and Gini (full O(n^2) mean-absolute-difference, 0 if n==0 or mu==0) for both raw exposure and the weighted index, plus 7-strata stratified_exposure. Column count and manifest structure REPORTED from PORT_MAP; gini formula, vulnerable predicate, and header fragments directly verified.",
+   "source": "Geography/src/geography/output/OutcomeLogger.java:155-165,398-403,609-628,744-753; websim/docs/PORT_MAP.md:507-590",
+   "status": "VERIFIED"
+  }
+ ],
+ "gaps": [
+  "OutcomeLogger.java read only in targeted windows (header fragment, vulnerable predicate, gini, stratified marker), not all 817 lines — the 59-column claim and full simulation.json key order are REPORTED from PORT_MAP.md:513-573, not independently re-verified line-by-line.",
+  "PORT_MAP.md lines 596-753 (validation assets / golden runs / risk register tail) not read — the 41-parameter surface spec sections (1-5) were read in full.",
+  "Batch parameter XML files were not opened; baseline-real values (e.g. gammaVuln 0.25, barrier costs 0.26, sigmaTheta 1.0) are taken from PORT_MAP.md:355-373 and registry text, consistent with ContextCreator defaults but not verified against the actual batch files.",
+  "The claim that pushThetaThreshold executed as 0.0 in archived runs (Repast zeroing negative 'number' constants) is REPORTED (PORT_MAP.md:389 and memory note); the archived run manifests were not inspected.",
+  "The E9 calibration of alphaHazard is registered as pending (A-30); whether a fitted value now exists elsewhere in docs/ was not checked — the code default is -8.0 (ContextCreator.java:282).",
+  "The websim TypeScript port itself was not audited for mechanism fidelity (task scoped to the certified Java model plus PORT_MAP as spec); nor were scripts/ analysis tools.",
+  "Shelter CSVs for arms B/C/D and _elayer variants were not opened row-by-row; capacities (6,842 etc.) and the 4-of-48 pet-admit sites are taken from code comments, registry A-29, and PORT_MAP (REPORTED)."
+ ]
+}
